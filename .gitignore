@@ -1,4 +1,5 @@
 log/*
 tmp/*
 db/schema.rb
+db/sphinx/*
 public/system/*
