@@ -1,0 +1,9 @@
+- title("What place are you looking for?")
+
+.span-20.box
+  %h3== Search results for '#{@query}' matched #{@places.size} places
+  
+%hr.space
+
+.span-20
+  =render(:partial => 'places', :locals => {:places => @places})

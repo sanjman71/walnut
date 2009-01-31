@@ -1,0 +1,143 @@
+/* link styles */
+
+/*
+a                                                 { color: #000000; background: transparent none repeat scroll 0 0; }
+
+a.current, a.current:hover                        { color: #000000; text-decoration: none; background: transparent none repeat scroll 0 0; }
+
+a:hover                                           { background-color: #0033BB; color: #FFFFFF; text-decoration: none; }
+*/
+
+a:hover                                           { color: #FFFFFF; background-color: #0033CC; text-decoration: none; }
+
+a.current, a.current:hover                        { text-decoration: none; }
+
+a img                                             { border: 0 none; vertical-align: top; }
+
+a img:hover                                       { background-color: green; }
+
+/* error styles */
+
+.field_error                                      { background-color: #FF8800; padding: 5px; }
+
+/* padding, border styles */
+
+.padding-5                                        { padding: 5px; }
+.padding-bottom-5                                 { padding-bottom: 5px; }
+.padding-bottom-10                                { padding-bottom: 10px; }
+
+.letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
+
+.margin-bottom-0                                  { margin-bottom: 0px; }
+
+.text-align-right                                 { text-align: right; }
+.text-align-left                                  { text-align: left; }
+
+/* header, tab, link styles */
+
+div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 15px 0px 0px 0px; 
+                                                    position: relative; text-align: left; }
+
+div#tabs                                          { clear: left; height: 24px; margin: 15px 0 0; padding: 0; font-size: 12px; }
+
+div#tabs ul                                       { margin: 0; padding: 0; }
+
+div#tabs li                                       { border: medium none; display: inline; list-style-image: none; list-style-position: outside; 
+                                                    list-style-type: none; margin: 0; padding: 0; color: #FFFFFF; }
+
+div#tabs li.with_space                            { margin-right: 2px; }
+
+div#tabs li.right                                 { float: right; }
+
+div#tabs a                                        { text-decoration: none; }
+
+div#tabs a:visited, div#tabs a:link               { color: #FFFFFF; background-color: #CD9100; border-bottom-color: #CD9100; border-style: solid; 
+                                                    border-width: 1px; color: #000000; padding: 3px 8px 8px; }
+
+div#tabs a.current                                { color: #000000; border-bottom-color: #E5E5E5; }
+
+div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited, div#tabs li a.current:visited                       
+                                                  { background: #E5E5E5 url(/images/tab-background.gif) repeat-x scroll center top;
+                                                    border-bottom: 1px solid #E5E5E5; font-weight: bold; margin: 0;
+                                                    text-decoration: none; padding: 3px 8px 8px; }
+
+#location_switcher, #location_switcher ul         { list-style: none; }
+#location_switcher, #location_switcher *          { padding: 0; margin: 0; }
+#location_switcher li ul                          { display: none; }
+#location_switcher li:hover ul                    { display: block; }
+
+
+/* body styles */
+
+div.container div.box                             { background: #EDF3FE; padding: 13px 0px 13px 40px; }
+
+div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
+                                                    color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 10px; }
+
+/* form styles */
+
+input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
+
+label.big                                         { font-size: 16px; }
+
+.button                                           { font-size: 12px;}
+.button.big                                       { font-size: 15px; }
+
+.select                                           { font-size: 12px; }
+.select.big                                       { font-size: 15px; }
+
+/* admin styles */
+
+a.admin:link, a.admin:visited                     { font-size: 11px; font-weight: normal; color: #0000FF; }
+
+a.header:link, a.header:visited                   { color: #CCCCCC; }
+
+a.admin:hover                                     { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
+
+/* signup styles */
+
+a.signup:link, a.signup:visited                   { font-size: 11px; font-weight: normal; color: #000000; }
+
+a.signup:hover                                    { color: #000000; background-color: #FFFFFF; text-decoration: none; }
+
+
+/* sidebar styles */
+
+div.sidebar                                       { background: #EDF3FE none repeat scroll 0 0; border: 1px solid #C9D8EF; }
+
+/* instruction styles */
+
+div.instructions, div.instructions.sidebar        { background: #FFFFCC; padding: 5px; font-size: 12px; border: 1px solid #FFD324; }
+
+div.instructions ul                               { font-size: 12px; }
+
+/* pagination styles */
+
+.pagination a                                     { background: #FF6600; }
+
+.pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
+                                                    text-decoration: none; }
+
+.pagination span.disabled                         { background: #CCCCCC; }
+
+/* highlight styles */
+
+.shaded                                           { background: #EDF3FE; none repeat scroll 0 0; }
+
+.highlighted, .highlighted.shaded, .highlight     { background: #FFCC00; none repeat scroll 0 0; }
+
+.highlight.muted                                  { background: #FFFF66; none repeat scroll 0 0; }
+
+.blue.muted                                       { background: #EDF3FE; none repeat scroll 0 0; }
+  
+/* color styles */
+
+.red                                              { color: #FF0000; }
+
+.green                                            { color: #FF6600; }
+
+.grey                                             { color: #666666; }
+
+/* example styles */
+
+span.example                                      { color: #666666; font-style: italic; font-size: 11px; padding-left: 5px; }

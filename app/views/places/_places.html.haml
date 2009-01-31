@@ -1,0 +1,4 @@
+- places.each do |place|
+  .span-17.prepend-1.letterbox{:class => cycle("shaded", "")}
+    %h3.margin-bottom-0= place.name
+    = place.area_tag_list

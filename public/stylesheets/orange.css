@@ -1,0 +1,12 @@
+/* color palette */
+
+div#header                                        { background-color: #FF6600; }
+
+div#tabs a                                        { border-color: #FF6600; background-color: #FF6600; border-bottom-color: #FF6600; }
+
+div#tabs a:hover                                  { background-color: #FF9900; }
+
+/* whoami user info */
+
+.whoami                                           { display: block; background-color: #FF4400; color: #FFFFFF; text-align: center; 
+                                                    margin-top: 5px; }
