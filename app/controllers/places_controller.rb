@@ -4,7 +4,7 @@ class PlacesController < ApplicationController
   def index
     @query      = params[:query]
      
-    @places     = Address.search(@query)
+    @addresses  = Address.search(@query)
   end
   
 end

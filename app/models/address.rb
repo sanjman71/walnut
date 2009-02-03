@@ -4,11 +4,14 @@ class Address < ActiveRecord::Base
   has_many                :address_areas
   has_many                :areas, :through => :address_areas, :after_add => :add_area_tag, :before_remove => :remove_area_tag
   
-  acts_as_taggable_on     :tags, :area_tags
+  has_many_polymorphs     :addressables, :from => [:places], :through => :address_addressables
+  
+  acts_as_taggable_on     :area_tags, :place_tags
   
   define_index do
-    indexes :name, :sortable => true
     indexes area_tags.name, :as => :area_tags
+    indexes places.name, :sortable => true
+    indexes place_tags.name, :as => :place_tags
   end
 
   protected
@@ -16,7 +19,6 @@ class Address < ActiveRecord::Base
   def add_area_tag(area)
     return false if area.blank? or area.extent.blank?
     area_tag_list.add(area.extent.name)
-    area_tag_list.sort!
     save
   end
   

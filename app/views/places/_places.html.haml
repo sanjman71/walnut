@@ -1,4 +1,6 @@
-- places.each do |place|
+- addresses.each do |address|
   .span-17.prepend-1.letterbox{:class => cycle("shaded", "")}
-    %h3.margin-bottom-0= place.name
-    = place.area_tag_list
+    %h3.margin-bottom-0= address.places.first.name
+    = address.area_tag_list
+    %br
+    = address.place_tag_list

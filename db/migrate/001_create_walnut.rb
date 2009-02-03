@@ -39,7 +39,6 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :neighborhood
     end
   
-    # Location
     create_table :addresses do |t|
       t.string      :name
       t.string      :street_address
@@ -49,10 +48,21 @@ class CreateWalnut < ActiveRecord::Migration
       t.string      :country
     end
     
-    # Locations to areas mapping
+    # An address can have many addressables (e.g. places)
+    create_table :address_addressables do |t|
+      t.references  :address
+      t.references  :addressable, :polymorphic => true
+    end
+    
+    # An address can have many areas
     create_table :address_areas do |t|
       t.references  :area
       t.references  :address
+    end
+    
+    create_table :places do |t|
+      t.string      :name
+      t.integer     :addresses_count
     end
   end
 

@@ -6,6 +6,16 @@ namespace :db do
     require 'populator'
     require 'faker'
     require 'test/factories'
+
+    desc "Populate places."
+    task :places, :count do |t, args|
+      count = args.count.to_i
+      count = 20 if count == 0
+
+      Place.populate count do |place|
+        place.name = Faker::Name.name
+      end
+    end
     
     desc "Populate addresses."
     task :addresses, :count do |t, args|
@@ -13,7 +23,7 @@ namespace :db do
       count = 20 if count == 0
       
       Address.populate count do |address|
-        address.name = Faker::Name.name
+        address.name = 'Home'
       end
       
       puts "#{Time.now}: added #{count} addresses"
