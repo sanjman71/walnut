@@ -8,10 +8,13 @@ namespace :db do
       task :areas do
         # create default areas
 
+        @us = Country.create(:name => "United States", :ab => "US")
+        Area.create(:extent => @us)
+        
         [{:city => "Chicago", :state => "Illinois", :ab => "IL"},
          {:city => "New York", :state => "New York", :ab => "NY"},
          {:city => "San Francisco", :state =>  "California", :ab => "CA"}].each do |hash|
-          @state  = State.create(:name => hash[:state], :ab => hash[:ab], :country => "US")
+          @state  = State.create(:name => hash[:state], :ab => hash[:ab], :country => @us)
           @city   = City.create(:name => hash[:city], :state => @state)
           Area.create(:extent => @state)
           Area.create(:extent => @city)

@@ -7,10 +7,15 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :extent, :polymorphic => true
     end
 
+    create_table :countries do |t|
+      t.string      :name,          :default => nil
+      t.string      :ab,            :default => nil
+    end
+
     create_table :states do |t|
       t.string      :name,          :default => nil
       t.string      :ab,            :default => nil
-      t.string      :country
+      t.references  :country
     end
 
     create_table :cities do |t|

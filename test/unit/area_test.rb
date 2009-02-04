@@ -3,9 +3,13 @@ require 'test/factories'
 
 class AreaTest < ActiveSupport::TestCase
   
+  def setup
+    @us = Factory(:us)
+  end
+  
   context "create state area" do
     setup do
-      @il   = Factory(:state, :name => "Illinois", :ab => "IL")
+      @il   = Factory(:state, :name => "Illinois", :ab => "IL", :country => @us)
       @area = Area.create(:extent => @il)
     end
 
