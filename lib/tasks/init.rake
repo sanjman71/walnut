@@ -28,10 +28,13 @@ namespace :db do
         addresses = 0
         Address.all.each do |address|
           # pick a random city
-          city  = City.find(rand(City.count) + 1)
-          state = city.state
+          city    = City.find(rand(City.count) + 1)
+          state   = city.state
+          country = state.country
+          
           address.areas.push(city.areas.first)
           address.areas.push(state.areas.first)
+          address.areas.push(country.areas.first)
           address.save
           
           # pick a random place

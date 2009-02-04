@@ -10,7 +10,7 @@ class Address < ActiveRecord::Base
   
   define_index do
     indexes area_tags.name, :as => :area_tags
-    indexes places.name, :sortable => true
+    indexes places.name
     indexes place_tags.name, :as => :place_tags
   end
 
