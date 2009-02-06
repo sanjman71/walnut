@@ -7,7 +7,7 @@ class AddressTest < ActiveSupport::TestCase
   
   def setup
     @us           = Factory(:us)
-    @il           = Factory(:state, :name => "Illinois", :ab => "IL", :country => @us)
+    @il           = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
     @chicago      = Factory(:city, :name => "Chicago", :state => @il)
     @area_us      = Area.create(:extent => @us)
     @area_il      = Area.create(:extent => @il)

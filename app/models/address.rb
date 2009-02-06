@@ -6,6 +6,9 @@ class Address < ActiveRecord::Base
   
   has_many_polymorphs     :addressables, :from => [:places], :through => :address_addressables
   
+  # make sure only accessible attributes are written to from forms etc.
+	attr_accessible         :name
+  
   acts_as_taggable_on     :area_tags, :place_tags
   
   define_index do

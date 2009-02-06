@@ -1,7 +1,14 @@
 ActionController::Routing::Routes.draw do |map|
   # The priority is based upon order of creation: first created -> highest priority.
 
-  map.connect     'places/:query', :controller => 'places', :action => 'index'
+  # Map places [area, query] routes
+  map.connect     'places/:country/:state/:city/:tag', :controller => 'places', :action => 'index', :city => /[a-z-]+/
+  map.connect     'places/:country/:state/:city', :controller => 'places', :action => 'index', :city => /[a-z-]+/
+  map.connect     'places/:country/:state/:zip/:tag', :controller => 'places', :action => 'index', :zip => /\d{5}/
+  map.connect     'places/:country/:state/:zip', :controller => 'places', :action => 'index', :zip => /\d{5}/
+  map.connect     'places/:country/:tag', :controller => 'places', :action => 'index'
+  map.connect     'places/:country', :controller => 'places', :action => 'index'
+  
   map.resources   :places, :only => [:index]
   
   # map the root to the home controller

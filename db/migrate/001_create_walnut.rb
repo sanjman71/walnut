@@ -9,12 +9,12 @@ class CreateWalnut < ActiveRecord::Migration
 
     create_table :countries do |t|
       t.string      :name,          :default => nil
-      t.string      :ab,            :default => nil
+      t.string      :code,          :default => nil
     end
 
     create_table :states do |t|
       t.string      :name,          :default => nil
-      t.string      :ab,            :default => nil
+      t.string      :code,          :default => nil
       t.references  :country
     end
 
