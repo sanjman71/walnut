@@ -36,23 +36,25 @@ namespace :db do
           address.areas.push(state.areas.first)
           address.areas.push(country.areas.first)
           address.save
-          
-          # pick a random place
-          address.places.push(Place.find(rand(Place.count) + 1))
-          address.save
-          
+                    
           addresses += 1
         end
         puts "#{Time.now}: tagged all #{addresses} addresses with a city and state areas, and a place"
 
-        # add tags to each place
-        places  = 0
-        tags    = ['coffee', 'beer', 'soccer']
+        # create address list of objects w/ no places
+        addresses = Address.all.select { |a| a.places.size == 0 }
+        
+        # initialize tag list
+        tags      = ['coffee', 'beer', 'soccer']
+        
+        # add tags to each place, assign an addresss to each place
+        places    = 0
         Place.all.each do |place|
           # pick a random address
-          place.addresses.push(Address.find(rand(Address.count) + 1))
+          address = addresses.delete(addresses.rand)
+          place.addresses.push(address)
           
-          # pick a random tag and add it to the address
+          # pick a random tag and add it to the address as a place tag
           tag     = tags[rand(tags.size)]
           address = place.addresses.first
           address.place_tag_list = tag
