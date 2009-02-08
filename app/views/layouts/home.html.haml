@@ -4,6 +4,7 @@
     %meta{'http-equiv' => "content-type", :content => "text/html;charset=UTF-8"}
     %title
       = yield :title
+      == | Walnut Places
     %meta{:name => 'robots', :content => 'nofollow, noindex'}
     = stylesheet_link_tag 'blueprint/screen'
     = stylesheet_link_tag 'walnut'
@@ -17,9 +18,11 @@
   %body
     #header
       .container
-        .span-24
-          .span-16
+        .span-22
+          .span-16.last
             %h1= yield :title
+        .span-2.last{:style => 'text-align: right;'}
+          = link_to 'Home', root_path, :style => 'color: #FFFFFF;'
           
     - if RAILS_ENV == 'development'
       .container.showgrid
@@ -27,4 +30,3 @@
     - else
       .container
         = yield
-  

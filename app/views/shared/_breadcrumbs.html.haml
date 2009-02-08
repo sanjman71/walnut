@@ -1,0 +1,20 @@
+- zip           = nil unless defined?(zip)
+- city          = nil unless defined?(city)
+- neighborhood  = nil unless defined?(neighborhood)
+- state         = nil unless defined?(state)
+- link_all      = nil unless defined?(link_all) # true means link all breadcrumb objects
+
+- separator     = ">"
+
+- areas = [country, state, city, zip, neighborhood].compact
+- size  = areas.size
+
+- areas.each_with_index do |area, index|
+  - klass = area.class.to_s.downcase
+  - if index == size-1 and link_all.nil?
+    %span{:class => klass}= area.name
+  - else
+    = link_to area.name, url_for(:controller => 'places', :action => klass), :class => klass
+
+  -# show separator unless its the last object
+  = separator unless index == size-1

@@ -8,6 +8,10 @@ class Country < ActiveRecord::Base
     @@country ||= Country.find_by_code("US")
   end
   
+  def to_s
+    self.name
+  end
+  
   def to_param
     self.code.downcase
   end

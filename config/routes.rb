@@ -2,12 +2,14 @@ ActionController::Routing::Routes.draw do |map|
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Map places [area, query] routes
+  map.connect     'places/:country/:state/:city/hood/:neighborhood/:tag', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
+  map.connect     'places/:country/:state/:city/hood/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     'places/:country/:state/:city/:tag', :controller => 'places', :action => 'index', :city => /[a-z-]+/
-  map.connect     'places/:country/:state/:city', :controller => 'places', :action => 'index', :city => /[a-z-]+/
+  map.connect     'places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/
   map.connect     'places/:country/:state/:zip/:tag', :controller => 'places', :action => 'index', :zip => /\d{5}/
-  map.connect     'places/:country/:state/:zip', :controller => 'places', :action => 'index', :zip => /\d{5}/
-  map.connect     'places/:country/:tag', :controller => 'places', :action => 'index'
-  map.connect     'places/:country', :controller => 'places', :action => 'index'
+  map.connect     'places/:country/:state/:zip', :controller => 'places', :action => 'zip', :zip => /\d{5}/
+  map.connect     'places/:country/:state', :controller => 'places', :action => 'state'
+  map.connect     'places/:country', :controller => 'places', :action => 'country'
   
   map.resources   :places, :only => [:index]
   

@@ -3,6 +3,9 @@ class City < ActiveRecord::Base
   validates_uniqueness_of     :name, :scope => :state_id
   belongs_to                  :state
   has_many                    :areas, :as => :extent
+  has_many                    :city_zips
+  has_many                    :zips, :through => :city_zips
+  has_many                    :neighborhoods
   
   # the special anywhere object
   def self.anywhere(state=nil)
@@ -19,5 +22,9 @@ class City < ActiveRecord::Base
   
   def to_param
     self.name.downcase.gsub(' ', '-')
+  end
+  
+  def to_s
+    self.name
   end
 end

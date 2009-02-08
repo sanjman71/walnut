@@ -16,11 +16,13 @@ class CreateWalnut < ActiveRecord::Migration
       t.string      :name,          :default => nil
       t.string      :code,          :default => nil
       t.references  :country
+      t.integer     :cities_count, :default => 0
     end
 
     create_table :cities do |t|
       t.string      :name,          :default => nil
       t.references  :state
+      t.integer     :neighborhoods_count, :default => 0
     end
 
     create_table :zips do |t|
@@ -31,17 +33,11 @@ class CreateWalnut < ActiveRecord::Migration
     create_table :neighborhoods do |t|
       t.string      :name,          :default => nil
       t.references  :city
-      t.references  :state
     end
     
     create_table :city_zips do |t|
       t.references  :city
       t.references  :zip
-    end
-
-    create_table :city_neighborhoods do |t|
-      t.references  :city
-      t.references  :neighborhood
     end
   
     create_table :addresses do |t|

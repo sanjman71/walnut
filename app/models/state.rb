@@ -4,8 +4,13 @@ class State < ActiveRecord::Base
   belongs_to                  :country
   has_many                    :areas, :as => :extent
   has_many                    :cities
+  has_many                    :zips
   
   def to_param
     self.code.downcase
+  end
+  
+  def to_s
+    self.name
   end
 end

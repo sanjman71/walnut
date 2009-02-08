@@ -22,6 +22,11 @@ class Area < ActiveRecord::Base
           state   = State.find_by_code(geoloc.state)
           # find city from state
           object  = state.cities.find_by_name(geoloc.city)
+        when 'zip'
+          # find state database object
+          state   = State.find_by_code(geoloc.state)
+          # find zip from state
+          object  = state.zips.find_by_name(geoloc.zip)
         end
         
         return object

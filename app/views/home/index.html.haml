@@ -5,14 +5,11 @@
     == Its not always easy to find a local business online.  We are trying to fix that by making it really easy to find the places you are looking for.
     
     %p
-    == Browse by popular cities:
-    %p
+    == Browse Popular Cities:
+    %br
     - @cities.each do |city|
-      = link_to city.name, url_for(:controller => 'places', :action => 'index', :country => @country, :state => city.state, :city => city)
-    
+      = link_to city.name, url_for(:controller => 'places', :action => 'city', :country => @country, :state => city.state, :city => city)
+
     %p
-    == Browse by popular tags:
-    %p
-    - @tags.each do |tag|
-      = link_to tag, url_for(:controller => 'places', :action => 'index', :country => @country, :tag => tag)
-    
+    = link_to 'Browse by state', url_for(:controller => 'places', :action => 'country', :country => @country)
+        

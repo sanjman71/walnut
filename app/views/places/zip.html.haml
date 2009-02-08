@@ -1,0 +1,14 @@
+- title(@title)
+
+.span-20.box.prepend-1.last
+  %h2== Popular Tags and Cities
+  %h4.span-7.last#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :zip => @zip})
+  
+%h3.span-20.prepend-1
+  - @tags.each do |tag|
+    %span[tag]= link_to tag, url_for(:controller => 'places', :action => 'index', :country => @country, :state => @state, :city => @city, :tag => tag)
+    
+%h3.span-20.prepend-1#cities
+  - @cities.each do |city|
+    %span[city]= link_to city, url_for(:controller => 'places', :action => 'city', :country => @country, :state => @state, :city => city)

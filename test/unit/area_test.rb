@@ -7,7 +7,7 @@ class AreaTest < ActiveSupport::TestCase
     @us = Factory(:us)
   end
   
-  context "create state area" do
+  context "state area" do
     setup do
       @il   = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
       @area = Area.create(:extent => @il)
@@ -15,11 +15,11 @@ class AreaTest < ActiveSupport::TestCase
 
     should_change "Area.count", :by => 1
         
-    should "have area extent == state" do
+    should "have area extent illinois" do
       assert_equal @il, @area.extent
     end
 
-    context "create city area" do
+    context "city area" do
       setup do 
         @chicago  = Factory(:city, :name => "Chicago", :state => @il)
         @area2    = Area.create(:extent => @chicago)
@@ -27,11 +27,11 @@ class AreaTest < ActiveSupport::TestCase
 
       should_change "Area.count", :by => 1
 
-      should "have area extent == city" do
+      should "have area extent chicago" do
         assert_equal @chicago, @area2.extent
       end
       
-      context "try to create duplicate city area" do
+      context "duplicate city area" do
         setup do
           @area3 = Area.create(:extent => @chicago)
         end
@@ -42,8 +42,8 @@ class AreaTest < ActiveSupport::TestCase
     end
   end
   
-  context "resolve country" do
-    context "geocode united states" do
+  context "geocode country" do
+    context "united states" do
       setup do
         @object = Area.resolve("united states")
       end
@@ -53,7 +53,7 @@ class AreaTest < ActiveSupport::TestCase
       end
     end
 
-    context "geocode us" do
+    context "us" do
       setup do
         @object = Area.resolve("united states")
       end
@@ -64,8 +64,8 @@ class AreaTest < ActiveSupport::TestCase
     end
   end
   
-  context "resolve state" do
-    context "geocode illinois" do
+  context "geocode state" do
+    context "illinois" do
       setup do
         @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
         @object = Area.resolve("illinois")
@@ -77,8 +77,8 @@ class AreaTest < ActiveSupport::TestCase
     end
   end
 
-  context "resolve city" do
-    context "geocode chicago" do
+  context "geocode city" do
+    context "chicago" do
       setup do
         @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
         @chicago  = Factory(:city, :name => "Chicago", :state => @il)
@@ -87,6 +87,20 @@ class AreaTest < ActiveSupport::TestCase
 
       should "resolve to chicago city object" do
         assert_equal @chicago, @object
+      end
+    end
+  end
+
+  context "geocode zip" do
+    context "60654" do
+      setup do
+        @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @zip      = Factory(:zip, :name => "60654", :state => @il)
+        @object   = Area.resolve("60654")
+      end
+
+      should "resolve to chicago zip object" do
+        assert_equal @zip, @object
       end
     end
   end

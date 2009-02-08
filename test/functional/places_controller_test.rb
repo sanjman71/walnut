@@ -11,27 +11,38 @@ class PlacesControllerTest < ActionController::TestCase
   
   context "place area, tag routes" do
     # country route
-    should_route :get, '/places/us', :controller => 'places', :action => 'index', :country => 'us'
-    # country, tag route
-    should_route :get, '/places/us/food', :controller => 'places', :action => 'index', :country => 'us', :tag => 'food'
-    # city route
-    should_route :get, '/places/us/il/chicago', :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago'
-    # city, tag route
-    should_route :get, '/places/us/il/chicago/food',
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
-    # city with hyphen, tag route
-    should_route :get, '/places/us/ny/new-york/food',
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :tag => 'food'
+    should_route :get, '/places/us', :controller => 'places', :action => 'country', :country => 'us'
+    # country, tag route - no longer valid
+    # should_route :get, '/places/us/food', :controller => 'places', :action => 'index', :country => 'us', :tag => 'food'
+    
     # state route
-    should_route :get, '/places/us/il/anywhere',
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'anywhere'
-    # state, tag route
+    should_route :get, '/places/us/il',
+                 :controller => 'places', :action => 'state', :country => 'us', :state => 'il'
+    # state tag route
     should_route :get, '/places/us/il/anywhere/food',
                  :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'anywhere', :tag => 'food'
+
+    # city route
+    should_route :get, '/places/us/il/chicago', :controller => 'places', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
+    # city tag route
+    should_route :get, '/places/us/il/chicago/food',
+                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
+    # hyphenated city tag route
+    should_route :get, '/places/us/ny/new-york/food',
+                 :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :tag => 'food'
+
+    # neighborhood route
+    should_route :get, '/places/us/il/chicago/hood/river-north', 
+                 :controller => 'places', :action => 'neighborhood', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north'
+
+    # neighborhood tag route
+    should_route :get, '/places/us/il/chicago/hood/river-north/soccer', 
+                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :tag => 'soccer'
+    
     # zip route
     should_route :get, '/places/us/il/60610', 
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610'
-    # zip, tag route
+                 :controller => 'places', :action => 'zip', :country => 'us', :state => 'il', :zip => '60610'
+    # zip tag route
     should_route :get, '/places/us/il/60610/food', 
                  :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food'
   end
@@ -40,7 +51,7 @@ class PlacesControllerTest < ActionController::TestCase
     context "with no addresses" do
       setup do
         Address.stubs(:search).returns([])
-        get :index, :country => @us.to_param, :state => @il.to_param, :city => @chicago.to_param
+        get :index, :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
       end
     
       should_respond_with :success
@@ -50,8 +61,8 @@ class PlacesControllerTest < ActionController::TestCase
       should_assign_to :city, :equals => "@chicago"
       should_assign_to :query
       
-      should "build query" do
-        assert_equal "United States Illinois Chicago", assigns(:query)
+      should "build query from parameters" do
+        assert_equal "United States Illinois Chicago food", assigns(:query)
       end
     end
   end
