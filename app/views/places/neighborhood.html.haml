@@ -1,10 +1,11 @@
 - title(@title)
 
 .span-20.box.prepend-1.last
-  %h2== Popular Tags
+  %h2== #{@neighborhood.name}, #{@city.name} Neighborhood Directory
   %h4.span-7.last#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :neighborhood => @neighborhood})
   
 %h3.span-20.prepend-1#tags
+  %p== Popular Tags
   - @tags.each do |tag|
     %span[tag]= link_to tag, url_for(:controller => 'places', :action => 'index', :country => @country, :state => @state, :city => @city, :tag => tag.name)

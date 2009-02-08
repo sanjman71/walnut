@@ -1,11 +1,14 @@
 - title(@title)
 
 .span-20.box
-  %h3== Search results for '#{@query}' matched #{@addresses.size} places
+  %h2== Search results for '#{@query}'
   %h4.span-7.last#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood, :link_all => true})
   
 %hr.space
 
+.span-20.prepend-1#query
+  %h4== Found #{@addresses.size} places
+    
 .span-20
   =render(:partial => 'places', :locals => {:addresses => @addresses})

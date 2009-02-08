@@ -59,7 +59,7 @@ namespace :db do
         addresses = Address.all.select { |a| a.places.size == 0 }
         
         # initialize tag list
-        tags      = ['coffee', 'beer', 'soccer']
+        tags      = ['coffee', 'beer', 'soccer', 'bar', 'party', 'muffin', 'pizza']
         
         # add tags to each place, assign an addresss to each place
         places    = 0
@@ -68,10 +68,10 @@ namespace :db do
           address = addresses.delete(addresses.rand)
           place.addresses.push(address)
           
-          # pick a random tag and add it to the address as a place tag
-          tag     = tags[rand(tags.size)]
+          # pick 2 random tags and add it to the address as place tags
+          picked  = pick_tags(tags, 2)
           address = place.addresses.first
-          address.place_tag_list = tag
+          address.place_tag_list.add(picked.sort)
           address.save
           
           # place.tag_list = tags[rand(tags.size)]
@@ -82,6 +82,15 @@ namespace :db do
         puts "#{Time.now}: tagged all #{places} places with an address and tag"
       end
     
+      # pick n tags randomly from the tags collection
+      def pick_tags(tags, n)
+        picked = []
+        while picked.size < n
+          picked.push(tags.rand).uniq!
+        end
+        picked
+      end
+      
       desc "Initialize city to zip mappings"
       task :city_zips do
         Address.all.each do |address|

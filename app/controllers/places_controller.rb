@@ -23,7 +23,7 @@ class PlacesController < ApplicationController
     @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank?
     @zips           = @city.zips
     @neighborhoods  = @city.neighborhoods
-    @tags           = Address.place_tag_counts
+    @tags           = Address.place_tag_counts.sort_by(&:name)
 
     @title          = "#{@city.name}, #{@state.name} Yellow Pages"
   end
@@ -33,7 +33,7 @@ class PlacesController < ApplicationController
     @state          = State.find_by_code(params[:state].to_s.upcase)
     @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank?
     @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
-    @tags           = Address.place_tag_counts
+    @tags           = Address.place_tag_counts.sort_by(&:name)
 
     @title          = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
@@ -43,7 +43,7 @@ class PlacesController < ApplicationController
     @state          = State.find_by_code(params[:state].to_s.upcase)
     @zip            = @state.zips.find_by_name(params[:zip].to_s) unless @state.blank?
     @cities         = @zip.cities
-    @tags           = Address.place_tag_counts
+    @tags           = Address.place_tag_counts.sort_by(&:name)
 
     @title          = "#{@state.name} #{@zip.name} Yellow Pages"
   end
@@ -82,7 +82,7 @@ class PlacesController < ApplicationController
     elsif options[:state] and options[:city]
       where = "#{options[:city].name}, #{options[:state].name}"
     elsif options[:state] and options[:zip]
-      where = "#{options[:state].name}, #{options[:city].name}"
+      where = "#{options[:state].name}, #{options[:zip].name}"
     else
       raise Exception, "invalid search"
     end

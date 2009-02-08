@@ -1,20 +1,24 @@
 - title(@title)
 
 .span-20.box.prepend-1.last
-  %h2== Popular Tags and Zips
+  %h2== #{@city.name} City Directory
   %h4.span-7.last#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
-  
+
 %h3.span-20.prepend-1#tags
+  %p== Popular Tags
   - @tags.each do |tag|
     %span[tag]= link_to tag, url_for(:controller => 'places', :action => 'index', :country => @country, :state => @state, :city => @city, :tag => tag.name)
 
 %h3.span-20.prepend-1#zips
+  %p== #{@city.name} Zip Codes
   - @zips.each do |zip|
     %span[zip]= link_to zip, url_for(:controller => 'places', :action => 'zip', :country => @country, :state => @state, :zip => zip)
     
 %h3.span-20.prepend-1#neighborhoods
-  - @neighborhoods.each do |neighborhood|
-    %span[neighborhood]= link_to neighborhood, url_for(:controller => 'places', :action => 'neighborhood', :country => @country, :state => @state, :city => @city, :neighborhood => neighborhood)
+  - unless @neighborhoods.blank?
+    %p== #{@city.name} Neighborhoods
+    - @neighborhoods.each do |neighborhood|
+      %span[neighborhood]= link_to neighborhood, url_for(:controller => 'places', :action => 'neighborhood', :country => @country, :state => @state, :city => @city, :neighborhood => neighborhood)
     
 
