@@ -1,51 +1,33 @@
 class PlacesController < ApplicationController
+  before_filter   :init_areas, :only => [:country, :state, :city, :neighborhood, :zip]
   layout "home"
   
   def country
-    @country        = Country.find_by_code(params[:country].to_s.upcase)
-    @states         = @country.states if @country
-    
-    @title          = "#{@country.name} Yellow Pages"
+    # @country, @states initialized in before filter
+    @title  = "#{@country.name} Yellow Pages"
   end
       
   def state
-    @country        = Country.find_by_code(params[:country].to_s.upcase)
-    @state          = State.find_by_code(params[:state].to_s.upcase)
-    @cities         = @state.cities if @state
-    @zips           = @state.zips if @state
-    
-    @title          = "#{@state.name} Yellow Pages"
+    # @country, @state, @cities, @zips all initialized in before filter
+    @title  = "#{@state.name} Yellow Pages"
   end
   
   def city
-    @country        = Country.find_by_code(params[:country].to_s.upcase)
-    @state          = State.find_by_code(params[:state].to_s.upcase)
-    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank?
-    @zips           = @city.zips
-    @neighborhoods  = @city.neighborhoods
-    @tags           = Address.place_tag_counts.sort_by(&:name)
-
-    @title          = "#{@city.name}, #{@state.name} Yellow Pages"
+    # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
+    @tags   = Address.place_tag_counts.sort_by(&:name)
+    @title  = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
-    @country        = Country.find_by_code(params[:country].to_s.upcase)
-    @state          = State.find_by_code(params[:state].to_s.upcase)
-    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank?
-    @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
-    @tags           = Address.place_tag_counts.sort_by(&:name)
-
-    @title          = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
+    # @country, @state, @city, @neighborhood all initialized in before filter
+    @tags   = Address.place_tag_counts.sort_by(&:name)
+    @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
   
   def zip
-    @country        = Country.find_by_code(params[:country].to_s.upcase)
-    @state          = State.find_by_code(params[:state].to_s.upcase)
-    @zip            = @state.zips.find_by_name(params[:zip].to_s) unless @state.blank?
-    @cities         = @zip.cities
-    @tags           = Address.place_tag_counts.sort_by(&:name)
-
-    @title          = "#{@state.name} #{@zip.name} Yellow Pages"
+    # @country, @state, @zip and @cities all initialized in before filter
+    @tags   = Address.place_tag_counts.sort_by(&:name)
+    @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
   
   def index
@@ -56,20 +38,19 @@ class PlacesController < ApplicationController
     @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
     @tag            = params[:tag]
     
-    # if @country.blank?
-    #   @country = Country.default
-    #   logger.debug("*** redirecting to default country")
-    #   redirect_to(url_for(:country => @country, :query => @query)) and return
-    # end
-    
     # build sphinx query
     @query          = [@country, @state, @city, @neighborhood, @zip, @tag].compact.collect { |o| o.is_a?(String) ? o : o.name }.join(" ")
 
     # build search title based on city, neighborhood, zip search
     @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @h1             = @title
     
     # find addresses matching query
     @addresses      = Address.search(@query).paginate(:page => params[:page])
+  end
+  
+  def error
+    @error_text = "We are sorry, but we couldn't find the #{params[:area]} you were looking for."
   end
   
   protected
@@ -88,6 +69,64 @@ class PlacesController < ApplicationController
     end
     
     "#{tag.titleize} in #{where}"
+  end
+  
+  def init_areas
+    # country is required for all actions
+    @country  = Country.find_by_code(params[:country].to_s.upcase)
+    
+    if @country.blank?
+      redirect_to(:controller => 'places', :action => 'error', :area => 'country') and return
+    end
+    
+    case params[:action]
+    when 'country'
+      # find all states
+      @states = @country.states
+      return true
+    else
+      # find the specified state for all other cases
+      @state  = State.find_by_code(params[:state].to_s.upcase)
+    end
+
+    if @state.blank?
+      redirect_to(:controller => 'places', :action => 'error', :area => 'state') and return
+    end
+    
+    case params[:action]
+    when 'state'
+      # find all state cities and zips
+      @cities = @state.cities
+      @zips   = @state.zips
+    when 'city'
+      # find city, and all its zips and neighborhoods
+      @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
+      @zips           = @city.zips unless @city.blank?
+      @neighborhoods  = @city.neighborhoods unless @city.blank?
+      
+      if @city.blank?
+        redirect_to(:controller => 'places', :action => 'error', :area => 'city') and return
+      end
+    when 'neighborhood'
+      # find city and neighborhood
+      @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
+      @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
+
+      if @city.blank? or @neighborhood.blank?
+        redirect_to(:controller => 'places', :action => 'error', :area => 'city') and return if @city.blank?
+        redirect_to(:controller => 'places', :action => 'error', :area => 'neighborhood') and return if @neighborhood.blank?
+      end
+    when 'zip'
+      # find zip and all its cities
+      @zip      = @state.zips.find_by_name(params[:zip].to_s)
+      @cities   = @zip.cities unless @zip.blank?
+
+      if @zip.blank?
+        redirect_to(:controller => 'places', :action => 'error', :area => 'zip') and return
+      end
+    end
+    
+    return true
   end
   
 end

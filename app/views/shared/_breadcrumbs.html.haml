@@ -14,7 +14,7 @@
   - if index == size-1 and link_all.nil?
     %span{:class => klass}= area.name
   - else
-    = link_to area.name, url_for(:controller => 'places', :action => klass), :class => klass
+    = link_to area.name, url_for(:action => klass), :class => klass
 
   -# show separator unless its the last object
   = separator unless index == size-1

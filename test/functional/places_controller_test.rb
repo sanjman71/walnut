@@ -9,43 +9,44 @@ class PlacesControllerTest < ActionController::TestCase
     @chicago  = Factory(:city, :name => "Chicago", :state => @il)
   end
   
-  context "place area, tag routes" do
-    # country route
-    should_route :get, '/places/us', :controller => 'places', :action => 'country', :country => 'us'
-    # country, tag route - no longer valid
-    # should_route :get, '/places/us/food', :controller => 'places', :action => 'index', :country => 'us', :tag => 'food'
-    
-    # state route
-    should_route :get, '/places/us/il',
-                 :controller => 'places', :action => 'state', :country => 'us', :state => 'il'
-    # state tag route
-    should_route :get, '/places/us/il/anywhere/food',
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'anywhere', :tag => 'food'
+  # country route
+  should_route :get, '/places/us', :controller => 'places', :action => 'country', :country => 'us'
+  # country, tag route - no longer valid
+  # should_route :get, '/places/us/food', :controller => 'places', :action => 'index', :country => 'us', :tag => 'food'
+  
+  # state route
+  should_route :get, '/places/us/il',
+               :controller => 'places', :action => 'state', :country => 'us', :state => 'il'
+  # state tag route
+  should_route :get, '/places/us/il/anywhere/food',
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'anywhere', :tag => 'food'
 
-    # city route
-    should_route :get, '/places/us/il/chicago', :controller => 'places', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
-    # city tag route
-    should_route :get, '/places/us/il/chicago/food',
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
-    # hyphenated city tag route
-    should_route :get, '/places/us/ny/new-york/food',
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :tag => 'food'
+  # city route
+  should_route :get, '/places/us/il/chicago', :controller => 'places', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
+  # city tag route
+  should_route :get, '/places/us/il/chicago/food',
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
+  # hyphenated city tag route
+  should_route :get, '/places/us/ny/new-york/food',
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :tag => 'food'
 
-    # neighborhood route
-    should_route :get, '/places/us/il/chicago/hood/river-north', 
-                 :controller => 'places', :action => 'neighborhood', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north'
+  # neighborhood route
+  should_route :get, '/places/us/il/chicago/hood/river-north', 
+               :controller => 'places', :action => 'neighborhood', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north'
 
-    # neighborhood tag route
-    should_route :get, '/places/us/il/chicago/hood/river-north/soccer', 
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :tag => 'soccer'
-    
-    # zip route
-    should_route :get, '/places/us/il/60610', 
-                 :controller => 'places', :action => 'zip', :country => 'us', :state => 'il', :zip => '60610'
-    # zip tag route
-    should_route :get, '/places/us/il/60610/food', 
-                 :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food'
-  end
+  # neighborhood tag route
+  should_route :get, '/places/us/il/chicago/hood/river-north/soccer', 
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :tag => 'soccer'
+  
+  # zip route
+  should_route :get, '/places/us/il/60610', 
+               :controller => 'places', :action => 'zip', :country => 'us', :state => 'il', :zip => '60610'
+  # zip tag route
+  should_route :get, '/places/us/il/60610/food', 
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food'
+  
+  # error route
+  should_route :get, '/places/error/country', :controller => 'places', :action => 'error', :area => 'country'
   
   context "search city" do
     context "with no addresses" do

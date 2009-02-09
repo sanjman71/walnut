@@ -17,8 +17,10 @@
       .container
         .span-24.last#search_places
           = render(:partial => 'shared/search_bar_places')
-        .span-24.prepend-23.last
-          = link_to 'Home', root_path, :style => 'color: #FFFFFF;'
+        .span-24.last{:style => 'text-align: right;'}
+          = link_to 'Find Places', root_path, :style => 'color: #FFFFFF;'
+          == &nbsp;|&nbsp;
+          = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :style => 'color: #FFFFFF;'
           
     - if RAILS_ENV == 'development'
       .container.showgrid

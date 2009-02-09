@@ -1,0 +1,8 @@
+- title(@title)
+
+.span-20.box.prepend-1.last
+  %h2== Browse Zip Codes by State
+  
+%h3.span-20.prepend-1
+  - @states.each do |state|
+    %span[state]= link_to state, url_for(:controller => 'zips', :action => 'state', :country => @country, :state => state)

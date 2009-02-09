@@ -1,0 +1,14 @@
+- title(@title)
+
+.span-20.box.prepend-1.last
+  %h2== #{@state.name} Zip Code Directory
+  %h4.span-7.last#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => nil})
+    
+%h3.span-20.prepend-1
+  %p== #{@state.name} Zip Codes
+  - @zips.each do |zip|
+    %span[zip]= link_to zip, url_for(:controller => 'zips', :action => 'zip', :country => @country, :state => @state, :zip => zip)
+    
+%h3.span-20.prepend-1
+  == Browse Zip Codes by City

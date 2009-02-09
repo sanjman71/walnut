@@ -1,7 +1,7 @@
 - title(@title)
 
 .span-20.box
-  %h2== Search results for '#{@query}'
+  %h1= @h1
   %h4.span-7.last#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood, :link_all => true})
   
