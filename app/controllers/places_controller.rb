@@ -30,6 +30,35 @@ class PlacesController < ApplicationController
     @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
   
+  def search
+    # resolve where parameter
+    @area   = Area.resolve(params[:where].to_s)
+    @tag    = params[:what].to_s
+    
+    if @area.blank?
+      redirect_to(:action => 'error', :area => 'area') and return
+    end
+    
+    case @area.class.to_s
+    when 'City'
+      @state    = @area.state
+      @country  = @state.country
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @area, :tag => @tag) and return
+    when 'Zip'
+      @state    = @area.state
+      @country  = @state.country
+      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @area, :tag => @tag) and return
+    when 'Neighborhood'
+      @city     = @area.city
+      @state    = @city.state
+      @country  = @state.country
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @area, :tag => @tag) and return
+    when 'State'
+      raise Exception, "not allowed to search by state"
+    end
+    
+  end
+  
   def index
     @country        = Country.find_by_code(params[:country].to_s.upcase)
     @state          = State.find_by_code(params[:state].to_s.upcase)

@@ -1,7 +1,7 @@
 - form_for(Place.new, :url => url_for(:controller => 'places', :action => 'search'), :method => :post, :html => {:id => 'search_places_form'}) do |f|
   .span-10
     = label_tag "what", "What", :class => 'big', :style => 'padding-right: 5px;'
-    = text_field_tag "search_what", '', :id => 'search_what', :name => 'what', :class => 'title big', :style => 'width: 325px;', :title => 'e.g. pizza, sex'
+    = text_field_tag "search_what", '', :id => 'search_what', :name => 'what', :class => 'title big', :style => 'width: 325px;', :title => 'e.g. pizza, soccer'
   .span-14.last
     = label_tag "search_where", "Where", :class => 'big', :style => 'padding-right: 5px;'
     = text_field_tag "where", '', :id => 'search_where', :name => 'where', :class => 'title big', :style => 'width: 325px;', :title => 'e.g. Chicago, IL'
