@@ -69,7 +69,7 @@ class PlacesController < ApplicationController
     @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     
     # find addresses matching query
-    @addresses      = Address.search(@query)
+    @addresses      = Address.search(@query).paginate(:page => params[:page])
   end
   
   protected

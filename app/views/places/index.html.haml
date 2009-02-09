@@ -7,8 +7,11 @@
   
 %hr.space
 
-.span-20.prepend-1#query
-  %h4== Found #{@addresses.size} places
-    
+.span-19.prepend-1#query
+  .span-15
+    %h4= page_entries_info @addresses unless @addresses.blank?
+  .span-5.last
+    = will_paginate(@addresses, :page_links => false)
+  
 .span-20
   =render(:partial => 'places', :locals => {:addresses => @addresses})
