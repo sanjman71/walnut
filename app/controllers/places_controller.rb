@@ -105,7 +105,7 @@ class PlacesController < ApplicationController
       raise Exception, "invalid search"
     end
     
-    "#{tag.titleize} in #{where}"
+    "#{tag.titleize} near #{where}"
   end
   
   def init_areas
