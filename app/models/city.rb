@@ -1,7 +1,7 @@
 class City < ActiveRecord::Base
   validates_presence_of       :name, :state_id
   validates_uniqueness_of     :name, :scope => :state_id
-  belongs_to                  :state
+  belongs_to                  :state, :counter_cache => true
   has_many                    :areas, :as => :extent
   has_many                    :city_zips
   has_many                    :zips, :through => :city_zips

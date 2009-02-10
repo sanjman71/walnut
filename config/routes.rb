@@ -13,15 +13,15 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     'places/:country/:state/:zip/:tag', :controller => 'places', :action => 'index', :zip => /\d{5}/
   map.connect     'places/:country/:state/:zip', :controller => 'places', :action => 'zip', :zip => /\d{5}/
   map.connect     'places/:country/:state', :controller => 'places', :action => 'state'
-  map.connect     'places/:country', :controller => 'places', :action => 'country'
+  map.connect     'places/:country', :controller => 'places', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
   
-  map.resources   :places, :only => [:index]
+  map.resources   :places, :only => [:index, :show]
   
   # zip routes
   map.connect     'zips/error/:area', :controller => 'zips', :action => 'error'
   map.connect     'zips/:country/:state/:city', :controller => 'zips', :action => 'city'
   map.connect     'zips/:country/:state', :controller => 'zips', :action => 'state'
-  map.connect     'zips/:country', :controller => 'zips', :action => 'country'
+  map.connect     'zips/:country', :controller => 'zips', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
   map.resources   :zips, :only => [:index]
   

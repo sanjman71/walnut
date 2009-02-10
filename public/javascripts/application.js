@@ -8,7 +8,7 @@ $.fn.init_input_hints = function() {
   // show the display text
   el.each(function(i) {
       $(this).attr('value', $(this).attr('title'));
-      $(this).addClass('grey');
+      $(this).addClass('hint');
   });
 
   // hook up the blur & focus
@@ -17,14 +17,14 @@ $.fn.init_input_hints = function() {
     if ($(this).attr('value') == $(this).attr('title'))
     {
       $(this).attr('value', '');
-      $(this).removeClass('grey');
+      $(this).removeClass('hint');
     } 
   }).blur(function() {
     // add hint on blur if the field is empty
     if ($(this).attr('value') == '')
     {
       $(this).attr('value', $(this).attr('title'));
-      $(this).addClass('grey');
+      $(this).addClass('hint');
     }
   });
 }

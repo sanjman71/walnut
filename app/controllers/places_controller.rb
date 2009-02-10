@@ -78,6 +78,14 @@ class PlacesController < ApplicationController
     @addresses      = Address.search(@query).paginate(:page => params[:page])
   end
   
+  def show
+    @address  = Address.find(params[:id])
+    @place    = @address.place unless @address.blank?
+    
+    @title    = "#{@place.name}"
+    @h1       = @title
+  end
+  
   def error
     @error_text = "We are sorry, but we couldn't find the #{params[:area]} you were looking for."
   end

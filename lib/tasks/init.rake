@@ -2,7 +2,7 @@ namespace :db do
   namespace :walnut do
     namespace :init do
     
-      task :all  => [:areas, "db:populate:places", "db:populate:addresses", :tags, :city_zips]
+      task :all  => [:areas, :addresses, "db:populate:places", :tags, :city_zips]
     
       desc "Init areas database"
       task :areas do
@@ -11,7 +11,8 @@ namespace :db do
         @us = Country.create(:name => "United States", :code => "US")
         Area.create(:extent => @us)
         
-        [{:city => "Chicago", :zip => "60654", :state => "Illinois", :code => "IL", :neighborhood => "River North"},
+        [{:city => "Chicago", :zip => "60654", :state => "Illinois", :code => "IL", :neighborhood => "River North", 
+          :streets => ["200 W Grand Ave", "100 W Grand Ave", "70 W Erie St"]},
          {:city => "New York", :zip => "10001", :state => "New York", :code => "NY"},
          {:city => "San Francisco", :zip => "94127", :state =>  "California", :code => "CA"}].each do |hash|
           @state  = State.create(:name => hash[:state], :code => hash[:code], :country => @us)
@@ -30,56 +31,61 @@ namespace :db do
         puts "#{Time.now}: initialized #{Area.count} areas"
       end
     
-      desc "Init tags by tagging each address with a city, zip, and state area"
-      task :tags do
-        addresses = 0
-        Address.all.each do |address|
-          # pick a random city
-          city    = City.find(rand(City.count) + 1)
+      desc "Init addresses."
+      task :addresses do |t|
+
+        @chicago_streets  = [{:streets => ["200 W Grand Ave", "100 W Grand Ave", "70 W Erie St", "661 N Clark St", "415 N Milwaukee Ave"], 
+                              :city => "Chicago"}]
+        @new_york_streets = [{:streets => ["80 Wall St", "135 Front St", "150 Water St", "27 William St", "88 Pine St"], 
+                              :city => "New York"}]
+        @sf_streets       = [{:streets => ["1298 Howard St", "609 Mission St", "200 S Spruce Ave", "215 Harbor Way", "170 Mitchell Ave"], 
+                              :city => "San Francisco"}]
+        count             = 0
+        
+        (@chicago_streets + @new_york_streets + @sf_streets).each do |street_hash|
+          streets = street_hash[:streets]
+          city    = City.find_by_name(street_hash[:city].titleize)
           state   = city.state
           zip     = state.zips.first # should use a city zip when this relationship is built
           country = state.country
           
-          address.areas.push(city.areas.first)
-          address.areas.push(zip.areas.first)
-          address.areas.push(state.areas.first)
-          address.areas.push(country.areas.first)
-
-          # check for city neighborhoods
-          if city.neighborhoods_count > 0
-            neighborhood = city.neighborhoods.rand
-            address.areas.push(neighborhood.areas.first)
+          streets.each do |street|
+            address = Address.create(:name => "Work", :street_address => street, :city => city, :state => state, :zip => zip, :country => country)
+            count   += 1
           end
-          
-          addresses += 1
         end
-        puts "#{Time.now}: tagged all #{addresses} addresses with a city, zip state area"
-
-        # create list of addresses w/ no places
+        
+        puts "#{Time.now}: added #{count} addresses"
+      end    
+    
+      desc "Init tags by tagging each address with a city, zip, and state area"
+      task :tags do
+        # find list of addresses w/ no places
         addresses = Address.all.select { |a| a.places.size == 0 }
         
         # initialize tag list
         tags      = ['coffee', 'beer', 'soccer', 'bar', 'party', 'muffin', 'pizza']
         
-        # add tags to each place, assign an addresss to each place
+        # assign an addresss to each place, and add tags to the address/place
         places    = 0
         Place.all.each do |place|
+          # stop when there are no more addresses
+          break if addresses.empty?
+          
           # pick a random address
           address = addresses.delete(addresses.rand)
           place.addresses.push(address)
           
-          # pick 2 random tags and add it to the address as place tags
-          picked  = pick_tags(tags, 2)
+          # pick some random tags, add them to the address as place tags
+          picked  = pick_tags(tags, 3)
           address = place.addresses.first
           address.place_tag_list.add(picked.sort)
           address.save
           
-          # place.tag_list = tags[rand(tags.size)]
-          # place.save
           places += 1 
         end
         
-        puts "#{Time.now}: tagged all #{places} places with an address and tag"
+        puts "#{Time.now}: tagged #{places} places with an address and tag"
       end
     
       # pick n tags randomly from the tags collection

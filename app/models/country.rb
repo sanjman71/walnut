@@ -3,6 +3,7 @@ class Country < ActiveRecord::Base
   validates_uniqueness_of     :name
   has_many                    :areas, :as => :extent
   has_many                    :states
+  has_many                    :addresses
   
   def self.default
     @@country ||= Country.find_by_code("US")

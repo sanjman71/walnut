@@ -1,6 +1,11 @@
 - addresses.each do |address|
   .span-17.prepend-1.letterbox{:class => cycle("shaded", "")}[address]
-    %h3.name.margin-bottom-0= address.places.first.name
+    %h3.name.margin-bottom-0
+      = link_to address.place.name, {:action => 'show', :id => address}
+    %span.street= address.street_address
+    %br
     %span.tags.area= address.area_tag_list
     %br
-    %span.tags.place= address.place_tag_list
+    %span.tags.place
+      - address.place_tag_list.each do |place_tag|
+        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:tag => place_tag}

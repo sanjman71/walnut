@@ -45,6 +45,9 @@ class PlacesControllerTest < ActionController::TestCase
   should_route :get, '/places/us/il/60610/food', 
                :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food'
   
+  # show route
+  should_route :get, 'places/1', :controller => 'places', :action => 'show', :id => 1
+  
   # error route
   should_route :get, '/places/error/country', :controller => 'places', :action => 'error', :area => 'country'
   

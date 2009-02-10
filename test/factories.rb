@@ -5,6 +5,11 @@ Factory.define :us, :class => :Country do |o|
   o.code        "US"
 end
 
+Factory.define :country do |o|
+  o.name        "United States"
+  o.code        "US"
+end
+
 Factory.define :state do |o|
   o.name        "Illinois"
   o.code        "IL"

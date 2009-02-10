@@ -16,17 +16,6 @@ namespace :db do
         place.name = Faker::Name.name
       end
     end
-    
-    desc "Populate addresses."
-    task :addresses, :count do |t, args|
-      count = args.count.to_i
-      count = 20 if count == 0
-      
-      Address.populate count do |address|
-        address.name = 'Home'
-      end
-      
-      puts "#{Time.now}: added #{count} addresses"
-    end    
+        
   end # populate
 end # db
