@@ -1,9 +1,9 @@
 class CreateWalnut < ActiveRecord::Migration
   def self.up
     
-    create_table :areas do |t|
+    create_table :localities do |t|
       t.references  :extent, :polymorphic => true
-      t.integer     :addresses_count, :default => 0  # counter cache of area addresses
+      t.integer     :locations_count, :default => 0  # counter cache of locations
     end
 
     create_table :countries do |t|
@@ -40,31 +40,25 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :zip
     end
   
-    create_table :addresses do |t|
+    create_table :locations do |t|
       t.string      :name
       t.string      :street_address,  :default => nil
       t.references  :city
       t.references  :state
       t.references  :zip
       t.references  :country
-      t.references  :addressable, :polymorphic => true
+      t.references  :locatable, :polymorphic => true
     end
-    
-    # an address can have many addressables (e.g. places)
-    # create_table :address_addressables do |t|
-    #   t.references  :address
-    #   t.references  :addressable, :polymorphic => true
-    # end
-    
-    # an address can have many areas
-    create_table :address_areas do |t|
-      t.references  :area
-      t.references  :address
+        
+    # many to many relationship between locations and localities
+    create_table :locality_locations do |t|
+      t.references  :locality
+      t.references  :location
     end
     
     create_table :places do |t|
       t.string      :name
-      t.integer     :addresses_count, :default => 0   # counter cache
+      t.integer     :locations_count, :default => 0   # counter cache
       t.references  :chain
     end
 
@@ -75,12 +69,12 @@ class CreateWalnut < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table  :areas
     drop_table  :states
     drop_table  :cities
     drop_table  :zips
     drop_table  :neighborhoods
-    drop_table  :addresses
-    drop_table  :address_areas
+    drop_table  :locations
+    drop_table  :localities
+    drop_table  :locality_locations
   end
 end

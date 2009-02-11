@@ -4,62 +4,62 @@ require 'test/factories'
 class PlaceTest < ActiveSupport::TestCase
   
   should_require_attributes   :name
-  should_have_many            :addresses
+  should_have_many            :locations
   should_belong_to            :chain
   
   context "create place with an address" do
     setup do
       @place    = Place.create(:name => "Place 1")
-      @address  = Address.create(:name => "Home")
-      @place.addresses.push(@address)
+      @location = Location.create(:name => "Home")
+      @place.locations.push(@location)
       @place.reload
     end
     
     should_change "Place.count", :by => 1
-    should_change "Address.count", :by => 1
+    should_change "Location.count", :by => 1
     
     should "have 1 address" do
-      assert_equal [@address], @place.addresses
+      assert_equal [@location], @place.locations
     end
     
-    should "have addresses_count of 1" do
-      assert_equal 1, @place.addresses_count
+    should "have locations_count of 1" do
+      assert_equal 1, @place.locations_count
     end
     
-    context "then remove an address" do
+    context "then remove a location" do
       setup do
-        @place.addresses.clear
+        @place.locations.clear
         @place.reload
       end
       
       should_not_change "Place.count"
-      should_not_change "Address.count"
+      should_not_change "Location.count"
 
-      should "have no address" do
-        assert_equal [], @place.addresses
+      should "have no locations" do
+        assert_equal [], @place.locations
       end
 
-      should "have addresses_count of 0" do
-        assert_equal 0, @place.addresses_count
+      should "have locations_count of 0" do
+        assert_equal 0, @place.locations_count
       end
     end
     
-    context "then add an address" do
+    context "then add a location" do
       setup do
-        @address2  = Address.create(:name => "Work")
-        @place.addresses.push(@address2)
+        @location2  = Location.create(:name => "Work")
+        @place.locations.push(@location2)
         @place.reload
       end
     
       should_not_change "Place.count"
-      should_change "Address.count", :by => 1
+      should_change "Location.count", :by => 1
     
-      should "have 2 address" do
-        assert_equal [@address, @address2], @place.addresses
+      should "have 2 locations" do
+        assert_equal [@location, @location2], @place.locations
       end
 
-      should "have addresses_count of 2" do
-        assert_equal 2, @place.addresses_count
+      should "have locations_count of 2" do
+        assert_equal 2, @place.locations_count
       end
     end
   end

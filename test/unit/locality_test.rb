@@ -1,42 +1,42 @@
 require 'test/test_helper'
 require 'test/factories'
 
-class AreaTest < ActiveSupport::TestCase
+class LocalityTest < ActiveSupport::TestCase
   
   def setup
     @us = Factory(:us)
   end
   
-  context "state area" do
+  context "state locality" do
     setup do
-      @il   = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
-      @area = Area.create(:extent => @il)
+      @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+      @locality = Locality.create(:extent => @il)
     end
 
-    should_change "Area.count", :by => 1
+    should_change "Locality.count", :by => 1
         
-    should "have area extent illinois" do
-      assert_equal @il, @area.extent
+    should "have locality extent illinois" do
+      assert_equal @il, @locality.extent
     end
 
     context "city area" do
       setup do 
-        @chicago  = Factory(:city, :name => "Chicago", :state => @il)
-        @area2    = Area.create(:extent => @chicago)
+        @chicago    = Factory(:city, :name => "Chicago", :state => @il)
+        @locality2  = Locality.create(:extent => @chicago)
       end
 
-      should_change "Area.count", :by => 1
+      should_change "Locality.count", :by => 1
 
       should "have area extent chicago" do
-        assert_equal @chicago, @area2.extent
+        assert_equal @chicago, @locality2.extent
       end
       
       context "duplicate city area" do
         setup do
-          @area3 = Area.create(:extent => @chicago)
+          @locality3 = Locality.create(:extent => @chicago)
         end
 
-        should_not_change "Area.count"
+        should_not_change "Locality.count"
       end
       
     end
@@ -45,7 +45,7 @@ class AreaTest < ActiveSupport::TestCase
   context "geocode country" do
     context "united states" do
       setup do
-        @object = Area.resolve("united states")
+        @object = Locality.resolve("united states")
       end
       
       should "resolve to us country object" do
@@ -55,7 +55,7 @@ class AreaTest < ActiveSupport::TestCase
 
     context "us" do
       setup do
-        @object = Area.resolve("united states")
+        @object = Locality.resolve("united states")
       end
       
       should "resolve to us country object" do
@@ -68,7 +68,7 @@ class AreaTest < ActiveSupport::TestCase
     context "illinois" do
       setup do
         @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
-        @object = Area.resolve("illinois")
+        @object = Locality.resolve("illinois")
       end
 
       should "resolve to illinois state object" do
@@ -82,7 +82,7 @@ class AreaTest < ActiveSupport::TestCase
       setup do
         @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
         @chicago  = Factory(:city, :name => "Chicago", :state => @il)
-        @object   = Area.resolve("chicago")
+        @object   = Locality.resolve("chicago")
       end
 
       should "resolve to chicago city object" do
@@ -96,7 +96,7 @@ class AreaTest < ActiveSupport::TestCase
       setup do
         @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
         @zip      = Factory(:zip, :name => "60654", :state => @il)
-        @object   = Area.resolve("60654")
+        @object   = Locality.resolve("60654")
       end
 
       should "resolve to chicago zip object" do

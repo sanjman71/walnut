@@ -9,9 +9,9 @@
 
 .span-19.prepend-1#query
   .span-15
-    %h4= page_entries_info @addresses unless @addresses.blank?
+    %h4= page_entries_info @locations unless @locations.blank?
   .span-5.last
-    = will_paginate(@addresses, :page_links => false)
+    = will_paginate(@locations, :page_links => false)
   
 .span-24#places
-  =render(:partial => 'places', :locals => {:addresses => @addresses})
+  =render(:partial => 'places', :locals => {:locations => @locations})

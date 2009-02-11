@@ -52,9 +52,9 @@ class PlacesControllerTest < ActionController::TestCase
   should_route :get, '/places/error/country', :controller => 'places', :action => 'error', :area => 'country'
   
   context "search city" do
-    context "with no addresses" do
+    context "with no locations" do
       setup do
-        Address.stubs(:search).returns([])
+        Location.stubs(:search).returns([])
         get :index, :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
       end
     

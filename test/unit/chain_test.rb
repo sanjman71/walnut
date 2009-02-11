@@ -1,3 +1,4 @@
+require 'test/test_helper'
 require 'test/factories'
 
 class ChainTest < ActiveSupport::TestCase

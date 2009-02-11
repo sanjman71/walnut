@@ -14,45 +14,45 @@ class PlacesController < ApplicationController
   
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
-    @tags   = Address.place_tag_counts.sort_by(&:name)
+    @tags   = Location.place_tag_counts.sort_by(&:name)
     @title  = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
     # @country, @state, @city, @neighborhood all initialized in before filter
-    @tags   = Address.place_tag_counts.sort_by(&:name)
+    @tags   = Location.place_tag_counts.sort_by(&:name)
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
   
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
-    @tags   = Address.place_tag_counts.sort_by(&:name)
+    @tags   = Location.place_tag_counts.sort_by(&:name)
     @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
   
   def search
     # resolve where parameter
-    @area   = Area.resolve(params[:where].to_s)
-    @tag    = params[:what].to_s
+    @locality = Locality.resolve(params[:where].to_s)
+    @tag      = params[:what].to_s
     
-    if @area.blank?
-      redirect_to(:action => 'error', :area => 'area') and return
+    if @locality.blank?
+      redirect_to(:action => 'error', :locality => 'unknown') and return
     end
     
-    case @area.class.to_s
+    case @locality.class.to_s
     when 'City'
       @state    = @area.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @area, :tag => @tag) and return
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :tag => @tag) and return
     when 'Zip'
       @state    = @area.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @area, :tag => @tag) and return
+      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :tag => @tag) and return
     when 'Neighborhood'
       @city     = @area.city
       @state    = @city.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @area, :tag => @tag) and return
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :tag => @tag) and return
     when 'State'
       raise Exception, "not allowed to search by state"
     end
@@ -74,13 +74,13 @@ class PlacesController < ApplicationController
     @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
     
-    # find addresses matching query
-    @addresses      = Address.search(@query).paginate(:page => params[:page])
+    # find location matching query
+    @locations      = Location.search(@query).paginate(:page => params[:page])
   end
   
   def show
-    @address  = Address.find(params[:id])
-    @place    = @address.addressable unless @address.blank?
+    @location = Location.find(params[:id])
+    @place    = @location.locatable unless @location.blank?
     
     @title    = "#{@place.name}"
     @h1       = @title

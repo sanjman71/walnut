@@ -4,23 +4,23 @@ class Place < ActiveRecord::Base
   belongs_to                :chain, :counter_cache => true
   
   # TODO: find out why the counter cache field doesn't work without the before and after filters
-  has_many                  :addresses, :as => :addressable, :after_add => :after_add_address, :before_remove => :before_remove_address
+  has_many                  :locations, :as => :locatable, :after_add => :after_add_location, :before_remove => :before_remove_location
   
-  has_many                  :states, :through => :addresses
-  has_many                  :cities, :through => :addresses
-  has_many                  :zips, :through => :addresses
+  has_many                  :states, :through => :locations
+  has_many                  :cities, :through => :locations
+  has_many                  :zips, :through => :locations
   
-  attr_readonly             :addresses_count
+  attr_readonly             :locations_count
   
   # acts_as_taggable_on       :tags
   
   private
   
-  def after_add_address(address)
-    Place.increment_counter(:addresses_count, self.id) if address
+  def after_add_location(location)
+    Place.increment_counter(:locations_count, self.id) if location
   end
   
-  def before_remove_address(address)
-    Place.decrement_counter(:addresses_count, self.id) if address
+  def before_remove_location(location)
+    Place.decrement_counter(:locations_count, self.id) if location
   end
 end

@@ -2,8 +2,8 @@ require 'test/test_helper'
 
 class StateTest < ActiveSupport::TestCase
   should_belong_to    :country
+  should_have_many    :localities
   should_have_many    :cities
-  should_have_many    :areas
   
   def setup
     @us = Factory(:us)

@@ -2,18 +2,23 @@ class Chain < ActiveRecord::Base
   validates_presence_of     :name
   validates_uniqueness_of   :name
   has_many                  :places
-  has_many                  :addresses, :through => :places
+  has_many                  :locations, :through => :places
   
   include NameModule
   
-  # returns the total number of chain addresses
+  # returns the total number of chain locations
   def count
-    addresses.size
+    locations.size
   end
 
   # returns the list of states for the chain store
   def states
-    addresses.collect { |a| a.state }.uniq
+    locations.collect { |a| a.state }.uniq
+  end
+
+  # returns the list of states for the chain store
+  def cities
+    locations.collect { |a| a.city }.uniq
   end
   
 end

@@ -1,7 +1,7 @@
 class Country < ActiveRecord::Base
   validates_presence_of       :name, :code
   validates_uniqueness_of     :name
-  has_many                    :areas, :as => :extent
+  has_many                    :localities, :as => :extent
   has_many                    :states
   has_many                    :addresses
   
