@@ -7,11 +7,5 @@ class Zip < ActiveRecord::Base
   has_many                    :city_zips
   has_many                    :cities, :through => :city_zips
   
-  def to_param
-    self.name
-  end
-  
-  def to_s
-    self.name
-  end
+  include NameModule
 end

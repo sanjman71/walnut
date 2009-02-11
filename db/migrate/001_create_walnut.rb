@@ -47,13 +47,14 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :state
       t.references  :zip
       t.references  :country
+      t.references  :addressable, :polymorphic => true
     end
     
     # an address can have many addressables (e.g. places)
-    create_table :address_addressables do |t|
-      t.references  :address
-      t.references  :addressable, :polymorphic => true
-    end
+    # create_table :address_addressables do |t|
+    #   t.references  :address
+    #   t.references  :addressable, :polymorphic => true
+    # end
     
     # an address can have many areas
     create_table :address_areas do |t|
@@ -64,6 +65,12 @@ class CreateWalnut < ActiveRecord::Migration
     create_table :places do |t|
       t.string      :name
       t.integer     :addresses_count, :default => 0   # counter cache
+      t.references  :chain
+    end
+
+    create_table :chains do |t|
+      t.string      :name
+      t.integer     :places_count, :default => 0   # counter cache
     end
   end
 

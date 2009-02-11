@@ -7,6 +7,8 @@ class City < ActiveRecord::Base
   has_many                    :zips, :through => :city_zips
   has_many                    :neighborhoods
   
+  include NameModule
+  
   # the special anywhere object
   def self.anywhere(state=nil)
     City.new do |o|
@@ -20,11 +22,4 @@ class City < ActiveRecord::Base
     self.id == 0
   end
   
-  def to_param
-    self.name.downcase.gsub(' ', '-')
-  end
-  
-  def to_s
-    self.name
-  end
 end

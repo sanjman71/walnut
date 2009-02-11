@@ -4,12 +4,6 @@ class Neighborhood < ActiveRecord::Base
   belongs_to                  :city, :counter_cache => true
   has_many                    :areas, :as => :extent
 
-  def to_s
-    self.name
-  end
+  include NameModule
 
-  def to_param
-    self.name.downcase.gsub(' ', '-')
-  end
-  
 end

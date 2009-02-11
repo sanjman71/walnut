@@ -4,13 +4,8 @@ require 'test/factories'
 class PlaceTest < ActiveSupport::TestCase
   
   should_require_attributes   :name
-  
-  def setup
-    # @il           = Factory(:state, :name => "Illinois", :ab => "IL")
-    # @chicago      = Factory(:city, :name => "Chicago", :state => @il)
-    # @area_il      = Area.create(:extent => @il)
-    # @area_chicago = Area.create(:extent => @chicago)
-  end
+  should_have_many            :addresses
+  should_belong_to            :chain
   
   context "create place with an address" do
     setup do
@@ -21,10 +16,51 @@ class PlaceTest < ActiveSupport::TestCase
     end
     
     should_change "Place.count", :by => 1
+    should_change "Address.count", :by => 1
     
     should "have 1 address" do
       assert_equal [@address], @place.addresses
-      assert_equal [@place], @address.addressables
+    end
+    
+    should "have addresses_count of 1" do
+      assert_equal 1, @place.addresses_count
+    end
+    
+    context "then remove an address" do
+      setup do
+        @place.addresses.clear
+        @place.reload
+      end
+      
+      should_not_change "Place.count"
+      should_not_change "Address.count"
+
+      should "have no address" do
+        assert_equal [], @place.addresses
+      end
+
+      should "have addresses_count of 0" do
+        assert_equal 0, @place.addresses_count
+      end
+    end
+    
+    context "then add an address" do
+      setup do
+        @address2  = Address.create(:name => "Work")
+        @place.addresses.push(@address2)
+        @place.reload
+      end
+    
+      should_not_change "Place.count"
+      should_change "Address.count", :by => 1
+    
+      should "have 2 address" do
+        assert_equal [@address, @address2], @place.addresses
+      end
+
+      should "have addresses_count of 2" do
+        assert_equal 2, @place.addresses_count
+      end
     end
   end
 end

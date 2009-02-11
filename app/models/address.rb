@@ -6,9 +6,9 @@ class Address < ActiveRecord::Base
   belongs_to              :zip
   
   has_many                :address_areas
-  has_many                :areas, :through => :address_areas, :after_add => :add_area_tag, :before_remove => :remove_area_tag
+  has_many                :areas, :through => :address_areas, :after_add => :after_add_area, :before_remove => :before_remove_area
   
-  has_many_polymorphs     :addressables, :from => [:places], :through => :address_addressables
+  belongs_to              :addressable, :polymorphic => true, :counter_cache => :addresses_count
   
   after_save              :update_areas
   
@@ -18,16 +18,12 @@ class Address < ActiveRecord::Base
   acts_as_taggable_on     :area_tags, :place_tags
   
   define_index do
+    indexes addressable.name
+    indexes street_address
     indexes area_tags.name, :as => :area_tags
-    indexes places.name
     indexes place_tags.name, :as => :place_tags
   end
-  
-  # find the first (and should be only) place for this address
-  def place
-    places.first
-  end
-  
+    
   protected
   
   # after_save callback to update areas based on changes detected using dirty objects
@@ -71,15 +67,15 @@ class Address < ActiveRecord::Base
     end
   end
   
-  # after_add callback to add area tags
-  def add_area_tag(area)
+  # after_add area callback to add area tags
+  def after_add_area(area)
     return false if area.blank? or area.extent.blank?
     area_tag_list.add(area.extent.name)
     save
   end
   
-  # before_remove callback to remove area tags
-  def remove_area_tag(area)
+  # before_remove area callback to remove area tags
+  def before_remove_area(area)
     return false if area.blank? or area.extent.blank?
     area_tag_list.remove(area.extent.name)
     save

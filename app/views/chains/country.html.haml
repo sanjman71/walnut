@@ -1,0 +1,11 @@
+- title(@title)
+
+.span-20.box
+  %h1= @h1
+  
+.prepend-1.span-23#states
+  %h3== Find by State
+  - @states.each do |state|
+    %span#state{:style => "font-size: 12px;"}= link_to state, {:action => 'state', :country => @country, :state => state}
+  
+

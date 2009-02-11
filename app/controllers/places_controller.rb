@@ -80,7 +80,7 @@ class PlacesController < ApplicationController
   
   def show
     @address  = Address.find(params[:id])
-    @place    = @address.place unless @address.blank?
+    @place    = @address.addressable unless @address.blank?
     
     @title    = "#{@place.name}"
     @h1       = @title

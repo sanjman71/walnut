@@ -2,7 +2,7 @@ namespace :db do
   namespace :walnut do
     namespace :init do
     
-      task :all  => [:areas, :addresses, "db:populate:places", :tags, :city_zips]
+      task :all  => [:areas, :addresses, "db:populate:places", :tags, :chains, :city_zips]
     
       desc "Init areas database"
       task :areas do
@@ -61,7 +61,7 @@ namespace :db do
       desc "Init tags by tagging each address with a city, zip, and state area"
       task :tags do
         # find list of addresses w/ no places
-        addresses = Address.all.select { |a| a.places.size == 0 }
+        addresses = Address.all.select { |a| a.addressable.nil? }
         
         # initialize tag list
         tags      = ['coffee', 'beer', 'soccer', 'bar', 'party', 'muffin', 'pizza']
@@ -95,6 +95,37 @@ namespace :db do
           picked.push(tags.rand).uniq!
         end
         picked
+      end
+      
+      desc "Initialize chain stores"
+      task :chains do
+        chains = [{:name => "McDonalds", :tags => ["burgers", "greasy", "fries"]},
+                  {:name => "Starbucks", :tags => ["coffee", "tea", "wifi"]}
+                 ]
+        
+        chains.each do |hash|
+          name  = hash[:name]
+          chain = Chain.create(:name => name)
+          
+          # create chain places and addresses
+          
+          place = Place.create(:name => name)
+          chain.places.push(place)
+          
+          # create an address in each city
+          City.all.each do |city|
+            state   = city.state
+            country = state.country
+            address = Address.create(:name => "Work", :city => city, :state => state, :country => country)
+            place.addresses.push(address)
+            
+            # add place tags
+            address.place_tag_list.add(hash[:tags])
+            address.save
+          end
+        end
+        
+        puts "#{Time.now}: initialized chain stores #{chains.collect{ |h| h[:name]}.join(",")}"
       end
       
       desc "Initialize city to zip mappings"

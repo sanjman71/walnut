@@ -1,0 +1,9 @@
+- title(@title)
+
+.span-20.box
+  %h1= @h1
+  
+.prepend-1.span-14#cities
+  %h4== Find by city
+  - @cities.each do |city|
+    = link_to city.name, {:action => 'city', :city => city, :state => @state, :country => @country}

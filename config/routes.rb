@@ -17,6 +17,13 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources   :places, :only => [:index, :show]
   
+  # chains routes
+  map.connect     'chains/:name/:country', :controller => 'chains', :action => 'country'
+  map.connect     'chains/:name/:country/:state', :controller => 'chains', :action => 'state'
+  map.connect     'chains/:name/:country/:state/:city', :controller => 'chains', :action => 'city'
+  
+  map.resources   :chains, :only => [:index]
+  
   # zip routes
   map.connect     'zips/error/:area', :controller => 'zips', :action => 'error'
   map.connect     'zips/:country/:state/:city', :controller => 'zips', :action => 'city'

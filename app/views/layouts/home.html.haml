@@ -20,6 +20,8 @@
         .span-24.last{:style => 'text-align: right;'}
           = link_to 'Find Places', root_path, :style => 'color: #FFFFFF;'
           == &nbsp;|&nbsp;
+          = link_to 'Chain Stores', chains_path, :style => 'color: #FFFFFF;'
+          == &nbsp;|&nbsp;
           = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :style => 'color: #FFFFFF;'
           
     - if RAILS_ENV == 'development'
