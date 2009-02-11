@@ -14,7 +14,7 @@ namespace :db do
 
       Place.populate count do |place|
         place.name = Faker::Name.name
-        place.addresses_count = 0
+        place.locations_count = 0
       end
     end
         
