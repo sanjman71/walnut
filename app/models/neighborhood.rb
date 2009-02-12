@@ -3,6 +3,6 @@ class Neighborhood < ActiveRecord::Base
   validates_uniqueness_of     :name, :scope => :city_id
   belongs_to                  :city, :counter_cache => true
 
-  include NameModule
+  include NameParam
 
 end

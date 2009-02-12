@@ -6,7 +6,7 @@ class City < ActiveRecord::Base
   has_many                    :zips, :through => :city_zips
   has_many                    :neighborhoods
   
-  include NameModule
+  include NameParam
   
   # the special anywhere object
   def self.anywhere(state=nil)

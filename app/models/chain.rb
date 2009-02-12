@@ -4,7 +4,7 @@ class Chain < ActiveRecord::Base
   has_many                  :places
   has_many                  :locations, :through => :places
   
-  include NameModule
+  include NameParam
   
   # returns the total number of chain locations
   def count
