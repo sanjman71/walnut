@@ -31,11 +31,11 @@ class PlacesControllerTest < ActionController::TestCase
                :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :tag => 'food'
 
   # neighborhood route
-  should_route :get, '/places/us/il/chicago/hood/river-north', 
+  should_route :get, '/places/us/il/chicago/n/river-north', 
                :controller => 'places', :action => 'neighborhood', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north'
 
   # neighborhood tag route
-  should_route :get, '/places/us/il/chicago/hood/river-north/soccer', 
+  should_route :get, '/places/us/il/chicago/n/river-north/soccer', 
                :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :tag => 'soccer'
   
   # zip route

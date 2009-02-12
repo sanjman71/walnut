@@ -6,8 +6,8 @@ ActionController::Routing::Routes.draw do |map|
   
   # places [area, tag] routes
   map.connect     'places/search', :controller => 'places', :action => 'search'
-  map.connect     'places/:country/:state/:city/hood/:neighborhood/:tag', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
-  map.connect     'places/:country/:state/:city/hood/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
+  map.connect     'places/:country/:state/:city/n/:neighborhood/:tag', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
+  map.connect     'places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     'places/:country/:state/:city/:tag', :controller => 'places', :action => 'index', :city => /[a-z-]+/
   map.connect     'places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/
   map.connect     'places/:country/:state/:zip/:tag', :controller => 'places', :action => 'index', :zip => /\d{5}/
