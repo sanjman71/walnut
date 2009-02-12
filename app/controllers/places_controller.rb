@@ -41,15 +41,15 @@ class PlacesController < ApplicationController
     
     case @locality.class.to_s
     when 'City'
-      @state    = @area.state
+      @state    = @locality.state
       @country  = @state.country
       redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :tag => @tag) and return
     when 'Zip'
-      @state    = @area.state
+      @state    = @locality.state
       @country  = @state.country
       redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :tag => @tag) and return
     when 'Neighborhood'
-      @city     = @area.city
+      @city     = @locality.city
       @state    = @city.state
       @country  = @state.country
       redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :tag => @tag) and return

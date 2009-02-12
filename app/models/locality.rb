@@ -1,5 +1,5 @@
-class Locality < ActiveRecord::Base
-  acts_as_mappable
+class Locality
+  include Geokit::Mappable
   
   def self.resolve(s)
     begin
