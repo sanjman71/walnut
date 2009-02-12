@@ -1,14 +1,10 @@
 class CreateWalnut < ActiveRecord::Migration
   def self.up
     
-    create_table :localities do |t|
-      t.references  :extent, :polymorphic => true
-      t.integer     :locations_count, :default => 0  # counter cache of locations
-    end
-
     create_table :countries do |t|
       t.string      :name,          :default => nil
       t.string      :code,          :default => nil
+      t.integer     :locations_count, :default => 0   # counter cache
     end
 
     create_table :states do |t|
@@ -17,27 +13,37 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :country
       t.integer     :cities_count,  :default => 0
       t.integer     :zips_count,    :default => 0
+      t.integer     :locations_count, :default => 0   # counter cache
     end
 
     create_table :cities do |t|
       t.string      :name,          :default => nil
       t.references  :state
       t.integer     :neighborhoods_count, :default => 0
+      t.integer     :locations_count, :default => 0   # counter cache
     end
 
     create_table :zips do |t|
       t.string      :name,          :default => nil
       t.references  :state
+      t.integer     :locations_count, :default => 0   # counter cache
     end
 
     create_table :neighborhoods do |t|
       t.string      :name,          :default => nil
       t.references  :city
+      t.integer     :locations_count, :default => 0   # counter cache
+    end
+    
+    create_table :location_neighborhoods do |t|
+      t.references  :location
+      t.references  :neighborhoods
     end
     
     create_table :city_zips do |t|
       t.references  :city
       t.references  :zip
+      t.integer     :locations_count, :default => 0   # counter cache
     end
   
     create_table :locations do |t|
@@ -47,15 +53,11 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :state
       t.references  :zip
       t.references  :country
+      t.decimal     :lat, :precision => 15, :scale => 10
+      t.decimal     :lng, :precision => 15, :scale => 10
       t.references  :locatable, :polymorphic => true
     end
-        
-    # many to many relationship between locations and localities
-    create_table :locality_locations do |t|
-      t.references  :locality
-      t.references  :location
-    end
-    
+            
     create_table :places do |t|
       t.string      :name
       t.integer     :locations_count, :default => 0   # counter cache
@@ -69,12 +71,14 @@ class CreateWalnut < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table  :countries
     drop_table  :states
     drop_table  :cities
     drop_table  :zips
     drop_table  :neighborhoods
+    drop_table  :city_zips
     drop_table  :locations
-    drop_table  :localities
-    drop_table  :locality_locations
+    drop_table  :places
+    drop_table  :chains
   end
 end

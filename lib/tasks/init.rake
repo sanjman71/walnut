@@ -9,7 +9,6 @@ namespace :db do
         # create default localities
 
         @us = Country.create(:name => "United States", :code => "US")
-        Locality.create(:extent => @us)
         
         [{:city => "Chicago", :zip => "60654", :state => "Illinois", :code => "IL", :neighborhood => "River North"},
          {:city => "New York", :zip => "10001", :state => "New York", :code => "NY"},
@@ -17,17 +16,13 @@ namespace :db do
           @state  = State.create(:name => hash[:state], :code => hash[:code], :country => @us)
           @city   = City.create(:name => hash[:city], :state => @state)
           @zip    = Zip.create(:name => hash[:zip], :state => @state)
-          Locality.create(:extent => @state)
-          Locality.create(:extent => @city)
-          Locality.create(:extent => @zip)
           
           if hash[:neighborhood]
             @neighborhood = Neighborhood.create(:name => hash[:neighborhood], :city => @city)
-            Locality.create(:extent => @neighborhood)
           end
         end
       
-        puts "#{Time.now}: initialized #{Locality.count} localities"
+        puts "#{Time.now}: initialized basic countries, states, cities, zips, and neighborhoods"
       end
     
       desc "Init locations."
@@ -131,17 +126,17 @@ namespace :db do
       task :city_zips do
         Location.all.each do |location|
           # find location city, zip localities
-          localities = location.localities.select { |locality| [City, Zip].include?(locality.extent.class) }
+          localities = location.localities.select { |locality| [City, Zip].include?(locality.class) }
           
           # partition areas by type
-          groups  = localities.partition { |locality| locality.extent.is_a?(City) }
+          groups  = localities.partition { |locality| locality.is_a?(City) }
           
           cities  = groups.first
           zips    = groups.last
           
           cities.each do |city_locality|
             zips.each do |zip_locality|
-              CityZip.create(:city => city_locality.extent, :zip => zip_locality.extent)
+              CityZip.create(:city => city_locality, :zip => zip_locality)
             end
           end
         end

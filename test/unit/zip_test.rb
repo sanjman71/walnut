@@ -4,7 +4,6 @@ require 'test/factories'
 class ZipTest < ActiveSupport::TestCase
 
   should_belong_to    :state
-  should_have_many    :localities
   should_have_many    :cities
   
   def setup
@@ -30,7 +29,7 @@ class ZipTest < ActiveSupport::TestCase
       end
     end
     
-    context "1111" do
+    context "invalid zip 1111" do
       setup do
         @zip = Zip.create(:name => "1111", :state => @il)
       end
