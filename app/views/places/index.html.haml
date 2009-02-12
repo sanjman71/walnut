@@ -18,7 +18,9 @@
     = render(:partial => 'city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag}) unless @zips.blank?
   #cities
     = render(:partial => 'zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag}) unless @cities.blank?
-    
+  #nearby_cities
+    = render(:partial => 'nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag}) unless @nearby_cities.blank?
+  
   -# another google ad
   = google_ad(160, 600)
   

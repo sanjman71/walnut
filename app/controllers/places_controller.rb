@@ -73,6 +73,9 @@ class PlacesController < ApplicationController
     # find city zips if its a city search
     @zips           = @city.zips if @city
 
+    # find nearby cities if its a city search
+    @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city)
+    
     # find zip cities if its a zip search
     @cities         = @zip.cities if @zip
     
@@ -84,7 +87,7 @@ class PlacesController < ApplicationController
     @h1             = @title
     
     # find location matching query, eager load locatables
-    @locations      = Location.search(@query, :include => :locatable).paginate(:page => params[:page])
+    @locations      = Location.search(@query, :include => [:locatable, :place_tags]).paginate(:page => params[:page])
   end
   
   def show

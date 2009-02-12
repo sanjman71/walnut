@@ -4,7 +4,7 @@ namespace :db do
     
       task :all => [:localities, :locations, "db:populate:places", :tags, :chains, :city_zips]
     
-      desc "Init localities database"
+      desc "Init default countries, states, cities, zips, neighborhoods."
       task :localities do
         # create default localities
 
@@ -22,9 +22,27 @@ namespace :db do
           end
         end
       
-        puts "#{Time.now}: initialized basic countries, states, cities, zips, and neighborhoods"
+        puts "#{Time.now}: initialized default countries, states, cities, zips, and neighborhoods"
       end
     
+      desc "Initialize nearby cities"
+      task :nearby_cities do
+        @cities = [{:state => 'Illinois', :city => 'Naperville'},
+                   {:state => 'Illinois', :city => 'Aurora'}]
+                   
+        @cities.each do |hash|
+          # find state
+          @state = State.find_by_name(hash[:state])
+          next if @state.blank?
+          
+          # find or create city
+          @city = @state.cities.find_by_name(hash[:city]) || City.create(:name => hash[:city], :state => @state)
+          @city.geocode_latlng
+        end
+        
+        puts "#{Time.now}: initialized nearby cities"
+      end
+      
       desc "Init locations."
       task :locations do |t|
 

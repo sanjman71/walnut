@@ -6,7 +6,12 @@ class City < ActiveRecord::Base
   has_many                    :zips, :through => :city_zips
   has_many                    :neighborhoods
   
+  acts_as_mappable
+  
   include NameParam
+  
+  named_scope :exclude,       lambda { |city| {:conditions => ["id <> ?", city.is_a?(Integer) ? city : city.id] } }
+  named_scope :within_state,  lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
   
   # the special anywhere object
   def self.anywhere(state=nil)
@@ -19,6 +24,16 @@ class City < ActiveRecord::Base
   
   def anywhere?
     self.id == 0
+  end
+  
+  def geocode_latlng(options={})
+    force = options.has_key?(:force) ? options[:force] : false
+    return true if self.lat and self.lng and !force
+    # multi-geocoder geocode does not throw an exception on failure
+    geo = Geokit::Geocoders::MultiGeocoder.geocode("#{name}, #{state.name}")
+    return false unless geo.success
+    self.lat, self.lng = geo.lat, geo.lng
+    self.save
   end
   
 end
