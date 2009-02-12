@@ -8,4 +8,5 @@
     %br
     %span.tags.place
       - location.place_tag_list.each do |place_tag|
-        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:tag => place_tag}
+        - klasses = tag == place_tag ? ["current", "highlight"] : []
+        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:tag => place_tag}, :class => klasses.join(" ")
