@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2007-08-31T01:27:05.295096Z"
+   url="http://doodle-ad-stub.googlecode.com/svn/trunk/public/images/doodle_ad_stub"
+   last-author="themactep"
+   kind="dir"
+   uuid="31b74f92-f438-0410-9406-838beb06f9a3"
+   repos="http://doodle-ad-stub.googlecode.com/svn"
+   revision="9"/>
+<entry
+   committed-rev="2"
+   name="160x90_links5.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="10d36bdeb5b11bad970b84a3bc2b4a77"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="180x90_links5.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="a722daa6f71190b6fea629bfce69aae5"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="336x280_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="8f965af599f80d6e6e2b324d83439ed2"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="180x60_button.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="87f62d9a62a35e72d085f1fbdf6d0f82"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x90_links.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="aecd14b75d18a0e3172b3d710cc9431b"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="160x90_links.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="ab8a11a59d976d0e645c1f082817a2fb"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="300x250_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="9ea265be866ba5f164d96e3a8df4e672"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="728x90_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="ab3eae20d29f395a4087cf97df9ab2f6"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="180x90_links.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="578ee9f17bf015998269af9bc1db149f"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="468x60_button.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="0fce5453fae1174a7a5f3a878247a007"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x240_button.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="e9b6251e0c9c0d8a983c76735653dbf1"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="200x200_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="caa88dd5263e7029e86bf2c3ce6f89c0"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:53.000000Z"/>
+<entry
+   committed-rev="2"
+   name="728x15_links.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="52a1574fb91f3140ab4f32b7407393f4"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:53.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x600_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="08ec826de853d6c706b6e4b48ba407d4"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="336x280_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="246463e9886f92e2f4d5908c1bd72127"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="468x60_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="8922cdd3c0e456307be103916293fb79"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x600_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="7afb96d5572d649daf74286d242a5f8c"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x240_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="3a4d6256270d5aeb969010712511c254"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="728x90_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="b8e21ef664ab47b99a078401becdb68a"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="300x250_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="e6b6e83ac46bacf76ef0d4a8e7062449"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:54.000000Z"/>
+<entry
+   committed-rev="2"
+   name="160x600_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="81b42f1312f4a991c8fa7cb7a6ac058e"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="250x250_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="83d9c19e6d860ca5d99e58d6293bba6b"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="160x600_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="1237ca158bc1566f040238512df0f68f"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="110x32_button.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="20a864db55acaa9a55f198eba3cdb928"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="336x280_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="c6a8b4cea73e0e01a5678803b8bceee5"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="200x200_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="bb5c748d06523f583643b3d5a57cdc6d"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="200x90_links.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="ddc8e103f5201278a4cb58b1ec526717"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="728x15_links5.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="27093acad153b728a36ebc94ad7f31de"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="468x15_links5.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="a5ecd4270e66def5f302ef7d43018088"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x600_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="25dff3a11429dfb9975924e1895bcef5"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:55.000000Z"/>
+<entry
+   committed-rev="2"
+   name="160x600_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="33319df125cc765bed2b4d471679a540"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="234x60_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="a0d0eb9dbe1929dcbbd3a3e7889431eb"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="250x250_video.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="9d932ed7d9d8f86583229573e55734af"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="200x200_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="259a0bd48913622a28d94b0bc5147168"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="468x15_links.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="be7fb9afe29ee2ce6a4e83ff11843d85"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="468x60_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="366ba313af7600c784bfdbb4c061d8f7"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="125x125_button.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="744b9821bb48f7dc4f652edab7bed5a2"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:56.000000Z"/>
+<entry
+   committed-rev="2"
+   name="300x250_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="9f204dcbc4e77cd36759eda9acc0f9c1"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="728x90_image.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="ff61444ec8952b1174bab80552fc4bbc"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="200x90_links5.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="bbc1fd54b99a7c7954f3430efc1eeee9"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x90_links5.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="67dd86d3b193ac9611abe32dab670c73"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="250x250_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="94ca1755878749205886493123da1ef5"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="180x150_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="453c12f4e5468cfcf885026361bb397b"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="125x125_text.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="aa940ce02d91ef0f6bdacafb8ea97e2f"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+<entry
+   committed-rev="2"
+   name="120x60_button.png"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="52a3caddba643733eb0b8af9404928cf"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:57.000000Z"/>
+</wc-entries>

@@ -1,17 +1,32 @@
 - title(@title)
 
-.span-20.box
+.span-23.box
   %h1= @h1
   %h4.span-7.last#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood, :link_all => true})
   
+.span-22.prepend-2
+  -# try a google ad
+  = google_ad(728, 90, 'image')
+
 %hr.space
 
-.span-19.prepend-1#query
-  .span-15
+.span-4.colborder#sidebar
+  #neighborhoods
+    = render(:partial => 'city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag}) unless @neighborhoods.blank?
+  #zips
+    = render(:partial => 'city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag}) unless @zips.blank?
+  #cities
+    = render(:partial => 'zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag}) unless @cities.blank?
+    
+  -# another google ad
+  = google_ad(160, 600)
+  
+.span-19.last#search
+  .span-10
     %h4= page_entries_info @locations unless @locations.blank?
   .span-5.last
     = will_paginate(@locations, :page_links => false)
-  
-.span-24#places
-  =render(:partial => 'places', :locals => {:locations => @locations})
+
+  .span-19.last
+    =render(:partial => 'places', :locals => {:locations => @locations})

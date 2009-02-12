@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="2"
+   name=""
+   committed-date="2007-08-31T01:27:05.295096Z"
+   url="http://doodle-ad-stub.googlecode.com/svn/trunk/test"
+   last-author="themactep"
+   kind="dir"
+   uuid="31b74f92-f438-0410-9406-838beb06f9a3"
+   repos="http://doodle-ad-stub.googlecode.com/svn"
+   revision="9"/>
+<entry
+   committed-rev="2"
+   name="doodle_ad_stub_test.rb"
+   text-time="2009-02-12T16:00:52.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="896daf6fa35475af5504994ac54434c9"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+</wc-entries>

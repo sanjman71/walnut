@@ -23,6 +23,10 @@ class LocationTest < ActiveSupport::TestCase
     
     should_change "Location.count", :by => 1
     
+    should "have us as locality" do
+      assert_equal [@us], @location.localities
+    end
+    
     should "have united states locality tag" do
       assert_equal ["United States"], @location.locality_tag_list
     end
@@ -36,6 +40,10 @@ class LocationTest < ActiveSupport::TestCase
         @location.country = nil
         @location.save
         @us.reload
+      end
+
+      should "have us no localities" do
+        assert_equal [], @location.localities
       end
 
       should "have no locality tags" do
@@ -159,6 +167,42 @@ class LocationTest < ActiveSupport::TestCase
 
       should "decrement zip locations_count" do
         assert_equal 0, @zip.locations_count
+      end
+    end
+  end
+  
+  context "location with neighborhoods" do
+    setup do
+      @location = Location.create(:name => "Home")
+      @location.neighborhoods.push(@river_north)
+      @location.reload
+      @river_north.reload
+    end
+    
+    should_change "Location.count", :by => 1
+  
+    should "have neighborhood locality" do
+      assert_equal [@river_north], @location.localities
+    end
+    
+    should "have neighborhood locality tag" do
+      assert_equal ["River North"], @location.locality_tag_list
+    end
+    
+    should "increment neighborhood and locations counter caches" do
+      assert_equal 1, @river_north.locations_count
+      assert_equal 1, @location.neighborhoods_count
+    end
+  
+    context "remove neighborhood" do
+      setup do
+        @location.neighborhoods.delete(@river_north)
+        @location.reload
+        @river_north.reload
+      end
+
+      should "have no locality tag" do
+        assert_equal [], @location.locality_tag_list
       end
     end
   end

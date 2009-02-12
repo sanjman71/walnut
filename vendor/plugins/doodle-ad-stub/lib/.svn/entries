@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="8"
+   name=""
+   committed-date="2007-09-01T00:38:07.719731Z"
+   url="http://doodle-ad-stub.googlecode.com/svn/trunk/lib"
+   last-author="themactep"
+   kind="dir"
+   uuid="31b74f92-f438-0410-9406-838beb06f9a3"
+   repos="http://doodle-ad-stub.googlecode.com/svn"
+   revision="9"/>
+<entry
+   name="ppds"
+   kind="dir"/>
+</wc-entries>

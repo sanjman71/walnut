@@ -1,0 +1,10 @@
+Ppds::DoodleAdStub.client_id = "pub-0557047985484196"
+Ppds::DoodleAdStub.color_border = "666666"
+Ppds::DoodleAdStub.color_bg = "DDDDDD"
+Ppds::DoodleAdStub.color_link = "0000FF"
+Ppds::DoodleAdStub.color_text = "000000"
+Ppds::DoodleAdStub.color_url = "008800"
+Ppds::DoodleAdStub.ui_features = "rc:6"
+Ppds::DoodleAdStub.language = "en"
+Ppds::DoodleAdStub.cpa_choice = nil
+Ppds::DoodleAdStub.ad_channel = nil

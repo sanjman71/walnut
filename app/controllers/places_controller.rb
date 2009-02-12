@@ -62,10 +62,19 @@ class PlacesController < ApplicationController
   def index
     @country        = Country.find_by_code(params[:country].to_s.upcase)
     @state          = State.find_by_code(params[:state].to_s.upcase)
-    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank?
-    @zip            = @state.zips.find_by_name(params[:zip].to_s) unless @state.blank?
-    @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
+    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank? or params[:city].blank?
+    @zip            = @state.zips.find_by_name(params[:zip].to_s) unless @state.blank? or params[:zip].blank?
+    @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
     @tag            = params[:tag]
+    
+    # find city neighborhoods if its a city search
+    @neighborhoods  = @city.neighborhoods if @city
+    
+    # find city zips if its a city search
+    @zips           = @city.zips if @city
+
+    # find zip cities if its a zip search
+    @cities         = @zip.cities if @zip
     
     # build sphinx query
     @query          = [@country, @state, @city, @neighborhood, @zip, @tag].compact.collect { |o| o.is_a?(String) ? o : o.name }.join(" ")
@@ -74,8 +83,8 @@ class PlacesController < ApplicationController
     @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
     
-    # find location matching query
-    @locations      = Location.search(@query).paginate(:page => params[:page])
+    # find location matching query, eager load locatables
+    @locations      = Location.search(@query, :include => :locatable).paginate(:page => params[:page])
   end
   
   def show

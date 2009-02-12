@@ -1,0 +1,55 @@
+Doodle AdStub
+=============
+
+This plugin let you use stub images instead of real Google AdSense ads while running web project in development mode.
+
+
+Installation
+============
+
+After copying content of the plugin to vendor/plugins directory of your project open terminal and run following command in the root directory of the plugin (vendor/plugins/doodle_ad_stub)
+
+  $ ruby ./install.rb
+
+This will create public/images/doodle_ad_stub/ directory and copy images of most available Google AdSense ad formats to it.
+
+Plese note, configuration file will be placed to config/initializers/doodle_ad_stub.rb, don't forget to review it correct settings.
+
+Settings
+========
+
+  Ppds::DoogleAdStub.client_id = "pub-0557047985484196"
+  Ppds::DoogleAdStub.color_border = "666666"
+  Ppds::DoogleAdStub.color_bg = "DDDDDD"
+  Ppds::DoogleAdStub.color_link = "0000FF"
+  Ppds::DoogleAdStub.color_text = "000000"
+  Ppds::DoogleAdStub.color_url = "008800"
+  Ppds::DoogleAdStub.ui_features = "rc:6"
+  Ppds::DoogleAdStub.language = "en"
+  Ppds::DoogleAdStub.cpa_choice = nil
+  Ppds::DoogleAdStub.ad_channel = nil
+
+You'll want to change at least Ppds::DoogleAdStub.tracker_id to match your Google AdSense ID. The rest settings to customize the appearance of the ads and are optional.
+
+Usage
+=====
+
+  <%= google_ad(<width>, <height>, <type>) %>
+
+where <width> and <height> are dimension of the ad and type is one of the following avalable types: text / image / link / link5 / video / button.
+Resulting code will contain image tag either javascript code wrapped in <div> element with "google_adsense" class. You can style it via CSS.
+
+Sample
+======
+
+  <%= google_ad(728, 15, 'links') %> for set of 4 links
+  <%= google_ad(200, 90, 'links5') %> for set of 5 link
+  <%= google_ad(110, 32, 'button') %> for button
+  <%= google_ad(300, 250, 'video') %> for video ad
+  <%= google_ad(468, 60, 'image') %>  for image ad
+  <%= google_ad(468, 60, 'text') %> for text ad
+  <%= google_ad(468, 60) %> same as above, without explicitly defined type defaults to text.
+
+---
+Copyright (c) 2007 Paul Philippov <paul@ppds.ws>, released under the MIT license.
+Google AdSense and ad formats are copyright (c) 2007 Google. http://www.google.com/adsense/static/en_US/AdFormats.html

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wc-entries
+   xmlns="svn:">
+<entry
+   committed-rev="9"
+   name=""
+   committed-date="2007-09-01T00:39:16.164283Z"
+   url="http://doodle-ad-stub.googlecode.com/svn/trunk"
+   last-author="themactep"
+   kind="dir"
+   uuid="31b74f92-f438-0410-9406-838beb06f9a3"
+   repos="http://doodle-ad-stub.googlecode.com/svn"
+   prop-time="2009-02-12T16:00:57.000000Z"
+   revision="9"/>
+<entry
+   name="test"
+   kind="dir"/>
+<entry
+   committed-rev="3"
+   name="Rakefile"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T02:37:38.369534Z"
+   checksum="02288207e812d17d9a87e59ac2f61c3b"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   name="tasks"
+   kind="dir"/>
+<entry
+   committed-rev="2"
+   name="init.rb"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="717bdf00a5497bd6824f6df31db15eec"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   name="lib"
+   kind="dir"/>
+<entry
+   committed-rev="2"
+   name="install.rb"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="ed28f1a6c2120e2f78c4369b5714b904"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="MIT-LICENSE"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="f745cfa0587c10b7adabaae15c4ec423"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="2"
+   name="uninstall.rb"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T01:27:05.295096Z"
+   checksum="99a77f56fa2d2c068b05385b054cf940"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   committed-rev="5"
+   name="README"
+   text-time="2009-02-12T16:00:57.000000Z"
+   committed-date="2007-08-31T02:44:16.502641Z"
+   checksum="43d8eced38cb14b90541815379e928c8"
+   last-author="themactep"
+   kind="file"
+   prop-time="2009-02-12T16:00:52.000000Z"/>
+<entry
+   name="public"
+   kind="dir"/>
+</wc-entries>

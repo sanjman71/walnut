@@ -37,7 +37,7 @@ class CreateWalnut < ActiveRecord::Migration
     
     create_table :location_neighborhoods do |t|
       t.references  :location
-      t.references  :neighborhoods
+      t.references  :neighborhood
     end
     
     create_table :city_zips do |t|
@@ -53,6 +53,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :state
       t.references  :zip
       t.references  :country
+      t.integer     :neighborhoods_count, :default => 0 # counter cache
       t.decimal     :lat, :precision => 15, :scale => 10
       t.decimal     :lng, :precision => 15, :scale => 10
       t.references  :locatable, :polymorphic => true

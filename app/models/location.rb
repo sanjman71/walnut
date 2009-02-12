@@ -4,8 +4,8 @@ class Location < ActiveRecord::Base
   belongs_to              :state
   belongs_to              :city
   belongs_to              :zip
-  has_many                :neighborhoods
-  
+  has_many                :location_neighborhoods
+  has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   belongs_to              :locatable, :polymorphic => true, :counter_cache => :locations_count
   
   after_save              :update_locality_tags
@@ -24,7 +24,7 @@ class Location < ActiveRecord::Base
   
   # return collection of location's country, state, city, zip, neighborhoods
   def localities
-    [country, state, city, zip].compact
+    [country, state, city, zip].compact + neighborhoods.compact
   end
   
   protected
@@ -45,7 +45,7 @@ class Location < ActiveRecord::Base
       old_id, new_id = self.changes[change]
       
       if old_id
-        # remove locality
+        # remove locality tag
         locality = klass.find_by_id(old_id.to_i)
         locality_tag_list.remove(locality.name)
         # decrement counter cache
@@ -53,7 +53,7 @@ class Location < ActiveRecord::Base
       end
       
       if new_id
-        # add locality
+        # add locality tag
         locality = klass.find_by_id(new_id.to_i)
         locality_tag_list.add(locality.name)
         # increment counter cache
@@ -62,4 +62,17 @@ class Location < ActiveRecord::Base
     end
   end
   
+  def after_add_neighborhood(hood)
+    return if hood.blank?
+    # add locality tag
+    locality_tag_list.add(hood.name)
+    save
+  end
+  
+  def before_remove_neighborhood(hood)
+    return if hood.blank?
+    # remove locality tag
+    locality_tag_list.remove(hood.name)
+    save
+  end
 end

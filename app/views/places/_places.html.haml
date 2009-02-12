@@ -1,5 +1,5 @@
 - locations.each do |location|
-  .span-17.prepend-1.letterbox{:class => cycle("shaded", "")}[location]
+  .prepend-1.letterbox{:class => cycle("shaded", "")}[location]
     %h3.name.margin-bottom-0
       = link_to location.locatable.name, {:controller => 'places', :action => 'show', :id => location}
     %span.street= location.street_address
