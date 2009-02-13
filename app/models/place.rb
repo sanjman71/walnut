@@ -12,8 +12,6 @@ class Place < ActiveRecord::Base
   
   attr_readonly             :locations_count
   
-  # acts_as_taggable_on       :tags
-  
   private
   
   def after_add_location(location)

@@ -15,6 +15,10 @@ class Location < ActiveRecord::Base
   
   acts_as_taggable_on     :locality_tags, :place_tags
   
+  named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
+  named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
+  
+  
   define_index do
     indexes locatable.name
     indexes street_address

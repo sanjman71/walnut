@@ -2,6 +2,8 @@
 
 .span-20.box
   %h1= @h1
+  %h4.span-7.last#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
 
 .span-24#places
   =render(:partial => 'places/places', :locals => {:locations => @locations})

@@ -13,12 +13,12 @@ class Chain < ActiveRecord::Base
 
   # returns the list of states for the chain store
   def states
-    locations.collect { |a| a.state }.uniq
+    locations.collect(&:state).uniq
   end
-
+  
   # returns the list of states for the chain store
   def cities
-    locations.collect { |a| a.city }.uniq
+    locations.collect(&:city).uniq
   end
   
 end

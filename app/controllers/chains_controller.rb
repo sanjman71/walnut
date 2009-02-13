@@ -22,8 +22,8 @@ class ChainsController < ApplicationController
   def state
     # @country, @state initialized in before filter
     @chain      = Chain.find(params[:name].to_i)
-    @locations  = @chain.locations.select { |a| a.state_id == @state.id }
-    @cities     = @chain.cities
+    @locations  = @chain.locations.for_state(@state)
+    @cities     = @locations.collect(&:city).uniq
     
     @title      = "#{@chain.name} Locations in #{@state.name}"
     @h1         = @title
@@ -32,7 +32,7 @@ class ChainsController < ApplicationController
   def city
     # @country, @state initialized in before filter
     @chain      = Chain.find(params[:name].to_i)
-    @locations  = @chain.locations.select { |a| a.city_id == @city.id }
+    @locations  = @chain.locations.for_city(@city)
     
     @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
     @h1         = @title
