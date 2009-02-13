@@ -1,5 +1,5 @@
 class PlacesController < ApplicationController
-  before_filter   :init_areas, :only => [:country, :state, :city, :neighborhood, :zip]
+  before_filter   :init_areas, :only => [:country, :state, :city, :neighborhood, :zip, :index]
   layout "home"
   
   def country
@@ -60,24 +60,22 @@ class PlacesController < ApplicationController
   end
   
   def index
-    @country        = Country.find_by_code(params[:country].to_s.upcase)
-    @state          = State.find_by_code(params[:state].to_s.upcase)
-    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless @state.blank? or params[:city].blank?
-    @zip            = @state.zips.find_by_name(params[:zip].to_s) unless @state.blank? or params[:zip].blank?
+    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless params[:city].blank?
+    @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
     @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
     @tag            = params[:tag]
     
     # find city neighborhoods if its a city search
-    @neighborhoods  = @city.neighborhoods if @city
+    @neighborhoods  = @city.neighborhoods unless @city.blank?
     
     # find city zips if its a city search
-    @zips           = @city.zips if @city
+    @zips           = @city.zips unless @city.blank?
 
     # find nearby cities if its a city search
-    @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city)
+    @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city) unless @city.blank?
     
     # find zip cities if its a zip search
-    @cities         = @zip.cities if @zip
+    @cities         = @zip.cities unless @zip.blank?
     
     # build sphinx query
     @query          = [@country, @state, @city, @neighborhood, @zip, @tag].compact.collect { |o| o.is_a?(String) ? o : o.name }.join(" ")
@@ -91,8 +89,18 @@ class PlacesController < ApplicationController
   end
   
   def show
-    @location = Location.find(params[:id])
+    @location = Location.find(params[:id], :include => [:locatable, :place_tags, :locality_tags])
     @place    = @location.locatable unless @location.blank?
+
+    if @location.blank? or @place.blank?
+      redirect_to(:controller => 'places', :action => 'error', :area => 'location') and return
+    end
+
+    # initialize localities
+    @country  = @location.country
+    @state    = @location.state
+    @city     = @location.city
+    @zip      = @location.zip
     
     @title    = "#{@place.name}"
     @h1       = @title

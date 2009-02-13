@@ -1,4 +1,40 @@
 - title(@title)
+- content_for :head do
+  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
+- javascript("jquery.jmap", "maps")
 
-.span-20.box
+.span-23.box
   %h1= @h1
+  %h4.span-7.last#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
+
+.span-23.prepend-1.last
+  .span-11
+    = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
+  .span-12.last
+    %h2
+      = @location.street_address
+      %br
+      = city_state_zip(@city, @state, @zip)
+  
+%hr.space
+
+.span-18.colborder
+  .span-7.prepend-1.colborder
+    %h3== Search Tags
+    - @location.place_tags.each do |tag|
+      %span{:style => 'font-size: 13px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :tag => tag.name)
+    
+  .span-9.last
+    %h3== Location Tags
+    - @location.locality_tags.each do |tag|
+      %span{:style => 'font-size: 13px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
+    
+  %hr.space
+  
+  .span-17.prepend-1.last#nearby_locations
+    %h3== Nearby Locations
+    
+.span-5.last#sidebar
+  -# google ad
+  = google_ad(160, 600)

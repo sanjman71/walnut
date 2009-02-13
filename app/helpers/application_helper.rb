@@ -32,4 +32,43 @@ module ApplicationHelper
     "<div class=\"#{type.to_s}\">#{msg}</div>"
   end
   
+  # build a place search route
+  # note: searching can only be done by city, zip or neighborhood
+  def build_search_route(where, options={})
+    case where
+    when 'city'
+      url_for(:action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], :tag => options[:tag])
+    when 'zip'
+      url_for(:action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], :tag => options[:tag])
+    when 'neighborhood'
+      url_for(:action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+              :neighborhood => options[:neighborhood], :tag => options[:tag])
+    else
+      raise ArgumentError, "no route for #{where}"
+    end
+  end
+  
+  def infer_locality_route(name, options={})
+    # map name to a specific locality object
+    locality = options.values.compact.find { |o| o ? o.name == name : false }
+    return '' if locality.blank?
+    # build route using locality object
+    build_locality_route(locality, options)
+  end
+  
+  def build_locality_route(locality, options={})
+    case locality.class.to_s
+    when 'Country'
+      url_for(:action => 'country', :country => options[:country])
+    when 'State'
+      url_for(:action => 'state', :country => options[:country], :state => options[:state])
+    when 'City'
+      url_for(:action => 'city', :country => options[:country], :state => options[:state], :city => options[:city])
+    when 'Zip'
+      url_for(:action => 'zip', :country => options[:country], :state => options[:state], :zip => options[:zip])
+    else
+      ''
+    end
+  end
+  
 end

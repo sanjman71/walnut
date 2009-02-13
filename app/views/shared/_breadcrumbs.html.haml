@@ -2,19 +2,21 @@
 - city          = nil unless defined?(city)
 - neighborhood  = nil unless defined?(neighborhood)
 - state         = nil unless defined?(state)
-- link_all      = nil unless defined?(link_all) # true means link all breadcrumb objects
+- link_all      = nil unless defined?(link_all) # if true, link all breadcrumb objects
 
 - separator     = ">"
 
-- areas = [country, state, city, zip, neighborhood].compact
-- size  = areas.size
+-# build ordered hash mapping locality type to object; remove empty objects
+- localities    = ActiveSupport::OrderedHash[[:country, country], [:state, state], [:city, city], [:zip, zip], [:neighborhood, neighborhood]].delete_if { |klass, object| object.blank? }
+- size          = localities.size
 
-- areas.each_with_index do |area, index|
-  - klass = area.class.to_s.downcase
+- localities.each_with_index do |tuple, index|
+  - klass, locality = tuple
+  - next if locality.blank?
   - if index == size-1 and link_all.nil?
-    %span{:class => klass}= area.name
+    %span{:class => klass}= locality.name
   - else
-    = link_to area.name, url_for(:action => klass), :class => klass
+    = link_to locality.name, build_locality_route(locality, localities), :class => klass
 
   -# show separator unless its the last object
   = separator unless index == size-1

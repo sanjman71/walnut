@@ -27,6 +27,22 @@ class Location < ActiveRecord::Base
     [country, state, city, zip].compact + neighborhoods.compact
   end
   
+  # returns true iff the location has a latitude and longitude 
+  def mappable?
+    return true if self.lat and self.lng?
+    false
+  end
+  
+  def geocode_latlng(options={})
+    force = options.has_key?(:force) ? options[:force] : false
+    return true if self.lat and self.lng and !force
+    # multi-geocoder geocode does not throw an exception on failure
+    geo = Geokit::Geocoders::MultiGeocoder.geocode("#{street_address}, #{city.name }#{state.name}")
+    return false unless geo.success
+    self.lat, self.lng = geo.lat, geo.lng
+    self.save
+  end
+  
   protected
   
   # after_save callback to update locality tags (e.g. country, state, city, zip, neighborhood) based on changes to the location object
