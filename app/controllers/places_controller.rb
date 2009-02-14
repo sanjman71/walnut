@@ -77,15 +77,16 @@ class PlacesController < ApplicationController
     # find zip cities if its a zip search
     @cities         = @zip.cities unless @zip.blank?
     
-    # build sphinx query
-    @query          = [@country, @state, @city, @neighborhood, @zip, @tag].compact.collect { |o| o.is_a?(String) ? o : o.name }.join(" ")
-
     # build search title based on city, neighborhood, zip search
     @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
     
+    # build sphinx query
+    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag)
+    
     # find location matching query, eager load locatables
-    @locations      = Location.search(@query, :include => [:locatable, :place_tags]).paginate(:page => params[:page])
+    @locations      = Location.search(:conditions => {:place_tags => @search.field_for(:place_tags), :locality_tags => @search.field_for(:locality_tags)}, 
+                                      :include => [:locatable, :place_tags]).paginate(:page => params[:page])
   end
   
   def show
