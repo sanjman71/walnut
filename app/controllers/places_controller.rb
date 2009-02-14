@@ -85,7 +85,7 @@ class PlacesController < ApplicationController
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag)
     
     # find location matching query, eager load locatables
-    @locations      = Location.search(:conditions => {:place_tags => @search.field_for(:place_tags), :locality_tags => @search.field_for(:locality_tags)}, 
+    @locations      = Location.search(:conditions => {:place_tags => @search.field(:place_tags), :locality_tags => @search.field(:locality_tags)}, 
                                       :include => [:locatable, :place_tags]).paginate(:page => params[:page])
   end
   

@@ -13,12 +13,12 @@ class SearchTest < ActiveSupport::TestCase
       
       should "have localities tag" do
         assert_equal ["United States", "Illinois"], @search.locality_tags
-        assert_equal "United States Illinois", @search.field_for(:locality_tags)
+        assert_equal "United States Illinois", @search.field(:locality_tags)
       end
       
       should "have no place tags" do
         assert_equal [], @search.place_tags
-        assert_equal "", @search.field_for(:place_tags)
+        assert_equal "", @search.field(:place_tags)
       end
     end
     
@@ -31,12 +31,12 @@ class SearchTest < ActiveSupport::TestCase
       
       should "have localities tag" do
         assert_equal ["United States", "Illinois"], @search.locality_tags
-        assert_equal "United States Illinois", @search.field_for(:locality_tags)
+        assert_equal "United States Illinois", @search.field(:locality_tags)
       end
       
       should "have place tags" do
         assert_equal ["coffee", "shop"], @search.place_tags
-        assert_equal "coffee || shop", @search.field_for(:place_tags)
+        assert_equal "coffee || shop", @search.field(:place_tags)
       end
     end
     

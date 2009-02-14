@@ -6,7 +6,7 @@ class Search
     @place_tags     = options[:place_tags] || []
   end
   
-  def field_for(field)
+  def field(field)
     case field
     when :locality_tags, "locality_tags"
       @locality_tags.join(" ")
