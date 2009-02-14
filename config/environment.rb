@@ -78,3 +78,6 @@ Rails::Initializer.run do |config|
   # Turn off timestamped migrations
   config.active_record.timestamped_migrations = false
 end
+
+# Extend ruby classes
+require "#{RAILS_ROOT}/lib/string.rb"
