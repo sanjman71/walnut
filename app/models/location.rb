@@ -20,8 +20,8 @@ class Location < ActiveRecord::Base
   
   
   define_index do
-    indexes locatable.name
-    indexes street_address
+    indexes locatable.name, :as => :name
+    indexes street_address, :as => :street_address
     indexes locality_tags.name, :as => :locality_tags
     indexes place_tags.name, :as => :place_tags
   end

@@ -20,6 +20,10 @@ class SearchTest < ActiveSupport::TestCase
         assert_equal [], @search.place_tags
         assert_equal "", @search.field(:place_tags)
       end
+      
+      should "have no multiple field tags on name and place_tags" do
+        assert_equal "@(name,place_tags)", @search.multiple_fields(:name, :place_tags)
+      end
     end
     
     context "with tags 'coffee shop'" do
@@ -36,7 +40,15 @@ class SearchTest < ActiveSupport::TestCase
       
       should "have place tags" do
         assert_equal ["coffee", "shop"], @search.place_tags
-        assert_equal "coffee || shop", @search.field(:place_tags)
+        assert_equal "coffee | shop", @search.field(:place_tags)
+      end
+      
+      should "have multiple field tags on name and place_tags" do
+        assert_equal "@(name,place_tags) coffee | shop", @search.multiple_fields(:name, :place_tags)
+      end
+
+      should "have multiple field tags on place_tags" do
+        assert_equal "@(place_tags) coffee | shop", @search.multiple_fields(:place_tags)
       end
     end
     

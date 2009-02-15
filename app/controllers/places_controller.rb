@@ -33,7 +33,7 @@ class PlacesController < ApplicationController
   def search
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
-    @tag      = params[:what].to_s
+    @tag      = params[:what].to_s.to_url_param
     
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return
@@ -63,7 +63,7 @@ class PlacesController < ApplicationController
     @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless params[:city].blank?
     @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
     @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
-    @tag            = params[:tag]
+    @tag            = params[:tag].to_s.from_url_param
     
     # find city neighborhoods if its a city search
     @neighborhoods  = @city.neighborhoods unless @city.blank?
@@ -81,11 +81,16 @@ class PlacesController < ApplicationController
     @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
     
-    # build sphinx query
+    # build search object
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag)
     
-    # find location matching query, eager load locatables
-    @locations      = Location.search(:conditions => {:place_tags => @search.field(:place_tags), :locality_tags => @search.field(:locality_tags)}, 
+    # find locations matching query, eager load locatables
+    # @locations      = Location.search(:conditions => {:place_tags => @search.field(:place_tags), :locality_tags => @search.field(:locality_tags)}, 
+    #                                   :include => [:locatable, :place_tags]).paginate(:page => params[:page])
+
+    # use 'what' param to search name and place_tags fields
+    # use 'where' param as locality_tags field filter
+    @locations      = Location.search(@search.multiple_fields(:name, :place_tags), :conditions => {:locality_tags => @search.field(:locality_tags)}, 
                                       :include => [:locatable, :place_tags]).paginate(:page => params[:page])
   end
   
