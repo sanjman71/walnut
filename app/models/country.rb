@@ -3,7 +3,8 @@ class Country < ActiveRecord::Base
   validates_uniqueness_of     :name
   has_many                    :states
   has_many                    :addresses
-
+  has_many                    :locations
+  
   include NameParam
   
   def self.default

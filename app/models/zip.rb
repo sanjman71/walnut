@@ -5,6 +5,7 @@ class Zip < ActiveRecord::Base
   belongs_to                  :state, :counter_cache => true
   has_many                    :city_zips
   has_many                    :cities, :through => :city_zips
+  has_many                    :locations
   
   include NameParam
 end

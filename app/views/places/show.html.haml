@@ -14,9 +14,7 @@
       = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
     .span-6.append-1.last
       %h2
-        = @location.street_address
-        %br
-        = city_state_zip(@city, @state, @zip)
+        = [@location.street_address, city_state_zip(@city, @state, @zip)].compact.join("<br/>")
   
   %hr.space
 
@@ -24,12 +22,13 @@
     .span-7.colborder#search
       %h3== Search Tags (find related places)
       - @location.locatable.tags.each do |tag|
-        %span{:style => 'font-size: 13px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :what => tag.name.to_url_param)
+        %span{:style => 'font-size: 13px; padding-right: 3px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :what => tag.name.to_url_param)
     
     .span-9.last#locality
       %h3== Location Tags (search by geography)
       - @location.locality_tags.each do |tag|
-        %span{:style => 'font-size: 13px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
+        %span{:style => 'font-size: 13px; padding-right: 5px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
+        -#%li{:style => 'font-size: 13px; display: inline; padding-right: 5px; border-right: solid 3px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
     
   %hr.space
   

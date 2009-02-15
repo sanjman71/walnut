@@ -5,6 +5,7 @@ class City < ActiveRecord::Base
   has_many                    :city_zips
   has_many                    :zips, :through => :city_zips
   has_many                    :neighborhoods
+  has_many                    :locations
   
   acts_as_mappable
   

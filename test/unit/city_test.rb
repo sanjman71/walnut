@@ -6,6 +6,7 @@ class CityTest < ActiveSupport::TestCase
   should_belong_to    :state
   should_have_many    :zips
   should_have_many    :neighborhoods
+  should_have_many    :locations
   
   def setup
     @us   = Factory(:us)

@@ -4,6 +4,7 @@ class State < ActiveRecord::Base
   belongs_to                  :country
   has_many                    :cities
   has_many                    :zips
+  has_many                    :locations
 
   include NameParam
 end

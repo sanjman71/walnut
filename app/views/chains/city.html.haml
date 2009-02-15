@@ -6,4 +6,4 @@
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
 
 .span-24#places
-  =render(:partial => 'places/places', :locals => {:locations => @locations})
+  =render(:partial => 'places/places', :locals => {:locations => @locations, :tags => []})

@@ -2,6 +2,7 @@ require 'test/test_helper'
 
 class CountryTest < ActiveSupport::TestCase
   should_have_many    :states
+  should_have_many    :locations
   
   context "country" do
     context "us" do
