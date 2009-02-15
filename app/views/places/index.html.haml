@@ -13,13 +13,13 @@
 
 .span-4.colborder#sidebar
   #neighborhoods
-    = render(:partial => 'city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag}) unless @neighborhoods.blank?
+    = render(:partial => 'city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :what => @what}) unless @neighborhoods.blank?
   #zips
-    = render(:partial => 'city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag}) unless @zips.blank?
+    = render(:partial => 'city_zips', :locals => {:zips => @zips, :city => @city, :what => @what}) unless @zips.blank?
   #cities
-    = render(:partial => 'zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag}) unless @cities.blank?
+    = render(:partial => 'zip_cities', :locals => {:cities => @cities, :zip => @zip, :what => @what}) unless @cities.blank?
   #nearby_cities
-    = render(:partial => 'nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag}) unless @nearby_cities.blank?
+    = render(:partial => 'nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :what => @what}) unless @nearby_cities.blank?
   
   -# another google ad
   = google_ad(160, 600)
@@ -31,4 +31,4 @@
     = will_paginate(@locations, :page_links => false)
 
   .span-19.last
-    = render(:partial => 'places', :locals => {:locations => @locations, :tag => @tag})
+    = render(:partial => 'places', :locals => {:locations => @locations, :what => @what, :tags => @tags})

@@ -36,15 +36,15 @@ class Search
     [field_set, field_value.strip].compact.join(" ").strip
   end
   
-  # parse search localities and tags into a search object
-  def self.parse(localities, tags=nil)
-    locality_tags = Array(localities).compact.inject([]) do |array, locality|
+  # parse search where and what values
+  def self.parse(where_collection, what=nil)
+    locality_tags = Array(where_collection).compact.inject([]) do |array, locality|
       array.push(locality.name) if locality
       array
     end
     
-    # split tags into tokens
-    place_tags = tags.to_s.split
+    # split what into tokens
+    place_tags = what.to_s.split
     
     Search.new(:locality_tags => locality_tags, :place_tags => place_tags)
   end

@@ -11,24 +11,22 @@ class PlacesControllerTest < ActionController::TestCase
   
   # country route
   should_route :get, '/places/us', :controller => 'places', :action => 'country', :country => 'us'
-  # country, tag route - no longer valid
-  # should_route :get, '/places/us/food', :controller => 'places', :action => 'index', :country => 'us', :tag => 'food'
   
   # state route
   should_route :get, '/places/us/il',
                :controller => 'places', :action => 'state', :country => 'us', :state => 'il'
   # state tag route
   should_route :get, '/places/us/il/anywhere/food',
-               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'anywhere', :tag => 'food'
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'anywhere', :what => 'food'
 
   # city route
   should_route :get, '/places/us/il/chicago', :controller => 'places', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
   # city tag route
   should_route :get, '/places/us/il/chicago/food',
-               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :what => 'food'
   # hyphenated city tag route
   should_route :get, '/places/us/ny/new-york/food',
-               :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :tag => 'food'
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'ny', :city => 'new-york', :what => 'food'
 
   # neighborhood route
   should_route :get, '/places/us/il/chicago/n/river-north', 
@@ -36,14 +34,14 @@ class PlacesControllerTest < ActionController::TestCase
 
   # neighborhood tag route
   should_route :get, '/places/us/il/chicago/n/river-north/soccer', 
-               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :tag => 'soccer'
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :what => 'soccer'
   
   # zip route
   should_route :get, '/places/us/il/60610', 
                :controller => 'places', :action => 'zip', :country => 'us', :state => 'il', :zip => '60610'
   # zip tag route
   should_route :get, '/places/us/il/60610/food', 
-               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food'
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :what => 'food'
   
   # show route
   should_route :get, 'places/1', :controller => 'places', :action => 'show', :id => 1
@@ -55,7 +53,7 @@ class PlacesControllerTest < ActionController::TestCase
     context "with no locations" do
       setup do
         Location.stubs(:search).returns([])
-        get :index, :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
+        get :index, :country => 'us', :state => 'il', :city => 'chicago', :what => 'food'
       end
     
       should_respond_with :success
@@ -63,10 +61,17 @@ class PlacesControllerTest < ActionController::TestCase
       should_assign_to :country, :equals => "@us"
       should_assign_to :state, :equals => "@il"
       should_assign_to :city, :equals => "@chicago"
-      should_assign_to :query
+      should_assign_to :what
+      should_assign_to :search
+      should_assign_to :tags
+      should_assign_to :title
       
-      should "build query from parameters" do
-        assert_equal "United States Illinois Chicago food", assigns(:query)
+      should "have tags ['food']" do
+        assert_equal ["food"], assigns(:tags)
+      end
+      
+      should "have title 'Food near Chicago, Illinois'" do
+        assert_equal 'Food near Chicago, Illinois', assigns(:title)
       end
     end
   end

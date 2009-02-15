@@ -33,7 +33,7 @@ class PlacesController < ApplicationController
   def search
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
-    @tag      = params[:what].to_s.to_url_param
+    @what     = params[:what].to_s.to_url_param
     
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return
@@ -43,16 +43,16 @@ class PlacesController < ApplicationController
     when 'City'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :tag => @tag) and return
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :what => @what) and return
     when 'Zip'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :tag => @tag) and return
+      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :what => @what) and return
     when 'Neighborhood'
       @city     = @locality.city
       @state    = @city.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :tag => @tag) and return
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
     when 'State'
       raise Exception, "not allowed to search by state"
     end
@@ -63,7 +63,7 @@ class PlacesController < ApplicationController
     @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless params[:city].blank?
     @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
     @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
-    @tag            = params[:tag].to_s.from_url_param
+    @what           = params[:what].to_s.from_url_param
     
     # find city neighborhoods if its a city search
     @neighborhoods  = @city.neighborhoods unless @city.blank?
@@ -78,19 +78,17 @@ class PlacesController < ApplicationController
     @cities         = @zip.cities unless @zip.blank?
     
     # build search title based on city, neighborhood, zip search
-    @title          = build_search_title(:tag => @tag, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @title          = build_search_title(:what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
     
     # build search object
-    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag)
+    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @what)
+    @tags           = @search.place_tags
     
-    # find locations matching query, eager load locatables
-    # @locations      = Location.search(:conditions => {:place_tags => @search.field(:place_tags), :locality_tags => @search.field(:locality_tags)}, 
-    #                                   :include => [:locatable, :place_tags]).paginate(:page => params[:page])
-
     # use 'what' param to search name and place_tags fields
     # use 'where' param as locality_tags field filter
-    @locations      = Location.search(@search.multiple_fields(:name, :place_tags), :conditions => {:locality_tags => @search.field(:locality_tags)}, 
+    @locations      = Location.search(@search.multiple_fields(:name, :place_tags), 
+                                      :conditions => {:locality_tags => @search.field(:locality_tags)}, 
                                       :include => [:locatable]).paginate(:page => params[:page])
   end
   
@@ -119,7 +117,7 @@ class PlacesController < ApplicationController
   protected
   
   def build_search_title(options={})
-    tag = options[:tag] || ''
+    what = options[:what] || ''
     
     if options[:state] and options[:city] and options[:neighborhood]
       where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
@@ -131,7 +129,7 @@ class PlacesController < ApplicationController
       raise Exception, "invalid search"
     end
     
-    "#{tag.titleize} near #{where}"
+    "#{what.titleize} near #{where}"
   end
   
   def init_areas

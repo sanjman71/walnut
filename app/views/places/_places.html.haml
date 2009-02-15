@@ -1,4 +1,5 @@
-- tag = nil unless defined?(tag)
+- what = nil unless defined?(what)
+- tags = [] unless defined?(tags)
 
 - locations.each do |location|
   .prepend-1.letterbox{:class => cycle("shaded", "")}[location]
@@ -10,5 +11,5 @@
     %br
     %span.tags.place
       - location.locatable.tags.each do |place_tag|
-        - klasses = tag == place_tag.name ? ["current", "highlight"] : []
-        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:tag => place_tag.name}, :class => klasses.join(" ")
+        - klasses = tags.include?(place_tag.name) ? ["current", "highlight"] : []
+        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:what => place_tag.name}, :class => klasses.join(" ")
