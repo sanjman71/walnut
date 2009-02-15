@@ -14,19 +14,19 @@ class PlacesController < ApplicationController
   
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
-    @tags   = Location.place_tag_counts.sort_by(&:name)
+    @tags   = Place.tag_counts.sort_by(&:name)
     @title  = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
     # @country, @state, @city, @neighborhood all initialized in before filter
-    @tags   = Location.place_tag_counts.sort_by(&:name)
+    @tags   = Place.tag_counts.sort_by(&:name)
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
   
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
-    @tags   = Location.place_tag_counts.sort_by(&:name)
+    @tags   = Place.tag_counts.sort_by(&:name)
     @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
   
@@ -91,7 +91,7 @@ class PlacesController < ApplicationController
     # use 'what' param to search name and place_tags fields
     # use 'where' param as locality_tags field filter
     @locations      = Location.search(@search.multiple_fields(:name, :place_tags), :conditions => {:locality_tags => @search.field(:locality_tags)}, 
-                                      :include => [:locatable, :place_tags]).paginate(:page => params[:page])
+                                      :include => [:locatable]).paginate(:page => params[:page])
   end
   
   def show

@@ -13,17 +13,17 @@ class Location < ActiveRecord::Base
   # make sure only accessible attributes are written to from forms etc.
 	attr_accessible         :name, :country, :state, :city, :zip, :street_address
   
-  acts_as_taggable_on     :locality_tags, :place_tags
+  acts_as_taggable_on     :locality_tags
   
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
   
   define_index do
-    indexes locatable.name, :as => :name
     indexes street_address, :as => :street_address
     indexes locality_tags.name, :as => :locality_tags
-    indexes place_tags.name, :as => :place_tags
+    indexes locatable.name, :as => :name
+    indexes locatable.tags.name, :as => :place_tags
   end
   
   # return collection of location's country, state, city, zip, neighborhoods

@@ -84,15 +84,20 @@ namespace :db do
           # stop when there are no more locations
           break if locations.empty?
           
+          # pick some random tags for the place
+          picked = pick_tags(tags, 3)
+          place.tag_list.add(picked.sort)
+          place.save
+          
           # pick a random address
           location = locations.delete(locations.rand)
           place.locations.push(location)
           
           # pick some random tags, add them to the address as place tags
-          picked   = pick_tags(tags, 3)
-          location = place.locations.first
-          location.place_tag_list.add(picked.sort)
-          location.save
+          # picked   = pick_tags(tags, 3)
+          # location = place.locations.first
+          # location.place_tag_list.add(picked.sort)
+          # location.save
           
           places += 1 
         end
@@ -123,6 +128,10 @@ namespace :db do
           
           place = Place.create(:name => name)
           chain.places.push(place)
+
+          # add place tags
+          place.tag_list.add(hash[:tags])
+          place.save
           
           # create an address in each city
           City.all.each do |city|
@@ -130,10 +139,6 @@ namespace :db do
             country   = state.country
             location  = Location.create(:name => "Work", :city => city, :state => state, :country => country)
             place.locations.push(location)
-            
-            # add place tags
-            location.place_tag_list.add(hash[:tags])
-            location.save
           end
         end
         
