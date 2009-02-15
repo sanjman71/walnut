@@ -50,7 +50,7 @@ module ApplicationHelper
   
   def infer_locality_route(name, options={})
     # map name to a specific locality object
-    locality = options.values.compact.find { |o| o ? o.name == name : false }
+    locality = options.values.flatten.compact.find { |o| o ? o.name == name : false }
     return '' if locality.blank?
     # build route using locality object
     build_locality_route(locality, options)
@@ -59,13 +59,15 @@ module ApplicationHelper
   def build_locality_route(locality, options={})
     case locality.class.to_s
     when 'Country'
-      url_for(:action => 'country', :country => options[:country])
+      url_for(:action => 'country', :country => locality)
     when 'State'
-      url_for(:action => 'state', :country => options[:country], :state => options[:state])
+      url_for(:action => 'state', :country => options[:country], :state => locality)
     when 'City'
-      url_for(:action => 'city', :country => options[:country], :state => options[:state], :city => options[:city])
+      url_for(:action => 'city', :country => options[:country], :state => options[:state], :city => locality)
     when 'Zip'
-      url_for(:action => 'zip', :country => options[:country], :state => options[:state], :zip => options[:zip])
+      url_for(:action => 'zip', :country => options[:country], :state => options[:state], :zip => locality)
+    when 'Neighborhood'
+      url_for(:action => 'neighborhood', :country => options[:country], :state => options[:state], :city => options[:city], :neighborhood => locality)
     else
       ''
     end

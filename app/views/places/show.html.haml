@@ -9,7 +9,7 @@
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
 
 .span-18.prepend-1.last
-  .span-18#info
+  .span-18#place_address
     .span-11
       = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
     .span-6.append-1.last
@@ -18,17 +18,16 @@
   
   %hr.space
 
-  .span-18#tags
-    .span-7.colborder#search
+  .span-18#all_tags
+    .span-7.colborder#place_tags
       %h3== Search Tags (find related places)
       - @location.locatable.tags.each do |tag|
         %span{:style => 'font-size: 13px; padding-right: 3px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :what => tag.name.to_url_param)
     
-    .span-9.last#locality
+    .span-9.last#locality_tags
       %h3== Location Tags (search by geography)
       - @location.locality_tags.each do |tag|
-        %span{:style => 'font-size: 13px; padding-right: 5px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
-        -#%li{:style => 'font-size: 13px; display: inline; padding-right: 5px; border-right: solid 3px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
+        %span{:style => 'font-size: 13px; padding-right: 5px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhoods => @neighborhoods)
     
   %hr.space
   

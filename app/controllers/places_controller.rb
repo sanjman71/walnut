@@ -101,10 +101,14 @@ class PlacesController < ApplicationController
     end
 
     # initialize localities
-    @country  = @location.country
-    @state    = @location.state
-    @city     = @location.city
-    @zip      = @location.zip
+    @country          = @location.country
+    @state            = @location.state
+    @city             = @location.city
+    @zip              = @location.zip
+    @neighborhoods    = @location.neighborhoods
+    
+    # find nearby locations
+    @nearby_locations = []
     
     @title    = "#{@place.name}"
     @h1       = @title
