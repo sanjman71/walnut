@@ -2,7 +2,7 @@ namespace :db do
   namespace :walnut do
     namespace :init do
     
-      task :all => [:localities, :locations, "db:populate:places", :tags, :chains, :city_zips]
+      task :all => [:localities, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
     
       desc "Init default countries, states, cities, zips, neighborhoods."
       task :localities do
@@ -93,12 +93,6 @@ namespace :db do
           location = locations.delete(locations.rand)
           place.locations.push(location)
           
-          # pick some random tags, add them to the address as place tags
-          # picked   = pick_tags(tags, 3)
-          # location = place.locations.first
-          # location.place_tag_list.add(picked.sort)
-          # location.save
-          
           places += 1 
         end
         
@@ -165,6 +159,15 @@ namespace :db do
         end
         
         puts "#{Time.now}: initialized city to zip mappings"
+      end
+      
+      desc "Geocode all locations"
+      task :geocode_latlngs do
+        Location.all.each do |location|
+          location.geocode_latlng
+        end
+        
+        puts "#{Time.now}: geocoded #{Location.count} locations"
       end
       
     end # init
