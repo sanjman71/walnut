@@ -109,11 +109,15 @@ class PlacesController < ApplicationController
     
     # find nearby locations, within the same city, exclude this location, and sort by distance
     @search           = Search.parse([@country, @state, @city])
+    @nearby_limit     = 7
     @nearby_locations = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
                                         :conditions => {:locality_tags => @search.field(:locality_tags)},
                                         :without_ids => @location.id,
-                                        :order => "@geodist ASC")
+                                        :order => "@geodist ASC", 
+                                        :limit => @nearby_limit,
+                                        :include => [:locatable])
 
+    # initialize title, h1 tags
     @title    = "#{@place.name}"
     @h1       = @title
   end
