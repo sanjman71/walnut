@@ -1,0 +1,3 @@
+%p== Popular Tags
+- tags.each do |tag|
+  %span[tag]= link_to tag, build_search_route(locality_type, locality_params.merge(:what => tag.name.to_url_param))

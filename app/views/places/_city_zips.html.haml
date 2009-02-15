@@ -1,4 +1,4 @@
 %h4== #{city.name} Zip Codes
 %ul
   - zips.each do |zip|
-    %li= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what)
+    %li= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what.to_url_param)

@@ -93,7 +93,7 @@ class PlacesController < ApplicationController
   end
   
   def show
-    @location = Location.find(params[:id], :include => [:locatable, :place_tags, :locality_tags])
+    @location = Location.find(params[:id], :include => [:locatable, :locality_tags])
     @place    = @location.locatable unless @location.blank?
 
     if @location.blank? or @place.blank?
