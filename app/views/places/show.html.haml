@@ -32,9 +32,8 @@
   %hr.space
   
   .span-18.last#nearby_places
-    %h3== Nearby Places
-    == add some nearby places here
-    
+    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations})
+      
 .span-5.last#sidebar{:style => 'text-align: right;'}
   -# google ad
   = google_ad(160, 600)

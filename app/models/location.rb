@@ -24,6 +24,9 @@ class Location < ActiveRecord::Base
     indexes locality_tags.name, :as => :locality_tags
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
+    # convert degrees to radians for sphinx
+    has 'RADIANS(lat)', :as => :lat,  :type => :float
+    has 'RADIANS(lng)', :as => :lng,  :type => :float
   end
   
   # return collection of location's country, state, city, zip, neighborhoods

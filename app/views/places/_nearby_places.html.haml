@@ -1,0 +1,10 @@
+%h3== Nearby Places
+- nearby_locations.each_with_geodist do |location, distance|
+  %h4.nearby[location]
+    = link_to location.locatable.name, place_path(:id => location)
+    %br
+    = location.street_address
+    = location.city
+    %br
+    = number_with_precision(Math.meters_to_miles(distance.to_f), :precision => 2, :delimiter => ',')
+    == miles

@@ -107,9 +107,13 @@ class PlacesController < ApplicationController
     @zip              = @location.zip
     @neighborhoods    = @location.neighborhoods
     
-    # find nearby locations
-    @nearby_locations = []
-    
+    # find nearby locations, within the same city, exclude this location, and sort by distance
+    @search           = Search.parse([@country, @state, @city])
+    @nearby_locations = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
+                                        :conditions => {:locality_tags => @search.field(:locality_tags)},
+                                        :without_ids => @location.id,
+                                        :order => "@geodist ASC")
+
     @title    = "#{@place.name}"
     @h1       = @title
   end
