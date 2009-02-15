@@ -8,33 +8,35 @@
   %h4.span-7.last#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
 
-.span-23.prepend-1.last
-  .span-11
-    = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
-  .span-12.last
-    %h2
-      = @location.street_address
-      %br
-      = city_state_zip(@city, @state, @zip)
+.span-18.prepend-1.last
+  .span-18#info
+    .span-11
+      = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
+    .span-6.append-1.last
+      %h2
+        = @location.street_address
+        %br
+        = city_state_zip(@city, @state, @zip)
   
-%hr.space
+  %hr.space
 
-.span-18.colborder
-  .span-7.prepend-1.colborder
-    %h3== Search Tags (find related places)
-    - @location.locatable.tags.each do |tag|
-      %span{:style => 'font-size: 13px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :what => tag.name.to_url_param)
+  .span-18#tags
+    .span-7.colborder#search
+      %h3== Search Tags (find related places)
+      - @location.locatable.tags.each do |tag|
+        %span{:style => 'font-size: 13px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :what => tag.name.to_url_param)
     
-  .span-9.last
-    %h3== Location Tags (search by geography)
-    - @location.locality_tags.each do |tag|
-      %span{:style => 'font-size: 13px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
+    .span-9.last#locality
+      %h3== Location Tags (search by geography)
+      - @location.locality_tags.each do |tag|
+        %span{:style => 'font-size: 13px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip)
     
   %hr.space
   
-  .span-17.prepend-1.last#nearby_places
+  .span-18.last#nearby_places
     %h3== Nearby Places
+    == add some nearby places here
     
-.span-5.last#sidebar
+.span-5.last#sidebar{:style => 'text-align: right;'}
   -# google ad
   = google_ad(160, 600)
