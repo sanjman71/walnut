@@ -16,9 +16,11 @@
   %body
     #header
       .container
-        .span-24.last#search_places
+        .span-24.last#search_places{:style => 'visibility: hidden;'}
           = render(:partial => 'shared/search_bar')
         .span-24.last{:style => 'text-align: right;'}
+          = link_to 'Search', '',  :style => 'color: #FFFFFF;', :id => "search_link"
+          == &nbsp;|&nbsp;
           = link_to 'Find Places', root_path, :style => 'color: #FFFFFF;'
           == &nbsp;|&nbsp;
           = link_to 'Chain Stores', chains_path, :style => 'color: #FFFFFF;'

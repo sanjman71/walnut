@@ -33,6 +33,11 @@ $(document).ready(function() {
 
   $(document).init_input_hints();
   
+  $("#search_link").click(function () {
+    $("#search_places").css('visibility', 'visible');
+    return false;
+  })
+  
   $("#search_places_form").submit(function() {
     // check field values
     var $search_what  = $(this).find("#search_what")
