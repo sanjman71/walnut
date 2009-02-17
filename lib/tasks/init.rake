@@ -170,6 +170,28 @@ namespace :db do
         puts "#{Time.now}: geocoded #{Location.count} locations"
       end
       
+      desc "Import neighborhood info using the urban mapping api"
+      task :urban_neighborhoods do
+        added = 0
+        
+        # find locations with no neighborhoods
+        Location.all(:conditions => {:neighborhoods_count => 0}).each do |location|
+          neighborhoods = UrbanMapping::Neighborhood.find_by_latlng(location.lat, location.lng)
+          
+          # add neighborhoods
+          neighborhoods.each do |neighborhood|
+            next if location.neighborhoods.include?(neighborhood)
+            location.neighborhoods.push(neighborhood)
+            added += 1
+          end
+          
+          # throttle calls to urban mapping
+          Kernel.sleep(1)
+        end
+        
+        puts "#{Time.now}: imported #{added} neighborhoods from urban mapping"
+      end
+      
     end # init
   end # walnut
 end
