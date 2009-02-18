@@ -64,8 +64,11 @@ class CreateWalnut < ActiveRecord::Migration
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
       t.references  :locatable,             :polymorphic => true
+      t.references  :source,                :polymorphic => true, :default => nil
     end
             
+    add_index :locations, [:source_id, :source_type]
+    
     create_table :places do |t|
       t.string      :name
       t.integer     :locations_count,       :default => 0   # counter cache

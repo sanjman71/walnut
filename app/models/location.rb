@@ -11,13 +11,15 @@ class Location < ActiveRecord::Base
   after_save              :update_locality_tags
   
   # make sure only accessible attributes are written to from forms etc.
-	attr_accessible         :name, :country, :state, :city, :zip, :street_address
+	attr_accessible         :name, :country, :state, :city, :zip, :street_address, :lat, :lng, :source_id, :source_type
   
   acts_as_taggable_on     :locality_tags
   
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
+  # find location by the specified source id
+  named_scope :find_by_source_id,  lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
   
   define_index do
     indexes street_address, :as => :street_address
@@ -36,7 +38,7 @@ class Location < ActiveRecord::Base
   
   # returns true iff the location has a latitude and longitude 
   def mappable?
-    return true if self.lat and self.lng?
+    return true if self.lat and self.lng
     false
   end
   

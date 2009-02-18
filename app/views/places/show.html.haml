@@ -32,7 +32,7 @@
   %hr.space
   
   .span-18.last#nearby_places
-    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations})
+    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations}) unless @nearby_locations.blank?
     
 .span-5.last#sidebar{:style => 'text-align: right;'}
   -# google ad

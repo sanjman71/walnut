@@ -2,29 +2,43 @@ namespace :db do
   namespace :walnut do
     namespace :init do
     
-      task :all => [:localities, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
+      # task :all => [:countries, :states, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
+      task :all => [:countries, :states]
     
       desc "Init default countries, states, cities, zips, neighborhoods."
-      task :localities do
-        # create default localities
-
+      task :countries do
         @us = Country.create(:name => "United States", :code => "US")
         
-        [{:city => "Chicago", :zip => "60654", :state => "Illinois", :code => "IL", :neighborhood => "River North"},
-         {:city => "New York", :zip => "10001", :state => "New York", :code => "NY"},
-         {:city => "San Francisco", :zip => "94127", :state =>  "California", :code => "CA"}].each do |hash|
-          @state  = State.create(:name => hash[:state], :code => hash[:code], :country => @us)
-          @city   = City.create(:name => hash[:city], :state => @state)
-          @zip    = Zip.create(:name => hash[:zip], :state => @state)
-          
-          if hash[:neighborhood]
-            @neighborhood = Neighborhood.create(:name => hash[:neighborhood], :city => @city)
-          end
-        end
+        # [{:city => "Chicago", :zip => "60654", :state => "Illinois", :code => "IL", :neighborhood => "River North"},
+        #  {:city => "New York", :zip => "10001", :state => "New York", :code => "NY"},
+        #  {:city => "San Francisco", :zip => "94127", :state =>  "California", :code => "CA"}].each do |hash|
+        #   @state  = State.create(:name => hash[:state], :code => hash[:code], :country => @us)
+        #   @city   = City.create(:name => hash[:city], :state => @state)
+        #   @zip    = Zip.create(:name => hash[:zip], :state => @state)
+        #   
+        #   if hash[:neighborhood]
+        #     @neighborhood = Neighborhood.create(:name => hash[:neighborhood], :city => @city)
+        #   end
+        # end
       
-        puts "#{Time.now}: initialized default countries, states, cities, zips, and neighborhoods"
+        puts "#{Time.now}: initialized default countries"
       end
     
+      task :states do
+        @us     = Country.find_by_code("US")
+        
+        @states = [{:state => "Illinois", :code => "IL"},
+                   {:state => "New York", :code => "NY"},
+                   {:state => "California", :code => "CA"}
+                  ]
+                  
+        @states.each do |hash|
+          @state  = State.create(:name => hash[:state], :code => hash[:code], :country => @us)
+        end
+
+        puts "#{Time.now}: initialized default states"
+      end
+      
       desc "Initialize nearby cities"
       task :nearby_cities do
         @cities = [{:state => 'Illinois', :city => 'Naperville'},

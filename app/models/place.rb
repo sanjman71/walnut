@@ -1,6 +1,5 @@
 class Place < ActiveRecord::Base
   validates_presence_of     :name
-  validates_uniqueness_of   :name
   belongs_to                :chain, :counter_cache => true
   
   # TODO: find out why the counter cache field doesn't work without the before and after filters
