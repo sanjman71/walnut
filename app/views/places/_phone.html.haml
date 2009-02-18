@@ -1,0 +1,3 @@
+- if location.locatable.phone_numbers_count
+  - number = location.locatable.phone_numbers.first.number
+  = number_to_phone(number, :area_code => true)

@@ -5,9 +5,10 @@ class PlaceTest < ActiveSupport::TestCase
   
   should_require_attributes   :name
   should_have_many            :locations
+  should_have_many            :phone_numbers
   should_belong_to            :chain
   
-  context "create place with an address" do
+  context "create place with a location" do
     setup do
       @place    = Place.create(:name => "Place 1")
       @location = Location.create(:name => "Home")
@@ -18,7 +19,7 @@ class PlaceTest < ActiveSupport::TestCase
     should_change "Place.count", :by => 1
     should_change "Location.count", :by => 1
     
-    should "have 1 address" do
+    should "have 1 location" do
       assert_equal [@location], @place.locations
     end
     
@@ -62,5 +63,26 @@ class PlaceTest < ActiveSupport::TestCase
         assert_equal 2, @place.locations_count
       end
     end
+  end
+  
+  context "create place with a phone number" do
+    setup do
+      @place  = Place.create(:name => "Place 1")
+      @phone  = PhoneNumber.create(:name => "Home", :number => "9991234567")
+      @place.phone_numbers.push(@phone)
+      @place.reload
+    end
+  
+    should_change "Place.count", :by => 1
+    should_change "PhoneNumber.count", :by => 1
+    
+    should "have 1 phone number" do
+      assert_equal [@phone], @place.phone_numbers
+    end
+    
+    should "have phone_numbers_count of 1" do
+      assert_equal 1, @place.phone_numbers_count
+    end
+  
   end
 end

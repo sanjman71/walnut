@@ -3,7 +3,7 @@ class ChainsController < ApplicationController
   layout "home"
 
   def index
-    @chains   = Chain.all(:order => "name ASC")
+    @chains   = Chain.places.all(:order => "name ASC")
     @country  = Country.default
     
     @title    = "Chain Store Locator"

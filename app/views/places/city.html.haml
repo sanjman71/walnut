@@ -11,7 +11,7 @@
 %h3.span-20.prepend-1#zips
   %p== #{@city.name} Zip Codes
   - @zips.each do |zip|
-    %span[zip]= link_to zip, url_for(:controller => 'places', :action => 'zip', :country => @country, :state => @state, :zip => zip)
+    %span[zip]{:style => "line-height: 1.5em;"}= link_to zip, url_for(:controller => 'places', :action => 'zip', :country => @country, :state => @state, :zip => zip)
     
 %h3.span-20.prepend-1#neighborhoods
   - unless @neighborhoods.blank?

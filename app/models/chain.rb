@@ -6,6 +6,9 @@ class Chain < ActiveRecord::Base
   
   include NameParam
   
+  named_scope :zero,        { :conditions => {:places_count => 0} }
+  named_scope :places,      { :conditions => ["places_count > 0"] }
+  
   # returns the total number of chain locations
   def count
     locations.size

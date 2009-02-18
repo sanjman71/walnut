@@ -9,13 +9,16 @@
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
 
 .span-18.prepend-1.last
-  .span-18#place_address
+  .span-18#address_phone
     .span-11
       = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
     .span-6.append-1.last
-      %h2
-        = [@location.street_address, city_state_zip(@city, @state, @zip)].compact.join("<br/>")
-  
+      %h2#address
+        = [@location.street_address, city_state_zip(@city, @state, @zip)].reject(&:blank?).join("<br/>")
+      %p
+      %h3#phone
+        = render(:partial => 'phone', :locals => {:location => @location})
+          
   %hr.space
 
   .span-18#all_tags

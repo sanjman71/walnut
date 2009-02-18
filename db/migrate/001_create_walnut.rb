@@ -69,9 +69,16 @@ class CreateWalnut < ActiveRecord::Migration
             
     add_index :locations, [:source_id, :source_type]
     
+    create_table :phone_numbers do |t|
+      t.string      :name
+      t.string      :number,    :default => nil
+      t.references  :callable,  :polymorphic => true
+    end
+    
     create_table :places do |t|
       t.string      :name
       t.integer     :locations_count,       :default => 0   # counter cache
+      t.integer     :phone_numbers_count,   :default => 0   # counter cache
       t.references  :chain
     end
 

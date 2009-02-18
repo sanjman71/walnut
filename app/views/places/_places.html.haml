@@ -5,11 +5,10 @@
   .prepend-1.letterbox{:class => cycle("shaded", "")}[location]
     %h3.name.margin-bottom-0
       = link_to location.locatable.name, {:controller => 'places', :action => 'show', :id => location}
-    %span.street= location.street_address
+    %span.address
+      = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
     %br
-    %span.tags.locality= location.locality_tag_list
-    %br
-    %span.tags.place
+    %span.tags
       - location.locatable.tags.sort_by(&:name).each do |place_tag|
         - klasses = tags.any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
         %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => 'places', :action => 'index', :what => place_tag.name.to_url_param}, :class => klasses.join(" "), :style => "padding: 0 2px;"

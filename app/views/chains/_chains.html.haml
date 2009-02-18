@@ -3,4 +3,4 @@
     %h3.name.margin-bottom-0
       = link_to chain.name, url_for(:action => 'country', :country => @country, :name => chain.id)
     %h6#count
-      == #{chain.count} places
+      == #{chain.places_count} places

@@ -149,16 +149,30 @@ namespace :localeze do
         options.merge!(:lat => record.latitude, :lng => record.longitude) if record.mappable?
         location  = Location.create(options)
       
-        # create associated place
+        # create place
         place     = Place.create(:name => record.stdname)
         place.locations.push(location)
         place.reload
       
-        # add a tag
+        # add a random tag
         place.tag_list.add("business")
         place.save
       
-        # TODO: check for chain
+        # check for a phonenumber
+        if record.phone_number
+          # add phone number
+          phone_number = PhoneNumber.create(:name => "Work", :number => record.phone_number)
+          place.phone_numbers.push(phone_number)
+        end
+        
+        # check for chain
+        if record.chain_id > 0 and localeze_chain = Localeze::Chain.find(record.chain_id)
+          # find local chain object
+          chain = Chain.find_by_name(localeze_chain.name)
+          # add chain
+          place.chain = chain
+          place.save
+        end
         
         added += 1
       end

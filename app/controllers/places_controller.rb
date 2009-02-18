@@ -89,7 +89,7 @@ class PlacesController < ApplicationController
     # use 'where' param as locality_tags field filter
     @locations      = Location.search(@search.multiple_fields(:name, :place_tags), 
                                       :conditions => {:locality_tags => @search.field(:locality_tags)}, 
-                                      :include => [:locatable]).paginate(:page => params[:page])
+                                      :include => [:locatable, :city, :state, :zip]).paginate(:page => params[:page])
   end
   
   def show
