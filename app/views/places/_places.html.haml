@@ -10,5 +10,5 @@
     %br
     %span.tags
       - location.locatable.tags.sort_by(&:name).each do |place_tag|
-        - klasses = tags.any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
+        - klasses = Array(what).any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
         %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => 'places', :action => 'index', :what => place_tag.name.to_url_param}, :class => klasses.join(" "), :style => "padding: 0 2px;"

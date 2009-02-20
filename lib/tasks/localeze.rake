@@ -6,77 +6,96 @@ namespace :localeze do
                   "localeze:chains:add_by_city_state['Chicago','IL']"]
   end
   
-  namespace :chains do
+  desc "Import localeze tags"
+  task :import_tags do
+    
+    puts "#{Time.now}: importing localeze tags"
+    
+    checked = 0
+    tagged  = 0
+    blank   = 0 
+    
+    page    = 1
+    limit   = nil
+    
+    until (locations = Location.find(:all).paginate(:page => page, :per_page => 100)).blank?
+    
+      locations.each do |location|
+        # track number of locations checked
+        checked += 1
+        
+        tags = Localeze::BaseRecord.find(location.source_id).get(:tags)
+        
+        if tags.blank?
+          LOCALEZE_LOGGER.debug("xxx location #{location.id}:#{location.locatable.name} has no localeze tags")
+          blank += 1
+          next
+        end
+        
+        # build new tag list
+        new_tag_list  = tags.collect { |hash| hash["tag"] }.uniq.sort
+        place         = location.locatable
+        cur_tag_list  = place.tag_list.sort
+        
+        # check if the tags have changed
+        if cur_tag_list == new_tag_list
+          next
+        end
+        
+        # xxx remove all tags, then add all tags
+        place.tag_list.remove(place.tag_list)
+        place.save
+        place.reload
+        
+        place.tag_list.add(new_tag_list)
+        place.save
+       
+        tagged += 1
+        
+        puts "*** added tags: '#{new_tag_list.join(",")}' to place: #{place.name}"
+
+        # check limit
+        if limit and tagged >= limit
+          puts "*** reached limit of #{tagged}"
+          exit
+        end
+      end
+      
+      page += 1
+    end
+    
+    puts "#{Time.now}: completed, checked #{checked} locations, tagged #{tagged} places, found #{blank} places with no tags"
+  end
   
-    desc "Import localeze chains"
-    task :import do
-      added   = 0
-      exists  = 0
-      
-      puts "#{Time.now}: importing all localeze chains"
-      
-      page = 1
-      until (chains = Localeze::Chain.find(:all, :params => {:page => page})).blank?
-        chains.each do |chain|
-          if Chain.find_by_name(chain.name)
-            # already exists
-            exists += 1
-            next
-          end
-          
-          # add chain
-          Chain.create(:name => chain.name)
-          added += 1
+  desc "Import localeze chains"
+  task :import_chains do
+    added   = 0
+    exists  = 0
+    
+    puts "#{Time.now}: importing all localeze chains"
+    
+    page = 1
+    until (chains = Localeze::Chain.find(:all, :params => {:page => page})).blank?
+      chains.each do |chain|
+        if Chain.find_by_name(chain.name)
+          # already exists
+          exists += 1
+          next
         end
         
-        page += 1
+        # add chain
+        Chain.create(:name => chain.name)
+        added += 1
       end
       
-      puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported"
+      page += 1
     end
     
-    desc "Add localeze chains"
-    task :add_by_city_and_state, :city, :state_code do |t, args|
-      city        = args.city.titleize
-      state_code  = args.state_code.upcase
-
-      exit if city.blank? or state_code.blank?
-      
-      added = 0
-      Chain.all.each do |chain|
-        puts "*** chain #{chain.name}"
-
-        # map chain to localeze chain object
-        localeze_chain = Localeze::Chain.find(:first, :params => {:name => chain.name})
-        next if localeze_chain.blank?
-        
-        # find chains in the specified city, state
-        page = 1
-        until (records = Localeze::BaseRecord.find(:all, :params => {:city => city, :state => state_code, :chain_id => localeze_chain.id, :page => page})).blank?
-          records.each do |record|
-            # map record to location
-            location = Location.find_by_source_id(record)
-            next if location.blank?
-            
-            # add chain to location place
-            place = location.first.locatable
-            next if place.chain
-            
-            place.chain = chain
-            place.save
-            added += 1
-          end
-          
-          page += 1
-        end
-      end
-    
-      puts "#{Time.now}: completed, added #{added} chains to places"
-    end
+    puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported"
   end
   
   desc "Import localeze records"
-  task :import_by_city_and_state, :city, :state_code do |t, args|
+  task :import_records_by_city_and_state, :city, :state_code do |t, args|
     city        = args.city.titleize
     state_code  = args.state_code.upcase
     
@@ -84,14 +103,15 @@ namespace :localeze do
     
     puts "#{Time.now}: importing localeze records for #{city}:#{state_code}"
     
-    # track errors
+    # track stats
     added       = 0
     errors      = 0
     exists      = 0
     
     @country    = Country.find_by_code("US")
+    page        = 1
+    limit       = nil
     
-    page  = 1
     until (records = Localeze::BaseRecord.find(:all, :params => {:city => city, :state => state_code, :page => page})).blank?
       records.each do |record|
         # check if record has already been imported
@@ -154,10 +174,6 @@ namespace :localeze do
         place.locations.push(location)
         place.reload
       
-        # add a random tag
-        place.tag_list.add("business")
-        place.save
-      
         # check for a phonenumber
         if record.phone_number
           # add phone number
@@ -175,6 +191,12 @@ namespace :localeze do
         end
         
         added += 1
+        
+        # check limit
+        if limit and added >= limit
+          puts "*** reached limit of #{added}"
+          exit
+        end
       end
       
       page += 1

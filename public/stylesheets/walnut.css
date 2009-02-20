@@ -1,13 +1,5 @@
 /* link styles */
 
-/*
-a                                                 { color: #000000; background: transparent none repeat scroll 0 0; }
-
-a.current, a.current:hover                        { color: #000000; text-decoration: none; background: transparent none repeat scroll 0 0; }
-
-a:hover                                           { background-color: #0033BB; color: #FFFFFF; text-decoration: none; }
-*/
-
 a:hover                                           { color: #FFFFFF; background-color: #0033CC; text-decoration: none; }
 
 a.current, a.current:hover                        { text-decoration: none; }
@@ -101,6 +93,13 @@ a.signup:link, a.signup:visited                   { font-size: 11px; font-weight
 
 a.signup:hover                                    { color: #000000; background-color: #FFFFFF; text-decoration: none; }
 
+/* tag link styles */
+
+a.tag.even                                        { color: #5500BB; font-size: 1.3em; }
+a.tag.even:hover                                  { color: #FFFFFF; background-color: #5500BB; }
+
+a.tag.odd                                         { color: #341809; font-size: 1.2em; }
+a.tag.odd:hover                                   { color: #FFFFFF; background-color: #341809; }
 
 /* sidebar styles */
 

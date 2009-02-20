@@ -82,3 +82,6 @@ end
 # Extend ruby classes
 require "#{RAILS_ROOT}/lib/string.rb"
 require "#{RAILS_ROOT}/lib/math.rb"
+
+# create special localeze logger
+LOCALEZE_LOGGER = Logger.new("log/localeze.log")

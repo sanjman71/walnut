@@ -83,6 +83,36 @@ class PlaceTest < ActiveSupport::TestCase
     should "have phone_numbers_count of 1" do
       assert_equal 1, @place.phone_numbers_count
     end
+  end
   
+  context "place with a tag" do
+    setup do
+      @place  = Place.create(:name => "Place 1")
+      @tag1   = @place.tag_list.add("tag1")
+      @place.save
+      @place.reload 
+    end
+    
+    should_change "Place.count", :by => 1
+    should_change "Tag.count", :by => 1
+    should_change "Tagging.count", :by => 1
+    
+    should "set tag taggings_count to 1" do
+      assert_equal 1, Tag.find_by_name(@tag1).taggings_count
+    end
+    
+    context "remove tag" do
+      setup do
+        @place.tag_list.remove(@tag1)
+        @place.save
+        @place.reload
+      end
+
+      should_change "Tagging.count", :by => -1
+      
+      should "set tag taggings_count to 0" do
+        assert_equal 0, Tag.find_by_name(@tag1).taggings_count
+      end
+    end
   end
 end
