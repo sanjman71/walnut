@@ -22,11 +22,11 @@ class SearchTest < ActiveSupport::TestCase
       end
       
       should "have no multiple field tags on name and place_tags" do
-        assert_equal "@(name,place_tags)", @search.multiple_fields(:name, :place_tags)
+        assert_equal "", @search.multiple_fields(:name, :place_tags)
       end
     end
     
-    context "with tags 'coffee shop'" do
+    context "with what 'coffee shop'" do
       setup do
         @us     = Factory.create(:us)
         @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
@@ -52,5 +52,26 @@ class SearchTest < ActiveSupport::TestCase
       end
     end
     
+    context "with what 'anything'" do
+      setup do
+        @us     = Factory.create(:us)
+        @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @search = Search.parse([@us, @il], "anything")
+      end
+    
+      should "have localities tag" do
+        assert_equal ["United States", "Illinois"], @search.locality_tags
+        assert_equal "United States Illinois", @search.field(:locality_tags)
+      end
+      
+      should "have no place tags" do
+        assert_equal [], @search.place_tags
+        assert_equal '', @search.field(:place_tags)
+      end
+    
+      should "have no field tags on name and place_tags" do
+        assert_equal "", @search.multiple_fields(:name, :place_tags)
+      end
+    end
   end
 end

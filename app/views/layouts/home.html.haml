@@ -26,6 +26,8 @@
           = link_to 'Chain Stores', chains_path, :style => 'color: #FFFFFF;'
           == &nbsp;|&nbsp;
           = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :style => 'color: #FFFFFF;'
+          == &nbsp;|&nbsp;
+          = link_to 'Tag Groups', taggs_path, :style => 'color: #FFFFFF;'
           
     - if RAILS_ENV == 'development'
       .container.showgrid

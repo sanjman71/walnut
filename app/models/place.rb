@@ -6,6 +6,9 @@ class Place < ActiveRecord::Base
   has_many                  :locations, :as => :locatable, :after_add => :after_add_location, :before_remove => :before_remove_location
   has_many                  :phone_numbers, :as => :callable, :after_add => :after_add_phone_number, :before_remove => :before_remove_phone_number
 
+  has_many                  :place_tag_groups
+  has_many                  :tag_groups, :through => :place_tag_groups
+
   has_many                  :states, :through => :locations
   has_many                  :cities, :through => :locations
   has_many                  :zips, :through => :locations

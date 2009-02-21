@@ -1,0 +1,40 @@
+- title(@title)
+- javascript('tags')
+
+.span-23.box
+  %h1== Editing tag group '#{@group.name}'
+  
+%hr.space
+  
+.span-24
+  .span-23.prepend-1
+    %h2== Tags
+  - @group.tag_list.each_with_index do |tag, i|
+    .span-12.prepend-1.last.letterbox{:class => cycle("shaded", "")}
+      .span-10{:style => 'font-size: 15px;'}
+        %span{:id => "tag_#{i}"}= tag
+      .span-2.last= link_to 'Remove', '', :class => 'remove tag', :id => "#{i}"
+
+  %hr.space
+        
+  .span-23.prepend-1
+    = text_field '', '', :class => 'text', :id => 'new_tag', :style => 'width: 150px;'
+    == &nbsp;
+    = link_to 'Add', '', :id => 'add_tag'
+
+  %hr.space
+    
+  #add_container.span-23.prepend-1{:style => 'visibility: hidden;'}
+    %h4
+      %span.shaded== Add List:
+    %span#add_list{:style => 'color: #5500BB; font-size: 13px; font-weight: bold;'}==<br/>
+
+  %hr.space
+  
+  .span-23.prepend-1
+    - form_for(@group, :url => tagg_path(@group), :method => :put) do |f|
+      = hidden_field_tag "add_tags"
+      = hidden_field_tag "remove_tags"
+      = submit_tag 'Update', :class => 'button big', :id => "update_tag_group"
+      == or
+      = link_to 'Cancel', taggs_path

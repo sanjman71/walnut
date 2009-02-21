@@ -1,0 +1,26 @@
+- title(@title)
+
+.span-16
+  .span-15.box
+    %h1== Tag Groups
+
+  .span-16#groups
+    - @groups.each do |group|
+      .prepend-1.span-15.letterbox{:class => cycle("shaded", "")}[group]
+        .span-13
+          %h3= group.name
+          = group.tag_list.join(", ")
+        .span-2.last
+          = link_to 'Edit', edit_tagg_path(group)
+        
+.span-6.prepend-1.last
+  .span-6.box
+    - form_for(TagGroup.new, :url => taggs_path, :method => :post, :html => {:class => 'new_tag_group', :id => 'new_service_form'}) do |f|
+      .span-6.last
+        = label_tag "new_tag_group_name_name", "Add a Tag Group", :class => 'big'
+      .span-6.last
+        = text_field_tag "tag_group[name]", '', :id => 'new_tag_group_name', :class => 'title big required', :style => 'width: 200px;'
+      %hr.space
+      .span-6.last
+        #submit= submit_tag "Create", :name => nil, :class => 'button big'
+        

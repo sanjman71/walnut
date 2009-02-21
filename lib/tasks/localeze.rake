@@ -6,10 +6,10 @@ namespace :localeze do
                   "localeze:chains:add_by_city_state['Chicago','IL']"]
   end
   
-  desc "Import localeze tags"
-  task :import_tags do
+  desc "Import localeze categories"
+  task :import_categories do
     
-    puts "#{Time.now}: importing localeze tags"
+    puts "#{Time.now}: importing localeze categories"
     
     checked = 0
     tagged  = 0
@@ -23,37 +23,41 @@ namespace :localeze do
       locations.each do |location|
         # track number of locations checked
         checked += 1
+
+        categories  = Localeze::BaseRecord.find(location.source_id).get(:categories)
+        groups      = []
+         
+        categories.each do |category|
+          # map category to a tag group
+          tag_groups = TagGroup.search_by_name(category['name'])
+          
+          # a category should match exactly 1 tag group
+          next if tag_groups.size != 1
+          groups += tag_groups
+        end
+
+        next if groups.blank?
         
-        tags = Localeze::BaseRecord.find(location.source_id).get(:tags)
+        puts "*** groups: #{groups.collect(&:name).join(",")}"
         
-        if tags.blank?
-          LOCALEZE_LOGGER.debug("xxx location #{location.id}:#{location.locatable.name} has no localeze tags")
-          blank += 1
-          next
+        # add place/group mappings
+        place = location.locatable
+        groups.each do |group|
+          next if group.places.include?(place)
+          group.places.push(place)
+          puts "*** added group: '#{group.name}' to place: #{place.name}:#{place.id}"
         end
         
-        # build new tag list
-        new_tag_list  = tags.collect { |hash| hash["tag"] }.uniq.sort
-        place         = location.locatable
-        cur_tag_list  = place.tag_list.sort
-        
-        # check if the tags have changed
-        if cur_tag_list == new_tag_list
-          next
-        end
-        
-        # xxx remove all tags, then add all tags
-        place.tag_list.remove(place.tag_list)
-        place.save
-        place.reload
-        
-        place.tag_list.add(new_tag_list)
-        place.save
-       
+        # tags = Localeze::BaseRecord.find(location.source_id).get(:tags)
+        # 
+        # if tags.blank?
+        #   LOCALEZE_LOGGER.debug("xxx location #{location.id}:#{location.locatable.name} has no localeze tags")
+        #   blank += 1
+        #   next
+        # end
+               
         tagged += 1
         
-        puts "*** added tags: '#{new_tag_list.join(",")}' to place: #{place.name}"
-
         # check limit
         if limit and tagged >= limit
           puts "*** reached limit of #{tagged}"
@@ -94,14 +98,29 @@ namespace :localeze do
     puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported"
   end
   
-  desc "Import localeze records"
-  task :import_records_by_city_and_state, :city, :state_code do |t, args|
-    city        = args.city.titleize
-    state_code  = args.state_code.upcase
+  desc "Import localeze records, by city and state, or by offset and limit"
+  task :import_records do |t|
     
-    exit if city.blank? or state_code.blank?
+    # default page parameters
+    page        = 1
+    per_page    = 100
     
-    puts "#{Time.now}: importing localeze records for #{city}:#{state_code}"
+    if ENV["CITY"] and ENV["STATE"]
+      city        = ENV["CITY"].titleize
+      state_code  = ENV["STATE"].upcase
+      params      = {:city => city, :state => state_code, :page => page, :per_page => per_page}
+      
+      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}"
+    elsif ENV["OFFSET"] and ENV["LIMIT"]
+      offset      = ENV["OFFSET"].to_i
+      limit       = ENV["LIMIT"].to_i
+      params      = {:offset => offset, :limit => [per_page, limit].min} # get records in smaller chunks
+
+      puts "#{Time.now}: importing #{limit} localeze records starting at offset #{offset}"
+    else
+      puts "invalid arguments"
+      exit
+    end
     
     # track stats
     added       = 0
@@ -109,10 +128,8 @@ namespace :localeze do
     exists      = 0
     
     @country    = Country.find_by_code("US")
-    page        = 1
-    limit       = nil
     
-    until (records = Localeze::BaseRecord.find(:all, :params => {:city => city, :state => state_code, :page => page})).blank?
+    until (records = Localeze::BaseRecord.find(:all, :params => params)).blank?
       records.each do |record|
         # check if record has already been imported
         if Location.find_by_source_id(record).first
@@ -195,11 +212,18 @@ namespace :localeze do
         # check limit
         if limit and added >= limit
           puts "*** reached limit of #{added}"
+          puts "#{Time.now}: completed, #{added} added, #{exists} already imported, #{errors} errors"
           exit
         end
       end
       
-      page += 1
+      if offset
+        # increment offset
+        params[:offset] = params[:offset] + [per_page, limit].min
+      else
+        # increment page
+        params[:page]   = params[:page] + 1
+      end
     end
     
     puts "#{Time.now}: completed, #{added} added, #{exists} already imported, #{errors} errors"

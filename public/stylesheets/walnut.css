@@ -95,11 +95,11 @@ a.signup:hover                                    { color: #000000; background-c
 
 /* tag link styles */
 
-a.tag.even                                        { color: #5500BB; font-size: 1.3em; }
-a.tag.even:hover                                  { color: #FFFFFF; background-color: #5500BB; }
+a.tag.even, a.locality.even                       { color: #5500BB; font-size: 1.3em; }
+a.tag.even:hover, a.locality.even:hover           { color: #FFFFFF; background-color: #5500BB; }
 
-a.tag.odd                                         { color: #341809; font-size: 1.2em; }
-a.tag.odd:hover                                   { color: #FFFFFF; background-color: #341809; }
+a.tag.odd, a.locality.odd                         { color: #341809; font-size: 1.2em; }
+a.tag.odd:hover, a.locality.odd:hover             { color: #FFFFFF; background-color: #341809; }
 
 /* sidebar styles */
 

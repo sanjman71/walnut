@@ -6,6 +6,8 @@ class PlaceTest < ActiveSupport::TestCase
   should_require_attributes   :name
   should_have_many            :locations
   should_have_many            :phone_numbers
+  should_have_many            :place_tag_groups
+  should_have_many            :tag_groups
   should_belong_to            :chain
   
   context "create place with a location" do

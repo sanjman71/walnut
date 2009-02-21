@@ -1,9 +1,14 @@
 class Search
   attr_reader :locality_tags, :place_tags
   
+  @@anything_search = ["anything"]
+  
   def initialize(options={})
     @locality_tags  = options[:locality_tags] || []
     @place_tags     = options[:place_tags] || []
+    
+    # handle special anything search
+    @place_tags     = [] if @place_tags == @@anything_search
   end
   
   def field(field)
@@ -32,8 +37,13 @@ class Search
       s
     end
     
-    # build the final query from the field set and field value
-    [field_set, field_value.strip].compact.join(" ").strip
+    if field_value.blank?
+      # empty query
+      ""
+    else
+      # build the final query from the field set and field value
+      [field_set, field_value.strip].compact.join(" ").strip
+    end
   end
   
   # parse search where and what values

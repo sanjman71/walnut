@@ -7,8 +7,9 @@
   
 %h3.span-20.prepend-1
   %p== #{@state.name} Cities
-  - @cities.each do |city|
-    %span[city]= link_to city, url_for(:controller => 'places', :action => 'city', :country => @country, :state => @state, :city => city)
+  - @cities.each_with_index do |city, i|
+    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    %span[city]{:style => 'line-height: 1.5em; padding-right: 3px; white-space: nowrap;'}= link_to(city, url_for(:controller => 'places', :action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
 
 %h3.span-20.prepend-1
   %p== #{@state.name} Zip Codes

@@ -24,6 +24,9 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources   :chains, :only => [:index]
   
+  # tag group routes
+  map.resources   :taggs
+  
   # zip routes
   map.connect     'zips/error/:area', :controller => 'zips', :action => 'error'
   map.connect     'zips/:country/:state/:city', :controller => 'zips', :action => 'city'
