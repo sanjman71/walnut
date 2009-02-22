@@ -1,4 +1,17 @@
 %h4== #{city.name} Zip Codes
-%ul
-  - zips.each do |zip|
-    %li= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what.to_url_param)
+
+-# split zips into 2 lists of equal size
+- index1  = zips.length.even? ? zips.length/2 : zips.length/2 + 1
+- zips1   = zips.slice(0,index1)
+- zips2   = zips.slice(index1, index1)
+
+.span-4
+  .span-2
+    %ul
+      - zips1.each do |zip|
+        %li.zip= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what.to_url_param)
+
+  .span-2.last
+    %ul
+      - zips2.each do |zip|
+        %li.zip= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what.to_url_param)
