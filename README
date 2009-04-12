@@ -3,12 +3,35 @@
 To get the application up and running:
 
 1. Initialize the database:
-  - rake db:init:all
+  - rake init:all
 
-2. Build the sphinx index:
-  - rake ts:index
+2. Import localeze data.
+  - Start the localeze web service (defaults to port 3002)
+
+  2a. Import records by city
+    - rake localeze:import_records CITY='Chicago' STATE='IL'      # 8700
+    - rake localeze:import_records CITY='Charlotte' STATE='NC'    # 3726
+    - rake localeze:import_records CITY='New York' STATE='NY'     # 2053
+
+    - rake localeze:import_records CITY='Austin' STATE='TX'       # 2373
+    - rake localeze:import_records CITY='Tampa' STATE='FL'        # 2556
+    - rake localeze:import_records CITY='Philadelphia' STATE='PA' # 3496
+    - rake localeze:import_records CITY='Pittsburgh' STATE='PA'   # 2023
+    - rake localeze:import_records CITY='Sacramento' STATE='CA'   # 2451
+    - rake localeze:import_records CITY='Boston' STATE='MA'       # 1366
+
+  2b. Add tags by mapping localeze categories to local tag groups
+    - rake localeze:import_categories
+
+3. Import neighborhoods
+  - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
+   
+3. Map cities to zips.
+  - rake init:city_zips
+
+4. Build the sphinx index, without re-writing the configuration file:
+  - rake ts:index INDEX_ONLY=true
   
-3. Start the sphinx dameon:
+5. Start the sphinx dameon:
   - rake ts:start
   
-Go to http://www.walnut.dev:3000/places to see some search results.

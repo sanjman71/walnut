@@ -1,6 +1,6 @@
 namespace :localeze do
   
-  desc "Import localeze categories"
+  desc "Import localeze categories as tags and tag groups"
   task :import_categories do
     
     puts "#{Time.now}: importing localeze categories"
@@ -12,11 +12,11 @@ namespace :localeze do
     page      = 1
     limit     = nil
     
-    until (locations = Location.find(:all).paginate(:page => page, :per_page => 100)).blank?
-    
-      locations.each do |location|
+    # find places with no tag groups
+    until (places = Place.find(:all, :conditions => {:tag_groups_count => 0}, :include => :locations).paginate(:page => page, :per_page => 100)).blank?
+      places.collect(&:locations).flatten.each do |location|
         # track number of locations checked
-        checked += 1
+        checked     += 1
 
         categories  = Localeze::BaseRecord.find(location.source_id).get(:categories)
         groups      = []
@@ -66,6 +66,7 @@ namespace :localeze do
   task :import_chains do
     added   = 0
     exists  = 0
+    places  = 0
     
     puts "#{Time.now}: importing all localeze chains"
     
@@ -81,9 +82,10 @@ namespace :localeze do
           added += 1
         end
         
+        # find all localeze records for this chain
         puts "#{Time.now}: importing chain info for #{chain.name}"
         records = Localeze::Chain.find(localeze_chain.id).get(:records)
-        # puts "*** records: #{records}"
+        
         records.each do |record_hash|
           # map localeze id to a location and place
           localeze_id = record_hash['id']
@@ -92,11 +94,13 @@ namespace :localeze do
           
           # check for valid location and place
           next if location.blank? or place.blank?
-          
+
+          # the place exists, add chain if its not already mapped
           if place.chain.blank?
             puts "*** chain: #{chain.name}, record: #{localeze_id}, mapped to location: #{location.id}, place: #{place.name}"
             place.chain = chain
             place.save
+            places += 1
           end
         end
       end
@@ -104,20 +108,24 @@ namespace :localeze do
       page += 1
     end
       
-    puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported"
+    puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported, and mapped #{places} places to chains"
   end
   
   desc "Import localeze records, by city and state, or by offset and limit"
   task :import_records do |t|
     
     # default page parameters
-    page        = 1
-    per_page    = 100
+    page          = 1
+    per_page      = 100
     
+    # default limit
+    default_limit = 10
+     
     if ENV["CITY"] and ENV["STATE"]
       city        = ENV["CITY"].titleize
       state_code  = ENV["STATE"].upcase
       params      = {:city => city, :state => state_code, :page => page, :per_page => per_page}
+      limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : default_limit
       
       puts "#{Time.now}: importing localeze records for #{city}:#{state_code}"
     elsif ENV["OFFSET"] and ENV["LIMIT"]

@@ -80,6 +80,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :locations_count,       :default => 0   # counter cache
       t.integer     :phone_numbers_count,   :default => 0   # counter cache
       t.references  :chain
+      t.integer     :tag_groups_count,      :default => 0   # counter cache
     end
 
     create_table :chains do |t|

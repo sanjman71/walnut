@@ -1,8 +1,13 @@
 - title(@title)
 
-.span-23.box
+.span-23.prepend-1.mat.padding-top-10.padding-bottom-20
   %h1= @h1
+  %h4#breadcrumbs
+    = link_to 'Home', root_path
+
+%hr.space
 
 .span-24#chains
   %h3.prepend-1.span-22
-    =render(:partial => 'chains', :locals => {:chains => @chains})
+    - unless @chains.blank?
+      = render(:partial => 'chains', :locals => {:chains => @chains})

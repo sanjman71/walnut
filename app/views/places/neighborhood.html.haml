@@ -2,6 +2,7 @@
 
 .span-20.box.prepend-1.last
   %h2== #{@neighborhood.name}, #{@city.name} Neighborhood Directory
+  %h5= link_to("#{pluralize(@neighborhood.locations_count, 'location')}", url_for(:action => 'index', :what => 'anything'))
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :neighborhood => @neighborhood})
   

@@ -188,10 +188,29 @@ namespace :init do
   
   desc "Import neighborhood info using the urban mapping api"
   task :urban_neighborhoods do
-    added = 0
+    limit       = ENV["LIMIT"].to_i if ENV["LIMIT"]
+    city        = ENV["CITY"].titleize if ENV["CITY"]
+    state_code  = ENV["STATE"].upcase if ENV["STATE"]
+    added       = 0
+
+    # build conditions
+    conditions  = {:neighborhoods_count => 0}
     
-    # find locations with no neighborhoods
-    Location.all(:conditions => {:neighborhoods_count => 0}).each do |location|
+    if city and state_code
+      state = State.find_by_code(state_code)
+      city  = state.cities.find_by_name(city)
+      
+      if state.blank? or city.blank?
+        puts "*** invalid city, state"
+        exit
+      end
+      
+      conditions.update(:city_id => city.id)
+      conditions.update(:state_id => state.id)
+    end
+    
+    # find locations with no neighborhoods, matching conditions
+    Location.all(:conditions => conditions).each do |location|
       neighborhoods = UrbanMapping::Neighborhood.find_by_latlng(location.lat, location.lng)
       
       # add neighborhoods
@@ -199,6 +218,11 @@ namespace :init do
         next if location.neighborhoods.include?(neighborhood)
         location.neighborhoods.push(neighborhood)
         added += 1
+      end
+      
+      if limit and added >= limit
+        puts "#{Time.now}: *** reached limit #{limit}"
+        break
       end
       
       # throttle calls to urban mapping

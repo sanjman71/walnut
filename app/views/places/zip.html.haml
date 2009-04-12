@@ -1,6 +1,6 @@
 - title(@title)
 
-.span-20.box.prepend-1.last
+.span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
   %h2== #{@state.name} #{@zip.name} Directory
   %h5= link_to("#{pluralize(@zip.locations_count, 'location')}", url_for(:action => 'index', :what => 'anything'))
   %h4#breadcrumbs

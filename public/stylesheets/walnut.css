@@ -161,10 +161,14 @@ span.example                                      { color: #666666; font-style: 
 #breadcrumbs a:hover                              { color: #FFFFFF; background-color: #5500BB; }
 #breadcrumbs span                                 { color: #555555; }
 
-.popular_tags                                     { color: #5500BB; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
 
-.city_zips                                        { color: #FF6600; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
-.zip_cities                                       { color: #FF6600; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
+.popular_tags                                     { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
+.popular_cities, .popular_neighborhoods           { color: #666666; font-size: 0.7em; padding-bottom: 5px; }
 
-.state_cities                                     { color: #5500BB; font-weight: bold; font-size: 1.2em; padding-bottom: 10px; }
-.state_zips                                       { color: #FF6600; font-weight: bold; font-size: 1.2em; padding-bottom: 10px; }
+.city_zips, .city_neighborhoods                   { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
+.zip_cities                                       { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
+
+.state_cities                                     { color: #111111; font-weight: bold; padding-bottom: 10px; }
+.state_zips                                       { color: #111111; font-weight: bold; padding-bottom: 10px; }
+
+span.neighborhood                                 { margin-right: 2px; }
