@@ -3,7 +3,7 @@ require 'test/factories'
 
 class PlaceTest < ActiveSupport::TestCase
   
-  should_require_attributes   :name
+  should_validate_presence_of :name
   should_have_many            :locations
   should_have_many            :phone_numbers
   should_have_many            :place_tag_groups

@@ -3,24 +3,11 @@ require 'test/factories'
 
 class TagGroupTest < ActiveSupport::TestCase
   
-  should_require_attributes   :name
+  should_validate_presence_of :name
   should_have_many            :place_tag_groups
   should_have_many            :places
   
   context "tag group" do
-    context "with no tags" do
-      setup do
-        @tagg = TagGroup.create(:name => "fashion")
-      end
-
-      should_change "TagGroup.count"
-    
-      should "have no tags" do
-        assert_equal [], @tagg.tag_list
-        assert_equal nil, @tagg.tags
-      end
-    end
-    
     context "with lowercase name" do
       setup do
         @tagg = TagGroup.create(:name => "fashion")
@@ -31,8 +18,50 @@ class TagGroupTest < ActiveSupport::TestCase
       should "have name Fashion" do
         assert_equal 'Fashion', @tagg.name
       end
+      
+      should "not allow another tag group with the same name" do
+        @tagg2 = TagGroup.create(:name => "Fashion")
+        assert !@tagg2.valid?
+      end
     end
 
+    context "with mixed case name containing dashes" do
+      setup do
+        @tagg = TagGroup.create(:name => "LAW - criminal")
+      end
+
+      should_change "TagGroup.count"
+
+      should "have name Law - Criminal" do
+        assert_equal 'Law - Criminal', @tagg.name
+      end
+    end
+
+    context "with name containing 'and'" do
+      setup do
+        @tagg = TagGroup.create(:name => "Pizza and beer")
+      end
+      
+      should_change "TagGroup.count"
+
+      should "have name Pizza and Beer" do
+        assert_equal 'Pizza and Beer', @tagg.name
+      end
+    end
+    
+    context "with no tags" do
+      setup do
+        @tagg = TagGroup.create(:name => "fashion")
+      end
+
+      should_change "TagGroup.count"
+
+      should "have no tags" do
+        assert_equal [], @tagg.tag_list
+        assert_equal nil, @tagg.tags
+      end
+    end
+    
     context "with non-lowercase tags" do
       setup do
         @tagg = TagGroup.create(:name => "fashion", :tags => ["JEANS", "Diesel"])
@@ -150,16 +179,30 @@ class TagGroupTest < ActiveSupport::TestCase
         end
       end
       
-      context "then add tag to tag group" do
+      context "then add a tag to the tag group" do
         setup do
           @tagg.add_tags("zatiny")
           @tagg.save
-          @tagg.apply
           @place.reload
         end
         
-        should "add new tag to all tag group places" do
-          assert_equal ["diesel", "jeans", "zatiny"], @place.tag_list
+        should "have the dirty flag set" do
+          assert_equal true, @tagg.dirty?
+        end
+        
+        context "and apply tags" do
+          setup do
+            @tagg.apply
+            @tagg.reload
+          end
+
+          should "not have the dirty flag set" do
+            assert_equal false, @tagg.dirty?
+          end
+
+          should "add new tag to all tag group places" do
+            assert_equal ["diesel", "jeans", "zatiny"], @place.tag_list
+          end
         end
       end
     end

@@ -1,6 +1,7 @@
+- max_count   = chains.max{ |a,b| a.places_count <=> b.places_count}.places_count
+- tag_classes = ['one', 'two', 'three']
+
 - chains.each do |chain|
-  .span-17.prepend-1.letterbox{:class => cycle("shaded", "")}[chain]
-    %h3.name.margin-bottom-0
-      = link_to chain.name, url_for(:action => 'country', :country => @country, :name => chain.id)
-    %h6#count
-      == #{chain.places_count} places
+  - klass     = tag_cloud_class(chain, :places_count, max_count, tag_classes)
+  - klasses   = ["chain"].push(cycle('even', 'odd')).push(klass)
+  %span.small{:style => "white-space: nowrap;"}= link_to chain.name, url_for(:action => 'country', :country => @country, :name => chain.id), :class => klasses.join(" ")

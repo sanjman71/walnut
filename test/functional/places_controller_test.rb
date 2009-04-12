@@ -58,9 +58,9 @@ class PlacesControllerTest < ActionController::TestCase
     
       should_respond_with :success
       should_render_template 'places/index.html.haml'
-      should_assign_to :country, :equals => "@us"
-      should_assign_to :state, :equals => "@il"
-      should_assign_to :city, :equals => "@chicago"
+      should_assign_to(:country) { @us }
+      should_assign_to(:state) { @il }
+      should_assign_to(:city) { @chicago }
       should_assign_to :what
       should_assign_to :search
       should_assign_to :tags

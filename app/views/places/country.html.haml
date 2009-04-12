@@ -4,6 +4,7 @@
   %h2== Browse by State
   
 %h3.span-20.prepend-1
-  - @states.each do |state|
-    %span[state]= link_to state, url_for(:controller => 'places', :action => 'state', :country => @country, :state => state)
+  - @states.each_with_index do |state, i|
+    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    %span.small[state]{:style => "white-space: nowrap;"}= link_to(state, url_for(:controller => 'places', :action => 'state', :country => @country, :state => state), :class => klasses.join(" "))
 

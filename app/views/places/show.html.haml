@@ -23,7 +23,7 @@
 
   .span-18#all_tags
     .span-7.colborder#place_tags
-      %h2== Search Tags
+      %h2== Keyword Tags
       - @location.locatable.tags.each do |tag|
         %span{:style => 'font-size: 13px; padding-right: 3px;'}= link_to tag.name, build_search_route('city', :country => @country, :state => @state, :city => @city, :what => tag.name.to_url_param)
     

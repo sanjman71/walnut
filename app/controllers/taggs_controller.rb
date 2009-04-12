@@ -2,7 +2,19 @@ class TaggsController < ApplicationController
   layout "home"
   
   def index
-    @groups = TagGroup.all
+    @search = params[:search].to_s
+    
+    case @search
+    when ""
+      @groups       = TagGroup.order_by_name
+      @search_text  = @groups.blank? ? "No Tag Groups" : "All Tag Groups (#{@groups.size})"
+    when "empty"
+      @groups       = TagGroup.empty.order_by_name
+      @search_text  = "Empty Tag Groups (#{@groups.size})"
+    else
+      @groups       = TagGroup.search_name_and_tags(@search).order_by_name
+      @search_text  = "#{@groups.size} Tag Groups matching '#{@search}'"
+    end
     
     @title  = "Tag Groups"
   end
@@ -28,6 +40,9 @@ class TaggsController < ApplicationController
   def update
     @group  = TagGroup.find(params[:id])
     
+    # update name
+    @group.name = params[:name]
+    
     # build add, remove keyword lists
     @group.add_tags(params[:add_tags])
     @group.remove_tags(params[:remove_tags])
@@ -36,7 +51,17 @@ class TaggsController < ApplicationController
     # apply tag changes to places
     @group.apply
     
+    flash[:notice] = "Updated tag group '#{@group.name}'"
+    
     redirect_to(taggs_path)
   end
   
+  def show
+    @tagg   = TagGroup.find(params[:id])
+    
+    # find places tagged with this group
+    @places = @tagg.places
+    
+    @title  = "Tag Group '#{@tagg.name}'"
+  end
 end

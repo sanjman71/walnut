@@ -3,8 +3,8 @@ require 'test/factories'
 
 class PhoneNumberTest < ActiveSupport::TestCase
   
-  should_require_attributes   :name
-  should_require_attributes   :number
+  should_validate_presence_of   :name
+  should_validate_presence_of   :number
   
   context "phone number" do
     context "with invalid number" do

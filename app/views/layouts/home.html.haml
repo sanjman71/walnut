@@ -28,10 +28,10 @@
           = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :style => 'color: #FFFFFF;'
           == &nbsp;|&nbsp;
           = link_to 'Tag Groups', taggs_path, :style => 'color: #FFFFFF;'
+          == &nbsp;|&nbsp;
+          = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :style => 'color: #FFFFFF;')
           
-    - if RAILS_ENV == 'development'
-      .container.showgrid
-        = yield
-    - else
-      .container
-        = yield
+    .container{:class => $BlueprintGrid ? 'showgrid' : ''}
+      .flash.prepend-1.span-14
+        = display_flash(:all) if global_flash?
+      = yield

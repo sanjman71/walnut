@@ -38,6 +38,9 @@ ActionController::Routing::Routes.draw do |map|
   # map the root to the home controller
   map.root        :controller => 'home', :action => 'index'
   
+  # debug controller
+  map.connect   'debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
+  
   # Sample of regular route:
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action

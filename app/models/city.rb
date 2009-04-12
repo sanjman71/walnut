@@ -14,6 +14,12 @@ class City < ActiveRecord::Base
   named_scope :exclude,       lambda { |city| {:conditions => ["id <> ?", city.is_a?(Integer) ? city : city.id] } }
   named_scope :within_state,  lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
   
+  # find cities with locations
+  named_scope :with_locations,    { :conditions => ["locations_count > 0"] }
+  
+  # order cities by location count
+  named_scope :order_by_density,  { :order => "locations_count DESC" }
+  
   # the special anywhere object
   def self.anywhere(state=nil)
     City.new do |o|

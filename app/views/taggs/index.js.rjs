@@ -1,0 +1,8 @@
+# update search text
+page["#tag_groups_search_text"].html(@search_text)
+
+# update groups list
+page["#tag_groups"].html(render(:partial => 'groups.html.haml', :locals => {:groups => @groups}))
+
+# hide search progress bar
+page["#search_progress"].hide();

@@ -1,4 +1,8 @@
-%p== Popular Tags
-- tags.each_with_index do |tag, i|
-  - klasses = i.odd? ? ["tag", "odd",] : ["tag", "even"]
-  %span[tag]{:style => "line-height: 1.7em; padding-right: 3px; white-space: nowrap;"}= link_to(tag, build_search_route(locality_type, locality_params.merge(:what => tag.name.to_url_param)), :class => klasses.join(" "))
+.popular_tags== Popular Tags
+
+- max_count   = tags.max{ |a,b| a.count <=> b.count}.count
+- tag_classes = ['one', 'two', 'three']
+- tags.each do |tag|
+  - tag_class = tag_cloud_class(tag, :count, max_count, tag_classes)
+  - klasses   = ["tag"].push(cycle('even', 'odd')).push(tag_class)
+  %span.small[tag]{:style => "white-space: nowrap;"}= link_to(tag, build_search_route(locality_type, locality_params.merge(:what => tag.name.to_url_param)), :class => klasses.join(" "))

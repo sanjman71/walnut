@@ -8,4 +8,7 @@ class Zip < ActiveRecord::Base
   has_many                    :locations
   
   include NameParam
+  
+  # order zips by location count
+  named_scope :order_by_density,      {:order => "locations_count DESC"}
 end

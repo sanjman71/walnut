@@ -7,4 +7,21 @@ class State < ActiveRecord::Base
   has_many                    :locations
 
   include NameParam
+  
+  # find states with locations
+  named_scope :with_locations,    { :conditions => ["locations_count > 0"] }
+  
+  # order states by location count
+  named_scope :order_by_density,  { :order => "locations_count DESC" }
+  
+  def geocode_latlng(options={})
+    force = options.has_key?(:force) ? options[:force] : false
+    return true if self.lat and self.lng and !force
+    # multi-geocoder geocode does not throw an exception on failure
+    geo = Geokit::Geocoders::MultiGeocoder.geocode("#{name}")
+    return false unless geo.success
+    self.lat, self.lng = geo.lat, geo.lng
+    self.save
+  end
+  
 end

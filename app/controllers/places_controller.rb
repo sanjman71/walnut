@@ -69,7 +69,7 @@ class PlacesController < ApplicationController
     @neighborhoods  = @city.neighborhoods unless @city.blank?
     
     # find city zips if its a city search
-    @zips           = @city.zips unless @city.blank?
+    @zips           = @city.zips.order_by_density.all(:limit => 20) unless @city.blank?
 
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
     nearby_miles    = 20
@@ -158,8 +158,8 @@ class PlacesController < ApplicationController
     
     case params[:action]
     when 'country'
-      # find all states
-      @states = @country.states
+      # find all states that have locations
+      @states = @country.states.with_locations
       return true
     else
       # find the specified state for all other cases

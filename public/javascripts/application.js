@@ -1,6 +1,13 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
 
+// prevent a method from being called too often, e.g. live search requests
+Function.prototype.sleep = function (millisecond_delay) {
+  if(window.sleep_delay != undefined) clearTimeout(window.sleep_delay);
+  var function_object = this;
+  window.sleep_delay  = setTimeout(function_object, millisecond_delay);
+};
+
 // displays hint text on any input element with the 'title' attribute set
 $.fn.init_input_hints = function() {
   var el = $('input[title]');
@@ -29,10 +36,8 @@ $.fn.init_input_hints = function() {
   });
 }
 
-$(document).ready(function() {
-
-  $(document).init_input_hints();
-  
+$.fn.init_search_places_form = function() {
+  // show hidden search places form onclick
   $("#search_link").click(function () {
     $("#search_places").css('visibility', 'visible');
     return false;
@@ -73,4 +78,9 @@ $(document).ready(function() {
     
     return true;
   })
+}
+
+$(document).ready(function() {
+  $(document).init_input_hints();
+  $(document).init_search_places_form();
 })

@@ -1,7 +1,8 @@
 - title(@title)
 
-.span-20.box
+.span-23.box
   %h1= @h1
 
 .span-24#chains
-  =render(:partial => 'chains', :locals => {:chains => @chains})
+  %h3.prepend-1.span-22
+    =render(:partial => 'chains', :locals => {:chains => @chains})

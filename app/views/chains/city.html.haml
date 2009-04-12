@@ -1,6 +1,6 @@
 - title(@title)
 
-.span-20.box
+.span-23.box
   %h1= @h1
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
@@ -9,6 +9,6 @@
   -# show chain name and street address, link to place show
   - @locations.each do |location|
     .prepend-1.letterbox{:class => cycle("shaded", "")}[location]
-      %h3.name.margin-bottom-0
+      %h3.name.bottom
         = link_to location.locatable.name, {:controller => 'places', :action => 'show', :id => location}
         %span.street= location.street_address

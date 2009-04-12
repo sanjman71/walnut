@@ -1,0 +1,24 @@
+- title(@title)
+
+.span-23.box
+  .span-18
+    %h1== Tag group '#{@tagg.name}'
+    == Places: #{@places.size}
+    %br
+    == Tags: #{@tagg.tags}
+  .span-4.last
+    = link_to 'Edit', edit_tagg_path(@tagg)
+    == &nbsp;|&nbsp;
+    = link_to 'Show all Tag Groups', taggs_path
+  
+- @places.each do |place|
+  .prepend-1.span-15.letterbox{:class => cycle("shaded", "")}[place]
+    .span-13
+      %h3{:style => 'margin-bottom: 3px;'}
+        = place.name
+      .span-2
+        == Locations: #{place.locations_count}
+      %br
+      == Tags:
+      = place.tag_list.join(", ")
+

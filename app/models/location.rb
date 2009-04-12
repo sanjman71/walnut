@@ -19,7 +19,8 @@ class Location < ActiveRecord::Base
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
   # find location by the specified source id
-  named_scope :find_by_source_id,  lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
+  named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
+  named_scope :find_by_source_id,   lambda { |source_id| { :conditions => {:source_id => source_id} }}
   
   define_index do
     indexes street_address, :as => :street_address

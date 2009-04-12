@@ -1,14 +1,20 @@
-- zip           = nil unless defined?(zip)
-- city          = nil unless defined?(city)
-- neighborhood  = nil unless defined?(neighborhood)
-- state         = nil unless defined?(state)
-- link_all      = nil unless defined?(link_all) # if true, link all breadcrumb objects
+- state         = nil unless local_assigns.has_key?(:state)
+- zip           = nil unless local_assigns.has_key?(:zip)
+- city          = nil unless local_assigns.has_key?(:city)
+- neighborhood  = nil unless local_assigns.has_key?(:neighborhood)
+- link_all      = nil unless local_assigns.has_key?(:link_all) # if true, link all breadcrumb objects
 
 - separator     = ">"
 
--# build ordered hash mapping locality type to object; remove empty objects
-- localities    = ActiveSupport::OrderedHash[[:country, country], [:state, state], [:city, city], [:zip, zip], [:neighborhood, neighborhood]].delete_if { |klass, object| object.blank? }
-- size          = localities.size
+-# build ordered hash mapping locality type to object
+- localities                = ActiveSupport::OrderedHash.new
+- localities[:country]      = country unless country.blank?
+- localities[:state]        = state unless state.blank?
+- localities[:city]         = city unless city.blank?
+- localities[:city]         = city unless city.blank?
+- localities[:zip]          = zip unless zip.blank?
+- localities[:neighborhood] = neighborhood unless neighborhood.blank?
+- size                      = localities.size
 
 - localities.each_with_index do |tuple, index|
   - klass, locality = tuple

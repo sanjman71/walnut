@@ -1,8 +1,12 @@
 - title(@title)
 
-.span-20.box
-  %h1= @h1
-  
+.span-23.box
+  .span-20
+    %h1= @h1
+    == Places: #{@chain.places_count}
+  .span-3.last
+    = link_to 'All Chain Stores', chains_path
+    
 .prepend-1.span-23#states
   %h3== Find by State
   - @states.each do |state|

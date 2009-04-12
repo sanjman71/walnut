@@ -3,8 +3,8 @@ require 'test/factories'
 
 class LocationTest < ActiveSupport::TestCase
   
-  should_require_attributes   :name
-  should_belong_to            :country
+  should_validate_presence_of   :name
+  should_belong_to              :country
   
   def setup
     @us           = Factory(:us)

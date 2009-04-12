@@ -4,16 +4,29 @@ class TagGroup < ActiveRecord::Base
   has_many                    :place_tag_groups
   has_many                    :places, :through => :place_tag_groups, :after_add => :after_add_place, :after_remove => :after_remove_place
   
-  named_scope                 :search_by_name,    lambda { |s| {:conditions => ["name LIKE ?", "%#{s.titleize}%"] }}
+  named_scope                 :search_name,           lambda { |s| {:conditions => ["name REGEXP '%s'", s] }}
+  named_scope                 :search_name_and_tags,  lambda { |s| {:conditions => ["name REGEXP '%s' OR tags REGEXP '%s'", s, s] }}
+  
+  # find tag groups with no tags
+  named_scope                 :empty,                 { :conditions => ["tags = '' OR tags IS NULL"] }
+  
+  named_scope                 :order_by_name,         { :order => "name ASC" }
   
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?
 
-    # titleize name
-    self.name = self.name.titleize unless self.name.blank?
+    # initialize applied_at timestamp for new objects
+    self.applied_at = Time.now
   end
    
+  def name=(s)
+    return if s.blank?
+    # capitalize words, except for 'and', 'or'
+    s = s.split.map{ |s| ['and', 'or'].include?(s.downcase) ? s : s.capitalize }.join(" ")
+    write_attribute(:name, s)
+  end
+  
   # tags can be a comma separated list or an array
   def tags=(s)
     s = validate_and_clean_string(s)
@@ -56,6 +69,17 @@ class TagGroup < ActiveRecord::Base
   # (re-)apply tags to all places
   def apply
     places.each { |place| apply_tags(place) }
+    # update applied_at timestamp
+    update_attribute(:applied_at, Time.now)
+  end
+  
+  def dirty?
+    self.applied_at < self.updated_at
+  end
+  
+  # convert tag group to a string of attributes separated by '|'
+  def to_pipe
+    [self.id, self.name, self.tags].join("|")
   end
   
   protected
