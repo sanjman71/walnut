@@ -1,0 +1,23 @@
+.span-12.mat
+  .span-11.prepend-1.last
+    %h2== Log In
+    %hr
+    
+  - form_tag login_path do
+    .span-12.last.padding-bottom-10
+      .span-3
+        %h3.text-align-right.select_label== Email:
+      .span-9.last
+        = text_field_tag 'email', @email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+    .span-12.last.padding-bottom-10
+      .span-3
+        %h3.text-align-right.select_label== Password:
+      .span-9.last
+        = password_field_tag 'password', nil, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+
+    .span-11.prepend-1.last
+      = submit_tag 'Log in', :name => nil, :style => 'font-size: 15px;'
+
+    -# Uncomment this if you want this functionality
+    -#= label_tag 'remember_me', 'Remember me'
+    -#= check_box_tag 'remember_me', '1', @remember_me

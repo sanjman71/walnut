@@ -1,15 +1,17 @@
 - title(@title)
 
-.span-23.box
-  .span-20
+.span-23.prepend-1.mat.padding-top-10.padding-bottom-10
+  .span-23.last
     %h1= @h1
-    == Places: #{@chain.places_count}
-  .span-3.last
-    = link_to 'All Chain Stores', chains_path
+    %h4== Places: #{@chain.places_count}
+  .span-23.last
+    %h5.bottom= link_to 'All Chain Stores', chains_path
     
-.prepend-1.span-23#states
-  %h3== Find by State
-  - @states.each do |state|
-    %span#state{:style => "font-size: 12px;"}= link_to state, {:action => 'state', :country => @country, :state => state}
+%hr.space
+
+%h3.prepend-1.span-23#states
+  - @states.each_with_index do |state, i|
+    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    %span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to state, {:action => 'state', :country => @country, :state => state}, :class => klasses.join(" ")
   
 

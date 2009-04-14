@@ -99,8 +99,8 @@ class PlaceTest < ActiveSupport::TestCase
     should_change "Tag.count", :by => 1
     should_change "Tagging.count", :by => 1
     
-    should "set tag taggings_count to 1" do
-      assert_equal 1, Tag.find_by_name(@tag1).taggings_count
+    should "set tag.taggings_count to 1" do
+      assert_equal 1, Tag.find_by_name("tag1").taggings.count
     end
     
     context "remove tag" do
@@ -112,8 +112,23 @@ class PlaceTest < ActiveSupport::TestCase
 
       should_change "Tagging.count", :by => -1
       
-      should "set tag taggings_count to 0" do
-        assert_equal 0, Tag.find_by_name(@tag1).taggings_count
+      should "set tag.taggings_count to 0" do
+        assert_equal 0, Tag.find_by_name("tag1").taggings.count
+      end
+    end
+    
+    context "add another tag" do
+      setup do
+        @tag2 = @place.tag_list.add("tag2")
+        @place.save
+        @place.reload 
+      end
+
+      should_change "Tag.count", :by => 1
+      should_change "Tagging.count", :by => 1
+
+      should "set tag.taggings_count to 1" do
+        assert_equal 1, Tag.find_by_name("tag2").taggings.count
       end
     end
   end

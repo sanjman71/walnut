@@ -3,6 +3,8 @@ require 'test/factories'
 
 class NeighborhoodTest < ActiveSupport::TestCase
   should_belong_to    :city
+  should_have_many    :location_neighborhoods
+  should_have_many    :locations
   
   def setup
     @us       = Factory(:us)

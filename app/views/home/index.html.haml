@@ -1,30 +1,30 @@
-- title('Looking for a Place?')
+- title('Home')
 
 .span-23.prepend-1.padding-top-10
-  %h2
-    == Its not always easy to find a local business online.  We are trying to fix that by making it really easy to find the places you are looking for.
+  %h2== Its not always easy to find a local business online.  We are trying to fix that by making it really easy to find the places you are looking for.
     
-    %hr.space
+  %h4{:style => 'line-height: 1.5em; font-size: 1.3em;'}
+    = highlight("Find places by selecting popular cities or neighborhoods, and then searching by popular tags.  Or use the 'search' link at the top of the page to search based on your own criteria.", ["Find", "popular cities or neighborhoods", "popular tags", "'search'"])
+  
+  %h4{:style => 'line-height: 1.5em; font-size: 1.3em;'}
+    = highlight("Find business services to help your business market its services, generate revenue, increase efficiency and increase customer loyalty.  Our first business service is online scheduling.  Try it out for free.", ["business services", "online scheduling"])
     
-    .popular_cities
-      == Browse Popular Cities
-    
-    - @cities.each do |city|
-      - klasses = ["locality"].push(cycle('even', 'odd'))
-      %span.small{:style => "white-space: nowrap; font-weight: bold;"}= link_to city.name, url_for(:controller => 'places', :action => 'city', :country => @country, :state => city.state, :city => city), :class => klasses.join(" ")
+  %hr.space
+  
+  .popular_cities
+    == Browse Popular Cities
+  
+  - @cities.each do |city|
+    - klasses = ["locality"].push(cycle('even', 'odd'))
+    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to city.name, url_for(:controller => 'places', :action => 'city', :country => @country, :state => city.state, :city => city), :class => klasses.join(" ")
 
-    %hr.space
+  %hr.space
 
-    .popular_neighborhoods
-      == Browse Popular Neighborhoods
+  .popular_neighborhoods
+    == Browse Popular Neighborhoods
 
-    - @neighborhoods.each do |hood|
-      - klasses = ["locality"].push(cycle('even', 'odd'))
-      - city    = hood.city
-      %span.small{:style => "white-space: nowrap; font-weight: bold;"}= link_to hood.name, url_for(:controller => 'places', :action => 'neighborhood', :country => @country, :state => city.state, :city => city, :neighborhood => hood), :class => klasses.join(" ")
-
-    %hr.space
-    
-    %span{:style => 'font-size: 0.7em;'}= link_to 'Browse by state', url_for(:controller => 'places', :action => 'country', :country => @country), :style => 'color: #005500;'
-    
+  - @neighborhoods.each do |hood|
+    - klasses = ["locality"].push(cycle('even', 'odd'))
+    - city    = hood.city
+    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to hood.name, url_for(:controller => 'places', :action => 'neighborhood', :country => @country, :state => city.state, :city => city, :neighborhood => hood), :class => klasses.join(" ")
         

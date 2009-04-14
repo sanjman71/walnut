@@ -8,7 +8,7 @@
 .prepend-1.span-23.last#locations
   %h2== Found #{pluralize(@locations.size, 'location')} in #{@state.name}
   
-.prepend-1.span-14#cities
-  %h4== Find by city
-  - @cities.each do |city|
-    = link_to city.name, {:action => 'city', :city => city, :state => @state, :country => @country}
+%h4.prepend-1.span-14#cities
+  - @cities.each_with_index do |city, i|
+    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    %span.small[city]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to city.name, {:action => 'city', :city => city, :state => @state, :country => @country}, :class => klasses.join(" ")

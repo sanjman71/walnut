@@ -13,6 +13,7 @@ class LocationTest < ActiveSupport::TestCase
     @chicago      = Factory(:city, :name => "Chicago", :state => @il)
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
+    @place        = Place.create(:name => "My Place")
   end
 
   context "location with country" do
@@ -105,9 +106,11 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
-  context "location with city" do
+  context "location with a place and city" do
     setup do
       @location = Location.create(:name => "Home", :city => @chicago)
+      @place.locations.push(@location)
+      @location.reload
       @chicago.reload
     end
     
@@ -119,6 +122,14 @@ class LocationTest < ActiveSupport::TestCase
     
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
+    end
+
+    should "set chicago locations to [@place]" do
+      assert_equal [@location], @chicago.locations
+    end
+    
+    should "set chicago places to [@place]" do
+      assert_equal [@place], @chicago.places
     end
     
     context "remove city" do
@@ -135,12 +146,70 @@ class LocationTest < ActiveSupport::TestCase
       should "decrement chicago locations_count" do
         assert_equal 0, @chicago.locations_count
       end
+
+      should "set chicago locations to []" do
+        assert_equal [], @chicago.locations
+      end
+
+      should "set chicago places to []" do
+        assert_equal [], @chicago.places
+      end
+    end
+    
+    context "change city" do
+      setup do
+        @springfield = Factory(:city, :name => "Springfield", :state => @il)
+        @location.city = @springfield
+        @location.save
+        @chicago.reload
+      end
+
+      should "have springfield locality tag" do
+        assert_equal ["Springfield"], @location.locality_tag_list
+      end
+
+      should "remove chicago locations" do
+        assert_equal [], @chicago.locations
+      end
+
+      should "remove chicago places" do
+        assert_equal [], @chicago.places
+      end
+      
+      should "set springfield locations to [@location]" do
+        assert_equal [@location], @springfield.locations
+      end
+
+      should "set springfield places to [@place]" do
+        assert_equal [@place], @springfield.places
+      end
+    end
+    
+    context "remove place" do
+      setup do
+        @place.locations.delete(@location)
+        @location.reload
+      end
+
+      should "have no locatable" do
+        assert_equal nil, @location.locatable
+      end
+
+      should "leave chicago locations as [@location]" do
+        assert_equal [@location], @chicago.locations
+      end
+
+      should "set chicago places to []" do
+        assert_equal [], @chicago.places
+      end
     end
   end
-  
-  context "location with zip" do
+    
+  context "location with a place and zip" do
     setup do
       @location = Location.create(:name => "Home", :zip => @zip)
+      @place.locations.push(@location)
+      @location.reload
       @zip.reload
     end
     
@@ -152,6 +221,14 @@ class LocationTest < ActiveSupport::TestCase
     
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
+    end
+    
+    should "set zip places to [@place]" do
+      assert_equal [@place], @zip.places
+    end
+
+    should "set zip locations to [@location]" do
+      assert_equal [@location], @zip.locations
     end
     
     context "remove zip" do
@@ -168,13 +245,47 @@ class LocationTest < ActiveSupport::TestCase
       should "decrement zip locations_count" do
         assert_equal 0, @zip.locations_count
       end
+
+      should "remove zip locations" do
+        assert_equal [], @zip.locations
+      end
+
+      should "remove zip places" do
+        assert_equal [], @zip.places
+      end
+    end
+    
+    context "change zip" do
+      setup do
+        @zip2 = Factory(:zip, :name => "60610", :state => @il)
+        @location.zip = @zip2
+        @location.save
+        @zip2.reload
+      end
+
+      should "have 60610 locality tag" do
+        assert_equal ["60610"], @location.locality_tag_list
+      end
+
+      should "set 60654 places to []" do
+        assert_equal [], @zip.places
+      end
+      
+      should "set 60610 places to [@place]" do
+        assert_equal [@place], @zip2.places
+      end
+      
+      should "set 60610 locations to [@location]" do
+        assert_equal [@location], @zip2.locations
+      end
     end
   end
   
-  context "location with neighborhoods" do
+  context "location with a place and neighborhood" do
     setup do
       @location = Location.create(:name => "Home")
       @location.neighborhoods.push(@river_north)
+      @place.locations.push(@location)
       @location.reload
       @river_north.reload
     end
@@ -194,6 +305,10 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal 1, @location.neighborhoods_count
     end
   
+    should "set neighborhood locations to [@location]" do
+      assert_equal [@location], @river_north.locations
+    end
+  
     context "remove neighborhood" do
       setup do
         @location.neighborhoods.delete(@river_north)
@@ -203,6 +318,10 @@ class LocationTest < ActiveSupport::TestCase
 
       should "have no locality tag" do
         assert_equal [], @location.locality_tag_list
+      end
+
+      should "set neighborhood locations to []" do
+        assert_equal [], @river_north.locations
       end
     end
   end

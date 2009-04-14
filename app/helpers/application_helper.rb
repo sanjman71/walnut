@@ -13,18 +13,13 @@ module ApplicationHelper
     content_for(:stylesheet) { stylesheet_link_tag(*files) }
   end
   
-  FLASH_TYPES = [:error, :warning, :success, :message]
+  FLASH_TYPES = [:error, :warning, :success, :message, :notice]
 
-  def display_flash(type = nil)
-    html = ""
-
-    if type.nil?
-      FLASH_TYPES.each { |name| html << display_flash(name) }
-    else
-      return flash[type].blank? ? "" : "<div class=\"#{type}\">#{flash[type]}</div>"
+  def display_flash(force = false)
+    if force || @flash_displayed.nil? || @flash_displayed == false
+      @flash_displayed = true
+      render :partial => "shared/flash.html.haml", :object => (flash.nil? ? {} : flash)
     end
-
-    html
   end
   
   def display_message(msg, type = :notice)

@@ -87,15 +87,14 @@ label.big                                         { font-size: 16px; }
 /* admin styles */
 
 a.admin:link, a.admin:visited                     { font-size: 11px; font-weight: normal; color: #0000FF; }
-
-a.header:link, a.header:visited                   { color: #CCCCCC; }
-
 a.admin:hover                                     { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
+
+a.header.link:link, a.header.link:visited         { color: #FFFFFF; }
+a.header.link:hover                               { background-color: #008800; text-decoration: none; }
 
 /* signup styles */
 
 a.signup:link, a.signup:visited                   { font-size: 11px; font-weight: normal; color: #000000; }
-
 a.signup:hover                                    { color: #000000; background-color: #FFFFFF; text-decoration: none; }
 
 /* tag link styles */
@@ -108,10 +107,12 @@ a.tag.odd, a.locality.odd, a.chain.odd            { color: #663333; font-size: 1
 a.tag.odd:hover, a.locality.odd:hover, a.chain.odd:hover            
                                                   { color: #FFFFFF; background-color: #663333; }
 
-a.tag.odd.one, a.tag.even.one, a.chain.even.one   { font-size: 1.3em; }
-a.tag.odd.two, a.tag.even.two, a.chain.even.two   { font-size: 2.0em; }
-a.tag.odd.three, a.tag.even.three, a.chain.even.three
-                                                  { font-size: 2.5em; }
+a.tag.odd.one, a.tag.even.one, a.chain.even.one, a.chain.odd.one
+                                                  { font-size: 1.3em; }
+a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
+                                                  { font-size: 1.7em; }
+a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
+                                                  { font-size: 2.0em; }
 
 /* sidebar styles */
 
@@ -163,7 +164,7 @@ span.example                                      { color: #666666; font-style: 
 
 
 .popular_tags                                     { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
-.popular_cities, .popular_neighborhoods           { color: #666666; font-size: 0.7em; padding-bottom: 5px; }
+.popular_cities, .popular_neighborhoods           { color: #666666; font-size: 1.5em; padding-bottom: 5px; }
 
 .city_zips, .city_neighborhoods                   { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
 .zip_cities                                       { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 

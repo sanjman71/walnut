@@ -1,26 +1,34 @@
 ActionController::Routing::Routes.draw do |map|
   # The priority is based upon order of creation: first created -> highest priority.
 
+  # user, session routes
+  map.login       '/login',         :controller => 'sessions', :action => 'new', :conditions => {:method => :get}
+  map.login       '/login',         :controller => 'sessions', :action => 'create', :conditions => {:method => :post}
+  map.logout      '/logout',        :controller => 'sessions', :action => 'destroy'
+
+  # unauthorized route
+  map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
+
   # places error route
-  map.connect     'places/error/:area', :controller => 'places', :action => 'error'
+  map.connect     '/places/error/:area', :controller => 'places', :action => 'error'
   
   # places [area, tag] routes
-  map.connect     'places/search', :controller => 'places', :action => 'search'
-  map.connect     'places/:country/:state/:city/n/:neighborhood/:what', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
-  map.connect     'places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
-  map.connect     'places/:country/:state/:city/:what', :controller => 'places', :action => 'index', :city => /[a-z-]+/
-  map.connect     'places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/
-  map.connect     'places/:country/:state/:zip/:what', :controller => 'places', :action => 'index', :zip => /\d{5}/
-  map.connect     'places/:country/:state/:zip', :controller => 'places', :action => 'zip', :zip => /\d{5}/
-  map.connect     'places/:country/:state', :controller => 'places', :action => 'state'
-  map.connect     'places/:country', :controller => 'places', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
+  map.connect     '/places/search', :controller => 'places', :action => 'search'
+  map.connect     '/places/:country/:state/:city/n/:neighborhood/:what', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
+  map.connect     '/places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
+  map.connect     '/places/:country/:state/:city/:what', :controller => 'places', :action => 'index', :city => /[a-z-]+/
+  map.connect     '/places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/
+  map.connect     '/places/:country/:state/:zip/:what', :controller => 'places', :action => 'index', :zip => /\d{5}/
+  map.connect     '/places/:country/:state/:zip', :controller => 'places', :action => 'zip', :zip => /\d{5}/
+  map.connect     '/places/:country/:state', :controller => 'places', :action => 'state'
+  map.connect     '/places/:country', :controller => 'places', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
   
   map.resources   :places, :only => [:index, :show]
   
   # chains routes
-  map.connect     'chains/:name/:country', :controller => 'chains', :action => 'country'
-  map.connect     'chains/:name/:country/:state', :controller => 'chains', :action => 'state'
-  map.connect     'chains/:name/:country/:state/:city', :controller => 'chains', :action => 'city'
+  map.connect     '/chains/:name/:country', :controller => 'chains', :action => 'country'
+  map.connect     '/chains/:name/:country/:state', :controller => 'chains', :action => 'state'
+  map.connect     '/chains/:name/:country/:state/:city', :controller => 'chains', :action => 'city'
   
   map.resources   :chains, :only => [:index]
   
@@ -28,10 +36,10 @@ ActionController::Routing::Routes.draw do |map|
   map.resources   :taggs
   
   # zip routes
-  map.connect     'zips/error/:area', :controller => 'zips', :action => 'error'
-  map.connect     'zips/:country/:state/:city', :controller => 'zips', :action => 'city'
-  map.connect     'zips/:country/:state', :controller => 'zips', :action => 'state'
-  map.connect     'zips/:country', :controller => 'zips', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
+  map.connect     '/zips/error/:area', :controller => 'zips', :action => 'error'
+  map.connect     '/zips/:country/:state/:city', :controller => 'zips', :action => 'city'
+  map.connect     '/zips/:country/:state', :controller => 'zips', :action => 'state'
+  map.connect     '/zips/:country', :controller => 'zips', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
   map.resources   :zips, :only => [:index]
   
@@ -39,7 +47,7 @@ ActionController::Routing::Routes.draw do |map|
   map.root        :controller => 'home', :action => 'index'
   
   # debug controller
-  map.connect   'debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
+  map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
   
   # Sample of regular route:
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'

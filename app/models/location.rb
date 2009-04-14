@@ -18,6 +18,13 @@ class Location < ActiveRecord::Base
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
+  named_scope :places,    lambda { {:conditions => ["locatable_type = 'Place'"], :include => :locatable } } do 
+                            def tag_counts
+                              # delegate to locatable
+                              self.collect { |o| o.locatable.tag_counts }.flatten
+                            end
+                          end
+  
   # find location by the specified source id
   named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
   named_scope :find_by_source_id,   lambda { |source_id| { :conditions => {:source_id => source_id} }}
@@ -55,7 +62,7 @@ class Location < ActiveRecord::Base
   
   protected
   
-  # after_save callback to update locality tags (e.g. country, state, city, zip, neighborhood) based on changes to the location object
+  # after_save callback to update locality tags (e.g. country, state, city, zip) based on changes to the location object
   def update_locality_tags
     self.changes.keys.each do |change|
       # filter out unless its an area

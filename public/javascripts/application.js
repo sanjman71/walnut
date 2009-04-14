@@ -37,11 +37,13 @@ $.fn.init_input_hints = function() {
 }
 
 $.fn.init_search_places_form = function() {
+  /*
   // show hidden search places form onclick
   $("#search_link").click(function () {
     $("#search_places").css('visibility', 'visible');
     return false;
   })
+  */
   
   $("#search_places_form").submit(function() {
     // check field values

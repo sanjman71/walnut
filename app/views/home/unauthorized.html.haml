@@ -1,0 +1,13 @@
+.span-23.prepend-1.box
+  %h1== Unauthorized Access
+  
+.span-24.prepend-1
+  %h3.span-16
+    = display_flash(:all)
+    
+  %h3.error.span-18
+    - if !logged_in?
+      == If you have an account, please login and try again.
+    - else
+      == Please check the url you were trying to access and try again.
+  

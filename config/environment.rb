@@ -29,6 +29,7 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem "haml", :version => '2.0.6'
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
+  config.gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -37,6 +38,10 @@ Rails::Initializer.run do |config|
 
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
+
+  # Prevent the lib directory from being reloaded
+  # Avoid the problem: A copy of AuthenticatedSystem has been removed from the module tree but is still active!
+  config.load_once_paths += %W( #{RAILS_ROOT}/lib )
 
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)

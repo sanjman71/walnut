@@ -5,6 +5,7 @@ class State < ActiveRecord::Base
   has_many                    :cities
   has_many                    :zips
   has_many                    :locations
+  has_many                    :places, :through => :locations, :source => :locatable, :source_type => "Place"
 
   include NameParam
   

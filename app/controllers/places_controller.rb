@@ -14,19 +14,25 @@ class PlacesController < ApplicationController
   
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
-    @tags   = Place.tag_counts.sort_by(&:name)
+    
+    # generate city specific tag counts
+    @tags   = @city.places.tag_counts.sort_by(&:name)
     @title  = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
     # @country, @state, @city, @neighborhood all initialized in before filter
-    @tags   = Place.tag_counts.sort_by(&:name)
+
+    # generate neighborhood specific tag counts
+    @tags   = @neighborhood.locations.places.tag_counts.sort_by(&:name)
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
   
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
-    @tags   = Place.tag_counts.sort_by(&:name)
+
+    # generate zip specific tag counts
+    @tags   = @zip.places.tag_counts.sort_by(&:name)
     @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
   

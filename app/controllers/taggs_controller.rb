@@ -1,5 +1,6 @@
 class TaggsController < ApplicationController
-  layout "home"
+  
+  privilege_required 'read tag groups', :only => [:index], :on => :current_user
   
   def index
     @search = params[:search].to_s
