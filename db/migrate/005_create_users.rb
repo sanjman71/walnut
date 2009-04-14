@@ -18,18 +18,7 @@ class CreateUsers < ActiveRecord::Migration
     end
     
     add_index :users, [:email], :unique => true
-    
-    create_table :invitations do |t|
-      t.integer   :sender_id
-      t.integer   :recipient_id
-      t.string    :recipient_email
-      t.string    :token
-      t.string    :role
-      t.datetime  :sent_at
-      t.integer   :company_id
-      
-      t.timestamps
-    end
+    add_index :users, [:name]
   end
 
   def self.down
