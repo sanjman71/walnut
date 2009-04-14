@@ -29,7 +29,7 @@
 .span-19.last#search
   .span-10
     %h4= page_entries_info @locations unless @locations.blank?
-  .span-5.last
+  .span-4.prepend-5.last
     = will_paginate(@locations, :page_links => false)
 
   .span-19.last

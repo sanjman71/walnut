@@ -65,6 +65,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.decimal     :lng,                   :precision => 15, :scale => 10
       t.references  :locatable,             :polymorphic => true
       t.references  :source,                :polymorphic => true, :default => nil
+      t.integer     :search_rank,           :default => 0 # used to order search results
     end
             
     add_index :locations, [:source_id, :source_type]

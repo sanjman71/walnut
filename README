@@ -7,8 +7,9 @@ To get the application up and running:
 
 2. Import localeze data.
   - Start the localeze web service (defaults to port 3002)
-
-  2a. Import records by city
+    - e.g. ./script/server -p 3002
+    
+  - Import records by city
     - rake localeze:import_records CITY='Chicago' STATE='IL'      # 8700
     - rake localeze:import_records CITY='Charlotte' STATE='NC'    # 3726
     - rake localeze:import_records CITY='New York' STATE='NY'     # 2053
@@ -20,18 +21,18 @@ To get the application up and running:
     - rake localeze:import_records CITY='Sacramento' STATE='CA'   # 2451
     - rake localeze:import_records CITY='Boston' STATE='MA'       # 1366
 
-  2b. Add tags by mapping localeze categories to local tag groups
-    - rake localeze:import_categories
+3. Add tags by mapping localeze categories to local tag groups
+  - rake localeze:import_categories
 
-3. Import neighborhoods
+4. Import neighborhoods
   - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
    
-3. Map cities to zips.
+5. Map cities to zips.
   - rake init:city_zips
 
-4. Build the sphinx index, without re-writing the configuration file:
+6. Build the sphinx index, without re-writing the configuration file:
   - rake ts:index INDEX_ONLY=true
   
-5. Start the sphinx dameon:
+7. Start the sphinx dameon:
   - rake ts:start
   

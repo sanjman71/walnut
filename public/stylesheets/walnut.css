@@ -114,6 +114,9 @@ a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
 a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
                                                   { font-size: 2.0em; }
 
+a.locality.count                                  { color: #5500BB; font-size: 1.1em; }
+a.locality.count:hover                            { color: #FFFFFF; background-color: #5500BB; }
+
 /* sidebar styles */
 
 div.sidebar                                       { background: #EDF3FE none repeat scroll 0 0; border: 1px solid #C9D8EF; }
@@ -131,7 +134,7 @@ div.instructions ul                               { font-size: 12px; }
 .pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
                                                     text-decoration: none; }
 
-.pagination span.disabled                         { background: #CCCCCC; }
+.pagination span.disabled                         { background: #EEEEEE; color: #999999;}
 
 /* highlight styles */
 
@@ -162,6 +165,8 @@ span.example                                      { color: #666666; font-style: 
 #breadcrumbs a:hover                              { color: #FFFFFF; background-color: #5500BB; }
 #breadcrumbs span                                 { color: #555555; }
 
+
+/* locality styles */
 
 .popular_tags                                     { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
 .popular_cities, .popular_neighborhoods           { color: #666666; font-size: 1.5em; padding-bottom: 5px; }

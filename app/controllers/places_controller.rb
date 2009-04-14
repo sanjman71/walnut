@@ -1,4 +1,5 @@
 class PlacesController < ApplicationController
+  before_filter   :normalize_page_number, :only => [:index]
   before_filter   :init_areas, :only => [:country, :state, :city, :neighborhood, :zip, :index]
   layout "home"
   
@@ -96,7 +97,9 @@ class PlacesController < ApplicationController
     # use 'where' param as locality_tags field filter
     @locations      = Location.search(@search.multiple_fields(:name, :place_tags), 
                                       :conditions => {:locality_tags => @search.field(:locality_tags)}, 
-                                      :include => [:locatable, :city, :state, :zip]).paginate(:page => params[:page])
+                                      :include => [:locatable, :city, :state, :zip],
+                                      :order => :search_rank, :sort_mode => :desc,
+                                      :page => params[:page], :per_page => 20)
   end
   
   def show
@@ -212,4 +215,10 @@ class PlacesController < ApplicationController
     return true
   end
   
+  def normalize_page_number
+    if params[:page] == '1'
+      # redirect to url without page number
+      redirect_to(:page => nil) and return
+    end
+  end
 end
