@@ -38,8 +38,8 @@ class Location < ActiveRecord::Base
     # convert degrees to radians for sphinx
     has 'RADIANS(lat)', :as => :lat,  :type => :float
     has 'RADIANS(lng)', :as => :lng,  :type => :float
-    # turn on delta indexing
-    set_property :delta => true
+    # delta indexing
+    # set_property :delta => true
   end
   
   # return collection of location's country, state, city, zip, neighborhoods
