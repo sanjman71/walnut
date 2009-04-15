@@ -1,7 +1,7 @@
 - title(@title)
 - content_for :head do
   %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
-- javascript("jquery.jmap", "maps")
+- javascript("jquery.jmap", "maps", "places")
 
 .span-23.box
   %h1= @h1
@@ -11,16 +11,25 @@
 .span-18.prepend-1.last
   .span-18#address_phone
     .span-11
+      -# show location map only if its mappable
       = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
+    
     .span-6.append-1.last
+      -# location address
       %h2#address
-        = [@location.street_address, city_state_zip(@city, @state, @zip)].reject(&:blank?).join("<br/>")
-      %p
+        = [@location.street_address, city_state_zip(@city, @state, @zip)].reject(&:blank?).join("<br/>")     
+        
+      -# location phone 
       %h3#phone
         = render(:partial => 'phone', :locals => {:location => @location})
-          
+      %br
+      -# location recommendations
+      %h4.recommendations#recommend
+        = render(:partial => "recommendations", :locals => {:location => @location})
+        
   %hr.space
 
+  -# place and locality tags
   .span-18#all_tags
     .span-7.colborder#place_tags
       %h2== Keyword Tags
@@ -34,6 +43,7 @@
     
   %hr.space
   
+  -# nearby locations
   .span-18.last#nearby_places
     = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations}) unless @nearby_locations.blank?
     

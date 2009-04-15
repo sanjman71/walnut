@@ -5,10 +5,12 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
 
   # Make the following methods available to all helpers
-  helper_method :has_privilege?
+  helper_method :has_privilege?, :recommended?, :recommended_by_me?
   
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
+  
+  include RecommendationsHelper
   
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store

@@ -24,10 +24,13 @@ class Location < ActiveRecord::Base
                               self.collect { |o| o.locatable.tag_counts }.flatten
                             end
                           end
-  
+
+  named_scope :recommended,         { :conditions => ["recommendations_count > 0"] }
+
   # find location by the specified source id
   named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
   named_scope :find_by_source_id,   lambda { |source_id| { :conditions => {:source_id => source_id} }}
+  
   
   define_index do
     indexes street_address, :as => :street_address

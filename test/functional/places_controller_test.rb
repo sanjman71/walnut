@@ -52,7 +52,8 @@ class PlacesControllerTest < ActionController::TestCase
   context "search city" do
     context "with no locations" do
       setup do
-        Location.stubs(:search).returns([])
+        # ThinkingSphinx::Collection takes 4 arguments: page, per_page, entries, total_entries
+        Location.stubs(:search).returns(ThinkingSphinx::Collection.new(1, 1, 0, 0))
         get :index, :country => 'us', :state => 'il', :city => 'chicago', :what => 'food'
       end
     

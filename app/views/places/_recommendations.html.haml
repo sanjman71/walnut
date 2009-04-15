@@ -1,0 +1,4 @@
+- if recommended?(location)
+  = "Recommended #{pluralize(location.recommendations_count, 'time')}"
+- unless recommended_by_me?(location)
+  = link_to 'Recommend this place', url_for(:controller => 'locations', :action => 'recommend', :id => location.id), :id => 'recommend_location', :class => 'recommend'

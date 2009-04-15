@@ -1,7 +1,6 @@
 class PlacesController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
   before_filter   :init_areas, :only => [:country, :state, :city, :neighborhood, :zip, :index]
-  layout "home"
   
   def country
     # @country, @states initialized in before filter

@@ -1,6 +1,5 @@
 class ChainsController < ApplicationController
   before_filter   :init_areas, :only => [:country, :state, :city]
-  layout "home"
 
   def index
     @chains   = Chain.places.all(:order => "name ASC")

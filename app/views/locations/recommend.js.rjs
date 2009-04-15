@@ -1,0 +1,4 @@
+# page["#recommendations"].html(render(:partial => 'places/recommendations', :locals => {:location => @location}))
+#page["#recommend"].html("Recommended!")
+page["#recommend"].html("Recommended #{pluralize(@location.recommendations_count, 'time')}")
+page["#recommend"].addClass("bold")

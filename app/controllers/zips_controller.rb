@@ -1,6 +1,5 @@
 class ZipsController < ApplicationController
   before_filter   :init_areas, :only => [:country, :state, :city]
-  layout "home"
   
   def country
     # @country, @states initialized in before filter
