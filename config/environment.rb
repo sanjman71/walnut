@@ -88,5 +88,6 @@ end
 require "#{RAILS_ROOT}/lib/string.rb"
 require "#{RAILS_ROOT}/lib/math.rb"
 
-# create special localeze logger
-LOCALEZE_LOGGER = Logger.new("log/localeze.log")
+# create special localeze loggers
+LOCALEZE_LOGGER           = Logger.new("log/localeze.log")
+LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")

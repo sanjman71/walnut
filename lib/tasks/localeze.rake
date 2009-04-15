@@ -161,11 +161,13 @@ namespace :localeze do
         if @state.blank?
           # invalid state
           errors += 1
+          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} invalid state #{record.state}")
           next
         end
         
         if record.city.blank? or record.zip.blank?
           errors += 1
+          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} missing city or zip")
           next
         end
         
@@ -175,6 +177,7 @@ namespace :localeze do
         rescue Exception
           # log exception
           @city = nil
+          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate city:#{record.city} in state:#{@state.name}")
         end
       
         if @city.blank?
@@ -190,6 +193,7 @@ namespace :localeze do
         rescue Exception
           # log exception
           @zip = nil
+          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate zip:#{record.zip} in state:#{@state.name}")
         end
         
         if @zip.blank?
