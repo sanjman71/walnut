@@ -66,6 +66,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :locatable,             :polymorphic => true
       t.references  :source,                :polymorphic => true, :default => nil
       t.integer     :search_rank,           :default => 0 # used to order search results
+      t.boolean     :delta      # used by sphinx for real-time indexing
     end
             
     add_index :locations, [:source_id, :source_type]
