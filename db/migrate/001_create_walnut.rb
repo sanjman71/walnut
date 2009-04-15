@@ -71,6 +71,8 @@ class CreateWalnut < ActiveRecord::Migration
     end
             
     add_index :locations, [:source_id, :source_type]
+    add_index :locations, [:search_rank]
+    add_index :locations, [:recommendations_count]
     
     create_table :phone_numbers do |t|
       t.string      :name

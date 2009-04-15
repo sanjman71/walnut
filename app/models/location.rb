@@ -38,6 +38,7 @@ class Location < ActiveRecord::Base
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
     indexes search_rank, :as => :search_rank, :sortable => true
+    has recommendations_count, :as => :recommendations
     # convert degrees to radians for sphinx
     has 'RADIANS(lat)', :as => :lat,  :type => :float
     has 'RADIANS(lng)', :as => :lng,  :type => :float

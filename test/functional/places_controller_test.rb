@@ -44,7 +44,11 @@ class PlacesControllerTest < ActionController::TestCase
                :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :what => 'food'
   
   # show route
-  should_route :get, 'places/1', :controller => 'places', :action => 'show', :id => 1
+  should_route :get, '/places/1', :controller => 'places', :action => 'show', :id => 1
+  
+  # city rcommended route
+  should_route :get, '/recommended/places/us/il/chicago',
+               :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :filter => 'recommended' 
   
   # error route
   should_route :get, '/places/error/country', :controller => 'places', :action => 'error', :area => 'country'
