@@ -1,10 +1,11 @@
 class Search
-  attr_reader :locality_tags, :place_tags
+  attr_reader :locality_tags, :locality_hash, :place_tags
   
   @@anything_search = ["anything"]
   
   def initialize(options={})
     @locality_tags  = options[:locality_tags] || []
+    @locality_hash  = options[:locality_hash] || Hash.new
     @place_tags     = options[:place_tags] || []
     
     # handle special anything search
@@ -15,6 +16,8 @@ class Search
     case field
     when :locality_tags, "locality_tags"
       @locality_tags.join(" ")
+    when :locality_hash
+      @locality_hash
     when :place_tags, "place_tags"
       @place_tags.join(" | ")
     else
@@ -53,9 +56,18 @@ class Search
       array
     end
     
+    locality_hash = Array(where_collection).compact.inject(Hash.new) do |hash, locality|
+      if locality
+        # locality key looks like 'city_id', 'zip_id', 'state_id', ...
+        key       = locality.class.to_s.foreign_key
+        hash[key] = locality.id
+      end
+      hash
+    end
+    
     # split what into tokens
     place_tags = what.to_s.split
     
-    Search.new(:locality_tags => locality_tags, :place_tags => place_tags)
+    Search.new(:locality_tags => locality_tags, :locality_hash => locality_hash, :place_tags => place_tags)
   end
 end

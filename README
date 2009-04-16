@@ -26,6 +26,7 @@ To get the application up and running:
 
 4. Import neighborhoods
   - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
+  - rake init:urban_neighborhoods CITY='Charlotte' STATE='NC'
    
 5. Map cities to zips.
   - rake init:city_zips

@@ -51,7 +51,8 @@ class PlacesControllerTest < ActionController::TestCase
                :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :filter => 'recommended' 
   
   # error route
-  should_route :get, '/places/error/country', :controller => 'places', :action => 'error', :area => 'country'
+  should_route :get, '/places/error/country', :controller => 'places', :action => 'error', :locality => 'country'
+  should_route :get, '/places/error/unknown', :controller => 'places', :action => 'error', :locality => 'unknown'
   
   context "search city" do
     context "with no locations" do

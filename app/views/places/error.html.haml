@@ -1,4 +1,12 @@
-- title('Places error')
+- title(@title)
 
-.span-24#error
-  %h3.box= @error_text
+.span-23.prepend-1.mat.shaded.padding-top-10.padding-bottom-10#error
+  %h2= @title
+  
+%hr.space
+
+.span-23.prepend-1
+  %h3
+    == We're sorry but we couldn't find what you were looking for.
+    %hr.space
+    == Please check your search criteria and try again.

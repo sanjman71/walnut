@@ -38,12 +38,20 @@ class Location < ActiveRecord::Base
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
     indexes search_rank, :as => :search_rank, :sortable => true
+    # locality attributes
+    has city_id, :as => :city_id
+    has state_id, :as => :state_id
+    has zip_id, :as => :zip_id
+    has country_id, :as => :country_id
+    has location_neighborhoods.neighborhood_id, :as => :neighborhood_ids
+    # other attributes
     has recommendations_count, :as => :recommendations
     # convert degrees to radians for sphinx
     has 'RADIANS(lat)', :as => :lat,  :type => :float
     has 'RADIANS(lng)', :as => :lng,  :type => :float
     # delta indexing
     # set_property :delta => true
+    # set_property :delta => delayed
   end
   
   # return collection of location's country, state, city, zip, neighborhoods

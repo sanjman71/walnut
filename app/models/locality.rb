@@ -13,14 +13,20 @@ class Locality
           # find database object
           object = Country.find_by_code(geoloc.country_code)
         when 'state'
+          # map state codes
+          map_state_codes(geoloc)
           # find database object, geoloc state is the state code, e.g. "IL"
           object = State.find_by_code(geoloc.state)
         when 'city'
+          # map state codes
+          map_state_codes(geoloc)
           # find state database object
           state   = State.find_by_code(geoloc.state)
           # find city from state
           object  = state.cities.find_by_name(geoloc.city)
         when 'zip'
+          # map state codes
+          map_state_codes(geoloc)
           # find state database object
           state   = State.find_by_code(geoloc.state)
           # find zip from state
@@ -61,5 +67,29 @@ class Locality
     end
     
     return object
+  end
+  
+  protected
+  
+  # map special state codes
+  def self.map_state_codes(geoloc)
+    return geoloc if geoloc.blank? or geoloc.state.blank?
+    
+    case geoloc.state.titleize
+    when "N Carolina"
+      geoloc.state = "NC"
+    when "S Carolina"
+      geoloc.state = "SC"
+    when "S Dakota"
+      geoloc.state = "SD"
+    when "N Dakota"
+      geoloc.state = "ND"
+    when "Rhode Isl"
+      geoloc.state = "RI"
+    when "W Virginia"
+      geoloc.state = "WV"
+    end
+    
+    geoloc
   end
 end

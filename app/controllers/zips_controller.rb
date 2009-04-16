@@ -22,7 +22,7 @@ class ZipsController < ApplicationController
     @country  = Country.find_by_code(params[:country].to_s.upcase)
     
     if @country.blank?
-      redirect_to(:controller => 'zips', :action => 'error', :area => :country) and return
+      redirect_to(:controller => 'zips', :action => 'error', :locality => :country) and return
     end
     
     case params[:action]
@@ -36,7 +36,7 @@ class ZipsController < ApplicationController
     end
 
     if @state.blank?
-      redirect_to(:controller => 'zips', :action => 'error', :area => :state) and return
+      redirect_to(:controller => 'zips', :action => 'error', :locality => :state) and return
     end
     
     case params[:action]

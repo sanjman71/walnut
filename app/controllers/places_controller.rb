@@ -70,6 +70,7 @@ class PlacesController < ApplicationController
     @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
     @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
     @what           = params[:what].to_s.from_url_param
+    @filter         = params[:filter].to_s.from_url_param if params[:filter]
     
     # find city neighborhoods if its a city search
     @neighborhoods  = @city.neighborhoods unless @city.blank?
@@ -84,18 +85,27 @@ class PlacesController < ApplicationController
     # find zip cities if its a zip search
     @cities         = @zip.cities unless @zip.blank?
     
-    # build search title based on city, neighborhood, zip search
-    @title          = build_search_title(:what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    # build search title based on [what, filter] and city, neighborhood, zip search
+    @title          = build_search_title(:what => @what, :filter => @filter, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
     
     # build search object
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @what)
     @tags           = @search.place_tags
-    
+
     # use 'what' param to search name and place_tags fields
-    # use 'where' param as locality_tags field filter
-    @locations      = Location.search(@search.multiple_fields(:name, :place_tags), 
-                                      :conditions => {:locality_tags => @search.field(:locality_tags)}, 
+    # use 'where' param as locality_tags field filter - this is the old way
+    # use 'where' param as locality_hash conditions filter
+    # use filter' to narrow search conditions
+    @conditions     = @search.field(:locality_hash)
+
+    case @filter
+    when 'recommended'
+      @conditions.update(:recommendations => 1..2**30)
+    end
+
+    @locations      = Location.search(@search.field(:place_tags), 
+                                      :conditions => @conditions, 
                                       :include => [:locatable, :city, :state, :zip],
                                       :order => :search_rank, :sort_mode => :desc,
                                       :page => params[:page], :per_page => 20)
@@ -106,7 +116,7 @@ class PlacesController < ApplicationController
     @place    = @location.locatable unless @location.blank?
 
     if @location.blank? or @place.blank?
-      redirect_to(:controller => 'places', :action => 'error', :area => 'location') and return
+      redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
     end
 
     # initialize localities
@@ -122,26 +132,29 @@ class PlacesController < ApplicationController
     
     if @location.mappable?
       @nearby_locations = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
-                                        :conditions => {:locality_tags => @search.field(:locality_tags)},
-                                        :without_ids => @location.id,
-                                        :order => "@geodist ASC", 
-                                        :limit => @nearby_limit,
-                                        :include => [:locatable])
+                                          :conditions => @search.field(:locality_hash),
+                                          :without_ids => @location.id,
+                                          :order => "@geodist ASC", 
+                                          :limit => @nearby_limit,
+                                          :include => [:locatable])
     end
     
     # initialize title, h1 tags
-    @title    = "#{@place.name}"
+    @title    = @place.name
     @h1       = @title
   end
   
   def error
-    @error_text = "We are sorry, but we couldn't find the #{params[:area]} you were looking for."
+    @title    = "Search error"
   end
   
   protected
   
   def build_search_title(options={})
-    what = options[:what] || ''
+    what    = options[:what] || ''
+    filter  = options[:filter] || ''
+
+    raise ArgumentError if what.blank? and filter.blank?
     
     if options[:state] and options[:city] and options[:neighborhood]
       where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
@@ -152,8 +165,17 @@ class PlacesController < ApplicationController
     else
       raise Exception, "invalid search"
     end
+
+    # use 'what' if its available
+    unless what.blank?
+      return "#{what.titleize} near #{where}"
+    end
     
-    "#{what.titleize} near #{where}"
+    # otherwise use 'filter'
+    case filter
+    when 'recommended'
+      return "Recommended places near #{where}"
+    end
   end
   
   def init_areas
@@ -161,7 +183,7 @@ class PlacesController < ApplicationController
     @country  = Country.find_by_code(params[:country].to_s.upcase)
     
     if @country.blank?
-      redirect_to(:controller => 'places', :action => 'error', :area => 'country') and return
+      redirect_to(:controller => 'places', :action => 'error', :locality => 'country') and return
     end
     
     case params[:action]
@@ -175,7 +197,7 @@ class PlacesController < ApplicationController
     end
 
     if @state.blank?
-      redirect_to(:controller => 'places', :action => 'error', :area => 'state') and return
+      redirect_to(:controller => 'places', :action => 'error', :locality => 'state') and return
     end
     
     case params[:action]
@@ -190,7 +212,7 @@ class PlacesController < ApplicationController
       @neighborhoods  = @city.neighborhoods unless @city.blank?
       
       if @city.blank?
-        redirect_to(:controller => 'places', :action => 'error', :area => 'city') and return
+        redirect_to(:controller => 'places', :action => 'error', :locality => 'city') and return
       end
     when 'neighborhood'
       # find city and neighborhood
@@ -198,8 +220,8 @@ class PlacesController < ApplicationController
       @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
 
       if @city.blank? or @neighborhood.blank?
-        redirect_to(:controller => 'places', :action => 'error', :area => 'city') and return if @city.blank?
-        redirect_to(:controller => 'places', :action => 'error', :area => 'neighborhood') and return if @neighborhood.blank?
+        redirect_to(:controller => 'places', :action => 'error', :locality => 'city') and return if @city.blank?
+        redirect_to(:controller => 'places', :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
       end
     when 'zip'
       # find zip and all its cities
@@ -207,7 +229,7 @@ class PlacesController < ApplicationController
       @cities   = @zip.cities unless @zip.blank?
 
       if @zip.blank?
-        redirect_to(:controller => 'places', :action => 'error', :area => 'zip') and return
+        redirect_to(:controller => 'places', :action => 'error', :locality => 'zip') and return
       end
     end
     

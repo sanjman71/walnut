@@ -43,7 +43,7 @@ class ChainsController < ApplicationController
     @country = Country.find_by_code(params[:country].to_s.upcase)
     
     if @country.blank?
-      redirect_to(:controller => 'places', :action => 'error', :area => 'country') and return
+      redirect_to(:controller => 'places', :action => 'error', :locality => 'country') and return
     end
     
     case params[:action]
@@ -55,7 +55,7 @@ class ChainsController < ApplicationController
     @state = State.find_by_code(params[:state].to_s.upcase)
 
     if @state.blank?
-      redirect_to(:controller => 'places', :action => 'error', :area => 'state') and return
+      redirect_to(:controller => 'places', :action => 'error', :locality => 'state') and return
     end
     
     case params[:action]
@@ -66,7 +66,7 @@ class ChainsController < ApplicationController
       @city = @state.cities.find_by_name(params[:city].to_s.titleize)
       
       if @city.blank?
-        redirect_to(:controller => 'places', :action => 'error', :area => 'city') and return
+        redirect_to(:controller => 'places', :action => 'error', :locality => 'city') and return
       end
     end
     

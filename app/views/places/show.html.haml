@@ -44,7 +44,7 @@
     .span-9.last#locality_tags
       %h2== Geography Tags
       - @location.locality_tags.each do |tag|
-        %span{:style => 'font-size: 13px; padding-right: 5px;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhoods => @neighborhoods)
+        %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to tag.name, infer_locality_route(tag.name, :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhoods => @neighborhoods)
     
   %hr.space
   

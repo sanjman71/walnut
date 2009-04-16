@@ -11,9 +11,10 @@ class SearchTest < ActiveSupport::TestCase
         @search = Search.parse([@us, @il])
       end
       
-      should "have localities tag" do
+      should "have localities tag and hash" do
         assert_equal ["United States", "Illinois"], @search.locality_tags
         assert_equal "United States Illinois", @search.field(:locality_tags)
+        assert_equal Hash['country_id' => @us.id, 'state_id' => @il.id], @search.field(:locality_hash)
       end
       
       should "have no place tags" do
@@ -33,9 +34,10 @@ class SearchTest < ActiveSupport::TestCase
         @search = Search.parse([@us, @il], "coffee shop")
       end
       
-      should "have localities tag" do
+      should "have localities tag and hash" do
         assert_equal ["United States", "Illinois"], @search.locality_tags
         assert_equal "United States Illinois", @search.field(:locality_tags)
+        assert_equal Hash['country_id' => @us.id, 'state_id' => @il.id], @search.field(:locality_hash)
       end
       
       should "have place tags" do
@@ -59,9 +61,10 @@ class SearchTest < ActiveSupport::TestCase
         @search = Search.parse([@us, @il], "anything")
       end
     
-      should "have localities tag" do
+      should "have localities tag and hash" do
         assert_equal ["United States", "Illinois"], @search.locality_tags
         assert_equal "United States Illinois", @search.field(:locality_tags)
+        assert_equal Hash['country_id' => @us.id, 'state_id' => @il.id], @search.field(:locality_hash)
       end
       
       should "have no place tags" do
