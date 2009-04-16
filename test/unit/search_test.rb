@@ -4,7 +4,7 @@ require 'test/factories'
 class SearchTest < ActiveSupport::TestCase
   
   context "search localities" do
-    context "with no tags" do
+    context "with state and no 'what'" do
       setup do
         @us     = Factory.create(:us)
         @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
@@ -24,6 +24,28 @@ class SearchTest < ActiveSupport::TestCase
       
       should "have no multiple field tags on name and place_tags" do
         assert_equal "", @search.multiple_fields(:name, :place_tags)
+      end
+    end
+    
+    context "with state, city, neighborhood and no 'what'" do
+      setup do
+        @us           = Factory.create(:us)
+        @il           = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @chicago      = Factory(:city, :name => "Chicago", :state => @il)
+        @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
+        @search       = Search.parse([@us, @il, @chicago, @river_north])
+      end
+
+      should "have localities tag and hash" do
+        assert_equal ["United States", "Illinois", "Chicago", "River North"], @search.locality_tags
+        assert_equal "United States Illinois Chicago River North", @search.field(:locality_tags)
+        assert_equal Hash['country_id' => @us.id, 'state_id' => @il.id, 'city_id' => @chicago.id, 'neighborhood_ids' => @river_north.id], 
+                     @search.field(:locality_hash)
+      end
+
+      should "have no place tags" do
+        assert_equal [], @search.place_tags
+        assert_equal "", @search.field(:place_tags)
       end
     end
     

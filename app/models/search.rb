@@ -51,16 +51,28 @@ class Search
   
   # parse search where and what values
   def self.parse(where_collection, what=nil)
-    locality_tags = Array(where_collection).compact.inject([]) do |array, locality|
+    neighborhoods, others = Array(where_collection).compact.partition { |o| o.is_a?(Neighborhood) }
+
+    locality_tags = (others + neighborhoods).inject([]) do |array, locality|
       array.push(locality.name) if locality
       array
     end
     
-    locality_hash = Array(where_collection).compact.inject(Hash.new) do |hash, locality|
+    # build locality hash from cities, states, zips countries
+    locality_hash = others.inject(Hash.new) do |hash, locality|
       if locality
-        # locality key looks like 'city_id', 'zip_id', 'state_id', ...
+        # locality key looks like 'city_id', 'zip_id', 'state_id', 'country_id'
         key       = locality.class.to_s.foreign_key
         hash[key] = locality.id
+      end
+      hash
+    end
+    
+    # add neighborhoods
+    locality_hash = neighborhoods.inject(locality_hash) do |hash, neighborhood|
+      if neighborhood
+        key       = neighborhood.class.to_s.foreign_key + "s"
+        hash[key] = neighborhood.id
       end
       hash
     end
