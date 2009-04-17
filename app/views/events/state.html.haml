@@ -1,0 +1,14 @@
+- title(@title)
+
+.span-23.mat.prepend-1.last.padding-top-10.padding-bottom-20
+  %h2== #{@state.name} Events Directory
+  %h4#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => nil})
+  
+%hr.space
+
+%h3.span-23.prepend-1
+  .state_cities== #{@state.name} Cities
+  - @cities.each_with_index do |city, i|
+    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    %span.small[city]{:style => 'white-space: nowrap;'}= link_to(city, url_for(:action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
