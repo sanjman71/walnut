@@ -47,7 +47,7 @@ class PlacesControllerTest < ActionController::TestCase
   should_route :get, '/places/1', :controller => 'places', :action => 'show', :id => 1
   
   # city rcommended route
-  should_route :get, '/recommended/places/us/il/chicago',
+  should_route :get, '/places/us/il/chicago/recommended',
                :controller => 'places', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :filter => 'recommended' 
   
   # error route

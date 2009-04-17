@@ -16,14 +16,13 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/places/search', :controller => 'places', :action => 'search'
   map.connect     '/places/:country/:state/:city/n/:neighborhood/:what', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
+  map.connect     '/places/:country/:state/:city/:filter', :controller => 'places', :action => 'index', :city => /[a-z-]+/, :filter => /recommended/
   map.connect     '/places/:country/:state/:city/:what', :controller => 'places', :action => 'index', :city => /[a-z-]+/
   map.connect     '/places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/
   map.connect     '/places/:country/:state/:zip/:what', :controller => 'places', :action => 'index', :zip => /\d{5}/ # zip must be 5 digits
   map.connect     '/places/:country/:state/:zip', :controller => 'places', :action => 'zip', :zip => /\d{5}/
   map.connect     '/places/:country/:state', :controller => 'places', :action => 'state'
   map.connect     '/places/:country', :controller => 'places', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
-  
-  map.connect     '/:filter/places/:country/:state/:city', :controller => 'places', :action => 'index', :city => /[a-z-]+/, :filter => /recommended/
   
   map.resources   :places, :only => [:index, :show]
   
