@@ -24,6 +24,8 @@
           == &nbsp;|&nbsp;
           = link_to 'Find Places', url_for(:controller => 'places', :action => 'country', :country => Country.default), :class => 'header link'
           == &nbsp;|&nbsp;
+          = link_to 'Find Events', url_for(:controller => 'events', :action => 'country', :country => Country.default), :class => 'header link'
+          == &nbsp;|&nbsp;
           = link_to 'Chain Stores', chains_path, :class => 'header link'
 
           / == &nbsp;|&nbsp;

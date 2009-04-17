@@ -31,7 +31,7 @@ To get the application up and running:
 5. Map cities to zips.
   - rake init:city_zips
 
-6. Build the sphinx index, without re-writing the configuration file:
+6. Build the sphinx index, without re-creating the configuration file:
   - rake ts:index INDEX_ONLY=true
   
 7. Start the sphinx dameon:

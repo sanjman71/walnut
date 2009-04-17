@@ -1,7 +1,7 @@
 - title(@title)
 
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
-  %h2== Browse by State
+  %h2== Browse Places by State
   %h4#breadcrumbs
     = link_to 'Home', root_path
     
@@ -10,5 +10,5 @@
 %h3.span-23.prepend-1
   - @states.each_with_index do |state, i|
     - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-    %span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to(state, url_for(:controller => 'places', :action => 'state', :country => @country, :state => state), :class => klasses.join(" "))
+    %span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to(state, url_for(:action => 'state', :country => @country, :state => state), :class => klasses.join(" "))
 

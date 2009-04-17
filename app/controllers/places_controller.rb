@@ -1,6 +1,6 @@
 class PlacesController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
-  before_filter   :init_areas, :only => [:country, :state, :city, :neighborhood, :zip, :index]
+  before_filter   :init_localities, :only => [:country, :state, :city, :neighborhood, :zip, :index]
   
   def country
     # @country, @states initialized in before filter
@@ -176,64 +176,6 @@ class PlacesController < ApplicationController
     when 'recommended'
       return "Recommended places near #{where}"
     end
-  end
-  
-  def init_areas
-    # country is required for all actions
-    @country  = Country.find_by_code(params[:country].to_s.upcase)
-    
-    if @country.blank?
-      redirect_to(:controller => 'places', :action => 'error', :locality => 'country') and return
-    end
-    
-    case params[:action]
-    when 'country'
-      # find all states that have locations
-      @states = @country.states.with_locations
-      return true
-    else
-      # find the specified state for all other cases
-      @state  = State.find_by_code(params[:state].to_s.upcase)
-    end
-
-    if @state.blank?
-      redirect_to(:controller => 'places', :action => 'error', :locality => 'state') and return
-    end
-    
-    case params[:action]
-    when 'state'
-      # find all state cities and zips
-      @cities = @state.cities
-      @zips   = @state.zips
-    when 'city'
-      # find city, and all its zips and neighborhoods
-      @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
-      @zips           = @city.zips unless @city.blank?
-      @neighborhoods  = @city.neighborhoods unless @city.blank?
-      
-      if @city.blank?
-        redirect_to(:controller => 'places', :action => 'error', :locality => 'city') and return
-      end
-    when 'neighborhood'
-      # find city and neighborhood
-      @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
-      @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
-
-      if @city.blank? or @neighborhood.blank?
-        redirect_to(:controller => 'places', :action => 'error', :locality => 'city') and return if @city.blank?
-        redirect_to(:controller => 'places', :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
-      end
-    when 'zip'
-      # find zip and all its cities
-      @zip      = @state.zips.find_by_name(params[:zip].to_s)
-      @cities   = @zip.cities unless @zip.blank?
-
-      if @zip.blank?
-        redirect_to(:controller => 'places', :action => 'error', :locality => 'zip') and return
-      end
-    end
-    
-    return true
   end
   
   def normalize_page_number

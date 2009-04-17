@@ -12,7 +12,7 @@ ActionController::Routing::Routes.draw do |map|
   # places error route
   map.connect     '/places/error/:locality', :controller => 'places', :action => 'error'
   
-  # places [area, tag] routes
+  # places [locality, tag] routes
   map.connect     '/places/search', :controller => 'places', :action => 'search'
   map.connect     '/places/:country/:state/:city/n/:neighborhood/:what', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
@@ -36,6 +36,16 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/chains/:name/:country/:state/:city', :controller => 'chains', :action => 'city'
   
   map.resources   :chains, :only => [:index]
+  
+  # events [locality, tag] routes
+  map.connect     '/events/:country/:state/:city/n/:neighborhood/:what', :controller => 'events', :action => 'index', :neighborhood => /[a-z-]+/
+  map.connect     '/events/:country/:state/:city/n/:neighborhood', :controller => 'events', :action => 'neighborhood', :neighborhood => /[a-z-]+/
+  map.connect     '/events/:country/:state/:city/:what', :controller => 'events', :action => 'index', :city => /[a-z-]+/
+  map.connect     '/events/:country/:state/:city', :controller => 'events', :action => 'city', :city => /[a-z-]+/
+  map.connect     '/events/:country/:state/:zip/:what', :controller => 'events', :action => 'index', :zip => /\d{5}/ # zip must be 5 digits
+  map.connect     '/events/:country/:state/:zip', :controller => 'events', :action => 'zip', :zip => /\d{5}/
+  map.connect     '/events/:country/:state', :controller => 'events', :action => 'state'
+  map.connect     '/events/:country', :controller => 'events', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
   
   # tag group routes
   map.resources   :taggs

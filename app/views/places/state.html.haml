@@ -12,7 +12,7 @@
   .state_cities== #{@state.name} Cities
   - @cities.each_with_index do |city, i|
     - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-    %span.small[city]{:style => 'white-space: nowrap;'}= link_to(city, url_for(:controller => 'places', :action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
+    %span.small[city]{:style => 'white-space: nowrap;'}= link_to(city, url_for(:action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
 
 %hr.space
 
@@ -20,4 +20,4 @@
   .state_zips== #{@state.name} Zip Codes
   - @zips.each_with_index do |zip, i|
     - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-    %span.small[zip]= link_to(zip, url_for(:controller => 'places', :action => 'zip', :country => @country, :state => @state, :zip => zip), :class => klasses.join(" "))
+    %span.small[zip]= link_to(zip, url_for(:action => 'zip', :country => @country, :state => @state, :zip => zip), :class => klasses.join(" "))
