@@ -114,6 +114,17 @@ a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
 a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
                                                   { font-size: 2.0em; }
 
+/* event link styles */
+
+a.event.filter                                    { color: #5500BB; font-size: 1.1em; }
+a.event.filter:hover                              { color: #FFFFFF; background-color: #5500BB; }
+
+a.event.category.even                             { color: #5500BB; font-size: 1.3em; }
+a.event.category.even:hover                       { color: #FFFFFF; background-color: #5500BB; }
+
+a.event.category.odd                              { color: #663333; font-size: 1.2em; }
+a.event.category.odd:hover                        { color: #FFFFFF; background-color: #663333; }
+
 /* sidebar styles */
 
 div.sidebar                                       { background: #EDF3FE none repeat scroll 0 0; border: 1px solid #C9D8EF; }

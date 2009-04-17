@@ -5,7 +5,7 @@ namespace :init do
 
   desc "Initialize default values."
   # task :all => [:countries, :states, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
-  task :all => [:countries, :states, :tag_groups]
+  task :all => [:countries, :states, :event_cities, :tag_groups]
 
   desc "Initialize countries."
   task :countries do
@@ -36,6 +36,39 @@ namespace :init do
     puts "#{Time.now}: completed, ended with #{klass.count} objects"
     
     puts "#{Time.now}: initialized states"
+  end
+  
+  desc "Initialize event cities"
+  task :event_cities do
+
+    ["PA"].each do |code|
+      @state = State.find_by_code(code)
+      ['Philadelphia'].each do |city_name|
+        Locality.validate(@state, 'city', city_name)
+      end
+      @state.events = 1
+      @state.save
+    end
+    
+    ["CO"].each do |code|
+      @state = State.find_by_code(code)
+      ['Denver'].each do |city_name|
+        Locality.validate(@state, 'city', city_name)
+      end
+      @state.events = 1
+      @state.save
+    end
+
+    ["AZ"].each do |code|
+      @state = State.find_by_code(code)
+      ['Phoenix'].each do |city_name|
+        Locality.validate(@state, 'city', city_name)
+      end
+      @state.events = 1
+      @state.save
+    end
+    
+    puts "#{Time.now}: initialized event cities"
   end
   
   desc "Init locations."

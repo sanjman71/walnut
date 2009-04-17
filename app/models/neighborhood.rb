@@ -7,6 +7,9 @@ class Neighborhood < ActiveRecord::Base
   
   include NameParam
 
+  # find neighborhoods with locations
+  named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
+
   # order neighborhoods by location count
   named_scope :order_by_density,      {:order => "locations_count DESC"}
 end

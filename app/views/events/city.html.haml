@@ -1,25 +1,20 @@
 - title(@title)
 
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
-  %h2== #{@city.name} Events Directory
+  %h2= @title
+  %h5= link_to("Popular", url_for(:action => 'index', :filter => 'popular'), :class => 'event filter')
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
     
 %hr.space
 
-.span.23.prepend-1
-  == Found #{@total} events, showing #{@count} events
-
-%hr.space
+.span-23.prepend-1
+  %h3== Event Categories
   
-- @events.each do |event|
-  .prepend-1.letterbox{:class => cycle("shaded", "")}
-    %h3.name.margin-bottom-5
-      = event['title']
-    %h4.venue.margin-bottom-5
-      = event['venue_name']
-    %h4.when.margin-bottom-5
-      = Time.parse(event['start_time']).strftime("%a, %b %d, %I:%M %p") if event['start_time']
-    %h4.url
-      = link_to "Details", event['url']
+%h3.span-23.prepend-1
+  - @categories.each do |category|
+    / - tag_class = tag_cloud_class(tag, :count, max_count, tag_classes)
+    - klasses = ["event", "category"].push(cycle('even', 'odd'))
+    %span.small[category]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(category.name, url_for(:action => 'index', :category => category.eventful_id.dasherize), :class => klasses.join(" "))
+
       

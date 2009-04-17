@@ -16,6 +16,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :cities_count,          :default => 0   # counter cache
       t.integer     :zips_count,            :default => 0   # counter cache
       t.integer     :locations_count,       :default => 0   # counter cache
+      t.integer     :events,                :default => 0
     end
 
     create_table :cities do |t|

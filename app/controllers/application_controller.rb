@@ -73,13 +73,19 @@ class ApplicationController < ActionController::Base
     @country  = Country.find_by_code(params[:country].to_s.upcase)
     
     if @country.blank?
-      redirect_to(:controller => request.controller.name, :action => 'error', :locality => 'country') and return
+      redirect_to(:controller => params[:controller], :action => 'error', :locality => 'country') and return
     end
     
     case params[:action]
     when 'country'
-      # find all states that have locations
-      @states = @country.states.with_locations
+      case params[:controller]
+      when 'places'
+        # find all states that have locations
+        @states = @country.states.with_locations
+      when 'events'
+        # find all states that have locations or events
+        @states = (@country.states.with_events + @country.states.with_locations).uniq
+      end
       return true
     else
       # find the specified state for all other cases
@@ -87,7 +93,7 @@ class ApplicationController < ActionController::Base
     end
 
     if @state.blank?
-      redirect_to(:controller => request.controller.name, :action => 'error', :locality => 'state') and return
+      redirect_to(:controller => params[:controller], :action => 'error', :locality => 'state') and return
     end
     
     case params[:action]
@@ -102,7 +108,7 @@ class ApplicationController < ActionController::Base
       @neighborhoods  = @city.neighborhoods unless @city.blank?
       
       if @city.blank?
-        redirect_to(:controller => request.controller.name, :action => 'error', :locality => 'city') and return
+        redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
     when 'neighborhood'
       # find city and neighborhood
@@ -110,8 +116,8 @@ class ApplicationController < ActionController::Base
       @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
 
       if @city.blank? or @neighborhood.blank?
-        redirect_to(:controller => request.controller.name, :action => 'error', :locality => 'city') and return if @city.blank?
-        redirect_to(:controller => request.controller.name, :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
+        redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return if @city.blank?
+        redirect_to(:controller => params[:controller], :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
       end
     when 'zip'
       # find zip and all its cities
@@ -119,7 +125,18 @@ class ApplicationController < ActionController::Base
       @cities   = @zip.cities unless @zip.blank?
 
       if @zip.blank?
-        redirect_to(:controller => request.controller.name, :action => 'error', :locality => 'zip') and return
+        redirect_to(:controller => params[:controller], :action => 'error', :locality => 'zip') and return
+      end
+    when 'index'
+      # find city, zip and/or neighborhood
+      # city or zip must be specified; if its a city, neighborhood is optional
+      @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless params[:city].blank?
+      @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
+      @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
+      
+      if @city.blank? and @zip.blank?
+        # invalid search
+        redirect_to(:controller => params[:controller], :action => 'error', :locality => 'unknown') and return
       end
     end
     

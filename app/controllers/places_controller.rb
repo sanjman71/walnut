@@ -39,7 +39,7 @@ class PlacesController < ApplicationController
   def search
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
-    @what     = params[:what].to_s.to_url_param
+    @what     = params[:what].to_s.parameterize
     
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return
@@ -66,14 +66,13 @@ class PlacesController < ApplicationController
   end
   
   def index
-    @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless params[:city].blank?
-    @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
-    @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
+    # @country, @state, @city, @zip, @neighborhood all initialized in before filter
+    
     @what           = params[:what].to_s.from_url_param
     @filter         = params[:filter].to_s.from_url_param if params[:filter]
     
     # find city neighborhoods if its a city search
-    @neighborhoods  = @city.neighborhoods unless @city.blank?
+    @neighborhoods  = @city.neighborhoods.with_locations unless @city.blank?
     
     # find city zips if its a city search
     @zips           = @city.zips.order_by_density.all(:limit => 20) unless @city.blank?

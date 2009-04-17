@@ -11,6 +11,9 @@ class State < ActiveRecord::Base
   
   # find states with locations
   named_scope :with_locations,    { :conditions => ["locations_count > 0"] }
+
+  # find states with events, 1 means there are events, 0 means no events
+  named_scope :with_events,       { :conditions => ["events > 0"] }
   
   # order states by location count
   named_scope :order_by_density,  { :order => "locations_count DESC" }
