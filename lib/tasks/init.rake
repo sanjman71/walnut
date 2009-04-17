@@ -5,7 +5,7 @@ namespace :init do
 
   desc "Initialize default values."
   # task :all => [:countries, :states, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
-  task :all => [:countries, :states, :event_cities, :tag_groups]
+  task :all => [:countries, :states, :cities, :tag_groups, "eventful:import_categories", "eventful:mark_cities"]
 
   desc "Initialize countries."
   task :countries do
@@ -38,16 +38,35 @@ namespace :init do
     puts "#{Time.now}: initialized states"
   end
   
-  desc "Initialize event cities"
-  task :event_cities do
+  desc "Initialize first set of cities"
+  task :cities do
+
+    ["IL"].each do |code|
+      @state = State.find_by_code(code)
+      ['Chicago'].each do |city_name|
+        Locality.validate(@state, 'city', city_name)
+      end
+    end
+
+    ["NY"].each do |code|
+      @state = State.find_by_code(code)
+      ['New York'].each do |city_name|
+        Locality.validate(@state, 'city', city_name)
+      end
+    end
+
+    ["NC"].each do |code|
+      @state = State.find_by_code(code)
+      ['Charlotte'].each do |city_name|
+        Locality.validate(@state, 'city', city_name)
+      end
+    end
 
     ["PA"].each do |code|
       @state = State.find_by_code(code)
       ['Philadelphia'].each do |city_name|
         Locality.validate(@state, 'city', city_name)
       end
-      @state.events = 1
-      @state.save
     end
     
     ["CO"].each do |code|
@@ -55,8 +74,6 @@ namespace :init do
       ['Denver'].each do |city_name|
         Locality.validate(@state, 'city', city_name)
       end
-      @state.events = 1
-      @state.save
     end
 
     ["AZ"].each do |code|
@@ -64,11 +81,9 @@ namespace :init do
       ['Phoenix'].each do |city_name|
         Locality.validate(@state, 'city', city_name)
       end
-      @state.events = 1
-      @state.save
     end
     
-    puts "#{Time.now}: initialized event cities"
+    puts "#{Time.now}: initialized cities"
   end
   
   desc "Init locations."

@@ -80,11 +80,11 @@ class ApplicationController < ActionController::Base
     when 'country'
       case params[:controller]
       when 'places'
-        # find all states that have locations
+        # find all states with locations
         @states = @country.states.with_locations
       when 'events'
-        # find all states that have locations or events
-        @states = (@country.states.with_events + @country.states.with_locations).uniq
+        # find all states with events
+        @states = @country.states.with_events
       end
       return true
     else

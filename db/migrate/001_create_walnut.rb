@@ -26,6 +26,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.decimal     :lng,                   :precision => 15, :scale => 10
       t.integer     :neighborhoods_count,   :default => 0   # counter cache
       t.integer     :locations_count,       :default => 0   # counter cache
+      t.integer     :events,                :default => 0
     end
 
     create_table :zips do |t|

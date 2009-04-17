@@ -1,0 +1,12 @@
+- events.each do |event|
+  .span-18.prepend-1.event.letterbox{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
+    - date = Time.parse(event['start_time'])
+    .span-2.date
+      = render(:partial => 'calendar_date', :locals => {:date => date})
+    
+    .span-15.info.last
+      %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
+        = event['title']
+      %h4.venue.margin-bottom-5{:style => 'color: #555;'}
+        = event['venue_name']
+        %span{:style => 'font-size: 0.8em; padding-left: 3px;'}= link_to "Details", event['url']

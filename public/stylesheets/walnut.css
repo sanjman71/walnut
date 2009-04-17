@@ -116,14 +116,22 @@ a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
 
 /* event link styles */
 
-a.event.filter                                    { color: #5500BB; font-size: 1.1em; }
-a.event.filter:hover                              { color: #FFFFFF; background-color: #5500BB; }
+a.event.sort                                      { color: #5500BB; font-size: 1.1em; }
+a.event.sort:hover                                { color: #FFFFFF; background-color: #5500BB; }
 
 a.event.category.even                             { color: #5500BB; font-size: 1.3em; }
 a.event.category.even:hover                       { color: #FFFFFF; background-color: #5500BB; }
 
 a.event.category.odd                              { color: #663333; font-size: 1.2em; }
 a.event.category.odd:hover                        { color: #FFFFFF; background-color: #663333; }
+
+/* calendar styles */
+
+.calendar.date                                    { text-align: center; width: 40px; border: 1px solid #DDDDDD; padding-bottom: 0; }
+.calendar.date.week_day                           { background: #FF6600 none repeat scroll 0 0; color: #FFFFFF; display: block; font-size: 0.8em; 
+                                                    letter-spacing: 1px; margin: 0; padding: 0; text-transform: uppercase; }
+.calendar.date.month_day                          { background: #FFFFFF none repeat scroll 0 0; color: #111111; display: block; font-size: 1.5em; 
+                                                    font-weight: bold; line-height: 1.25em; }
 
 /* sidebar styles */
 

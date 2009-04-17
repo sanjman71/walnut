@@ -1,4 +1,4 @@
-%h4== Categories
+%h4= name
 %ul
   - categories.each do |category|
     %li= link_to category.name, url_for(:category => category.eventful_id.dasherize)

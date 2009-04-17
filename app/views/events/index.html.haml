@@ -15,7 +15,7 @@
 
 .span-5#sidebar
   #categories
-    = render(:partial => 'categories', :locals => {:categories => @categories}) unless @categories.blank?
+    = render(:partial => 'categories', :locals => {:categories => @categories, :name => "Popular Categories"}) unless @categories.blank?
 
   -# show another google ad
   = google_ad(160, 600)
@@ -24,13 +24,4 @@
   .span.18.prepend-1.padding-bottom-10
     == Showing events #{@first_item}-#{@last_item} of #{@total}
     
-  - @events.each do |event|
-    .prepend-1.letterbox{:class => cycle("shaded", "")}
-      %h3.name.margin-bottom-5
-        = event['title']
-      %h4.venue.margin-bottom-5
-        = event['venue_name']
-      %h4.when.margin-bottom-5
-        = Time.parse(event['start_time']).strftime("%a, %b %d, %I:%M %p") if event['start_time']
-      %h4.url
-        = link_to "Details", event['url']
+  = render(:partial => 'events', :locals => {:events => @events})

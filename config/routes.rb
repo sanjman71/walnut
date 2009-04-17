@@ -39,8 +39,8 @@ ActionController::Routing::Routes.draw do |map|
   # events [locality, tag, category] routes
   map.connect     '/events/:country/:state/:city/n/:neighborhood/:what', :controller => 'events', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/n/:neighborhood', :controller => 'events', :action => 'neighborhood', :neighborhood => /[a-z-]+/
-  map.connect     '/events/:country/:state/:city/:filter', :controller => 'events', :action => 'index', :city => /[a-z-]+/, :filter => /popular/
-  map.connect     '/events/:country/:state/:city/c/:category', :controller => 'events', :action => 'index', :city => /[a-z-]+/
+  map.connect     '/events/:country/:state/:city/:sort', :controller => 'events', :action => 'index', :city => /[a-z-]+/, :sort => /popular/
+  map.connect     '/events/:country/:state/:city/category/:category', :controller => 'events', :action => 'index', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/:what', :controller => 'events', :action => 'index', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:city', :controller => 'events', :action => 'city', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:zip/:what', :controller => 'events', :action => 'index', :zip => /\d{5}/ # zip must be 5 digits
