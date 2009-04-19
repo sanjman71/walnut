@@ -6,6 +6,14 @@ namespace :eventful do
     puts "#{Time.now}: imported #{imported} eventful categories"
   end
   
+  desc "Create cities with events"
+  task :create_cities do
+    # initialize cities
+    ["Chicago", "Charlotte", "New York", "Philadelphia"].sort.each do |s|
+      EventfulFeed::City.create(:name => s)
+    end
+  end
+  
   desc "Mark cities with events"
   task :mark_cities do
     EventfulFeed::City.all.each do |eventful_city|

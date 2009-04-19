@@ -5,7 +5,7 @@ namespace :init do
 
   desc "Initialize default values."
   # task :all => [:countries, :states, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
-  task :all => [:countries, :states, :cities, :state_zips, :tag_groups, "eventful:import_categories", "eventful:mark_cities"]
+  task :all => [:countries, :states, :cities, :state_zips, :tag_groups, "eventful:import_categories", "eventful:create_cities", "eventful:mark_cities"]
 
   desc "Initialize countries."
   task :countries do

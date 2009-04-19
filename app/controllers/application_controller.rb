@@ -89,7 +89,7 @@ class ApplicationController < ActionController::Base
       return true
     else
       # find the specified state for all other cases
-      @state  = State.find_by_code(params[:state].to_s.upcase)
+      @state  = @country.states.find_by_code(params[:state].to_s.upcase)
     end
 
     if @state.blank?
