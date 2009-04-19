@@ -217,7 +217,7 @@ namespace :init do
   task :tag_groups do
     klass   = TagGroup
     columns = [:id, :name, :tags, :applied_at]
-    file    = "#{RAILS_ROOT}/tag_groups.txt"
+    file    = "#{RAILS_ROOT}/data/tag_groups.txt"
     values  = []
     options = { :validate => false }
 
