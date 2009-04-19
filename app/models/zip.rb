@@ -9,9 +9,12 @@ class Zip < ActiveRecord::Base
   has_many                    :places, :through => :locations, :source => :locatable, :source_type => "Place"
   
   include NameParam
+
+  # find zips with locations
+  named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
   
   # order zips by location count
-  named_scope :order_by_density,      {:order => "locations_count DESC"}
+  named_scope :order_by_density,      {:order => "zips.locations_count DESC"}
 
 
   def self.to_csv

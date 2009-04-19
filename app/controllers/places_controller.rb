@@ -74,8 +74,9 @@ class PlacesController < ApplicationController
     # find city neighborhoods if its a city search
     @neighborhoods  = @city.neighborhoods.with_locations.order_by_density.all(:limit => 5) unless @city.blank?
     
-    # find city zips if its a city search
-    @zips           = @city.zips.order_by_density.all(:limit => 20) unless @city.blank?
+    # find city zips if its a city search - note: the order_by_density clause results in an inefficient sql query
+    @zips           = @city.zips.with_locations.all(:limit => 20) unless @city.blank?
+    # @zips           = @city.zips.with_locations.order_by_density.all(:limit => 20) unless @city.blank?
 
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
     nearby_miles    = 20
