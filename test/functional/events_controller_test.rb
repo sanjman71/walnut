@@ -23,4 +23,12 @@ class EventsControllerTest < ActionController::TestCase
   # city popular route
   should_route :get, '/events/us/il/chicago/popular',
                :controller => 'events', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :sort => 'popular'
+               
+  # city keyword/q route
+  should_route :get, '/events/us/il/chicago/q/techno',
+               :controller => 'events', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :q => 'techno'
+  
+  # city search route
+  should_route :get, '/events/us/il/chicago/search', 
+               :controller => 'events', :action => 'search', :country => 'us', :state => 'il', :city => 'chicago'
 end

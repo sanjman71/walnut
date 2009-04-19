@@ -16,9 +16,15 @@
   %body
     #header
       .container
-        .span-24.last#search_places{:style => 'visibility: visible;'}
+        -# hide search bar when showing events
+        - if params[:controller] == 'events'
+          - search_bar_style = 'hidden'
+        - else
+          - search_bar_style = 'visible'
+         
+        .span-24.last#search_places{:style => "visibility: #{search_bar_style};"}
           = render(:partial => 'shared/search_bar')
-        .span-24.last{:style => 'text-align: right;'}
+        .span-24.last#header_links{:style => 'text-align: right;'}
           -# show these links in any state
           = link_to 'Home', root_path, :class => 'header link'
           == &nbsp;|&nbsp;

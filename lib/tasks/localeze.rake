@@ -10,10 +10,11 @@ namespace :localeze do
     unmapped  = 0 
     
     page      = 1
+    per_page  = 10
     limit     = nil
     
     # find places with no tag groups
-    until (places = Place.find(:all, :conditions => {:tag_groups_count => 0}, :include => :locations).paginate(:page => page, :per_page => 100)).blank?
+    until (places = Place.find(:all, :conditions => {:tag_groups_count => 0}, :include => :locations).paginate(:page => page, :per_page => per_page)).blank?
       places.collect(&:locations).flatten.each do |location|
         # track number of locations checked
         checked     += 1
@@ -119,7 +120,7 @@ namespace :localeze do
     per_page      = 100
     
     # default limit
-    default_limit = 10
+    default_limit = 2**30
      
     if ENV["CITY"] and ENV["STATE"]
       city        = ENV["CITY"].titleize
@@ -127,7 +128,7 @@ namespace :localeze do
       params      = {:city => city, :state => state_code, :page => page, :per_page => per_page}
       limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : default_limit
       
-      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}"
+      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{default_limit}"
     elsif ENV["OFFSET"] and ENV["LIMIT"]
       offset      = ENV["OFFSET"].to_i
       limit       = ENV["LIMIT"].to_i
@@ -221,8 +222,8 @@ namespace :localeze do
         
         # check for chain
         if record.chain_id > 0 and localeze_chain = Localeze::Chain.find(record.chain_id)
-          # find local chain object
-          chain = Chain.find_by_name(localeze_chain.name)
+          # find or create local chain object
+          chain = Chain.find_by_name(localeze_chain.name) || Chain.create(:name => localeze_chain.name)
           # add chain
           place.chain = chain
           place.save

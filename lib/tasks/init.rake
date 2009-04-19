@@ -5,7 +5,7 @@ namespace :init do
 
   desc "Initialize default values."
   # task :all => [:countries, :states, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
-  task :all => [:countries, :states, :cities, :tag_groups, "eventful:import_categories", "eventful:mark_cities"]
+  task :all => [:countries, :states, :cities, :state_zips, :tag_groups, "eventful:import_categories", "eventful:mark_cities"]
 
   desc "Initialize countries."
   task :countries do
@@ -225,6 +225,27 @@ namespace :init do
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       id, name, tags = row
       value = [id, name, tags, Time.now]
+      values << value
+    end
+
+    # import data
+    puts "#{Time.now}: importing data, starting with #{klass.count} objects"
+    klass.import columns, values, options 
+    puts "#{Time.now}: completed, ended with #{klass.count} objects" 
+  end
+  
+  desc "Initialize state zips"
+  task :state_zips do
+    klass   = Zip
+    columns = [:id, :name, :state_id, :lat, :lng]
+    file    = "#{RAILS_ROOT}/data/state_zips.txt"
+    values  = []
+    options = { :validate => false }
+    
+    puts "#{Time.now}: parsing file #{file}" 
+    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+      id, name, state_id, lat, lng = row
+      value = [id, name, state_id, lat, lng]
       values << value
     end
 

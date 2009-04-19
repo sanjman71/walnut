@@ -19,7 +19,7 @@ module EventfulFeed
     #          => exact ranges take the form 'YYYYMMDDHH-YYYYMMDDHH', e.g. '2008042500-2008042723'
     #  - :sort_order => 'popularity', 'date', 'title', 'relevance', or 'venue_name', default is 'popularity'
     def self.call(options={})
-      search_options = {:sort_order => 'popularity', :date => 'Future'}
+      search_options = {:date => 'Future'}
       session.call(@@method, search_options.update(options))
     end
   

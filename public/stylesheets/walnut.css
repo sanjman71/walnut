@@ -116,7 +116,7 @@ a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
 
 /* event link styles */
 
-a.event.sort                                      { color: #5500BB; font-size: 1.1em; }
+a.event.sort                                      { color: #5500BB; font-size: 1.1em; font-weight: bold; } 
 a.event.sort:hover                                { color: #FFFFFF; background-color: #5500BB; }
 
 a.event.category.even                             { color: #5500BB; font-size: 1.3em; }
@@ -145,7 +145,8 @@ div.instructions ul                               { font-size: 12px; }
 
 /* pagination styles */
 
-.pagination a                                     { background: #FF6600; }
+.pagination a                                     { background: #FF6600; color: #111111; }
+.pagination a:hover                               { color: #FFFFFF; }
 
 .pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
                                                     text-decoration: none; }

@@ -1,9 +1,15 @@
 - title(@title)
 
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
-  %h2= @title
-  %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
+  .span-13
+    %h2= @title
+  .span-10.last
+    #event_search
+      = render(:partial => 'event_search', :locals => {:object => @city, :url => url_for(:action => 'search')})
+    
+  .span-23.last
+    %h4#breadcrumbs
+      = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
 
 %hr.space
 
@@ -22,6 +28,9 @@
 
 .span-19.last#events
   .span.18.prepend-1.padding-bottom-10
-    == Showing events #{@first_item}-#{@last_item} of #{@total}
+    - if @events.blank?
+      == No events found
+    - else
+      == Showing events #{@first_item}-#{@last_item} of #{@total}
     
   = render(:partial => 'events', :locals => {:events => @events})

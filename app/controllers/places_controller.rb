@@ -72,7 +72,7 @@ class PlacesController < ApplicationController
     @filter         = params[:filter].to_s.from_url_param if params[:filter]
     
     # find city neighborhoods if its a city search
-    @neighborhoods  = @city.neighborhoods.with_locations unless @city.blank?
+    @neighborhoods  = @city.neighborhoods.with_locations.order_by_density.all(:limit => 5) unless @city.blank?
     
     # find city zips if its a city search
     @zips           = @city.zips.order_by_density.all(:limit => 20) unless @city.blank?

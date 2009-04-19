@@ -22,19 +22,24 @@ class EventsController < ApplicationController
     @title    = "#{@city.name} Events Directory"
   end
   
+  def search
+    redirect_to(url_for(:action => 'index', :q => params[:q].to_s.parameterize, :category => nil, :sort => nil)) and return
+  end
+  
   def index
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
     @sort       = params[:sort]
     @category   = params[:category] ? EventfulFeed::Category.find_by_eventful_id(params[:category].underscore) : nil
-
+    @q          = params[:q] ? params[:q].from_url_param.titleize : nil
+    
     if @sort and @category
       # is this allowed?
     end
     
-    if @sort.blank? and @category.blank?
+    if @sort.blank? and @category.blank? and @q.blank?
       # redirect to default sort
-      redirect_to(url_for(:sort => 'popularity')) and return 
+      redirect_to(url_for(:sort => 'popularity')) and return
     end
     
     # build events search conditions
@@ -51,6 +56,11 @@ class EventsController < ApplicationController
     if @category
       @conditions[:category] = @category.eventful_id
       @title  = "#{@city.name} #{@category.name.singularize.titleize} Events"
+    end
+    
+    if @q
+      @conditions[:q] = @q
+      @title  = "#{@city.name} Events matching '#{@q}'"
     end
     
     # find city events
