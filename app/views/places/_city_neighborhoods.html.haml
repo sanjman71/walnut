@@ -1,4 +1,4 @@
-%h4== #{city.name} Neighborhoods
+%h4.neighborhood.related== #{city.name} Neighborhoods
 %ul
   - neighborhoods.each do |hood|
-    %li= link_to hood.name, url_for(:action => 'index', :city => city, :neighborhood => hood, :what => what.parameterize)
+    %li= link_to hood.name, url_for(:action => 'index', :city => city, :neighborhood => hood, :what => what.parameterize, :class => 'neighborhood')
