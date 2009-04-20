@@ -12,29 +12,38 @@ class ChainsController < ApplicationController
   def country
     # @country initialized in before filter
     @chain    = Chain.find(params[:name].to_i)
-    @states   = @chain.states
-    
+
+    # facet search by chain id
+    @facets   = Location.facets(:conditions => {:chain_id => @chain.id})
+    @states   = State.find(@facets[:state_id].keys)
+    # count locations in country
+    @count    = @facets[:country_id].values.first.to_i
+
     @title    = "#{@chain.name} Store Locator"
-    @h1       = @title
   end
   
   def state
     # @country, @state initialized in before filter
     @chain      = Chain.find(params[:name].to_i)
-    @locations  = @chain.locations.for_state(@state)
-    @cities     = @locations.collect(&:city).uniq
     
+    # facet search by chain id and state id
+    @facets   = Location.facets(:conditions => {:chain_id => @chain.id, :state_id => @state.id})
+    @cities   = City.find(@facets[:city_id].keys)
+    # count locations in state
+    @count    = @facets[:state_id][@state.id]
+
     @title      = "#{@chain.name} Locations in #{@state.name}"
-    @h1         = @title
   end
   
   def city
-    # @country, @state initialized in before filter
+    # @country, @state, @city initialized in before filter
     @chain      = Chain.find(params[:name].to_i)
     @locations  = @chain.locations.for_city(@city)
-    
+
+    # facet search by chain id and city id
+    @facets   = Location.facets(:conditions => {:chain_id => @chain.id, :city_id => @city.id})
+
     @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
-    @h1         = @title
   end
   
   protected

@@ -39,19 +39,21 @@ class Location < ActiveRecord::Base
     indexes locatable.tags.name, :as => :place_tags
     indexes search_rank, :as => :search_rank, :sortable => true
     # locality attributes
-    has city_id, :as => :city_id
-    has state_id, :as => :state_id
-    has zip_id, :as => :zip_id
-    has country_id, :as => :country_id
+    has country_id, :type => :integer, :as => :country_id, :facet => true
+    has state_id, :type => :integer, :as => :state_id, :facet => true
+    has city_id, :type => :integer, :as => :city_id, :facet => true
+    has zip_id, :type => :integer, :as => :zip_id, :facet => true
+    # facet issues with arrays of values
     has location_neighborhoods.neighborhood_id, :as => :neighborhood_ids
+    # has location_neighborhoods.neighborhood_id, :as => :neighborhood_ids, :facet => true
     # other attributes
+    has locatable.chain_id, :type => :integer, :as => :chain_id, :facet => true
     has recommendations_count, :as => :recommendations
     # convert degrees to radians for sphinx
     has 'RADIANS(lat)', :as => :lat,  :type => :float
     has 'RADIANS(lng)', :as => :lng,  :type => :float
-    # delta indexing
-    # set_property :delta => true
-    # set_property :delta => delayed
+    # delta indexing using a delayed/background processing scheduler so its 'almost' real-time
+    set_property :delta => :delayed
   end
   
   # return collection of location's country, state, city, zip, neighborhoods

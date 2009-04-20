@@ -75,7 +75,7 @@ class PlacesController < ApplicationController
     @neighborhoods  = @city.neighborhoods.with_locations.order_by_density.all(:limit => 5) unless @city.blank?
     
     # find city zips if its a city search - note: the order_by_density clause results in an inefficient sql query
-    @zips           = @city.zips.with_locations.all(:limit => 20) unless @city.blank?
+    # @zips           = @city.zips.with_locations.all(:limit => 20) unless @city.blank?
     # @zips           = @city.zips.with_locations.order_by_density.all(:limit => 20) unless @city.blank?
 
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
@@ -92,6 +92,7 @@ class PlacesController < ApplicationController
     # build search object
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @what)
     @tags           = @search.place_tags
+    @sphinx_query   = @search.field(:place_tags)
 
     # use 'what' param to search name and place_tags fields
     # use 'where' param as locality_tags field filter - this is the old way
@@ -104,11 +105,18 @@ class PlacesController < ApplicationController
       @conditions.update(:recommendations => 1..2**30)
     end
 
-    @locations      = Location.search(@search.field(:place_tags), 
+    @locations      = Location.search(@sphinx_query,
                                       :conditions => @conditions, 
                                       :include => [:locatable, :city, :state, :zip],
                                       :order => :search_rank, :sort_mode => :desc,
                                       :page => params[:page], :per_page => 20)
+
+
+    if @city and @neighborhood.blank?
+      # build facets for a city search
+      @facets = Location.facets(@sphinx_query, :conditions => @conditions)
+      @zips   = Zip.find(@facets[:zip_id].keys)
+    end
   end
   
   def show
