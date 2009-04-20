@@ -81,10 +81,7 @@ class PlacesController < ApplicationController
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
     nearby_miles    = 20
     @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles) unless @city.blank?
-    
-    # find zip cities if its a zip search
-    @cities         = @zip.cities unless @zip.blank?
-    
+
     # build search title based on [what, filter] and city, neighborhood, zip search
     @title          = build_search_title(:what => @what, :filter => @filter, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
@@ -112,10 +109,19 @@ class PlacesController < ApplicationController
                                       :page => params[:page], :per_page => 20)
 
 
-    if @city and @neighborhood.blank?
-      # build facets for a city search
+    if @city or @zip and @neighborhood.blank?
+      # build facets for a city or zip search
       @facets = Location.facets(@sphinx_query, :conditions => @conditions)
-      @zips   = Zip.find(@facets[:zip_id].keys)
+
+      if @city
+        # find related zips
+        @zips = Zip.find(@facets[:zip_id].keys)
+      end
+
+      if @zip
+        # find related cities
+        @cities = City.find(@facets[:city_id].keys)
+      end
     end
   end
   
