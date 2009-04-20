@@ -43,9 +43,7 @@ class Location < ActiveRecord::Base
     has state_id, :type => :integer, :as => :state_id, :facet => true
     has city_id, :type => :integer, :as => :city_id, :facet => true
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
-    # facet issues with arrays of values
-    has location_neighborhoods.neighborhood_id, :as => :neighborhood_ids
-    # has location_neighborhoods.neighborhood_id, :as => :neighborhood_ids, :facet => true
+    has location_neighborhoods.neighborhood_id, :type => :integer, :as => :neighborhood_ids, :facet => true, :multi => true
     # other attributes
     has locatable.chain_id, :type => :integer, :as => :chain_id, :facet => true
     has recommendations_count, :as => :recommendations

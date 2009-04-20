@@ -71,13 +71,6 @@ class PlacesController < ApplicationController
     @what           = params[:what].to_s.from_url_param
     @filter         = params[:filter].to_s.from_url_param if params[:filter]
     
-    # find city neighborhoods if its a city search
-    @neighborhoods  = @city.neighborhoods.with_locations.order_by_density.all(:limit => 5) unless @city.blank?
-    
-    # find city zips if its a city search - note: the order_by_density clause results in an inefficient sql query
-    # @zips           = @city.zips.with_locations.all(:limit => 20) unless @city.blank?
-    # @zips           = @city.zips.with_locations.order_by_density.all(:limit => 20) unless @city.blank?
-
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
     nearby_miles    = 20
     @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles) unless @city.blank?
@@ -109,13 +102,16 @@ class PlacesController < ApplicationController
                                       :page => params[:page], :per_page => 20)
 
 
-    if @city or @zip and @neighborhood.blank?
+    if @city or @zip
       # build facets for a city or zip search
       @facets = Location.facets(@sphinx_query, :conditions => @conditions)
 
       if @city
         # find related zips
         @zips = Zip.find(@facets[:zip_id].keys)
+        
+        # find related neighborhoods, ignore neighborhood_id == 0
+        @neighborhoods = Neighborhood.find(@facets[:neighborhood_ids].keys.delete_if { |i| i == 0 })
       end
 
       if @zip
