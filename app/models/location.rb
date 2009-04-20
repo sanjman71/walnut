@@ -37,8 +37,9 @@ class Location < ActiveRecord::Base
     indexes locality_tags.name, :as => :locality_tags
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
+    has locatable.tags(:id), :type => :integer, :as => :tag_ids, :facet => true, :multi => true
     indexes search_rank, :as => :search_rank, :sortable => true
-    # locality attributes
+    # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
     has state_id, :type => :integer, :as => :state_id, :facet => true
     has city_id, :type => :integer, :as => :city_id, :facet => true

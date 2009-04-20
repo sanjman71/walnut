@@ -98,9 +98,15 @@ class ApplicationController < ActionController::Base
     
     case params[:action]
     when 'state'
-      # find all state cities and zips
-      @cities = @state.cities.with_locations
-      @zips   = @state.zips.with_locations
+      case params[:controller]
+      when 'places'
+        # find all state cities and zips with locations
+        @cities = @state.cities.with_locations
+        @zips   = @state.zips.with_locations
+      when 'events'
+        # find all state cities with events
+        @cities = @state.cities.with_events
+      end
     when 'city'
       # find city, and all its zips and neighborhoods
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
