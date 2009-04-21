@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
 
   # Make the following methods available to all helpers
-  helper_method :has_privilege?, :recommended?, :recommended_by_me?
+  helper_method :has_privilege?, :recommended?, :recommended_by_me?, :ga_events
   
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -50,6 +50,10 @@ class ApplicationController < ActionController::Base
     @current_roles ||= []
   end
   
+  def ga_events
+    @ga_events ||= []
+  end
+
   def init_current_privileges
     if logged_in?
       # load privileges without an authorizable object
@@ -86,6 +90,8 @@ class ApplicationController < ActionController::Base
         # find all states with events
         @states = @country.states.with_events
       end
+      # track events
+      init_ga_events(params[:controller], @country)
       return true
     else
       # find the specified state for all other cases
@@ -107,15 +113,22 @@ class ApplicationController < ActionController::Base
         # find all state cities with events
         @cities = @state.cities.with_events
       end
+
+      # track events
+      init_ga_events(params[:controller], @state)
     when 'city'
-      # find city, and all its zips and neighborhoods
+      # find city, and all city zips and neighborhoods
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
-      @zips           = @city.zips unless @city.blank?
-      @neighborhoods  = @city.neighborhoods unless @city.blank?
-      
+
       if @city.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
+
+      @zips           = @city.zips
+      @neighborhoods  = @city.neighborhoods
+
+      # track events
+      init_ga_events(params[:controller], @city)
     when 'neighborhood'
       # find city and neighborhood
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
@@ -125,14 +138,21 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return if @city.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
       end
+
+      # track events
+      init_ga_events(params[:controller], @neighborhood)
     when 'zip'
-      # find zip and all its cities
+      # find zip and all zip cities
       @zip      = @state.zips.find_by_name(params[:zip].to_s)
-      @cities   = @zip.cities unless @zip.blank?
 
       if @zip.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'zip') and return
       end
+
+      @cities   = @zip.cities
+
+      # track events
+      init_ga_events(params[:controller], @zip)
     when 'index'
       # find city, zip and/or neighborhood
       # city or zip must be specified; if its a city, neighborhood is optional
@@ -144,9 +164,30 @@ class ApplicationController < ActionController::Base
         # invalid search
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'unknown') and return
       end
+
+      # track events
+      if @neighborhood
+        # track only the neighborhood event
+        init_ga_events(params[:controller], [@neighborhood])
+      else
+        # track city or zip event
+        init_ga_events(params[:controller], [@city, @zip].compact)
+      end
     end
     
     return true
+  end
+  
+  def init_ga_events(category, localities)
+    @ga_events ||= []
+    
+    case category
+    when 'events', 'places'
+      Array(localities).compact.each do |locality|
+        @ga_events.push([category.titleize, locality.class.to_s, locality.name])
+      end
+    else
+    end
   end
   
 end

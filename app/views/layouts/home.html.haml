@@ -16,41 +16,13 @@
   %body
     #header
       .container
-        -# hide search bar when showing events
-        - if params[:controller] == 'events'
-          - search_bar_style = 'hidden'
-        - else
-          - search_bar_style = 'visible'
-         
-        .span-24.last#search_places{:style => "visibility: #{search_bar_style};"}
-          = render(:partial => 'shared/search_bar')
-        .span-24.last#header_links{:style => 'text-align: right;'}
-          -# show these links in any state
-          = link_to 'Home', root_path, :class => 'header link'
-          == &nbsp;|&nbsp;
-          = link_to 'Find Places', url_for(:controller => 'places', :action => 'country', :country => Country.default), :class => 'header link'
-          == &nbsp;|&nbsp;
-          = link_to 'Find Events', url_for(:controller => 'events', :action => 'country', :country => Country.default), :class => 'header link'
-          == &nbsp;|&nbsp;
-          = link_to 'Chain Stores', chains_path, :class => 'header link'
+        = render(:partial => "shared/header_links")
 
-          / == &nbsp;|&nbsp;
-          / = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :class => 'header link'
-          
-          - if has_privilege?('manage site')
-            == &nbsp;|&nbsp;
-            = link_to 'Tag Groups', taggs_path, :class => 'header link'
-            == &nbsp;|&nbsp;
-            = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'header link')
-
-          - if logged_in?
-            == &nbsp;|&nbsp;
-            = link_to('Log-out', logout_path, :class => 'header link')
-          - else
-            == &nbsp;|&nbsp;
-            = link_to('Log-in', login_path, :class => 'header link')
-
+    -# main container
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .prepend-1.span-14
         = display_flash
       = yield
+
+    -# google analytics
+    = render(:partial => "shared/google_analytics")

@@ -8,7 +8,7 @@
 %hr.space
 
 %h3.span-23.prepend-1
-  .state_cities== #{@state.name} Cities
+  .state_cities== Browse by City
   - @cities.each_with_index do |city, i|
     - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
     %span.small[city]{:style => 'white-space: nowrap;'}= link_to(city, url_for(:action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
