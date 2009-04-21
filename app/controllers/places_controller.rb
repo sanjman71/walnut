@@ -147,6 +147,13 @@ class PlacesController < ApplicationController
                                           :order => "@geodist ASC", 
                                           :limit => @nearby_limit,
                                           :include => [:locatable])
+
+      @nearby_event_venues = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
+                                             :conditions => @search.field(:locality_hash).update(:event_venue => 1..10),
+                                             :without_ids => @location.id,
+                                             :order => "@geodist ASC", 
+                                             :limit => @nearby_limit,
+                                             :include => [:locatable])
     end
     
     # initialize title, h1 tags

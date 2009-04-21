@@ -21,7 +21,7 @@ namespace :init do
     
     klass   = State
     columns = [:id, :name, :code, :country_id, :lat, :lng]
-    file    = "#{RAILS_ROOT}/states.txt"
+    file    = "#{RAILS_ROOT}/data/states.txt"
     values  = []
     options = { :validate => false }
 

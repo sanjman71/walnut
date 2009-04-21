@@ -26,6 +26,7 @@ class Location < ActiveRecord::Base
                           end
 
   named_scope :recommended,         { :conditions => ["recommendations_count > 0"] }
+  named_scope :event_venues,        { :conditions => ["events_count > 0"] }
 
   # find location by the specified source id
   named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
@@ -47,7 +48,8 @@ class Location < ActiveRecord::Base
     has location_neighborhoods.neighborhood_id, :type => :integer, :as => :neighborhood_ids, :facet => true, :multi => true
     # other attributes
     has locatable.chain_id, :type => :integer, :as => :chain_id
-    has recommendations_count, :as => :recommendations
+    has recommendations_count, :type => :integer, :as => :recommendations
+    has event_venue, :type => :integer, :as => :event_venue
     # convert degrees to radians for sphinx
     has 'RADIANS(lat)', :as => :lat,  :type => :float
     has 'RADIANS(lng)', :as => :lng,  :type => :float

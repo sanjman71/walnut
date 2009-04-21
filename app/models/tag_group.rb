@@ -12,6 +12,12 @@ class TagGroup < ActiveRecord::Base
   
   named_scope                 :order_by_name,         { :order => "name ASC" }
   
+  def self.to_csv
+    csv = TagGroup.all.collect do |o|
+      "#{o.id}|#{o.name}|#{o.tags}"
+    end
+  end
+  
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?

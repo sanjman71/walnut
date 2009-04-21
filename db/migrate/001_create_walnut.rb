@@ -93,6 +93,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :source,                :polymorphic => true, :default => nil
       t.integer     :search_rank,           :default => 0 # used to order search results
       t.integer     :recommendations_count, :default => 0
+      t.boolean     :event_venue,           :default => 0
       t.boolean     :delta  # used by sphinx for real-time indexing
     end
             

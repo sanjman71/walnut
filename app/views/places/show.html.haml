@@ -50,7 +50,11 @@
   
   -# nearby locations
   .span-18.last#nearby_places
-    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations}) unless @nearby_locations.blank?
+    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations, :heading => 'Nearby Places'}) unless @nearby_locations.blank?
+    
+  -# nearby event venues
+  .span-18.last#nearby_event_venues
+    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_event_venues, :heading => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
     
 .span-5.last#sidebar{:style => 'text-align: right;'}
   -# google ad
