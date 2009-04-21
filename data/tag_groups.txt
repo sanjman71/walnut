@@ -223,3 +223,4 @@
 223|Contractors - Tile, Marble and Granite|
 224|Utilities - Gas, Water and Electric|
 225|Signs, Displays, Flags and Banners|
+226|Event Venues|events

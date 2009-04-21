@@ -34,6 +34,25 @@ module EventfulFeed
       
       imported = Category.count - start_count
     end
+    
+    def self.venues
+      page_size   = 50
+      
+      @results    = Venue.call(:sort_order => 'popularity', :location => 'Chicago', :page_size => page_size)
+      @venues     = @results['venues'] ? @results['venues']['venue'] : []
+      
+      @total      = @results['total_items']
+      @count      = @results['page_items']   # the number of events on this page
+      @first_item = @results['first_item']   # the first item number on this page, e.g. 11
+      @last_item  = @results['last_item']    # the last item number on this page, e.g. 20
+      
+      @venues.each do |venue|
+        Venue.create(:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'])
+      end
+      
+      @venues.size
+    end
+    
   end
   
 end
