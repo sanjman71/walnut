@@ -46,7 +46,7 @@ class Location < ActiveRecord::Base
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
     has location_neighborhoods.neighborhood_id, :type => :integer, :as => :neighborhood_ids, :facet => true, :multi => true
     # other attributes
-    has locatable.chain_id, :type => :integer, :as => :chain_id, :facet => true
+    has locatable.chain_id, :type => :integer, :as => :chain_id
     has recommendations_count, :as => :recommendations
     # convert degrees to radians for sphinx
     has 'RADIANS(lat)', :as => :lat,  :type => :float

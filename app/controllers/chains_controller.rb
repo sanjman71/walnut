@@ -17,7 +17,7 @@ class ChainsController < ApplicationController
     @facets   = Location.facets(:conditions => {:chain_id => @chain.id})
     @states   = State.find(@facets[:state_id].keys)
     # count locations in country
-    @count    = @facets[:country_id].values.first.to_i
+    @count    = @facets[:country_id][@country.id]
 
     @title    = "#{@chain.name} Store Locator"
   end
