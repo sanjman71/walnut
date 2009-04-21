@@ -1,7 +1,7 @@
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init => [:admins]
+  task :init => [:admins, :tag_groups]
 
   desc "Initialize admin users roles and privileges"
   task :admins do
