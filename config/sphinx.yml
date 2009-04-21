@@ -1,2 +1,4 @@
 development:
   max_matches: 50
+test:
+  max_matches: 50

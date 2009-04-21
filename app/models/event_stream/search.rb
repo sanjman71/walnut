@@ -1,6 +1,6 @@
 require 'eventful/api'
 
-module EventfulFeed
+module EventStream
 
   class Search
     

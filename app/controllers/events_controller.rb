@@ -17,9 +17,9 @@ class EventsController < ApplicationController
     # @country, @state, @city all initialized in before filter
 
     # find all categories
-    @categories = EventfulFeed::Category.order_by_name
+    @categories = EventCategory.order_by_name
     
-    @title    = "#{@city.name} Events Directory"
+    @title      = "#{@city.name} Events Directory"
   end
   
   def search
@@ -30,7 +30,7 @@ class EventsController < ApplicationController
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
     @sort       = params[:sort]
-    @category   = params[:category] ? EventfulFeed::Category.find_by_eventful_id(params[:category].underscore) : nil
+    @category   = params[:category] ? EventCategory.find_by_source_id(params[:category].underscore) : nil
     @q          = params[:q] ? params[:q].from_url_param.titleize : nil
     
     if @sort and @category
@@ -54,7 +54,7 @@ class EventsController < ApplicationController
     end
     
     if @category
-      @conditions[:category] = @category.eventful_id
+      @conditions[:category] = @category.source_id
       @title  = "#{@city.name} #{@category.name.singularize.titleize} Events"
     end
     
@@ -64,7 +64,7 @@ class EventsController < ApplicationController
     end
     
     # find city events
-    @results    = EventfulFeed::Search.call(@conditions)
+    @results    = EventStream::Search.call(@conditions)
     @events     = @results['events'] ? @results['events']['event'] : []
     
     # sort events by date
@@ -76,7 +76,7 @@ class EventsController < ApplicationController
     @last_item  = @results['last_item']    # the last item number on this page, e.g. 20
     
     # find popular categories
-    @categories = EventfulFeed::Category.popular.order_by_name - [@category]
+    @categories = EventCategory.popular.order_by_name - [@category]
   end
   
 end

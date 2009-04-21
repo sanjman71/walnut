@@ -27,6 +27,6 @@
 %h3.span-23.prepend-1#categories
   - @categories.each do |category|
     - klasses = ["event", "category"].push(cycle('even', 'odd'))
-    %span.small[category]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(category.name, url_for(:action => 'index', :category => category.eventful_id.dasherize), :class => klasses.join(" "))
+    %span.small[category]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(category.name, url_for(:action => 'index', :category => category.to_param), :class => klasses.join(" "))
 
       

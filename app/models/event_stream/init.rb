@@ -1,6 +1,6 @@
 require 'eventful/api'
 
-module EventfulFeed
+module EventStream
 
   class Init
     
@@ -8,21 +8,27 @@ module EventfulFeed
       @@session ||= Eventful::API.new(EVENTFUL_API_KEY)
     end
 
+    @@eventful_source = "eventful"
+    
     def self.categories
       method        = "categories/list"
       results       = session.call(method)
       categories    = results['category']
-      start_count   = Category.count
+      start_count   = EventCategory.count
       
       popular_list  = ["Concerts", "Festivals", "Nightlife", "Organizations", "Sports"]
       
       categories.each do |category|
         # format category name
         category_name = category['name'].gsub(" | ", ', ')
-        category_id   = category['id']
+        source_id     = category['id']
+        source_type   = @@eventful_source
         
         # create category
-        category = Category.find_by_name(category_name) || Category.create(:name => category_name, :source_id => category_id)
+        options   = {:name => category_name, :source_id => source_id, :source_type => source_type}
+        category  = EventCategory.find_by_name(category_name) || EventCategory.create(options)
+        
+        puts "xxx #{category.errors.full_messages}" if !category.valid?
         
         # mark popular categories
         if popular_list.any? { |s| category_name.match(/#{s}/) }
@@ -32,13 +38,13 @@ module EventfulFeed
         end
       end
       
-      imported = Category.count - start_count
+      imported = EventCategory.count - start_count
     end
     
     def self.venues(options)
       page_size     = options[:limit] ? options[:limit].to_i : 50
       
-      @results      = Venue.call(:sort_order => 'popularity', :location => 'Chicago', :page_size => page_size)
+      @results      = EventVenue.call(:sort_order => 'popularity', :location => 'Chicago', :page_size => page_size)
       @venues       = @results['venues'] ? @results['venues']['venue'] : []
       
       @total        = @results['total_items']
@@ -46,13 +52,14 @@ module EventfulFeed
       @first_item   = @results['first_item']   # the first item number on this page, e.g. 11
       @last_item    = @results['last_item']    # the last item number on this page, e.g. 20
       
-      start_count   = Venue.count
+      start_count   = EventVenue.count
       
       @venues.each do |venue|
-        Venue.create(:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], :source_id => venue['id'])
+        EventVenue.create(:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], 
+                          :source_type => @@eventful_source, :source_id => venue['id'])
       end
       
-      imported = Venue.count - start_count
+      imported = EventVenue.count - start_count
     end
     
   end
