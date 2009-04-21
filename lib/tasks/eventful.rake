@@ -5,6 +5,12 @@ namespace :eventful do
     imported = EventfulFeed::Init.categories
     puts "#{Time.now}: imported #{imported} eventful categories"
   end
+
+  desc "Import eventful venues"
+  task :import_venues do
+    imported = EventfulFeed::Init.venues(:limit => 100)
+    puts "#{Time.now}: imported #{imported} eventful venues"
+  end
   
   desc "Create cities with events"
   task :create_cities do

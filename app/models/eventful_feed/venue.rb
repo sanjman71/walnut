@@ -4,7 +4,9 @@ module EventfulFeed
 
   class Venue < ActiveRecord::Base
     set_table_name "eventful_venues"
-    validates_uniqueness_of :name, :scope => :city
+    validates_presence_of     :name
+    validates_presence_of     :source_id
+    validates_uniqueness_of   :source_id
     
     belongs_to  :location, :counter_cache => :event_venue
     
