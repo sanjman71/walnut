@@ -28,9 +28,9 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal [@us], @location.localities
     end
     
-    should "have united states locality tag" do
-      assert_equal ["United States"], @location.locality_tag_list
-    end
+    # should "have united states locality tag" do
+    #   assert_equal ["United States"], @location.locality_tag_list
+    # end
 
     should "increment us locations_count" do
       assert_equal 1, @us.locations_count
@@ -47,9 +47,9 @@ class LocationTest < ActiveSupport::TestCase
         assert_equal [], @location.localities
       end
 
-      should "have no locality tags" do
-        assert_equal [], @location.locality_tag_list
-      end
+      # should "have no locality tags" do
+      #   assert_equal [], @location.locality_tag_list
+      # end
 
       should "decrement us locations_count" do
         assert_equal 0, @us.locations_count
@@ -63,9 +63,9 @@ class LocationTest < ActiveSupport::TestCase
         @ca.reload
       end
 
-      should "have ca country area tag" do
-        assert_equal ["Canada"], @location.locality_tag_list
-      end
+      # should "have ca country area tag" do
+      #   assert_equal ["Canada"], @location.locality_tag_list
+      # end
 
       should "increment ca locations_count" do
         assert_equal 1, @ca.locations_count
@@ -80,10 +80,10 @@ class LocationTest < ActiveSupport::TestCase
     end
     
     should_change "Location.count", :by => 1
-    
-    should "have illinois locality tag" do
-      assert_equal ["Illinois"], @location.locality_tag_list
-    end
+
+    # should "have illinois locality tag" do
+    #   assert_equal ["Illinois"], @location.locality_tag_list
+    # end
 
     should "increment illinois locations_count" do
       assert_equal 1, @il.locations_count
@@ -95,10 +95,10 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @il.reload
       end
-  
-      should "have no illinois locality tag" do
-        assert_equal [], @location.locality_tag_list
-      end
+
+      # should "have no illinois locality tag" do
+      #   assert_equal [], @location.locality_tag_list
+      # end
 
       should "decrement illinois locations_count" do
         assert_equal 0, @il.locations_count
@@ -115,11 +115,11 @@ class LocationTest < ActiveSupport::TestCase
     end
     
     should_change "Location.count", :by => 1
-    
-    should "have chicago locality tag" do
-      assert_equal ["Chicago"], @location.locality_tag_list
-    end
-    
+
+    # should "have chicago locality tag" do
+    #   assert_equal ["Chicago"], @location.locality_tag_list
+    # end
+
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
     end
@@ -138,10 +138,10 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @chicago.reload
       end
-  
-      should "have no locality tags" do
-        assert_equal [], @location.locality_tag_list
-      end
+
+      # should "have no locality tags" do
+      #   assert_equal [], @location.locality_tag_list
+      # end
 
       should "decrement chicago locations_count" do
         assert_equal 0, @chicago.locations_count
@@ -164,9 +164,9 @@ class LocationTest < ActiveSupport::TestCase
         @chicago.reload
       end
 
-      should "have springfield locality tag" do
-        assert_equal ["Springfield"], @location.locality_tag_list
-      end
+      # should "have springfield locality tag" do
+      #   assert_equal ["Springfield"], @location.locality_tag_list
+      # end
 
       should "remove chicago locations" do
         assert_equal [], @chicago.locations
@@ -214,10 +214,10 @@ class LocationTest < ActiveSupport::TestCase
     end
     
     should_change "Location.count", :by => 1
-    
-    should "have 60654 locality tag" do
-      assert_equal ["60654"], @location.locality_tag_list
-    end
+
+    # should "have 60654 locality tag" do
+    #   assert_equal ["60654"], @location.locality_tag_list
+    # end
     
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
@@ -237,10 +237,10 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @zip.reload
       end
-  
-      should "have no locality tags" do
-        assert_equal [], @location.locality_tag_list
-      end
+
+      # should "have no locality tags" do
+      #   assert_equal [], @location.locality_tag_list
+      # end
 
       should "decrement zip locations_count" do
         assert_equal 0, @zip.locations_count
@@ -263,9 +263,9 @@ class LocationTest < ActiveSupport::TestCase
         @zip2.reload
       end
 
-      should "have 60610 locality tag" do
-        assert_equal ["60610"], @location.locality_tag_list
-      end
+      # should "have 60610 locality tag" do
+      #   assert_equal ["60610"], @location.locality_tag_list
+      # end
 
       should "set 60654 places to []" do
         assert_equal [], @zip.places
@@ -296,9 +296,9 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal [@river_north], @location.localities
     end
     
-    should "have neighborhood locality tag" do
-      assert_equal ["River North"], @location.locality_tag_list
-    end
+    # should "have neighborhood locality tag" do
+    #   assert_equal ["River North"], @location.locality_tag_list
+    # end
     
     should "increment neighborhood and locations counter caches" do
       assert_equal 1, @river_north.locations_count
@@ -316,9 +316,9 @@ class LocationTest < ActiveSupport::TestCase
         @river_north.reload
       end
 
-      should "have no locality tag" do
-        assert_equal [], @location.locality_tag_list
-      end
+      # should "have no locality tag" do
+      #   assert_equal [], @location.locality_tag_list
+      # end
 
       should "set neighborhood locations to []" do
         assert_equal [], @river_north.locations

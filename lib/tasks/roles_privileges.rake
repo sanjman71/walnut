@@ -5,7 +5,7 @@ namespace :rp do
 
   desc "Initialize admin users roles and privileges"
   task :admins do
-    puts "initializing admin users"
+    puts "#{Time.now}: initializing admin users"
     
     u = User.find_by_name("Admin Killian")
     u.grant_role('admin') unless u.blank?

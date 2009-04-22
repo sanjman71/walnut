@@ -112,32 +112,36 @@ namespace :localeze do
     puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported, and mapped #{places} places to chains"
   end
   
-  desc "Import localeze records, by city and state, or by offset and limit"
+  desc "Import localeze records, by city and state"
   task :import_records do |t|
     
-    # default page parameters
+    # intialiaze page parameters, limit
     page          = 1
-    per_page      = 100
-    
-    # default limit
-    default_limit = 2**30
+    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
+    limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
      
+    # initialize params hash
+    params        = {:page => page, :per_page => per_page}
+    
     if ENV["CITY"] and ENV["STATE"]
       city        = ENV["CITY"].titleize
       state_code  = ENV["STATE"].upcase
-      params      = {:city => city, :state => state_code, :page => page, :per_page => per_page}
-      limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : default_limit
-      
-      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{default_limit}"
-    elsif ENV["OFFSET"] and ENV["LIMIT"]
-      offset      = ENV["OFFSET"].to_i
-      limit       = ENV["LIMIT"].to_i
-      params      = {:offset => offset, :limit => [per_page, limit].min} # get records in smaller chunks
 
-      puts "#{Time.now}: importing #{limit} localeze records starting at offset #{offset}"
+      # validate city and state
+      state       = State.find_by_code(state_code)
+      city        = state.cities.find_by_name(city) unless state.blank?
+      
+      if state.blank? or city.blank?
+        puts "#{Time.now}: invalid city or state"
+        exit
+      end
+      
+      params.update({:city => city.name, :state => state.code})
+      
+      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{limit}"
     else
-      puts "invalid arguments"
-      exit
+      # import all records
+      puts "#{Time.now}: importing all localeze records, limit: #{limit}"
     end
     
     # track stats
@@ -186,7 +190,7 @@ namespace :localeze do
           next
         end
 
-        puts "id: #{record.id}, class: #{record.class}, name: #{record.stdname}, city: #{record.city}, state: #{record.state}, zip: #{record.zip}, address: #{record.street_address}"
+        # puts "id: #{record.id}, class: #{record.class}, name: #{record.stdname}, city: #{record.city}, state: #{record.state}, zip: #{record.zip}, address: #{record.street_address}"
 
         begin
           # get zip if it exists, or validate and create if it doesn't
@@ -221,7 +225,7 @@ namespace :localeze do
         end
         
         # check for chain
-        if record.chain_id > 0 and localeze_chain = Localeze::Chain.find(record.chain_id)
+        if !record.chain_id.blank? and localeze_chain = Localeze::Chain.find(record.chain_id)
           # find or create local chain object
           chain = Chain.find_by_name(localeze_chain.name) || Chain.create(:name => localeze_chain.name)
           # add chain
@@ -231,21 +235,20 @@ namespace :localeze do
         
         added += 1
         
+        if (added % 1000) == 0
+          puts "#{Time.now}: *** added #{added} records"
+        end
+        
         # check limit
         if limit and added >= limit
-          puts "*** reached limit of #{added}"
+          puts "#{Time.now}: *** reached limit of #{added}"
           puts "#{Time.now}: completed, #{added} added, #{exists} already imported, #{errors} errors"
           exit
         end
       end
       
-      if offset
-        # increment offset
-        params[:offset] = params[:offset] + [per_page, limit].min
-      else
-        # increment page
-        params[:page]   = params[:page] + 1
-      end
+      # increment page
+      params[:page] = params[:page] + 1
     end
     
     puts "#{Time.now}: completed, #{added} added, #{exists} already imported, #{errors} errors"
