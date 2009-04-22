@@ -259,7 +259,7 @@ namespace :init do
   
   desc "Import neighborhood info using the urban mapping api"
   task :urban_neighborhoods do
-    limit       = ENV["LIMIT"].to_i if ENV["LIMIT"]
+    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     city        = ENV["CITY"].titleize if ENV["CITY"]
     state_code  = ENV["STATE"].upcase if ENV["STATE"]
     added       = 0
@@ -291,7 +291,7 @@ namespace :init do
         added += 1
       end
       
-      if limit and added >= limit
+      if added >= limit
         puts "#{Time.now}: *** reached limit #{limit}"
         break
       end

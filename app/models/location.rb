@@ -8,7 +8,7 @@ class Location < ActiveRecord::Base
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   belongs_to              :locatable, :polymorphic => true, :counter_cache => :locations_count
   
- after_save              :update_locality_tags
+  after_save              :update_locality_tags
   
   # make sure only accessible attributes are written to from forms etc.
 	attr_accessible         :name, :country, :state, :city, :zip, :street_address, :lat, :lng, :source_id, :source_type
@@ -38,21 +38,21 @@ class Location < ActiveRecord::Base
     indexes locality_tags.name, :as => :locality_tags
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
-    has locatable.tags(:id), :type => :integer, :as => :tag_ids, :facet => true, :multi => true
+    has locatable.tags(:id), :as => :tag_ids, :facet => true
     indexes search_rank, :as => :search_rank, :sortable => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
     has state_id, :type => :integer, :as => :state_id, :facet => true
     has city_id, :type => :integer, :as => :city_id, :facet => true
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
-    has location_neighborhoods.neighborhood_id, :type => :integer, :as => :neighborhood_ids, :facet => true, :multi => true
+    has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # other attributes
     has locatable.chain_id, :type => :integer, :as => :chain_id
     has recommendations_count, :type => :integer, :as => :recommendations
     has event_venue, :type => :integer, :as => :event_venue
     # convert degrees to radians for sphinx
-    has 'RADIANS(lat)', :as => :lat,  :type => :float
-    has 'RADIANS(lng)', :as => :lng,  :type => :float
+    has 'RADIANS(locations.lat)', :as => :lat,  :type => :float
+    has 'RADIANS(locations.lng)', :as => :lng,  :type => :float
     # delta indexing using a delayed/background processing scheduler so its 'almost' real-time
     set_property :delta => :delayed
   end
