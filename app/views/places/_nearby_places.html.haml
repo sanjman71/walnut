@@ -1,6 +1,6 @@
 %h2= heading
 - nearby_locations.each_with_geodist do |location, distance|
-  .span-8.nearby[location]{:style => 'margin-bottom: 20px;'}
+  .span-7.append-1.nearby[location]{:style => 'margin-bottom: 20px;'}
     %span{:style => 'font-size: 1.3em;'}= link_to location.locatable.name, place_path(:id => location)
     %br
     = location.street_address
