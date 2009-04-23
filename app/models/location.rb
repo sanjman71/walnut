@@ -55,6 +55,8 @@ class Location < ActiveRecord::Base
     has 'RADIANS(locations.lng)', :as => :lng,  :type => :float
     # delta indexing using a delayed/background processing scheduler so its 'almost' real-time
     set_property :delta => :delayed
+    # only index valid locations
+    where "status = 0"
   end
   
   # return collection of location's country, state, city, zip, neighborhoods
