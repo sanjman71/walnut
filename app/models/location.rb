@@ -8,12 +8,12 @@ class Location < ActiveRecord::Base
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   belongs_to              :locatable, :polymorphic => true, :counter_cache => :locations_count
   
-  after_save              :update_locality_tags
+  after_save              :after_save_callback
   
   # make sure only accessible attributes are written to from forms etc.
 	attr_accessible         :name, :country, :state, :city, :zip, :street_address, :lat, :lng, :source_id, :source_type
   
-  acts_as_taggable_on     :locality_tags
+  # acts_as_taggable_on     :locality_tags
   
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
@@ -35,7 +35,6 @@ class Location < ActiveRecord::Base
   
   define_index do
     indexes street_address, :as => :street_address
-    indexes locality_tags.name, :as => :locality_tags
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
     has locatable.tags(:id), :as => :tag_ids, :facet => true
@@ -85,7 +84,7 @@ class Location < ActiveRecord::Base
   # after_save callback to:
   #  - increment/decrement locality counter caches
   #  - update locality tags (e.g. country, state, city, zip) based on changes to the location object
-  def update_locality_tags
+  def after_save_callback
     self.changes.keys.each do |change|
       # filter out unless its an area
       next unless ["country_id", "state_id", "city_id", "zip_id"].include?(change.to_s)

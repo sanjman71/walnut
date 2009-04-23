@@ -21,8 +21,8 @@
 
 %h3.span-23.prepend-1#zips
   .city_zips== #{@city.name} Zip Codes
-  - @zips.each_with_index do |zip, i|
-    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+  - @zips.each do |zip|
+    - klasses = ["locality"].push(cycle('even', 'odd'))
     %span.small[zip]= link_to zip, url_for(:controller => 'places', :action => 'zip', :country => @country, :state => @state, :zip => zip), :class => klasses.join(" ")
     
 %hr.space
@@ -30,8 +30,8 @@
 %h3.span-23.prepend-1#neighborhoods
   - unless @neighborhoods.blank?
     .city_neighborhoods== #{@city.name} Neighborhoods
-    - @neighborhoods.each_with_index do |neighborhood, i|
-      - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    - @neighborhoods.each do |neighborhood|
+      - klasses = ["locality"].push(cycle('even', 'odd'))
       %span.small[neighborhood]= link_to neighborhood, url_for(:controller => 'places', :action => 'neighborhood', :country => @country, :state => @state, :city => @city, :neighborhood => neighborhood), :class => klasses.join(" ")
     
 
