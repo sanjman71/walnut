@@ -75,6 +75,19 @@ class TagGroupTest < ActiveSupport::TestCase
     end
   end
 
+  context "tag group with tags more than 3 words" do
+    setup do
+      @tagg = TagGroup.create(:name => "fashion", :tags => "jeans, tag is too long")
+    end
+
+    should_change "TagGroup.count"
+    
+    should "have tag list ['jeans']" do
+      assert_equal ['jeans'], @tagg.tag_list
+      assert_equal "jeans", @tagg.tags
+    end
+  end
+  
   context "tag group with tags" do
     setup do
       @tagg = TagGroup.create(:name => "fashion", :tags => "jeans, diesel")

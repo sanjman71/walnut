@@ -1,27 +1,59 @@
 namespace :localeze do
   
-  desc "Import localeze categories as tags and tag groups"
-  task :import_categories do
+  # Timing: ~ 1 hour
+  desc "Import localeze categories and attributes as tags and tag groups"
+  task :import_tags do
     
-    puts "#{Time.now}: importing localeze categories"
+    puts "#{Time.now}: importing localeze categories and attributes"
     
     checked   = 0
     mapped    = 0
     unmapped  = 0 
+    tagged    = 0
+    taggs     = 0
+    skipped   = 0
     
     page      = 1
-    per_page  = 10
-    limit     = nil
+    per_page  = 100
+    offset    = (page - 1) * per_page
+    limit     = 2**30
     
     # find places with no tag groups
-    until (places = Place.find(:all, :conditions => {:tag_groups_count => 0}, :include => :locations).paginate(:page => page, :per_page => per_page)).blank?
+    until (places = Place.find(:all, :conditions => {:tag_groups_count => 0}, :include => :locations, :offset => offset, :limit => per_page)).blank?
       places.collect(&:locations).flatten.each do |location|
         # track number of locations checked
         checked     += 1
-
-        categories  = Localeze::BaseRecord.find(location.source_id).get(:categories)
+        
+        place       = location.locatable
+        
+        record      = Localeze::BaseRecord.find(location.source_id)
+        categories  = record.get(:categories)
+        attributes  = record.get(:attributes)
         groups      = []
          
+        attributes.each do |attribute|
+          group_name  = attribute['group_name']
+          attr_name   = attribute['name']
+          
+          tags_list   = Localeze::TagFilter.to_tags(group_name, attr_name)
+
+          if tags_list.blank?
+            puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}"
+            LOCALEZE_TAGS_LOGGER.debug("*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
+            skipped += 1
+          end
+
+          tags_list.each do |tag_name|
+            puts "*** tagging #{place.name} with #{tag_name}"
+            place.tag_list.add(tag_name)
+            place.save
+            tagged += 1
+          end
+        end
+           
+        # xxx testing attributes
+        next
+        
         categories.each do |category|
           # map category to a tag group
           category_name = category['name'].gsub("&", "and")
@@ -29,7 +61,7 @@ namespace :localeze do
           
           # a category should match exactly 1 tag group
           if tag_groups.size != 1
-            LOCALEZE_LOGGER.debug("#{Time.now}: xxx category #{category_name} mapped to #{tag_groups.size} tag groups")
+            LOCALEZE_TAGS_LOGGER.debug("#{Time.now}: xxx category #{category_name} mapped to #{tag_groups.size} tag groups")
             next
           end
           
@@ -51,13 +83,14 @@ namespace :localeze do
         end
                        
         # check limit
-        if limit and mapped >= limit
+        if mapped >= limit
           puts "*** reached limit of #{mapped}"
           exit
         end
       end
       
-      page += 1
+      page   += 1
+      offset  = (page - 1) * per_page
     end
     
     puts "#{Time.now}: completed, checked #{checked} locations, mapped #{mapped} locations, found #{unmapped} locations with no matching categories"

@@ -12,12 +12,15 @@ class TagGroup < ActiveRecord::Base
   
   named_scope                 :order_by_name,         { :order => "name ASC" }
   
+  # tags have a limited word length
+  TAG_MAX_WORDS = 3
+  
   def self.to_csv
     csv = TagGroup.all.collect do |o|
       "#{o.id}|#{o.name}|#{o.tags}"
     end
   end
-  
+    
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?
@@ -35,13 +38,13 @@ class TagGroup < ActiveRecord::Base
   
   # tags can be a comma separated list or an array
   def tags=(s)
-    s = validate_and_clean_string(s)
+    s = TagGroup::validate_and_clean_string(s)
     write_attribute(:tags, s.join(","))
   end
 
   # tags to add as a comma separated list or an array
   def add_tags(s)
-    s = validate_and_clean_string(s)
+    s = TagGroup::validate_and_clean_string(s)
     t = tag_list
     s = (t + s).uniq.sort
     # keep track of recently added tags
@@ -51,7 +54,7 @@ class TagGroup < ActiveRecord::Base
   
   # tags to remove as a comma separated list or an array
   def remove_tags(s)
-    s = validate_and_clean_string(s)
+    s = TagGroup::validate_and_clean_string(s)
     t = tag_list
     s = (t - s).uniq.sort
     # keep track of recently removed tags
@@ -90,7 +93,7 @@ class TagGroup < ActiveRecord::Base
   
   protected
   
-  def validate_and_clean_string(s)
+  def self.validate_and_clean_string(s)
     raise ArgumentError, "expected String or Array" unless [String, Array].include?(s.class)
     
     case s.class.to_s
@@ -102,8 +105,8 @@ class TagGroup < ActiveRecord::Base
     s
   end
   
-  def clean(array)
-    array.reject(&:blank?).map{|s| s.downcase.strip }.uniq.sort
+  def self.clean(array)
+    array.reject(&:blank?).map{|s| s.split(/\S+/).size > TAG_MAX_WORDS ? nil : s.downcase.strip }.compact.uniq.sort
   end
   
   def apply_tags(place)
