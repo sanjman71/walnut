@@ -3,16 +3,14 @@
   var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
   document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
   </script>
-  <script type="text/javascript">
+
+%script{'type' => "text/javacript"}
   try {
   var pageTracker = _gat._getTracker("UA-8481541-1");
   pageTracker._setDomainName("none");
   pageTracker._setAllowLinker(true);
   pageTracker._setAllowHash(false);
   pageTracker._trackPageview();
-  } catch(err) {}</script>
-
-- unless ga_events.blank?
-  %script{'type' => "text/javacript"}
-    - ga_events.each do |event|
-      == pageTracker._trackEvent("#{event.join(", ")}")
+  - ga_events.each do |event|
+    == pageTracker._trackEvent("#{event.join(", ")}")
+  } catch(err) {}
