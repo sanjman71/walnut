@@ -12,5 +12,5 @@
   pageTracker._setAllowHash(false);
   pageTracker._trackPageview();
   - ga_events.each do |event|
-    == pageTracker._trackEvent("#{event.join(", ")}")
+    = event
   } catch(err) {}

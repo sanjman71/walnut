@@ -184,7 +184,7 @@ class ApplicationController < ActionController::Base
     case category
     when 'events', 'places'
       Array(localities).compact.each do |locality|
-        @ga_events.push([category.titleize, locality.class.to_s, locality.name])
+        @ga_events.push("pageTracker._trackEvent('#{category.titleize}', '#{locality.class.to_s}', '#{locality.name}');")
       end
     else
     end
