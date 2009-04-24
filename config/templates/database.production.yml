@@ -6,3 +6,13 @@ production:
   database: walnut_production
   username: rails
   password: rails
+  
+shared_authentication_production:
+  encoding: utf8
+  adapter: mysql
+  host: localhost
+  port: 3306
+  database: walnut_development
+  username: rails
+  password: rails
+
