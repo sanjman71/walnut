@@ -2,7 +2,7 @@ require 'rubygems'
 require 'mocha'
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-GeoKit::Geocoders::provider_order=[:google,:us]
+Geokit::Geocoders::provider_order=[:google,:us]
 
 # Uses defaults
 class Company < ActiveRecord::Base #:nodoc: all
@@ -34,16 +34,27 @@ class CustomLocation < ActiveRecord::Base #:nodoc: all
   end
 end
 
-class ActsAsMappableTest < Test::Unit::TestCase #:nodoc: all
+# Uses :through
+class MockOrganization < ActiveRecord::Base #:nodoc: all
+  has_one :mock_address, :as => :addressable
+  acts_as_mappable :through => :mock_address
+end
+
+# Used by :through
+class MockAddress < ActiveRecord::Base #:nodoc: all
+  belongs_to :addressable, :polymorphic => true
+  acts_as_mappable
+end
+
+class ActsAsMappableTest < ActiveSupport::TestCase #:nodoc: all
     
   LOCATION_A_IP = "217.10.83.5"  
     
-  #self.fixture_path = File.dirname(__FILE__) + '/fixtures'  
-  #self.fixture_path = RAILS_ROOT + '/test/fixtures/'
-  #puts "Rails Path #{RAILS_ROOT}"
-  #puts "Fixture Path: #{self.fixture_path}"
-  #self.fixture_path = ' /Users/bill_eisenhauer/Projects/geokit_test/test/fixtures/'
-  fixtures :companies, :locations, :custom_locations, :stores
+  self.fixture_path = File.dirname(__FILE__) + '/fixtures'  
+  self.use_transactional_fixtures = true
+  self.use_instantiated_fixtures  = false
+  self.pre_loaded_fixtures = true
+  fixtures :companies, :locations, :custom_locations, :stores, :mock_organizations, :mock_addresses
 
   def setup
     @location_a = GeoKit::GeoLoc.new
@@ -62,7 +73,10 @@ class ActsAsMappableTest < Test::Unit::TestCase #:nodoc: all
     @loc_a = locations(:a)
     @custom_loc_a = custom_locations(:a)
     @loc_e = locations(:e)
-    @custom_loc_e = custom_locations(:e)    
+    @custom_loc_e = custom_locations(:e)
+
+    @barnes_and_noble = mock_organizations(:barnes_and_noble)
+    @address = mock_addresses(:address_barnes_and_noble)
   end
   
   def test_override_default_units_the_hard_way
@@ -164,7 +178,7 @@ class ActsAsMappableTest < Test::Unit::TestCase #:nodoc: all
     locations = Location.count(:origin => @loc_a, :conditions => ["distance < ? and city = ?", 5, 'Coppell'])
     assert_equal 2, locations
   end
-  
+
   def test_find_beyond
     locations = Location.find_beyond(3.95, :origin => @loc_a)
     assert_equal 1, locations.size    
@@ -197,6 +211,13 @@ class ActsAsMappableTest < Test::Unit::TestCase #:nodoc: all
     locations = Location.find(:all, :origin => @loc_a, :range => 0..10, :conditions => ["city = ?", 'Coppell'])
     assert_equal 2, locations.size
     locations = Location.count(:origin => @loc_a, :range => 0..10, :conditions => ["city = ?", 'Coppell'])
+    assert_equal 2, locations
+  end
+
+  def test_find_range_with_token_with_hash_conditions
+    locations = Location.find(:all, :origin => @loc_a, :range => 0..10, :conditions => {:city => 'Coppell'})
+    assert_equal 2, locations.size
+    locations = Location.count(:origin => @loc_a, :range => 0..10, :conditions => {:city => 'Coppell'})
     assert_equal 2, locations
   end
   
@@ -462,6 +483,11 @@ class ActsAsMappableTest < Test::Unit::TestCase #:nodoc: all
     assert_equal 1, locations.size
   end
 
+  def test_find_within_bounds_with_hash_conditions
+    locations = Location.find(:all, :bounds=>[@sw,@ne], :conditions=>{:id => locations(:a).id})
+    assert_equal 1, locations.size
+  end
+
   def test_auto_geocode
     GeoKit::Geocoders::MultiGeocoder.expects(:geocode).with("Irving, TX").returns(@location_a)
     store=Store.new(:address=>'Irving, TX')
@@ -478,4 +504,73 @@ class ActsAsMappableTest < Test::Unit::TestCase #:nodoc: all
     assert store.new_record?
     assert_equal 1, store.errors.size
   end
+  
+  
+  
+  
+  # test the augment_conditions helper
+  def test_augment_conditions_with_an_empty_string
+    assert_equal 'distance < 5', Location.send(:augment_conditions, '', 'distance < 5')    
+  end
+
+  def test_augment_conditions_with_a_conditional_string
+    assert_equal 'my_filter=my_value AND distance < 5', Location.send(:augment_conditions, 'my_filter=my_value', 'distance < 5')    
+  end
+  
+  def test_augment_conditions_with_an_empty_array
+    assert_equal ['distance < 5'], Location.send(:augment_conditions, [], 'distance < 5')    
+  end
+
+  def test_augment_conditions_with_a_simple_array
+    assert_equal ['my_filter=my_value AND distance < 5'], Location.send(:augment_conditions, ['my_filter=my_value'], 'distance < 5')    
+  end
+
+  def test_augment_conditions_with_a_prepared_value_array
+    assert_equal ['my_filter=? AND distance < 5', 10], Location.send(:augment_conditions, ['my_filter=?', 10], 'distance < 5')    
+  end
+  
+  def test_augment_conditions_should_not_modify_an_empty_conditional_array
+    conditions = []
+    Location.send(:augment_conditions, conditions, 'distance < 5')    
+    assert_equal [], conditions
+  end
+
+  def test_augment_conditions_with_simple_conditional_should_not_modify_the_conditional_array
+    conditions = ['my_filter=my_value']
+    Location.send(:augment_conditions, conditions, 'distance < 5')    
+    assert_equal ['my_filter=my_value'], conditions
+  end
+
+  def test_augment_conditions_with_an_empty_hash
+    assert_equal 'distance < 5', Location.send(:augment_conditions, {}, 'distance < 5')    
+  end
+
+  def test_augment_conditions_with_a_simple_hash
+    assert_equal "`locations`.`my_filter` = 'my_value' AND distance < 5", Location.send(:augment_conditions, {:my_filter => 'my_value'}, 'distance < 5')    
+  end
+
+  def test_augment_conditions_with_a_mixed_hash
+    # assert_equal "`locations`.`my_filter` = 'my_value' AND `locations`.`my_filter2` = 200 AND distance < 5",
+    result = Location.send(:augment_conditions, {:my_filter => 'my_value', :my_filter2 => 200}, 'distance < 5')    
+    #the order of the hash, at least in ruby < 1.9, is not guaranteed
+    result =~ /#{Regexp.escape("`locations`.`my_filter` = 'my_value'")}/
+    result =~ /#{Regexp.escape("`locations`.`my_filter2` = 200")}/
+    result =~ /#{Regexp.escape(" AND distance < 5")}/
+  end
+  
+  def test_augment_conditions_with_a_simple_conditional_should_not_modify_the_conditional_hash
+    conditions = {:my_filter => 'my_value'}
+    Location.send(:augment_conditions, conditions, 'distance < 5')
+    orig_conditions = {:my_filter => 'my_value'}
+    assert_equal orig_conditions, conditions
+  end
+  
+  # Test :through
+    
+  def test_find_with_through
+    organizations = MockOrganization.find(:all, :origin => @location_a, :order => 'distance ASC')
+    assert_equal 2, organizations.size
+    organizations = MockOrganization.count(:origin => @location_a, :conditions => "distance < 3.97")
+    assert_equal 1, organizations
+  end 
 end

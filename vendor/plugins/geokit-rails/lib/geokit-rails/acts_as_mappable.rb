@@ -48,29 +48,42 @@ module Geokit
       # and create your own AR callback to handle geocoding.
       def acts_as_mappable(options = {})
         # Mix in the module, but ensure to do so just once.
-        return if self.included_modules.include?(Geokit::ActsAsMappable::InstanceMethods)
+        return if !defined?(Geokit::Mappable) || self.included_modules.include?(Geokit::ActsAsMappable::InstanceMethods)
         send :include, Geokit::ActsAsMappable::InstanceMethods
         # include the Mappable module.
         send :include, Geokit::Mappable
         
         # Handle class variables.
-        cattr_accessor :distance_column_name, :default_units, :default_formula, :lat_column_name, :lng_column_name, :qualified_lat_column_name, :qualified_lng_column_name
-        self.distance_column_name = options[:distance_column_name]  || 'distance'
-        self.default_units = options[:default_units] || Geokit::default_units
-        self.default_formula = options[:default_formula] || Geokit::default_formula
-        self.lat_column_name = options[:lat_column_name] || 'lat'
-        self.lng_column_name = options[:lng_column_name] || 'lng'
-        self.qualified_lat_column_name = "#{table_name}.#{lat_column_name}"
-        self.qualified_lng_column_name = "#{table_name}.#{lng_column_name}"
-        if options.include?(:auto_geocode) && options[:auto_geocode]
-          # if the form auto_geocode=>true is used, let the defaults take over by suppling an empty hash
-          options[:auto_geocode] = {} if options[:auto_geocode] == true 
-          cattr_accessor :auto_geocode_field, :auto_geocode_error_message
-          self.auto_geocode_field = options[:auto_geocode][:field] || 'address'
-          self.auto_geocode_error_message = options[:auto_geocode][:error_message] || 'could not locate address'
+        cattr_accessor :through
+        if self.through = options[:through]
+          if reflection = self.reflect_on_association(self.through)
+            (class << self; self; end).instance_eval do
+              [ :distance_column_name, :default_units, :default_formula, :lat_column_name, :lng_column_name, :qualified_lat_column_name, :qualified_lng_column_name ].each do |method_name|
+                define_method method_name do
+                  reflection.klass.send(method_name)
+                end
+              end
+            end
+          end
+        else
+          cattr_accessor :distance_column_name, :default_units, :default_formula, :lat_column_name, :lng_column_name, :qualified_lat_column_name, :qualified_lng_column_name
+          self.distance_column_name = options[:distance_column_name]  || 'distance'
+          self.default_units = options[:default_units] || Geokit::default_units
+          self.default_formula = options[:default_formula] || Geokit::default_formula
+          self.lat_column_name = options[:lat_column_name] || 'lat'
+          self.lng_column_name = options[:lng_column_name] || 'lng'
+          self.qualified_lat_column_name = "#{table_name}.#{lat_column_name}"
+          self.qualified_lng_column_name = "#{table_name}.#{lng_column_name}"
+          if options.include?(:auto_geocode) && options[:auto_geocode]
+            # if the form auto_geocode=>true is used, let the defaults take over by suppling an empty hash
+            options[:auto_geocode] = {} if options[:auto_geocode] == true 
+            cattr_accessor :auto_geocode_field, :auto_geocode_error_message
+            self.auto_geocode_field = options[:auto_geocode][:field] || 'address'
+            self.auto_geocode_error_message = options[:auto_geocode][:error_message] || 'could not locate address'
           
-          # set the actual callback here
-          before_validation_on_create :auto_geocode_address        
+            # set the actual callback here
+            before_validation_on_create :auto_geocode_address        
+          end
         end
       end
     end
@@ -198,7 +211,8 @@ module Geokit
         # Prepares either a find or a count action by parsing through the options and
         # conditionally adding to the select clause for finders.
         def prepare_for_find_or_count(action, args)
-          options = defined?(args.extract_options!) ? args.extract_options! : extract_options_from_args!(args)
+          options = args.extract_options!
+          #options = defined?(args.extract_options!) ? args.extract_options! : extract_options_from_args!(args)
           # Obtain items affecting distance condition.
           origin = extract_origin_from_options(options)
           units = extract_units_from_options(options)
@@ -215,11 +229,26 @@ module Geokit
           substitute_distance_in_conditions(options, origin, units, formula) if origin && options.has_key?(:conditions)
           # Order by scoping for find action.
           apply_find_scope(args, options) if action == :find
+          # Handle :through
+          apply_include_for_through(options) if origin
           # Unfortunatley, we need to do extra work if you use an :include. See the method for more info.
           handle_order_with_include(options,origin,units,formula) if options.include?(:include) && options.include?(:order) && origin
           # Restore options minus the extra options that we used for the
           # Geokit API.
           args.push(options)   
+        end
+        
+        def apply_include_for_through(options)
+          if self.through
+            case options[:include]
+            when Array
+              options[:include] << self.through
+            when Hash, String, Symbol
+              options[:include] = [ self.through, options[:include] ]
+            else
+              options[:include] = [ self.through ]
+            end
+          end
         end
         
         # If we're here, it means that 1) an origin argument, 2) an :include, 3) an :order clause were supplied.
@@ -276,15 +305,23 @@ module Geokit
         # 
         # Takes the current conditions (which can be an array or a string, or can be nil/false), 
         # and a SQL string. It inserts the sql into the existing conditions, and returns new conditions
-        # (which can be a string or an array
+        # (which can be a string, an array, or a hash)
         def augment_conditions(current_conditions,sql)
           if current_conditions && current_conditions.is_a?(String)
-            res="#{current_conditions} AND #{sql}"  
+            sql = ' AND ' + sql unless current_conditions.blank?
+            res = current_conditions + sql   
           elsif current_conditions && current_conditions.is_a?(Array)
-            current_conditions[0]="#{current_conditions[0]} AND #{sql}"
-            res=current_conditions
+            cond_copy = current_conditions.dup
+            cond_copy[0] ||= ''
+            cond_copy[0] += " AND " unless cond_copy[0].blank? 
+            cond_copy[0] += sql
+            res = cond_copy
+          elsif current_conditions && current_conditions.is_a?(Hash)
+            res = "#{sanitize_sql_for_conditions(current_conditions)}" || ''
+            res += ' AND ' unless res.blank?
+            res += sql
           else
-            res=sql
+            res = sql
           end
           res
         end
@@ -354,7 +391,7 @@ module Geokit
             distance_selector = distance_sql(origin, units, formula) + " AS #{distance_column_name}"
             selector = options.has_key?(:select) && options[:select] ? options[:select] : "*"
             options[:select] = "#{selector}, #{distance_selector}"  
-          end   
+          end
         end
 
         # Looks for the distance column and replaces it with the distance sql. If an origin was not 
@@ -429,7 +466,7 @@ class Array
     distance_attribute_name = opts.delete(:distance_attribute_name) || 'distance'    
     self.each do |e|
       e.class.send(:attr_accessor, distance_attribute_name) if !e.respond_to? "#{distance_attribute_name}="
-      e.send("#{distance_attribute_name}=", origin.distance_to(e,opts))
+      e.send("#{distance_attribute_name}=", e.distance_to(origin,opts))
     end
     self.sort!{|a,b|a.send(distance_attribute_name) <=> b.send(distance_attribute_name)}
   end

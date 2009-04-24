@@ -2,17 +2,23 @@
   
 Geokit consists of a Gem ([geokit-gem](http://github.com/andre/geokit-gem/tree/master)) and a Rails plugin ([geokit-rails](http://github.com/andre/geokit-rails/tree/master)).
 
-### First install the gem:
-
-    gem sources -a http://gems.github.com
-    sudo gem install andre-geokit
-
-### Next, install the Rails plugin:
+#### 1. Install the Rails plugin:
 
     cd [YOUR_RAILS_APP_ROOT]
     script/plugin install git://github.com/andre/geokit-rails.git
+    
+#### 2. Add this line to your environment.rb 
+(inside the Rails::Initializer.run do |config| block)
 
-And you're good to go! FYI, the gem stands alone (you can use it without the plugin), but the plugin requires the gem.
+		config.gem "geokit"
+
+This informs Rails of the gem dependency.
+
+#### 3. Tell Rails to install the gem:
+
+		rake gems:install
+
+And you're good to go! If you're running an older verion of Rails, just install the gem manually: `sudo gem install rails`
 
 ## FEATURE SUMMARY
 
@@ -55,8 +61,8 @@ After doing so, you can do things like:
 
     Location.distance_between(from, to) 
 
-with optional parameters :units and :formula.  Values for :units can be :miles or 
-:kms with :miles as the default.  Values for :formula can be :sphere or :flat with
+with optional parameters :units and :formula.  Values for :units can be :miles, 
+:kms (kilometers), or :nms (nautical miles) with :miles as the default.  Values for :formula can be :sphere or :flat with
 :sphere as the default.  :sphere gives you Haversine calculations, while :flat 
 gives the Pythagoreum Theory.  These defaults persist through out the plug-in.
 
@@ -185,6 +191,28 @@ condition alone in your SQL (there's no use calculating the distance twice):
     bounds=Bounds.from_point_and_radius(home,5)
     stores=Store.find :all, :include=>[:reviews,:cities] :bounds=>bounds
     stores.sort_by_distance_from(home)
+    
+## USING :through
+
+You can also specify a model as mappable "through" another associated model.  In other words, that associated model is the
+actual mappable model with "lat" and "lng" attributes, but this "through" model can still utilize all of the above find methods
+to search for records.
+
+    class Location < ActiveRecord::Base
+      belongs_to :locatable, :polymorphic => true
+    	acts_as_mappable
+    end
+
+    class Company < ActiveRecord::Base
+      has_one :location, :as => :locatable  # also works for belongs_to associations
+    	acts_as_mappable :through => :location
+    end
+    
+Then you can still call:
+    
+    Company.find_within(distance, :origin => @somewhere)
+
+Remember that the notes above about USING INCLUDES apply to the results from this find, since an include is automatically used.
 
 ## IP GEOCODING
 
@@ -251,9 +279,9 @@ Geokit can geocode addresses using multiple geocodeing web services.
 Currently, Geokit supports Google, Yahoo, and Geocoder.us geocoding 
 services. 
 
-These geocoder services are made available through three classes: 
-GoogleGeocoder, YahooGeocoder, and UsGeocoder.  Further, an additional
-geocoder class called MultiGeocoder incorporates an ordered failover
+These geocoder services are made available through the following classes: 
+GoogleGeocoder, YahooGeocoder, UsGeocoder, CaGeocoder, and GeonamesGeocoder.
+Further, an additional geocoder class called MultiGeocoder incorporates an ordered failover
 sequence to increase the probability of successful geocoding.
 
 All classes are called using the following signature:
@@ -275,7 +303,7 @@ to be used independently.
 
 The MultiGeocoder class requires the configuration of a provider
 order which dictates what order to use the various geocoders.  Ordering
-is done through the `PROVIDER_ORDER` constant found in 
+is done through `Geokit::Geocoders::provider_order`, found in 
 `config/initializers/geokit_config.rb`.
 
 If you don't already have a `geokit_config.rb` file, the plugin creates one
@@ -294,6 +322,18 @@ The Geocoder.geocode method returns a GeoLoc object. Basic usage:
       puts loc.lng
       puts loc.full_address
     end
+
+## REVERSE GEOCODING
+
+Currently, only the Google Geocoder supports reverse geocoding. Pass the lat/lng as a string, array or LatLng instance:
+
+		res=Geokit::Geocoders::GoogleGeocoder.reverse_geocode "37.791821,-122.394679"
+		=> #<Geokit::GeoLoc:0x558ed0 ...
+		res.full_address
+		"101-115 Main St, San Francisco, CA 94105, USA"
+
+The address will usually appear as a range, as it does in the above example.
+
 
 ## INTEGRATED FIND WITH ADDRESS GEOCODING
 
@@ -385,11 +425,11 @@ A few quick examples to get you started ....
 
 1. configure your geocoder key(s) in `config/initializers/geokit_config.rb`
 
-2. also in `geokit_config.rb`, make sure that `PROVIDER_ORDER` reflects the 
+2. also in `geokit_config.rb`, make sure that `Geokit::Geocoders::provider_order` reflects the 
    geocoder(s). If you only want to use one geocoder, there should
    be only one symbol in the array. For example:
    
-    PROVIDER_ORDER=[:google]
+    Geokit::Geocoders::provider_order=[:google]
    
 3. Test it out in script/console
 
@@ -468,11 +508,21 @@ has been geocoded. You can get the city, zipcode, street address, etc.
 from a GeoLoc object. GeoLoc extends LatLng, so you also get lat/lng
 AND the Mappable modeule goodness for free.
 
+## GOOGLE GROUP
 
-## IMPORTANT NOTE: The configuration file
+Follow the Google Group for updates and discussion on Geokit: http://groups.google.com/group/geokit 
 
-Geokit for Rails uses a configuration file in config/initializers. You *must* add your own keys for the various
-geocoding services if you want to use geocoding. If you need to refer to the original
-template again, see the `assets/api_keys_template` file.
+## IMPORTANT POST-INSTALLATION NOTES: 
 
+*1. The configuration file*: Geokit for Rails uses a configuration file in config/initializers. 
+You *must* add your own keys for the various geocoding services if you want to use geocoding. 
+If you need to refer to the original template again, see the `assets/api_keys_template` file.
 
+*2. The gem dependency*: Geokit for Rails depends on the Geokit gem. Tell Rails about this 
+dependency in `config/environment.rb`, within the initializer block:
+config.gem "geokit"
+
+*If you're having trouble with dependencies ....*
+
+Try installing the gem manually (sudo gem install geokit), then adding a `require 'geokit'` to the top of 
+`vendor/plugins/geokit-rails/init.rb` and/or `config/geokit_config.rb`.
