@@ -12,7 +12,7 @@ shared_authentication_production:
   adapter: mysql
   host: localhost
   port: 3306
-  database: walnut_production
+  database: peanut_production
   username: rails
   password: rails
 
