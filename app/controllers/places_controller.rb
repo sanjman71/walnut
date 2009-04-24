@@ -15,9 +15,24 @@ class PlacesController < ApplicationController
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
+    # generate tag counts using facets
+    # @facets     = Location.facets(:group_by => "tag_ids", :group_clause => "@count desc", :limit => 100, :conditions => {:city_id => @city.id})
+    # @tag_ids    = @facets[:tag_ids]
+    # @tags       = Tag.find(@tag_ids.keys, :select => "id, name")
+    # 
+    # # replace tag ids with tag objects
+    # @tag_counts = @tags.collect do |tag|
+    #   [tag, @tag_ids[tag.id]]
+    # end
+    
+    # @tag_counts.each do |tag, count|
+    #   logger.debug("*** tag: #{tag}, count: #{count}")
+    # end
+    
     # generate city specific tag counts
-    @tags   = @city.places.tag_counts.sort_by(&:name)
-    @title  = "#{@city.name}, #{@state.name} Yellow Pages"
+    @tags       = @city.places.tag_counts(:order => "count desc", :limit => 150).sort_by(&:name)
+    
+    @title      = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
@@ -110,8 +125,8 @@ class PlacesController < ApplicationController
         # find related zips
         @zips = Zip.find(@facets[:zip_id].keys)
         
-        # find related neighborhoods, ignore neighborhood_id == 0
-        @neighborhoods = Neighborhood.find(@facets[:neighborhood_ids].keys.delete_if { |i| i == 0 })
+        # find related neighborhoods using faceted search results
+        @neighborhoods = Neighborhood.find(@facets[:neighborhood_ids].keys)
       end
 
       if @zip
