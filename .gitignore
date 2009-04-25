@@ -5,3 +5,4 @@ db/sphinx/*
 db/schema.rb
 public/system/*
 backups/
+config/database.yml
