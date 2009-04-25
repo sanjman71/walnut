@@ -87,9 +87,7 @@ class PlacesController < ApplicationController
     @filter         = params[:filter].to_s.from_url_param if params[:filter]
     
     # handle special case of 'something' to find a random what
-    if @what == 'something'
-      @what = Tag.all(:order => 'rand()', :limit => 1).first.name
-    end
+    @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'someting'
 
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
     nearby_miles    = 20
