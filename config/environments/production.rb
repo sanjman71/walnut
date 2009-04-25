@@ -22,3 +22,8 @@ config.action_controller.perform_caching             = true
 
 # Disable delivery errors, bad email addresses will be ignored
 # config.action_mailer.raise_delivery_errors = false
+
+# Google maps api key - http://www.walnut.dev
+GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBQ_iVWkfahRx28F601hjowthm7xKBTBIas46h18ghWQEh_aYdV9ICVtng"
+GOOGLE_MAPS_API_URL = "http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{GOOGLE_MAPS_API_KEY}"
+
