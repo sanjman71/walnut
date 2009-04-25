@@ -1,6 +1,6 @@
 development:
   max_matches: 50
-prodution:
+production:
   max_matches: 50
 test:
   max_matches: 50
