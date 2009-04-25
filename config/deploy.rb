@@ -25,3 +25,8 @@ load_paths << "config/database"
 load "database_tasks"
 load_paths << "config/sphinx"
 load "sphinx_tasks"
+
+
+deploy.task :restart, :roles => :app do
+  run "touch #{current_release}/tmp/restart.txt"
+end
