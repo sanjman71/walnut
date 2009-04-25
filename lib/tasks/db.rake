@@ -39,6 +39,13 @@ namespace :db do
       puts "no FILE specified"
       exit
     end
+
+    load_file = ENV["FILE"]
+
+    if !File.exists?(load_file)
+      puts "file #{load_file} does not exist"
+      exit
+    end
     
     mysqlload           = 'mysql'
     username            = ActiveRecord::Base.configurations[RAILS_ENV]['username']
@@ -46,11 +53,15 @@ namespace :db do
     host                = ActiveRecord::Base.configurations[RAILS_ENV]['host']
     database_name       = ActiveRecord::Base.configurations[RAILS_ENV]['database']
     
-    load_file = ENV["FILE"]
-    cmd       = "#{mysqlload} -u#{username} -p#{password} -h#{host} #{database_name} < #{load_file}"
+    if load_file.match(/.gz$/)
+      # unzip, then reset load file name
+      cmd = "gunzip #{load_file}"
+      puts "#{Time.now}: unzipping #{load_file}"
+      system cmd
+      load_file = load_file.gsub(".gz", '')
+    end
     
-    # puts cmd
-
+    cmd = "#{mysqlload} -u#{username} -p#{password} -h#{host} #{database_name} < #{load_file}"
     puts "#{Time.now}: loading file '#{load_file}' into database '#{database_name}'"
     system cmd
     puts "#{Time.now}: completed"
