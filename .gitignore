@@ -4,3 +4,4 @@ db/schema.rb
 db/sphinx/*
 db/schema.rb
 public/system/*
+backups/
