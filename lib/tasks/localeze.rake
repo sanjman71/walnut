@@ -149,7 +149,7 @@ namespace :localeze do
   task :import_records do |t|
     
     # intialiaze page parameters, limit
-    page          = 1
+    page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
     per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
      
@@ -171,10 +171,10 @@ namespace :localeze do
       
       params.update({:city => city.name, :state => state.code})
       
-      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{limit}"
+      puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{limit}, page: #{page}, per page: #{per_page}"
     else
       # import all records
-      puts "#{Time.now}: importing all localeze records, limit: #{limit}"
+      puts "#{Time.now}: importing all localeze records, limit: #{limit}, page: #{page}, per page: #{per_page}"
     end
     
     # track stats

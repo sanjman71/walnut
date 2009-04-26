@@ -14,7 +14,7 @@ class ChainsController < ApplicationController
     @chain    = Chain.find(params[:name].to_i)
 
     # facet search by chain id
-    @facets   = Location.facets(:conditions => {:chain_id => @chain.id})
+    @facets   = Location.facets(:conditions => {:chain_id => @chain.id}, :facets => ["country_id", "state_id"])
     @states   = State.find(@facets[:state_id].keys)
     # count locations in country
     @count    = @facets[:country_id][@country.id]
@@ -27,21 +27,18 @@ class ChainsController < ApplicationController
     @chain      = Chain.find(params[:name].to_i)
     
     # facet search by chain id and state id
-    @facets   = Location.facets(:conditions => {:chain_id => @chain.id, :state_id => @state.id})
+    @facets   = Location.facets(:conditions => {:chain_id => @chain.id, :state_id => @state.id}, :facets => ["city_id", "state_id"])
     @cities   = City.find(@facets[:city_id].keys)
     # count locations in state
     @count    = @facets[:state_id][@state.id]
 
-    @title      = "#{@chain.name} Locations in #{@state.name}"
+    @title    = "#{@chain.name} Locations in #{@state.name}"
   end
   
   def city
     # @country, @state, @city initialized in before filter
     @chain      = Chain.find(params[:name].to_i)
     @locations  = @chain.locations.for_city(@city)
-
-    # facet search by chain id and city id
-    @facets   = Location.facets(:conditions => {:chain_id => @chain.id, :city_id => @city.id})
 
     @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
   end
@@ -61,7 +58,7 @@ class ChainsController < ApplicationController
     end
 
     # find the specified state for all other cases
-    @state = State.find_by_code(params[:state].to_s.upcase)
+    @state = @country.states.find_by_code(params[:state].to_s.upcase)
 
     if @state.blank?
       redirect_to(:controller => 'places', :action => 'error', :locality => 'state') and return
