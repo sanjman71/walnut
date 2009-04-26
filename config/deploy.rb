@@ -80,6 +80,9 @@ load "god_tasks"
 # Load tasks for configuring the database
 load "database_tasks"
 
+# Load tasks for managing nginx
+load "nginx_tasks"
+
 before "deploy:setup", "rails:install_rails"
 before "deploy:setup", "rails:copy_git_keys"
 after "deploy:setup", "god:start_mysql"

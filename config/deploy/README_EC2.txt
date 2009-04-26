@@ -50,3 +50,10 @@ Need to support a list of packages to install using aptitude, as I have done for
 
 Fix 'god start nginx' - god isn't found.
 
+Copy the nginx configuration files - nginx.conf and www.walnutplaces.com
+
+Need an nginx init.d script file.
+
+Uninstalled rack 1.0.0, replaced with rack 0.9.1 - startup failure.
+  undefined method `new' for "Rack::Lock":String (NoMethodError)
+
