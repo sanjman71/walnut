@@ -11,43 +11,40 @@ class PlacesController < ApplicationController
     # @country, @state, @cities, @zips all initialized in before filter
     @title  = "#{@state.name} Yellow Pages"
   end
-  
+    
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     # generate tag counts using facets
-    # @facets     = Location.facets(:group_by => "tag_ids", :group_clause => "@count desc", :limit => 100, :conditions => {:city_id => @city.id})
-    # @tag_ids    = @facets[:tag_ids]
-    # @tags       = Tag.find(@tag_ids.keys, :select => "id, name")
-    # 
-    # # replace tag ids with tag objects
-    # @tag_counts = @tags.collect do |tag|
-    #   [tag, @tag_ids[tag.id]]
-    # end
-    
-    # @tag_counts.each do |tag, count|
-    #   logger.debug("*** tag: #{tag}, count: #{count}")
-    # end
+    @tags   = tag_counts(:conditions => {:city_id => @city.id})
     
     # generate city specific tag counts
-    @tags       = @city.places.tag_counts(:order => "count desc", :limit => 150).sort_by(&:name)
+    # @tags = @city.places.tag_counts(:order => "count desc", :limit => 150).sort_by(&:name)
     
-    @title      = "#{@city.name}, #{@state.name} Yellow Pages"
+    @title  = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
     # @country, @state, @city, @neighborhood all initialized in before filter
 
+    # generate tag counts using facets
+    @tags   = tag_counts(:conditions => {:neighborhood_ids => @neighborhood.id})
+    
     # generate neighborhood specific tag counts
-    @tags   = @neighborhood.locations.places.tag_counts.sort_by(&:name)
+    # @tags   = @neighborhood.locations.places.tag_counts.sort_by(&:name)
+    
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
   
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
 
+    # generate tag counts using facets
+    @tags   = tag_counts(:conditions => {:zip_id => @zip.id})
+
     # generate zip specific tag counts
-    @tags   = @zip.places.tag_counts.sort_by(&:name)
+    # @tags   = @zip.places.tag_counts.sort_by(&:name)
+    
     @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
   
@@ -122,7 +119,8 @@ class PlacesController < ApplicationController
 
     if @city or @zip
       # build facets for a city or zip search
-      @facets = Location.facets(@sphinx_query, :conditions => @conditions)
+      # @facets = Location.facets(@sphinx_query, :conditions => @conditions)
+      @facets = Location.facets(@sphinx_query, :conditions => @conditions, :facets => ["city_id", "zip_id", "neighborhood_ids"])
 
       if @city
         # find related zips
@@ -185,6 +183,27 @@ class PlacesController < ApplicationController
   
   protected
   
+  def tag_counts(options={})
+    # search facets by tag_ids
+    facet_name  = "tag_ids"
+    options.update(:facets => facet_name, :group_by => facet_name, :group_clause => "@count desc")
+    # use default tag limit if no limit or max_matches were specified
+    tag_limit   = 150
+    options.update(:limit => tag_limit) unless options[:limit]
+    options.update(:max_matches => tag_limit) unless options[:max_matches]
+    @facets     = Location.facets(options)
+    @tag_ids    = @facets[facet_name.to_sym]
+    @tags       = Tag.find(@tag_ids.keys, :order => "name")
+
+    # set tag.taggings_count to faceted value, and freeze tag objects
+    @tags.each do |tag|
+      tag.taggings_count = @tag_ids[tag.id]
+      tag.freeze
+    end
+
+    @tags
+  end
+
   def build_search_title(options={})
     what    = options[:what] || ''
     filter  = options[:filter] || ''

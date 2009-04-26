@@ -1,8 +1,11 @@
 .popular_tags== Popular Tags
 
-- max_count   = tags.blank? ? 0 : tags.max{ |a,b| a.count <=> b.count}.count
-- tag_classes = ['one', 'two', 'three']
-- tags.each do |tag|
-  - tag_class = tag_cloud_class(tag, :count, max_count, tag_classes)
-  - klasses   = ["tag"].push(cycle('even', 'odd')).push(tag_class)
-  %span.small[tag]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(tag, build_search_route(locality_type, locality_params.merge(:what => tag.name.parameterize)), :class => klasses.join(" "))
+- unless tags.blank?
+  - count_method  = tags.first.has_attribute?(:taggings_count) ? :taggings_count : :count
+  - max_count     = tags.blank? ? 0 : tags.max{ |a,b| a.send(count_method) <=> b.send(count_method)}.send(count_method)
+  - tag_classes   = ['one', 'two', 'three']
+
+  - tags.each do |tag|
+    - tag_class = tag_cloud_class(tag, count_method, max_count, tag_classes)
+    - klasses   = ["tag"].push(cycle('even', 'odd')).push(tag_class)
+    %span.small[tag]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(tag, build_search_route(locality_type, locality_params.merge(:what => tag.name.parameterize)), :class => klasses.join(" "))

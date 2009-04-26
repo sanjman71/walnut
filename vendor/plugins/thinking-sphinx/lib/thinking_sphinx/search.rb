@@ -355,11 +355,15 @@ module ThinkingSphinx
       def facets(*args)
         hash    = ThinkingSphinx::FacetCollection.new args
         options = args.extract_options!.clone.merge! :group_function => :attr
-        
+
+        # build facet constraints
+        facets  = options[:facets] ? Array(options.delete(:facets)) : options[:class].sphinx_facets.collect(&:attribute_name)
+
         options[:class].sphinx_facets.inject(hash) do |hash, facet|
-          options[:group_by] = facet.attribute_name
-          
-          hash.add_from_results facet, search(*(args + [options]))
+          if facets.include?(facet.attribute_name)
+            options[:group_by] = facet.attribute_name
+            hash.add_from_results facet, search_for_ids(*(args + [options]))
+          end
           hash
         end
       end
