@@ -2,7 +2,7 @@ class CreateWalnut < ActiveRecord::Migration
   def self.up
     
     create_table :countries do |t|
-      t.string      :name,                  :limit => 50, :default => nil
+      t.string      :name,                  :limit => 30, :default => nil
       t.string      :code,                  :limit => 2, :default => nil
       t.integer     :locations_count,       :default => 0   # counter cache
     end
@@ -11,7 +11,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :countries, :locations_count
     
     create_table :states do |t|
-      t.string      :name,                  :limit => 50, :default => nil
+      t.string      :name,                  :limit => 30, :default => nil
       t.string      :code,                  :limit => 2, :default => nil
       t.references  :country
       t.decimal     :lat,                   :precision => 15, :scale => 10
@@ -27,7 +27,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :states, [:country_id, :code]
 
     create_table :cities do |t|
-      t.string      :name,                  :limit => 50, :default => nil
+      t.string      :name,                  :limit => 30, :default => nil
       t.references  :state
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
@@ -52,7 +52,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :zips, [:state_id, :locations_count]
 
     create_table :neighborhoods do |t|
-      t.string      :name,                  :limit => 50, :default => nil
+      t.string      :name,                  :limit => 30, :default => nil
       t.references  :city
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
@@ -80,7 +80,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :city_zips, :zip_id
     
     create_table :locations do |t|
-      t.string      :name
+      t.string      :name,                  :limit => 30
       t.string      :street_address,        :default => nil
       t.references  :city
       t.references  :state
@@ -107,15 +107,15 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :locations, [:locatable_type, :city_id], :name => "index_locations_on_locatable_type_and_city"
     
     create_table :phone_numbers do |t|
-      t.string      :name
-      t.string      :number,    :default => nil
-      t.references  :callable,  :polymorphic => true
+      t.string      :name,      :limit => 20
+      t.string      :number,    :limit => 20, :default => nil
+      t.references  :callable,  :limit => 20, :polymorphic => true
     end
 
     add_index :phone_numbers, [:callable_id, :callable_type], :name => "index_phone_numbers_on_callable"
     
     create_table :places do |t|
-      t.string      :name
+      t.string      :name,                  :limit => 50
       t.integer     :locations_count,       :default => 0   # counter cache
       t.integer     :phone_numbers_count,   :default => 0   # counter cache
       t.references  :chain
