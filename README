@@ -22,7 +22,7 @@ To get the application up and running:
     - rake localeze:import_records CITY='Boston' STATE='MA'       # 1366
 
 3. Add tags by mapping localeze categories to local tag groups
-  - rake localeze:import_categories
+  - rake localeze:import_tags
 
 4. Import neighborhoods
   - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
