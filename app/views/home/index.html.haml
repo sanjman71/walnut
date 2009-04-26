@@ -10,14 +10,14 @@
 
   %h3{:style => 'color: #666666;'}== How?
   %h4{:style => 'line-height: 1.5em; font-size: 1.4em;'}
-    = highlight("Find places by selecting popular cities or neighborhoods, and then searching by popular tags.  Or use the search bar at the top of the page to search based on your own criteria.", ["places", "popular cities or neighborhoods", "popular tags"])
-    = highlight("If you like a place, recommend it.", 'recommend')
+    = highlight("Find places by selecting popular cities or neighborhoods, and then searching by popular tags.  Or use the search bar at the top of the page to search based on your own criteria.", ["places", "popular cities or neighborhoods", "popular tags"], :highlighter => '<strong class="highlight muted">\1</strong>')
+    = highlight("If you like a place, recommend it.", 'recommend', :highlighter => '<strong class="highlight muted">\1</strong>')
     %hr.space
-    = highlight("Find local events in your city", "events")
-    = highlight(", or publish upcoming events to get the word out.", ["publish"])
+    = highlight("Find local events in your city", "events", :highlighter => '<strong class="highlight muted">\1</strong>')
+    = highlight(", or publish upcoming events to get the word out.", ["publish"], :highlighter => '<strong class="highlight muted">\1</strong>')
     
   %h4{:style => 'line-height: 1.5em; font-size: 1.4em;'}
-    = highlight("Find business services to help your business market its services, generate revenue, increase efficiency and increase customer loyalty.  Our first business service is online scheduling.  Try it out for free.", ["business services", "online scheduling"])
+    = highlight("Find business services to help your business market its services, generate revenue, increase efficiency and increase customer loyalty.  Our first business service is online scheduling.  Try it out for free.", ["business services", "online scheduling"], :highlighter => '<strong class="highlight muted">\1</strong>')
     
   %hr.space
   
