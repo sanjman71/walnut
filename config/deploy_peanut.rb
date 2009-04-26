@@ -9,11 +9,11 @@ set :server_name, "ec2-174-129-88-81.compute-1.amazonaws.com"
 set :ec2_instance_id, "i-f01e7499"
 
 # Be explicit about our different environments
-set :stages, %w(staging production)
+# set :stages, %w(staging production)
 require 'capistrano/ext/multistage'
 
 # Set application name
-set :application,   "walnut"
+set :application,   "peanut"
 
 # If you aren't deploying to /u/apps/#{application} on the target
 # servers (which is the default), you can specify the actual location
@@ -22,8 +22,8 @@ set :deploy_to,     "/usr/apps/#{application}"
 
 # Git repository
 set :scm,           :git
-set :repository,    'git@github.com:sanjman71/walnut.git'
-set :branch,        "walnutec2"
+set :repository,    'git@github.com:sanjman71/peanut.git'
+set :branch,        "peanutec2"
 set :deploy_via,    :remote_cache
 
 # Users, groups
@@ -38,13 +38,6 @@ set :rails_version, "2.3.2"
 # We need to copy our git keys over to the machine as part of setting up, before we try to clone the repository
 set :git_key, "/Users/killian/.ssh/id_rsa-github-ec2" # the path to the key file to use with git, e.g. "~/.ssh/id_rsa-git"
 
-set :apts_to_install, [
-  'libcurl-dev',
-  'libcurl3',
-  'libcurl3-gnutls',
-  'libcurl4-openssl-dev'
-  ]
-
 set :gems_to_install, [
   'mbleigh-subdomain-fu --source=http://gems.github.com',
   "chronic",
@@ -56,13 +49,7 @@ set :gems_to_install, [
   'prawn',
   'populator',
   'faker',
-  'thoughtbot-factory_girl --source http://gems.github.com',
-  "geokit",
-  "curb",
-  "json",
-  "eventfulapi",
-  "fastercsv",
-  "ar-extensions"
+  'thoughtbot-factory_girl --source http://gems.github.com'
   ]
 
 # We want to use a separate user with sudo privileges
@@ -88,12 +75,3 @@ after "deploy:setup", "rails:set_app_dir_owner"
 after "deploy:update_code", "database:configure"
 after "deploy:symlink", "rails:install_gems"
 after "deploy", "god:start_god"
-
-# Load external recipe files
-# load "database_tasks"
-# load "sphinx_tasks"
-# 
-# deploy.task :restart, :roles => :app do
-#   run "touch #{current_release}/tmp/restart.txt"
-# end
-
