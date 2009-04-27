@@ -33,7 +33,7 @@
   .span-18#all_tags
     .span-7.colborder#place_tags
       %h2== Keyword Tags
-      - tags = @location.locatable.tags
+      - tags = @location.place.tags
       - if tags.blank?
         -# add space to fill in column border
         == &nbsp;

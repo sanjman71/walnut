@@ -6,7 +6,8 @@ class Location < ActiveRecord::Base
   belongs_to              :zip
   has_many                :location_neighborhoods
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
-  belongs_to              :locatable, :polymorphic => true, :counter_cache => :locations_count
+  has_many                :location_places
+  has_many                :places, :through => :location_places
   has_one                 :event_venue
   has_many                :events, :through => :event_venue
   
@@ -20,12 +21,12 @@ class Location < ActiveRecord::Base
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
-  named_scope :places,    lambda { {:conditions => ["locatable_type = 'Place'"], :include => :locatable } } do 
-                            def tag_counts
-                              # delegate to locatable
-                              self.collect { |o| o.locatable.tag_counts }.flatten
-                            end
-                          end
+  # named_scope :places,    lambda { {:conditions => ["locatable_type = 'Place'"], :include => :locatable } } do 
+  #                           def tag_counts
+  #                             # delegate to locatable
+  #                             self.collect { |o| o.locatable.tag_counts }.flatten
+  #                           end
+  #                         end
 
   named_scope :recommended,         { :conditions => ["recommendations_count > 0"] }
   named_scope :event_venues,        { :conditions => ["events_count > 0"] }
@@ -37,10 +38,10 @@ class Location < ActiveRecord::Base
   
   define_index do
     indexes street_address, :as => :street_address
-    indexes locatable.name, :as => :name
-    indexes locatable.tags.name, :as => :place_tags
+    indexes places.name, :as => :place_names
+    indexes places.tags.name, :as => :place_tags
     indexes events.name, :as => :event_names
-    has locatable.tags(:id), :as => :tag_ids, :facet => true
+    has places.tags(:id), :as => :tag_ids, :facet => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
     has state_id, :type => :integer, :as => :state_id, :facet => true
@@ -49,7 +50,7 @@ class Location < ActiveRecord::Base
     has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # other attributes
     indexes search_rank, :as => :search_rank, :sortable => true
-    has locatable.chain_id, :type => :integer, :as => :chain_id
+    has places.chain_id, :type => :integer, :as => :chain_ids
     has recommendations_count, :type => :integer, :as => :recommendations
     has events_count, :type => :integer, :as => :events, :facet => true
     # convert degrees to radians for sphinx
@@ -59,6 +60,11 @@ class Location < ActiveRecord::Base
     set_property :delta => :delayed
     # only index valid locations
     where "status = 0"
+  end
+  
+  # return location's first place
+  def place
+    self.places.first
   end
   
   # return collection of location's country, state, city, zip, neighborhoods

@@ -4,7 +4,6 @@ class StateTest < ActiveSupport::TestCase
   should_belong_to    :country
   should_have_many    :cities
   should_have_many    :locations
-  should_have_many    :places
   
   def setup
     @us = Factory(:us)

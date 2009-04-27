@@ -6,7 +6,6 @@ class ZipTest < ActiveSupport::TestCase
   should_belong_to    :state
   should_have_many    :cities
   should_have_many    :locations
-  should_have_many    :places
   
   def setup
     @us   = Factory(:us)

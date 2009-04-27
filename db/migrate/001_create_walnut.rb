@@ -89,7 +89,6 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :neighborhoods_count,   :default => 0 # counter cache
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
-      t.references  :locatable,             :polymorphic => true
       t.references  :source,                :polymorphic => true, :default => nil
       t.integer     :search_rank,           :default => 0 # used to order search results
       t.integer     :recommendations_count, :default => 0
@@ -101,10 +100,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :locations, [:source_id, :source_type], :name => "index_locations_on_source"
     add_index :locations, [:search_rank]
     add_index :locations, [:recommendations_count]
-    add_index :locations, [:locatable_id, :locatable_type], :name => "index_locations_on_locatable"
     add_index :locations, [:city_id], :name => "index_locations_on_city"
-    add_index :locations, [:locatable_id, :locatable_type, :city_id], :name => "index_locations_on_locatable_and_city"
-    add_index :locations, [:locatable_type, :city_id], :name => "index_locations_on_locatable_type_and_city"
     
     create_table :phone_numbers do |t|
       t.string      :name,      :limit => 20
@@ -121,6 +117,14 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :chain
       t.integer     :tag_groups_count,      :default => 0   # counter cache
     end
+
+    create_table :location_places do |t|
+      t.references  :location
+      t.references  :place
+    end
+
+    add_index :location_places, :location_id
+    add_index :location_places, :place_id
 
     create_table :chains do |t|
       t.string      :name

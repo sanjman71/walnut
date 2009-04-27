@@ -29,9 +29,9 @@ class PlaceTest < ActiveSupport::TestCase
       assert_equal 1, @place.locations_count
     end
     
-    context "then remove a location" do
+    context "then remove location" do
       setup do
-        @place.locations.clear
+        @place.locations.delete(@location)
         @place.reload
       end
       

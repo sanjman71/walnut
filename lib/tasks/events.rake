@@ -34,6 +34,7 @@ namespace :events do
 
   desc "Import event venues from eventful"
   task :import_venues do
+    puts "#{Time.now}: importing eventful venues"
     imported = EventStream::Init.venues(:limit => 100)
     puts "#{Time.now}: imported #{imported} eventful venues"
   end
@@ -79,17 +80,26 @@ namespace :events do
     # build events search conditions
     @city = ENV["CITY"] ? ENV["CITY"] : City.first
 
-    puts "#{Time.now}: importing events for #{@city.name}"
+    puts "#{Time.now}: importing #{@city.name} events"
 
     @conditions = {:location => @city.name, :date => 'Future', :page_size => 50, :sort_order => 'popularity'}
     @results    = EventStream::Search.call(@conditions)
     @events     = @results['events'] ? @results['events']['event'] : []
     @istart     = Event.count
 
-    # import events from mapped venues
-    EventVenue.mapped.each do |venue|
-      @results = venue.get
-      @results['events']['event'].each do |event|
+    # import events from all venues
+    EventVenue.all.each do |venue|
+      begin
+        @results  = venue.get
+        @events   = @results['events']['event']
+      rescue Exception => e
+        puts "xxx exception: #{e.message}"
+        next
+      end
+      
+      next if @events.blank?
+      
+      @events.each do |event|
         puts "*** #{event['title']}, url: #{event['url']}"
 
         options = {:name => event['title'], :url => event['url'], :source_type => venue.source_type, :source_id => event['id']}

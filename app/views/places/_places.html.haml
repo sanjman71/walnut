@@ -4,12 +4,12 @@
 - locations.each do |location|
   .prepend-1.letterbox{:class => cycle("shaded", "")}[location]
     %h3.name.margin-bottom-5
-      = link_to location.locatable.name, {:controller => 'places', :action => 'show', :id => location}
+      = link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}
     %span.address
       = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
     %br
     %span.tags
-      - location_tags = location.locatable.tags.sort_by(&:name)
+      - location_tags = location.place.tags.sort_by(&:name)
       - if location_tags.empty?
         -# empty tag to take up space
         == &nbsp;

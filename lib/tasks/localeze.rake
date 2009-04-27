@@ -24,7 +24,7 @@ namespace :localeze do
         # track number of locations checked
         checked     += 1
         
-        place       = location.locatable
+        place       = location.place
         
         record      = Localeze::BaseRecord.find(location.source_id)
         categories  = record.get(:categories)
@@ -74,7 +74,7 @@ namespace :localeze do
         end
         
         # add place/group mappings
-        place = location.locatable
+        place = location.place
         groups.each do |group|
           next if group.places.include?(place)
           group.places.push(place)
@@ -124,7 +124,7 @@ namespace :localeze do
           # map localeze id to a location and place
           localeze_id = record_hash['id']
           location    = Location.find_by_source_id(localeze_id).first
-          place       = location.locatable if location
+          place       = location.place if location
           
           # check for valid location and place
           next if location.blank? or place.blank?

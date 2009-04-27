@@ -6,7 +6,6 @@ class Zip < ActiveRecord::Base
   has_many                    :city_zips
   has_many                    :cities, :through => :city_zips
   has_many                    :locations
-  has_many                    :places, :through => :locations, :source => :locatable, :source_type => "Place"
   
   include NameParam
 

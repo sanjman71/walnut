@@ -124,14 +124,10 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal 1, @chicago.locations_count
     end
 
-    should "set chicago locations to [@place]" do
+    should "set chicago locations to [@location]" do
       assert_equal [@location], @chicago.locations
     end
-    
-    should "set chicago places to [@place]" do
-      assert_equal [@place], @chicago.places
-    end
-    
+
     context "remove city" do
       setup do
         @location.city = nil
@@ -139,20 +135,12 @@ class LocationTest < ActiveSupport::TestCase
         @chicago.reload
       end
 
-      # should "have no locality tags" do
-      #   assert_equal [], @location.locality_tag_list
-      # end
-
       should "decrement chicago locations_count" do
         assert_equal 0, @chicago.locations_count
       end
 
       should "set chicago locations to []" do
         assert_equal [], @chicago.locations
-      end
-
-      should "set chicago places to []" do
-        assert_equal [], @chicago.places
       end
     end
     
@@ -172,16 +160,8 @@ class LocationTest < ActiveSupport::TestCase
         assert_equal [], @chicago.locations
       end
 
-      should "remove chicago places" do
-        assert_equal [], @chicago.places
-      end
-      
       should "set springfield locations to [@location]" do
         assert_equal [@location], @springfield.locations
-      end
-
-      should "set springfield places to [@place]" do
-        assert_equal [@place], @springfield.places
       end
     end
     
@@ -191,16 +171,8 @@ class LocationTest < ActiveSupport::TestCase
         @location.reload
       end
 
-      should "have no locatable" do
-        assert_equal nil, @location.locatable
-      end
-
       should "leave chicago locations as [@location]" do
         assert_equal [@location], @chicago.locations
-      end
-
-      should "set chicago places to []" do
-        assert_equal [], @chicago.places
       end
     end
   end
@@ -215,16 +187,8 @@ class LocationTest < ActiveSupport::TestCase
     
     should_change "Location.count", :by => 1
 
-    # should "have 60654 locality tag" do
-    #   assert_equal ["60654"], @location.locality_tag_list
-    # end
-    
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
-    end
-    
-    should "set zip places to [@place]" do
-      assert_equal [@place], @zip.places
     end
 
     should "set zip locations to [@location]" do
@@ -249,10 +213,6 @@ class LocationTest < ActiveSupport::TestCase
       should "remove zip locations" do
         assert_equal [], @zip.locations
       end
-
-      should "remove zip places" do
-        assert_equal [], @zip.places
-      end
     end
     
     context "change zip" do
@@ -267,12 +227,8 @@ class LocationTest < ActiveSupport::TestCase
       #   assert_equal ["60610"], @location.locality_tag_list
       # end
 
-      should "set 60654 places to []" do
-        assert_equal [], @zip.places
-      end
-      
-      should "set 60610 places to [@place]" do
-        assert_equal [@place], @zip2.places
+      should "set 60654 locations to []" do
+        assert_equal [], @zip.locations
       end
       
       should "set 60610 locations to [@location]" do

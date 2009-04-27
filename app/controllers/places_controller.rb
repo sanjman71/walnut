@@ -112,7 +112,7 @@ class PlacesController < ApplicationController
 
     @locations      = Location.search(@sphinx_query,
                                       :conditions => @conditions, 
-                                      :include => [:locatable, :city, :state, :zip],
+                                      :include => [:places, :city, :state, :zip],
                                       :order => :search_rank, :sort_mode => :desc,
                                       :page => params[:page], :per_page => 20)
 
@@ -138,8 +138,8 @@ class PlacesController < ApplicationController
   end
   
   def show
-    @location = Location.find(params[:id], :include => [:locatable])
-    @place    = @location.locatable unless @location.blank?
+    @location = Location.find(params[:id], :include => [:places])
+    @place    = @location.place unless @location.blank?
 
     if @location.blank? or @place.blank?
       redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
@@ -162,14 +162,14 @@ class PlacesController < ApplicationController
                                           :without_ids => @location.id,
                                           :order => "@geodist ASC", 
                                           :limit => @nearby_limit,
-                                          :include => [:locatable])
+                                          :include => [:places])
 
       @nearby_event_venues = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
                                              :conditions => @search.field(:locality_hash).update(:event_venue => 1..10),
                                              :without_ids => @location.id,
                                              :order => "@geodist ASC", 
                                              :limit => @nearby_limit,
-                                             :include => [:locatable])
+                                             :include => [:places])
     end
     
     # initialize title, h1 tags

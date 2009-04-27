@@ -7,7 +7,6 @@ class CityTest < ActiveSupport::TestCase
   should_have_many    :zips
   should_have_many    :neighborhoods
   should_have_many    :locations
-  should_have_many    :places
   
   def setup
     @us   = Factory(:us)
