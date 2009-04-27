@@ -7,6 +7,8 @@ class Location < ActiveRecord::Base
   has_many                :location_neighborhoods
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   belongs_to              :locatable, :polymorphic => true, :counter_cache => :locations_count
+  has_one                 :event_venue
+  has_many                :events, :through => :event_venue
   
   after_save              :after_save_callback
   
@@ -37,8 +39,8 @@ class Location < ActiveRecord::Base
     indexes street_address, :as => :street_address
     indexes locatable.name, :as => :name
     indexes locatable.tags.name, :as => :place_tags
+    indexes events.name, :as => :event_names
     has locatable.tags(:id), :as => :tag_ids, :facet => true
-    indexes search_rank, :as => :search_rank, :sortable => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
     has state_id, :type => :integer, :as => :state_id, :facet => true
@@ -46,9 +48,10 @@ class Location < ActiveRecord::Base
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
     has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # other attributes
+    indexes search_rank, :as => :search_rank, :sortable => true
     has locatable.chain_id, :type => :integer, :as => :chain_id
     has recommendations_count, :type => :integer, :as => :recommendations
-    has event_venue, :type => :integer, :as => :event_venue
+    has events_count, :type => :integer, :as => :events, :facet => true
     # convert degrees to radians for sphinx
     has 'RADIANS(locations.lat)', :as => :lat,  :type => :float
     has 'RADIANS(locations.lng)', :as => :lng,  :type => :float

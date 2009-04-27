@@ -38,8 +38,8 @@ namespace :events do
     puts "#{Time.now}: imported #{imported} eventful venues"
   end
   
-  desc "Mark locations that are event venues"
-  task :mark_venues do
+  desc "Map event venues to locations"
+  task :map_venues do
     marked = 0
     
     EventVenue.unmapped.each do |venue|
@@ -74,4 +74,45 @@ namespace :events do
     puts "#{Time.now}: completed, marked #{marked} locations as event venues"
   end
   
+  desc "Import events"
+  task :import_events do
+    # build events search conditions
+    @city = ENV["CITY"] ? ENV["CITY"] : City.first
+
+    puts "#{Time.now}: importing events for #{@city.name}"
+
+    @conditions = {:location => @city.name, :date => 'Future', :page_size => 50, :sort_order => 'popularity'}
+    @results    = EventStream::Search.call(@conditions)
+    @events     = @results['events'] ? @results['events']['event'] : []
+    @istart     = Event.count
+
+    # import events from mapped venues
+    EventVenue.mapped.each do |venue|
+      @results = venue.get
+      @results['events']['event'].each do |event|
+        puts "*** #{event['title']}, url: #{event['url']}"
+
+        options = {:name => event['title'], :url => event['url'], :source_type => venue.source_type, :source_id => event['id']}
+        options[:start_at]  = event['start_time'] if event['start_time']
+        options[:end_at]    = event['stop_time'] if event['stop_time']
+        venue.events.push(Event.create(options))
+      end
+    end
+    
+    # @events.each do |event|
+    #   # lookup the event venue
+    #   next if (venue = EventVenue.find_by_source_id_and_source_type(event['venue_id'], 'eventful')).blank?
+    # 
+    #   puts "*** creating event #{event['title']} @ #{venue.name}"
+    #   
+    #   options = {:name => event['title'], :url => event['url'], :source_type => venue.source_type, :source_id => event['id']}
+    #   options[:start_at]  = event['start_time'] if event['start_time']
+    #   options[:end_at]    = event['stop_time'] if event['stop_time']
+    #   venue.events.push(Event.create(options))
+    # end
+
+    @iend = Event.count
+
+    puts "#{Time.now}: completed, #{@iend} total events, imported #{@iend - @istart} events"
+  end
 end

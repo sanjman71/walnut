@@ -8,8 +8,6 @@ module EventStream
       @@session ||= Eventful::API.new(EVENTFUL_API_KEY)
     end
 
-    @@eventful_source = "eventful"
-    
     def self.categories
       method        = "categories/list"
       results       = session.call(method)
@@ -22,7 +20,7 @@ module EventStream
         # format category name
         category_name = category['name'].gsub(" | ", ', ')
         source_id     = category['id']
-        source_type   = @@eventful_source
+        source_type   = EventSource::Eventful
         
         # create category
         options   = {:name => category_name, :source_id => source_id, :source_type => source_type}
@@ -44,7 +42,7 @@ module EventStream
     def self.venues(options)
       page_size     = options[:limit] ? options[:limit].to_i : 50
       
-      @results      = EventVenue.call(:sort_order => 'popularity', :location => 'Chicago', :page_size => page_size)
+      @results      = EventVenue.search(:sort_order => 'popularity', :location => 'Chicago', :page_size => page_size)
       @venues       = @results['venues'] ? @results['venues']['venue'] : []
       
       @total        = @results['total_items']
@@ -56,7 +54,7 @@ module EventStream
       
       @venues.each do |venue|
         EventVenue.create(:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], 
-                          :source_type => @@eventful_source, :source_id => venue['id'])
+                          :source_type => EventSource::Eventful, :source_id => venue['id'])
       end
       
       imported = EventVenue.count - start_count
