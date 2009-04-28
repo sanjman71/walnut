@@ -1,0 +1,2026 @@
+1|7-Eleven
+2|A Cut Above
+3|AAMCO Transmissions
+4|ACE Hardware
+5|Advance Auto Parts
+6|AFLAC
+7|Afterthoughts
+8|Alcoholics Anonymous
+9|Allstate Insurance Companies
+10|American Express
+11|American Family Insurance
+12|American General Finance
+13|American Legion
+14|American Red Cross
+15|AmeriGas
+16|Amway Home Products
+17|Applebee's Neighborhood Grill & Bar
+18|Assembly of God Church
+19|Associates Financial Services
+20|AutoZone
+22|Avis Rent A Car
+23|Bank of America
+24|Baskin Robbins
+25|Bath & Body Works
+26|Beltone Hearing Aid Center
+27|Big A Auto Parts
+28|Blimpie Subs & Salads
+29|H & R Block
+30|Blockbuster Video
+31|Boston Market
+32|BP Oil Company
+33|Burger King
+35|Calvary Baptist Church
+36|Casey's Carry Out Pizza
+37|Casey's General Store
+38|Casual Corner
+39|Cellular One
+40|Century 21
+41|Chase Manhattan Bank
+42|Chevron Corporation
+43|Christian Science Church
+44|Church of Christ
+45|Church of God
+46|Church of God of Prophecy
+47|Church of Jesus Christ of Latter-Day Saints
+48|Church of the Nazarene
+49|Church's Chicken
+50|Circle K Corporation
+51|Claire's Boutiques
+52|Comfort Inn
+53|Commercial Credit Corporation
+55|Country Companies Insurance
+56|Culligan Water Systems
+57|The Cutting Edge
+58|Dairy Mart Convenience Stores Incorporated
+59|Dairy Queen
+60|Dairy Queen Brazier
+61|Days Inn
+62|Denny's Restaurant
+63|Dollar General Store
+64|Domino's Pizza
+65|Dunkin' Donuts
+66|Eckerd Drugs
+67|Econo Lodge
+68|Edward Jones Investments
+69|A.G. Edwards & Sons Incorporated
+70|Electrolux Corporation
+71|Enterprise Rent-A-Car
+72|Faith Baptist Church
+73|Family Dollar Store
+75|Famous Footwear
+76|Fantastic Sams
+77|Farm Bureau Insurance
+78|Farmers Insurance Group
+79|Fashion Bug
+80|Ferrell Gas
+82|First Assembly of God Church
+83|First Baptist Church
+84|First Christian Church
+85|First Church of Christ
+86|First Presbyterian Church
+87|First Temple Assembly of God Church
+88|First Union
+89|First United Methodist Church
+91|Foot Locker
+92|Frito-Lay Incorporated
+93|The Gap
+94|GNC
+96|Gideons International
+97|Goodyear Auto Service Centers
+98|Goodyear Tire & Rubber Company
+99|Grace Baptist Church
+100|Greyhound Bus Lines
+102|Hampton Inn
+103|Hardee's Restaurant
+104|Heilig Meyers Furniture Company
+105|Herbalife
+106|Penske Truck Rental
+107|Holiday Inn
+108|Hollywood Video Incorporated
+110|International House of Pancakes
+111|J. C. Penney Company Incorporated
+112|Jack in the Box
+113|Jackson Hewitt Tax Service
+115|Kingdom Hall of Jehovah's Witnesses
+116|Jiffy Lube
+117|Jo-Ann Fabrics & Crafts
+118|Kelly Services
+119|Kentucky Fried Chicken
+120|Kinkos Copies
+121|Kmart
+123|Knights of Columbus
+124|La Petite Academy
+125|Laboratory Corporation of America
+126|LCAH
+127|Lenscrafters Vision Centers
+128|Little Caesars Pizza
+129|Long John Silver's Seafood
+132|Mail Boxes Etc.
+133|Mary Kay Cosmetics
+134|Masonic Temple Association
+136|McDonald's
+138|The Medicine Shoppe
+139|Meineke Discount Mufflers
+140|Merle Norman Cosmetic Studio
+142|Merrill Lynch Pierce Fenner & Smith
+143|Merry Maids
+145|Midas Auto Systems
+146|Midas Muffler & Brake Shops
+147|Minuteman Press
+148|Miracle Ear Center
+149|Mobil Oil Corporation
+150|NAPA Auto Parts
+151|Nations Bank
+153|Nationwide Insurance
+156|New Hope Baptist Church
+159|New York Life Insurance Company
+161|North American Van Lines
+164|Olan Mills Portrait Studios
+165|Olsten Staffing Services
+166|One Price Clothing Store
+167|Orkin Pest & Termite Control
+168|Papa John's Pizza
+169|Payless Shoe Source
+171|Pearle Vision Center
+175|Pep Boys Automotive
+176|Pizza Hut
+177|Play It Again Sports
+179|Popeyes Famous Fried Chicken
+181|Primerica Financial Services
+182|Prudential Insurance Company
+183|Public Storage
+184|Quest Diagnostics Incorporated
+185|Radio Shack
+187|Red Lobster Restaurants
+188|Regis Hairstylists
+189|Rent-A-Center
+190|Rite Aid Express Packaging Service
+191|Rite Aid Pharmacies
+192|Roto Rooter Plumbing & Drain Services
+193|Royal Alliance Associates
+194|Ryder Truck Rental One Way Incorporated
+195|Safelite Auto Glass
+196|Sally Beauty Supply
+197|Salvation Army
+199|Sears Roebuck & Company
+200|Securities America Incorporated
+201|Seventh-day Adventist Church
+202|Shaklee Products
+203|Sherwin-Williams Company
+204|Shoney's Family Restaurant
+205|Sir Speedy Printing Center
+207|Smithkline Beecham Corporation
+208|Sonic Drive-In
+209|Stanley Steemer Carpet & Upholstery
+210|Starbucks Coffee
+211|State Farm Insurance
+214|Subway Restaurant
+215|Super 8 Motel
+216|Supercuts
+217|Sylvan Learning Center
+218|Taco Bell
+219|TCBY
+220|Terminix Incorporated
+221|Texaco Incorporated
+223|Things Remembered
+224|Time & Temperature Service
+225|Toys "R" Us
+226|Trinity Lutheran Church
+227|U-Haul Company
+228|United Methodist Church
+229|United Pentecostal Church
+232|Victoria's Secret
+234|Waffle House Incorporated
+235|Wal-Mart
+236|Waldenbooks
+237|Walgreen Drug Stores
+239|Wells Fargo Bank
+240|Wendy's
+242|Western Auto
+243|Western Union
+245|Zales Jewelers
+246|Presbyterian Church
+424|84 Lumber Co
+425|ACE Americas Cash Express
+426|Agency Rent A Car
+427|Albertsons Food & Pharmacy
+428|Allied Van Lines
+429|American Cancer Society
+430|American Fair Credit Assn
+431|Apria Healthcare
+432|Arby's
+433|The Athlete's Foot
+434|B. Dalton Bookseller
+435|Bane Clene Way
+437|Barnes & Noble Booksellers
+438|Barnett Bank
+439|Bills Dollar Store
+440|Boy Scouts of America
+441|Budget Car & Truck Rental
+442|Budget Inn
+443|Carlson Wagonlit Travel
+444|CARQUEST Auto Parts
+445|Casual Male Big & Tall
+446|Champs Sports
+447|Checkers Drive-In Restaurant
+448|Children's World Learning Center
+449|Chili's Grill & Bar
+450|Circuit City
+452|Coldwell Banker
+453|Consumer Credit Counseling
+454|Cost Cutters Family Hair Care
+455|Country Kitchen
+456|Crestar Bank
+457|CVS Pharmacy
+458|Dean Witter Reynolds Inc
+459|INTERTIORS by Decorating Den
+460|Diamond Shamrock
+461|Disabled American Veterans
+462|Dollar Tree
+464|Eckerd Express Photo
+465|Express Personnel Services
+466|Farm Credit Services
+467|Fastenal Co
+468|Firestone Tire & Service Centers
+469|First of America Bank
+470|Friedman's Jewelers
+471|Furniture Medic
+473|Godfather's Pizza
+474|Golden Corral Restaurants
+475|Goodwill Industries
+476|Great Clips
+477|Habitat for Humanity
+478|Horace Mann Insurance Co
+479|Household Finance Corp
+480|IKON Office Solutions
+482|Interim Personnel
+483|Jenny Craig Weight Loss Center
+484|Kay Jewelers
+485|Kindercare Learning Centers
+486|Kroger Co
+487|Labor Ready
+488|Lane Bryant
+489|Liberty Mutual Group
+490|Linsco Private Ledger
+491|Maaco Auto Paint & Bodyworks
+492|Manpower Temporary Services
+493|Marshalls Department Store
+494|Maurices
+495|Montgomery Ward & Co
+496|Motel 6
+497|Movie Gallery
+498|National Car Rental
+500|Northwestern Mutual Life Insurance Co
+501|NovaCare Inc
+502|NutriSystem Weight Loss Center
+503|Olive Garden Italian Restaurant
+504|One Hour Martinizing Cleaners
+505|Outback Steakhouse
+506|Parts America
+507|Penske Auto Centers
+508|Peoples Telephone Co
+509|Perkins Family Restaurant
+510|Pier 1 Imports
+511|Piercing Pagoda
+512|PIP Printing Centers
+513|PNC Bank
+514|Ponderosa Steak House
+515|Precision Tune
+516|Primestar
+517|Publix Super Markets Store
+518|Rent A Wreck
+519|Retired and Senior Volunteer Program
+520|Revco Drug Stores
+521|Ritz Camera One Hour Photo
+522|Roadway Express Inc
+523|Rug Doctor Rents
+524|Sbarro Italian Eatery
+525|Schlotzsky's Delicatessen
+526|Schwan's Ice Cream
+527|ServiceMaster Co
+528|Shelter Insurance Agents
+529|Senior Citizens Center
+530|Staples, The Office Superstore
+531|Stop N Go Markets of Texas Inc
+532|Storage USA
+533|Suburban Propane
+534|Summit Bank
+535|Sunglass Hut International
+536|Super America
+537|Target Stores
+538|Thrifty Car RentaL
+539|Triumph Auto Glass
+540|True Value Hardware
+541|US Bank
+542|U-Save Auto Rental
+543|United Van Lines Agent
+544|Valvoline Instant Oil Change
+545|Veterans of Foreign Wars
+546|Wachovia Offices
+547|Washington Mutual Bank
+548|Watkins Products
+549|Wawa Food Markets
+550|Winn-Dixie
+551|World Marketing Alliance Inc
+552|Yellow Cab Co
+553|Yellow Freight System Inc
+554|First Citizens Bank
+565|360 Communications
+566|AT&T
+568|AAA Travel Agency
+569|Aaron's Rental Purchase
+570|ABF Freight System Inc
+571|Acme Markets Inc
+572|Adecco Employment Services
+574|Agway Inc
+575|Aid Association for Lutherans
+576|Air Products & Chemicals Inc
+577|Airgas
+578|Al-Anon
+579|All Tune & Lube
+580|Ambulance Service
+581|American Eagle Outfitters
+582|American General Insurance Co
+583|American Heart Association
+584|American HomePatient
+585|American Medical Response
+586|American National Insurance
+587|American Speedy Printing Centers
+588|Amoco Food Shop
+590|Ampco System Parking
+591|AmSouth Bank
+592|Applied Industrial Technologies
+593|Aramark Uniform Services
+594|Arch Paging
+595|Associated Press
+596|Atlas Van Lines
+597|Auntie Anne's Soft Pretzels
+598|Avon Products
+599|GameStop
+600|Bally Total Fitness
+601|Banana Republic
+602|Bank of New York
+603|Bankers Life & Casualty Co
+604|The Barber Shop
+605|Beall's Department Store
+606|Bekins Van Lines
+607|Bell Atlantic
+608|BellSouth
+609|Ben Franklin Store
+610|Beneficial Credit Services
+611|Best Buy
+612|BFI
+613|Bi-Lo Inc
+614|Big Brothers/Big Sisters
+615|Big Lots
+616|Blazer Financial Services Inc
+617|Bob Evans Restaurant
+619|The Bombay Co
+620|Borics Family Haircare Center
+621|Brookstone Co
+622|Bruegger's Bagel Bakery
+623|Bumper To Bumper Auto Parts
+624|Burlington Coat Factory
+625|Burlington Northern Railroad
+627|Camelot Music
+628|Captain D's Seafood Restaurants
+629|Carlton Cards
+630|Cash America Pawn
+631|Catholic Charities
+632|Cato
+633|Centex Homes
+634|Centura Financial Centers
+635|Chamber of Commerce
+636|Check Into Cash
+637|Check 'n Go
+638|Chicago Title Insurance Co
+639|Chick-fil-A
+640|Chief Auto Parts
+641|China Buffet
+642|China Garden
+643|China Wok
+644|Cici's Pizza
+645|Cigarettes Cheaper
+646|Clark Oil & Refining Corp
+648|Classic Cuts
+649|Clean Sweep Janitorial Service
+650|Cloth World
+651|Clothestime
+652|Coast To Coast
+653|Coastal Mart Inc
+654|Coca-Cola Bottling Co
+655|Color Tile & Carpet
+656|Colortyme
+658|Communications Workers
+659|Computer Renaissance
+661|Conoco Inc
+662|Consol Electrical Distributors
+663|Consolidated Freightways
+664|Continental Baking Co
+665|Convenience Stores of Speedway
+666|CoreStates Bank
+667|Corning Clinical Laboratories
+668|Cottman Transmission Centers
+669|Countrywide Home Loans
+670|County Seat
+671|Cracker Barrel
+672|Crime Stoppers
+673|Cruise One
+674|Cumberland Farms
+675|Curves For Women
+676|Dale Carnegie Training
+677|Dal-Tile
+678|Daylight Donuts
+679|Deck The Walls
+680|Delta Airlines Inc
+681|Dial-A-Prayer
+682|Diamond Auto Glass
+683|Diet Center
+684|Digital Equipment Corp
+685|Discount Auto Parts
+686|Discovery Toys
+687|Disney Store Inc
+688|Doctors of Optometry
+689|Dollar Rent-A-Car
+690|Dress Barn
+691|Duron Paints & Wallcoverings
+692|Easy Spirit Shoe Store
+693|Economy Inn
+694|Eddie Bauer Inc
+695|Einstein Bros Bagels
+696|Electronics Boutique
+697|Elks Lodge
+698|Expressly Portraits
+699|Extended Stay America
+700|Exxon Corp
+701|EZ Pawn
+702|Fairfield Inn By Marriott
+703|Family Chiropractic Health Center
+704|Family Dentistry
+705|Family Video
+706|Farmers Union Insurance
+707|Fast Signs
+708|Federated Insurance
+710|Fidelity National Title Insurance
+711|Fiesta Hair & Tanning
+712|Fifth Third Bank
+714|The Finish Line
+716|First American Home Care
+717|First American National Bank
+718|First American Title Insurance Co
+720|First National Bank
+721|First State Bank
+722|Floor Coverings International
+723|Flowers Baking Company Inc
+724|Food Lion Store
+725|Footaction USA
+726|Ford Rent-A-Car System
+727|Frank's Nursery & Crafts
+728|Fraternal Order of Eagles
+729|Fred Meyer One-Stop Shopping
+730|Frederick's of Hollywood
+731|Frontier Adjusters
+732|GAB Business Services Inc
+733|Gadzooks
+734|General Business Services
+735|Georgia Pacific Corp
+736|Gingiss Formal Wear
+737|Glamour Shots
+738|Glass Doctor
+739|Glidden Paints
+740|Gold's Gym
+741|Gordon's Jewelers
+742|Graybar Electric Company Inc
+744|Gymboree Corp
+745|Hair Affair
+746|Hair It Is
+747|Hair Unlimited
+748|Hancock Fabrics
+750|Head Start
+751|HealthSouth Sports
+752|Helena Chemical Co
+753|Hertz Corp
+754|Hibernia National Bank
+755|Hickory Farms
+756|Hit Or Miss
+757|Holiday Hair
+758|Home Depot
+759|Home Savings of America
+760|Honeywell Home & Building Control
+761|Howard Johnson
+762|Hungry Howie's Pizza & Subs
+763|Huntington National Bank
+764|ICI Dulux Paints
+766|International Brotherhood of Electrical Workers
+767|J Riggings Mens Clothing
+768|Jazzercise
+769|Jeans West
+770|Joe's Barber Shop
+771|John Hancock Mutual Life Insurance
+773|Kaiser Permanente Health Care
+774|K B Toys
+775|Kenny Rogers Roasters
+776|KeyBank
+777|Kids Mart
+778|Kids R Us
+779|Kinney Shoes
+780|Knights Inn
+781|Kohl's Department Store
+782|Kwik Kopy Printing
+783|La-Z-Boy Furniture Galleries
+784|Laidlaw Transit Inc
+785|Lanier Worldwide Inc
+787|Lechter's Housewares
+788|Lerner Shops
+789|Lesco Inc
+790|Leslie's Swimming Pool Supplies
+791|Liberty Travel
+792|Life Uniform & Shoe Shops
+793|Limited Express
+794|Lincare Inc
+795|Lone Star Steakhouse & Saloon
+796|Long & Foster Realtors
+797|Lovely Nails
+798|LPL Financial Services
+799|Lucent Technologies
+800|Lutheran Brotherhood
+801|Management Recruiters
+802|March of Dimes
+803|Massachusetts Mutual Life Insurance Co
+804|Master Cuts
+805|Mayflower Transit Agency
+806|Meals On Wheels
+807|The Men's Wearhouse
+808|Mervyns California Department Stores
+809|Metropolitan Life Insurance Co Sales
+811|Metrocall
+812|Michaels Arts & Crafts
+813|Modern Woodmen of America
+814|Monro Muffler Brake
+815|Moore Business Forms & Systems
+816|Loyal Order of Moose Lodges
+817|Moovies
+818|Motherhood Maternity
+819|Mothers Against Drunk Driving
+820|Motion Industries Inc
+821|Mr. Rooter
+822|Mrs. Fields Cookies
+823|Muscular Dystrophy Association Inc
+824|Musicland
+825|Mutual of Omaha
+826|Narcotics Anonymous
+827|National Cash Advance
+829|National Health Laboratories
+830|Naturalizer Shoes
+831|New York Carpet World
+832|Nextel Communications
+833|North American Mortgage Co
+834|Northern Reflections
+835|Novus Windshield Repair
+836|National Tire & Battery
+837|OfficeMax
+838|Old Country Buffet
+839|Olde Discount Stockbrokers
+840|Olsten Kimberly Quality Care
+841|Once Upon A Child
+842|Orthodontic Centers of America
+843|Osco Drug
+844|Otis Elevator Co
+845|Overeaters Anonymous
+846|Pacific Sunwear of California
+847|Padgett Business Services
+848|Painewebber
+849|Pak Mail Centers of America
+850|Pameco Corp
+851|Panda Express
+852|Papa Murphy's Take 'N' Bake Pizza
+853|Parade of Shoes
+854|Parents Without Partners
+855|Paul Harris Stores Inc
+856|Pepsi-Cola Bottling Co
+857|Perfumania Inc
+858|Petco Animal Supplies Inc
+859|Petite Sophisticate
+860|Phillips 66
+861|Piggly Wiggly Supermarket
+862|Pizza Inn
+863|Pizza Plus
+864|Planned Parenthood
+865|Praxair Inc
+866|Premier Car Rental
+867|Pretzel Time
+868|The Principal Financial Group
+869|Pro Cuts
+870|Pro Nails
+871|Property Damage Appraisers
+872|Prudential Real Estate
+873|Prudential Securities
+874|Pulte Homes Corp
+875|Q Lube
+876|Quality Cleaners
+877|Quick Cash Inc
+878|Quizno's Classic Subs
+879|Rack Room Shoes
+880|Rainbow International Carpet
+881|Rally's Hamburgers
+882|Ramada Inn
+883|Record Town
+884|Red Wing Shoe Store
+885|Regions Bank
+886|Remedy Intelligent Staffing
+887|Retnirp
+888|RGIS Inventory Specialists
+889|Robert Thomas Securities Inc
+890|Rocky Mountain Chocolate Factory
+891|Round Table Pizza
+892|Ruby Tuesday Restaurant
+893|Ryan Homes Inc
+894|Ryland Homes
+895|Safeguard Business Systems
+896|Safety Kleen Corp
+897|Safeway Stores
+898|Sam Goody
+899|Sam's Club
+901|Security Finance Corp
+902|Sentry Insurance
+903|Service Merchandise Co
+904|Shear Magic
+905|Shear Perfection
+906|Shell Service Stations
+907|Shoe World
+909|Signs Now
+910|Sizes Unlimited
+911|Small Business Development Center
+912|Smith Barney Inc
+913|Smith's Food & Drug Centers Inc
+914|Snappy Car Rental
+915|Snelling Personnel Services
+916|Software Etc
+918|Spencer Gifts
+920|Sprint
+921|Stage Department Store
+924|Sterling Optical
+925|Stride Rite Shoes
+926|Structure
+927|Stuarts Plus
+928|Sun America Securities Inc
+929|Suncoast Motion Picture Co
+930|Suntrust Bank
+931|Sweet Factory Inc
+932|T.J.Maxx
+933|Taco John's
+934|Taco Time
+935|Talbots
+936|Tangles
+937|Terra Inernational Inc
+938|T.G.I. Friday's
+939|Top Nails
+940|Tractor Supply Co
+941|Transamerica Financial Services
+942|Transamerica Occidental Life
+943|Travel Agents International
+944|Travel Network
+945|Tuffy Auto Service Centers
+946|Tupperware
+947|Turner Construction Co
+948|UARCO Inc
+949|UC Lending
+950|Uni-Mart Inc
+951|Union Bank
+952|Union Pacific Railroad
+953|Union Planters Bank
+954|United States Cellular
+955|Postal Service Post Offices
+956|United Steelworkers of America
+960|Vistar Auto Glass
+961|Vocational Rehabilitation
+962|Volunteers of America
+964|W. W. Grainger Inc
+965|Waddell & Reed Inc
+966|Wallpaper For Less
+967|West Coast Video
+968|Western Sizzlin Steak House
+969|Westaff
+970|Whataburger Restaurants
+971|Wicks'n'Sticks
+972|Wild Birds Unlimited
+973|Wilsons Leather
+974|WonderBread
+975|Wonder Hostess Bakery
+976|Woodmen of The World Life Insurance
+977|Woolworth Co
+978|World Savings & Loan Association
+979|Wright Line Inc
+980|YMCA
+981|YWCA
+982|Classic Cleaners
+983|Beneficial Mortgage
+984|International Paper Co
+988|Ann Taylor
+989|BOC Gases
+990|Chevy Chase Bank
+991|Childtime Learning Centers
+992|Chuck E. Cheese's
+995|Convenient Food Mart
+1000|Farmers & Merchants Bank
+1001|Garden Botanika
+1003|Great Wall Restaurant
+1008|Lutheran Social Services
+1009|Marriott Hotels Resorts Suites
+1013|Oakwood Homes Inc
+1014|Party City
+1016|PNC Mortgage Corporation of America
+1018|Skytel
+1020|Trugreen ChemLawn
+1021|Allied Home Mortgage Capital Corporation
+1022|American Home Loans
+1023|Arbor Drugs
+1024|Bakers Shoe Store
+1025|Big Apple Bagels
+1026|Blue Cross & Blue Shield
+1027|Bob's Barber Shop
+1028|Braum's Ice Cream & Dairy Stores
+1029|The Buckle
+1030|Carter Lumber
+1031|Catholic Social Services
+1032|Central Parking System
+1033|Checker Auto Parts
+1034|Chesapeake Bagel Bakery
+1035|China Express
+1036|China Palace Restaurant
+1038|Civil Air Patrol
+1039|Claire's Accessories
+1040|Colonial Bank
+1041|Community Action Agency
+1042|Comprehensive Business Services
+1043|Con-Way Central Express
+1044|Concord Custom Cleaners
+1045|Continental Airlines
+1046|Cort Furniture Rental
+1047|Corvel Corp
+1048|Courtyard By Marriott
+1049|CPI One Hour Photo Finish
+1050|Critter Control
+1051|The Donut Palace
+1052|Equitable Life Assurance Scty
+1053|Farm Service Agency
+1054|Farmers State Bank
+1055|Fazoli's Italian Restaurant
+1056|First Virginia Bank
+1057|Glendale Federal Bank
+1058|GMAC Mortgage Corp
+1059|Great Harvest Bread Co
+1060|Great Western Fncl Securities
+1061|Greyhound Package Express
+1062|The Hair Station
+1063|The Herb Shop
+1065|Hostess Cakes
+1066|Insty Prints
+1067|JBM Retail
+1068|Jefferson Pilot Life Ins Co
+1069|John's Barber Shop
+1070|Johnstone Supply
+1071|Kits Cameras One Hour Photo
+1072|Lawyers Title Insurance Corp
+1073|Lerner New York
+1074|Lincoln Mercury Car Rental
+1075|Luby's Cafeteria
+1076|Main Street Cafe
+1077|Manhattan Bagel
+1078|Marietta Martin Aggregates
+1079|Marine Corps Recruiting
+1080|Marine Midland Bank
+1081|MCI Telecommunications Corp
+1082|Medicap Pharmacy
+1083|Mercury Finance Co
+1084|Moto Photo & Portrait Studio
+1085|National Guard Armory
+1087|Natural Wonders
+1088|The Nature Conservancy
+1089|NCR Corp
+1090|Norfolk Southern Corp
+1091|Norrell Staffing Services
+1092|Paytel Inc
+1093|Peoples Bank
+1094|Petland Discounts
+1095|Petsmart
+1096|Pilgrim Launderers & Cleaners
+1097|Pizza King
+1098|Portamedic
+1100|Production Credit Assn
+1101|Racetrac Petroleum Inc
+1102|Rental Service Corp
+1104|Rollins Truck Rental
+1105|Ryans Family Steak House
+1106|Schindler Elevator Corp
+1107|Select Comfort Sleep Systems
+1109|Shell Food Mart
+1110|Shoe Show
+1111|Southwestern Bell
+1112|Sovereign Bank
+1113|Standard Federal Bank
+1114|Styles Unlimited
+1115|Sundance Rehabilitation Corp
+1116|This End Up Furniture Co
+1118|TSR Wireless
+1119|U-Store-It
+1120|Uncle Bob's Self Storage
+1121|United Studios of Self Defense
+1122|Video City
+1123|Volt Services Group
+1124|Weichert Realtors
+1125|Western Southern Life Ins Co
+1126|WIC
+1127|World Gym Fitness Center
+1128|World of Science
+1129|Worldwide Refinishing Systems
+1130|Nine West
+1131|Citibank
+1132|Comerica Bank
+1133|Mercantile Bank
+1134|A & P Food Stores
+1135|ADP Automatic Data Processing
+1136|Air Liquide America Corp
+1137|Ameriquest Mortgage Co
+1138|Amsoil Synthetic Lubricants
+1140|Au Bon Pain
+1141|Bed Bath & Beyond
+1142|Better Business Bureau
+1143|Hong Kong Restaurant
+1144|Cintas The Uniform People
+1145|Cisco Systems
+1146|David Weekley Homes
+1148|Columbia Gas Transmission Corp
+1149|Travelodge
+1150|Contempo Casuals
+1151|Fashion Cents
+1152|Dictaphone Corp
+1153|Grand Rental Station
+1154|Taylor Rentals
+1155|Kids-Korner Day Care
+1156|Huntington Learning Center
+1158|Time Warner Cable
+1160|Togo's Eatery
+1161|Wienerschnitzel
+1162|Orange Julius
+1163|I Can't Believe It's Yogurt
+1164|Kirby Vacuum
+1165|Linens-N-Things
+1166|Mattress Discounters
+1167|Kaman Industrial Technologies
+1168|Great American Cookie Co
+1169|Helzberg Diamonds
+1170|Wolf Camera & Video
+1171|Tandy Leather Company
+1172|Factory Card Outlet
+1173|Thermogas
+1174|Invest Financial Corp
+1175|Hollywood Nails
+1176|Eco Water Systems
+1177|Grand Union Company
+1178|Private Industry Council
+1179|Famers Union Oil
+1180|Goodwill Stores
+1181|Bennigan's Restaurant
+1182|Bertucci's Restaurant
+1183|Big Boy Restaurant
+1184|Bresler's Ice Cream
+1185|Canteen Corporation
+1186|Carl's Junior Restaurants
+1187|Carvel Ice Cream
+1188|El Pollo Loco
+1189|Fuddrucker's Restaurant
+1190|Haagen Dazs Ice Cream
+1191|Jamba Juice
+1192|Juice Stop
+1193|Original Pancake House
+1194|Quincy's Family Steakhouse
+1195|Rita's Water Ice
+1196|Shakey's Pizza Restaurant
+1197|The Steak Escape
+1198|Steak 'N Shake Restaurants
+1199|Steak Out Restaurant
+1200|Tastee Freez
+1201|White Castle Restaurant
+1202|A & W Restaurants
+1203|AAA Insurance
+1204|Abercrombie & Fitch
+1205|Accountants On Call
+1206|Alamo Rent A Car
+1208|American Postal Workers Union
+1210|American Savings Bank
+1211|ARA Services Incorporated
+1212|Arthur Treachers Fish & Chips
+1213|Bartlett Tree Experts
+1214|Beauticontrol Cosmetics
+1215|Benihana of Tokyo
+1216|Big 5 Sporting Goods
+1217|Black Angus Restaurant
+1218|Brown's Chicken & Pasta
+1219|California Nails
+1220|Calvary Chapel
+1221|Caribou Coffee Company
+1222|Cellular Plus
+1223|Checker Cab Company
+1224|Chi Chi's Mexican Restaurant
+1225|China House Restaurant
+1226|China Inn Restaurant
+1228|Commonwealth Land Title Insurance Co
+1229|Commercial Federal Bank
+1231|Compass Bank
+1232|Bojangles' Restaurant
+1233|Swensen's Ice Cream
+1234|Fox's Pizza Den
+1235|Ground Round Restaurant
+1236|Hooters Restaurant
+1237|Longhorn Steakhouse
+1238|Oriental Express Restaurant
+1239|Roy Rogers Family Restaurant
+1240|Mazzio's Pizza
+1241|New China Restaurant
+1242|Pizza Pro
+1243|Pizzeria Uno
+1244|Tony's Pizza Service
+1245|Corning Revere Factory Store
+1246|Crabtree & Evelyn Incorporated
+1247|Denny's Auto Sales
+1248|Dial-A-Devotion
+1249|Dial-A-Story
+1250|Diebold Incorporated
+1252|Dover Elevator Company
+1253|Dryclean USA
+1254|Earl Scheib Paint & Body
+1255|Executive Tax Service
+1256|Federal Land Bank Association
+1257|Fisher Auto Parts
+1258|Four Seasons Beauty Salon
+1259|Grease Monkey
+1260|Groomingdales
+1262|Haircrafters
+1263|Hair Expressions
+1264|Hair Loft
+1265|Healthrider Incorporated
+1266|Heavenly Hams
+1267|Home Choice Rentals
+1268|Honey Baked Ham Company
+1269|Jim's Barber Shop
+1270|Karate For Kids
+1271|Kwik Fill
+1272|Let's Talk Cellular
+1273|Lids
+1274|Lincoln Property Company
+1275|Loomis Armored Incorporated
+1276|Magic Nails
+1277|Millers Outpost
+1278|Mr. Electric
+1279|The Money Store
+1280|Office Depot
+1282|Our Lady of Perpetual Help
+1284|Pagenet
+1285|Parts Plus Autostore
+1286|Rentavision Inc
+1287|Rodeway Inn
+1288|Singer Sewing Company
+1289|Sleep Inn
+1290|Southeast Service Corporation
+1291|Speedy Muffler King
+1292|Square D Company
+1293|Star Nails
+1294|Tenneco Packaging
+1295|Tennessee Valley Authority
+1296|United Food & Commercial Workers Union
+1297|United Dairy Farmers
+1298|United Insurance Company
+1299|Wesco Distribution Inc
+1300|Weyerhaeuser Company
+1301|Wheat First Butcher Singer
+1303|World Savings Bank
+1304|Krystal Company The
+1311|Hallmark Cards & Gifts
+1312|Smog Busters
+1313|Old Navy
+1314|Longs Drug Stores
+1315|Wells Fargo Financial
+1316|Wells Fargo Home Mortgage
+1317|Baja Fresh Mexican Grill
+1318|Raymond James Financial Services
+1319|Global Signal Inc
+1320|Liberty Tax Service
+1321|Aaron's Sales & Lease Ownership
+1322|Younkers
+1323|Smartstyle Family Hair Salon
+1324|Fye
+1325|McRae's Department Store
+1326|Kirkland's
+1327|Panera Bread
+1328|Corner Bakery Cafe
+1329|Trader Joe's
+1330|Advance America
+1331|Alltel
+1332|American Express Financial Advisors
+1334|Amoco Food Shop
+1336|BB & T
+1337|Budget Rent A Car
+1338|Budget Truck Rental
+1339|Cingular Wireless
+1340|Citifinancial
+1342|DIRECTV
+1343|Fleet Bank
+1344|Midas Auto Service Experts
+1345|National City Bank
+1346|O'Reilly Auto Parts
+1347|T-Mobile
+1348|Verizon Wireless
+1349|Waste Management
+1350|Lowe's Home Improvement Warehouse
+1351|Dippin Dots
+1352|Cold Stone Creamery
+1353|Sav-on Drugs
+1354|Charter One Bank
+1355|Save-A-Lot
+1356|Chipotle Mexican Grill
+1357|Hair Cuttery
+1358|Macy's
+1361|Qwestdex
+1362|Qwest
+1363|Thrivent Financial Bank
+1364|Thrivent Financial For Lutherans
+1365|Weight Watchers
+1366|Home Instead Senior Care
+1367|Kragen Auto Parts
+1368|Trade Secret
+1369|United Rentals Highway Technologies
+1370|United Rentals Aerial Equipment
+1371|United Rentals Trench Safety
+1372|United Rentals
+1373|Regal Nails
+1374|Sign-A-Rama
+1375|Rentway
+1376|American Tower Corporation
+1377|ACC Car Care Center
+1378|American General Life & Accident Insurance
+1379|Game Crazy
+1380|Gamestop
+1382|Charter Communications
+1383|Comfort Keepers
+1384|Harmon Autoglass
+1385|Yellow Transportation
+1386|Dex Media
+1387|Ladie's Workout Express
+1388|M & T Bank
+1389|The Body Shop
+1390|1-800-Flowers.Com
+1391|Zaxby's
+1392|Ocharley's
+1393|China King
+1394|Taste of China
+1397|Penn Station East Coast Subs
+1398|Jersey Mike's Subs
+1399|Philly Connection
+1400|Roly Poly
+1401|Jimmy John's
+1402|Mr. Gattis
+1404|Famous Daves
+1405|Wingstop
+1406|Beef 'O' Brady's
+1407|Studioplus
+1408|AmericInn
+1409|La Quinta
+1410|Mercy Medical Center
+1411|Mayo Clinic
+1412|Ochsner Clinic Foundation
+1413|The Cleveland Clinic
+1414|Sisters of Saint Joseph
+1415|Sisters of Notre Dame
+1416|Saint Patricks Church
+1417|Saint Anthonys Church
+1418|Community of Christ
+1419|Holy Family Church
+1420|Sisters of Saint Francis
+1422|J. D. Byrider
+1424|Car Mart
+1425|Reed Smith LLP
+1426|Bass Berry & Sims Plc
+1427|Pepper Hamilton
+1428|McGuireWoods
+1429|Steptoe & Johnson
+1430|Visible Changes
+1431|Best Cuts
+1432|Cutting Crew
+1433|Perfect Look Salons
+1434|Style America
+1435|Conroy's Flowers
+1436|Home Federal Bank
+1437|Fidelity Bank
+1438|Hudson United Bank
+1439|Columbia Bank
+1440|Banknorth
+1441|Guaranty Bank
+1442|Umpqua Bank
+1443|Republic Bank
+1444|Commerce Bank
+1445|UMB Bank
+1446|Dollar Bank
+1447|Southtrust Bank
+1448|Bancorpsouth
+1449|M & I Bank
+1450|Flagstar Bank
+1451|First Tennessee
+1452|Carolina First
+1453|Arvest Bank
+1454|Lasalle Bank
+1456|Webster Bank
+1457|Heights Finance Corporation
+1458|Title Cash
+1459|Equity One
+1460|Full Spectrum Lending
+1461|American Residential Funding
+1462|Wal-Mart Supercenter
+1463|SuperTarget
+1465|Afterhours
+1466|Banfield, The Pet Hospital
+1467|Aeropostale
+1468|LocalNet
+1469|DIRECT SAT TV
+1470|Budget Blinds
+1471|D.R. Horton
+1473|Menards
+1474|Sears Optical
+1475|Sears Portrait Studio
+1476|DaVita
+1477|Toll Brothers
+1478|Equity Corporate Housing
+1479|American Home Mortgage
+1480|Acceptance Insurance Companies Inc.
+1481|Precision Door Service
+1483|Capital One
+1484|Windstream
+1485|ADT
+1486|Medical Testing Center
+1487|Amtrax
+1488|Bank of the West
+1489|Parisian
+1491|Pop-A-Lock
+1492|Dish Network
+1493|Yellow Book
+1494|C.J. Banks
+1495|Spirit Halloween
+1496|Hoveround
+1497|Pella
+1498|LA Weight Loss
+1499|Ethan Allen
+1500|Del Taco
+1501|Dillards
+1502|Geico
+1503|Discount Tire
+1505|American Leak Detection
+1506|Ben & Jerry¿s
+1507|Hollywood Tans
+1508|CompUSA
+1509|Accountemps
+1510|1st Mariner Bank
+1511|Best Western
+1512|Fresh Choice
+1513|LRDM
+1514|Molly Maid
+1515|Neiman Marcus
+1516|Allegra Print & Imaging
+1517|AnchorBank
+1518|Aussie Pet Mobile
+1519|Bank of Stockton
+1520|Candy Bouquet
+1521|CMIT
+1522|Covan
+1523|Daimler
+1524|Educational Outfitters
+1525|ERA
+1526|First Weber
+1527|Friendly Computers
+1528|Global
+1529|Graebel
+1530|Green Mill
+1531|Howard Hanna
+1532|Ingles
+1533|Labor Finders
+1536|National Van Lines
+1537|Nordstrom
+1538|OfficeTeam
+1539|Palm Beach Tan
+1540|Peter Piper Pizza
+1541|PODS
+1542|Port of Subs
+1543|RBC Centura
+1544|Regent Drugs
+1545|Rockland Trust
+1546|RSVP
+1547|Rx Plus
+1548|SHAZAM
+1549|Sonitrol 
+1550|Southco
+1551|Spherion
+1552|Spiegel
+1553|Sport Clips
+1554|Taco Del Mar
+1555|Talent Tree
+1556|Tarbell, Realtors
+1557|Truly Nolen
+1558|UBuildIt
+1559|UTS
+1560|Window Genie
+1561|Wireless Toyz
+1562|Color Me Mine
+1563|Home Helpers
+1564|National Bank of Commerce
+1565|Edible Arrangements
+1566|AirTran Airways
+1568|America's Best Inns and Suites
+1569|AppleOne
+1570|Audi
+1571|Avery Hess
+1572|Avianca
+1573|Azteca
+1574|Big O Tires
+1575|Buca di Beppo
+1576|Camille's Sidewalk Cafe
+1577|Cirrus
+1578|Comet Cleaners
+1579|Culver's
+1580|First Choice Haircutters
+1581|First Dakota 
+1583|First Federal Bank of California
+1584|Footstar
+1585|Freedom Boat Club
+1586|GM
+1587|Gotcha Covered
+1588|Grange
+1589|Granite Transformations
+1590|HobbyTown USA
+1591|Juice It Up!
+1592|Kaba 
+1593|LendingTree
+1594|LifeWay Christian Store
+1595|Maid to Perfection
+1596|Marsh Supermarkets
+1598|NAMB
+1599|Northwest Airlines
+1600|Papa Gino's
+1601|QVC
+1602|Redball LLC
+1604|Saudi Arabian Airlines
+1605|Staterbros
+1606|TJX
+1607|Vanguard Cleaning Systems
+1608|Washington Federal
+1609|Weed Man
+1610|Weis Markets
+1611|Wheel Fun Rentals
+1612|Window Gang
+1613|1-800-DryClean
+1614|1-800-GOT-JUNK?
+1615|Absolutely Flowers
+1616|abc
+1617|Acsys
+1618|ESP
+1619|Aerotek
+1620|West Sanitation
+1621|Ahead Human Resources
+1622|Air France
+1623|Air New Zealand
+1624|TAB
+1625|Altracolor 
+1626|Amazon
+1627|American Asphalt Sealcoating
+1628|APC
+1629|1-800-Flowergram.com
+1630|AmeriHost Inn
+1631|Anago's
+1632|AnchorBlue
+1633|ANDY OnCall
+1634|Archadeck
+1635|Asheville Federal
+1636|AFB&T
+1637|Atlanta Bread Company
+1638|Alantic City & County Board of Realtors
+1640|Auto-Owners
+1641|Auto Value
+1642|Bahama Breeze
+1643|Baird
+1646|Bark Busters
+1647|Barnie's Coffee
+1648|Benjamin Franklin Plumbing
+1650|BJ's
+1651|Blackjack Pizza
+1652|BedandBreakfast.com
+1653|Bob Sumerel Tire Company
+1654|BONUS Building Care
+1655|Borders
+1656|The BrickKicker
+1657|Max Broock
+1658|Brooke Insurance 
+1659|Buck's Pizza
+1660|BuildingStars
+1661|Burnet
+1662|Carbone's Pizzeria
+1663|Carls
+1664|Cartex
+1665|Cendant Corporation
+1666|CHARLEY'S GRILLED SUBS
+1667|Charming Shoppes, Inc
+1668|Chem-Dry
+1669|CHEVYS
+1670|Choice Hotels
+1671|Citizens Financial Group
+1672|Citizens State Bank
+1673|City National Bank
+1674|The Cleaning Authority
+1675|Club Z!
+1676|Coffee News 
+1677|Coldwell Banker Commercial
+1679|Coldwell Banker Residential Brokerage
+1680|Colors on Parade
+1681|Central Texas Communications,
+1682|Complete Music Disc Jockey
+1683|Computer Troubleshooters
+1684|Computer Explorers
+1685|CONSOL Energy
+1686|Costco
+1687|Country Inns & Suites
+1688|Cousins Subs
+1689|Creative Colors International
+1690|Crestcom
+1691|D¿Angelo
+1692|Market Baskets
+1693|The Dentist's Choice
+1694|DirectBuy
+1695|Discount Drug Mart
+1696|Doubletree hotels
+1697|Dr. Vinyl
+1698|DRY CLEANING TO-YOUR-DOOR
+1699|Duct Doctor USA
+1700|Duraclean
+1701|Eagle Home Mortgage
+1702|Embassy Suites
+1703|EmbroidMe,
+1704|E.nopi
+1705|The Entrepreneur's Source
+1706|EPIC
+1707|Erie Insurance
+1708|Executive Tans¿
+1709|FAST-FIX
+1710|FastFrame
+1711|National City
+1712|Figaro's Pizza
+1713|Firehouse Subs
+1714|Firkin
+1715|First National Bank of Northern California
+1716|Blooms Today
+1717|Fonville Morisey Realty
+1718|Foot Solutions
+1719|Friendly's
+1720|Gateway Newstands
+1722|The Goddard School
+1723|Golf Etc.
+1724|Golf USA
+1725|Great Frame Up 
+1726|GSH Real Estate
+1727|The Gutter Guys
+1728|H-E-B
+1729|Fruitfull
+1730|Happy Harry's
+1731|Harris Teeter
+1732|Harry Norman Realtors
+1733|Hawthorn Suites
+1734|Hayes
+1735|Heaven's Best
+1736|Hilton
+1737|Home Cleaning Centers of America
+1738|HSN
+1739|HomeStreet Bank
+1740|HomeTeam Inspection Services
+1741|HomeTown Buffet
+1742|Hong Kong Express Airway
+1743|HUMITECH
+1744|Huntington
+1745|Hy-Vee
+1746|IKEA
+1747|Inspect-It 1st
+1748|Interface Financial Group
+1749|IBEW
+1750|Island Ink-Jet
+1751|It¿s A Grind
+1752|Jack Gaughen Realtor
+1753|Jani-King
+1754|Janney
+1755|Jantize
+1756|Jerry's
+1757|Jet-Black
+1758|Carino's
+1759|Johnny Rockets
+1760|Just-A-Buck
+1761|Keller Williams
+1763|Kitchen Tune-Up
+1766|LEDO
+1767|Lexus
+1768|The Lincoln National Life Insurance Company
+1769|LINE-X 
+1770|Lufthansa
+1771|Mad Science
+1772|MaggieMoo's
+1773|Magnetsigns
+1774|Maid Brigade
+1775|Marble Slab
+1776|Marco's Pizza
+1777|Marie Callender's
+1778|Master Care
+1779|Matco tools
+1780|Macy's
+1781|Melting Pot
+1782|Merlin
+1783|Mexicana
+1784|Michigan Works!
+1785|Microtel
+1786|Midas
+1787|Mighty
+1788|Milex
+1789|Miracle
+1790|Miracle Method
+1792|Mr. Goodcents
+1793|Mr. Handyman
+1794|Mr. Hero
+1795|Mr. Transmission
+1796|MLS.com
+1797|Mutual Drug
+1798|National Groundwater Surveyors
+1799|Nation's
+1800|Nationwide Floor & Window Covering's
+1801|New Horizons
+1802|New York & Company
+1803|Nissan
+1804|North American Airlines
+1805|Wells Fargo
+1806|Oil Butler
+1807|OpenWorks
+1808|OSH
+1809|Pappadeaux
+1810|Pappasito's
+1811|Party America
+1812|Arpin
+1813|Pillar To Post
+1814|Pizza Factory
+1815|PostNet
+1816|Pressed4Time
+1817|Pricele$$
+1818|Pro Image
+1819|Profit-Tell
+1820|PuroSystems
+1821|Radisson
+1822|Raley's
+1823|Real Estate
+1824|Re-Bath
+1825|Renaissance Executive Forums
+1826|Robeks
+1827|Rooter-Man
+1828|Ryan Beck & Co.
+1829|Saks Fifth Avenue
+1830|Samuel Mancino's
+1831|PartsAmerica.com
+1832|Screenmobile
+1833|See's
+1834|First American
+1835|SERVPRO
+1836|Shaw's
+1837|Shopko
+1838|Signal Graphics
+1839|Smart Service
+1840|Smoothie King
+1841|TSS
+1842|Spring-Green
+1843|SGO
+1845|Street Corner
+1846|Stretch-n-Grow
+1847|StrollerFit
+1848|SuperGlass
+1849|SUPERVALU
+1850|Swisher Hygiene
+1851|Taco Maker
+1852|The Old Spaghetti Factory
+1853|Kangaroo
+1854|TNC
+1855|Tutor Time
+1856|TWO MEN AND A TRUCK
+1857|UBS
+1858|Ultimate Staffing
+1859|UniGroup
+1860|United Shipping Solutions
+1861|United States Seamless
+1862|Mail Boxes Etc.
+1863|USA Mobility
+1864|V2K
+1865|Valley Bank
+1866|Valpak
+1867|Visiting Angels
+1868|PictureMe
+1869|WaterField
+1870|Wegmans
+1871|Wetzel's Pretzels
+1872|Whole Foods Market
+1873|Wild Bird Centers
+1874|Wingate by Wyndham
+1875|Woody's
+1876|WIN
+1877|DHL
+1878|Young Rembrandts
+1879|ExpressTaxRefund
+1880|First Bank
+1881|ACE Rent A Car
+1882|Aeromexico
+1883|AFFN
+1884|Ahold
+1885|AIM Mail Centers
+1886|Aire-Master
+1887|AlphaGraphics
+1888|American Red Ball
+1889|Ames
+1890|ATA Airlines
+1891|BankUnited
+1892|Batteries Plus
+1893|Booster Juice
+1894|Boston Pizza
+1895|Breadeaúx Pizza
+1896|British Airways
+1897|Burnet
+1898|Cape Air 
+1899|Champion
+1900|ChemStation
+1901|COMMISSION EXPRESS
+1902|Contours Express
+1903|Cookie Factory Bakery
+1904|Corbin Russwin
+1905|Country Bank
+1906|County Bank
+1907|DE-STA-CO
+1908|Delhaize Group
+1909|Dollar EXPRESS 
+1910|Drexel Heritage
+1911|Drug Emporium
+1913|DUCTBUSTERS
+1914|Edina Realty
+1915|ExpertTire
+1916|Family Pharmacy
+1917|Farmer Boys
+1918|FDIC
+1922|FiltaFry
+1923|First Charter
+1924|First Market Bank
+1925|Fitness Together
+1928|Giant Eagle
+1929|GRISWOLD SPECIAL CARE
+1930|Gulf Internet
+1931|Hancock Bank
+1932|Handyman Connection
+1933|Hansen
+1934|Health Mart
+1935|High Touch High Tech
+1936|Homebanc.com
+1937|Homewatch
+1938|Houlihan's
+1939|House Doctors
+1940|Hummer
+1941|Instant Imprints
+1942|IronStone Bank
+1943|John L. Scott
+1944|KaBloom
+1945|Kerr Drug 
+1946|Kid to Kid
+1947|KIDZART
+1948|KLM
+1949|Lawn Doctor
+1950|Lizard's Thicket
+1951|Lumbee Guaranty Bank
+1952|MaidPro
+1953|MTOclean
+1954|Me-n-Eds
+1955|Metro Brokers
+1956|Morrisons
+1958|NYCE
+1959|On The Border
+1960|Parcel Plus
+1961|Pathmark
+1962|The Penn Traffic Company
+1963|People
+1964|Philippine Airlines
+1965|PremierGarage
+1966|ProForma
+1967|Ralphs
+1968|Randstand Holding
+1969|Real Estate One
+1970|Red Brick Pizza
+1971|Referral Realty
+1972|Rooms To Go Furniture
+1973|Ross
+1974|SaladWorks
+1975|Signs By Tomorrow
+1976|Skill Staff
+1977|Smokey Bones
+1978|Sparkle Wash
+1979|Studio 6
+1980|Super Wash
+1981|SuperCoups
+1982|Texas State Bank
+1983|Thomasville
+1984|Tiffany & Co
+1985|Timber Lodge Steakhouse
+1986|Tires Plus
+1987|Tomlinson Black
+1988|Value Rite
+1989|WesBanco
+1990|WILLIAMS-SONOMA
+1991|Wireless Zone
+1992|WSFS Bank
+1993|Z Pizza
+1994|Ziebart
+1995|Book Sense
+1996|CHIP
+1997|Expetec
+1998|Express Oil Change
+2001|Hillard Lyons
+2002|InterContinental Hotels
+2003|My Gym
+2004|Navis
+2005|Water To Go
+2006|Volvo
+2007|Bank of Commerce
+2008|Extreme Pizza
+2009|Papa Romano's
+2010|Pet Supplies Plus
+2011|Results Travel
+2012|1-800-800-Rose
+2014|At Work Personnel Services
+2015|Bad Ass Coffee
+2016|California Closets
+2017|Christmas Décor
+2019|Geeks on Call
+2020|Limited Brands
+2021|Liberty Fitness
+2022|National Property Inspections
+2023|Primrose Schools
+2024|Prudential Realty
+2026|Snap-On
+2027|Unisys
+2028|We The People
+2029|APA
+2030|Belk
+2031|Buffalo Wild Wings
+2032|Car Care One
+2033|Cartridge World USA
+2034|PNC
+2035|Craters & Freighters
+2036|Dollar Discount
+2037|Ebby Halliday
+2038|Eberhard Manufacturing
+2039|Flowerama
+2040|Hilton Garden Inn
+2041|Ident-A-Kid
+2043|Interquest Detection Canines
+2044|KOA
+2045|Lee Myles
+2046|Mark's Pizzeria
+2047|McAlister's Deli
+2048|Money Mailer
+2049|Oldsmobile
+2050|Palmetto Bank
+2051|Peoples First
+2053|QDOBA MEXICAN GRILL
+2054|RELO
+2055|River City Bank
+2056|Schakolad Chocolate Factory
+2059|Sterlings Saving Bank
+2060|UNO CHICAGO GRILL
+2061|Value City
+2062|Wheaton Worldwide Moving
+2063|Willstaff Worldwide
+2064|WSI INTERNET
+2066|A1 CONCRETE LEVELING INC
+2067|ActionCOACH
+2068|Affiliated Car Rental
+2069|Aire Serv
+2070|Allen Tate
+2071|Fedex
+2072|Amerispec
+2073|ASSIST 2 SELL
+2074|Atlas Interstate Agent
+2075|Avalar Real Estate
+2076|Bruster's Real Ice Cream
+2077|Cash Plus
+2078|Certapro Painters
+2080|CleanNet USA
+2081|Coffee Beanery
+2082|ComForcare
+2083|Cookies by Design
+2084|Coverall
+2085|Crown Trophy
+2086|Décor & You
+2087|Drama Kids
+2088|DRY-B-LO
+2089|Express Mart
+2090|FasTracKids
+2091|Fiducial
+2092|Filippi's Pizza Grotto
+2093|First Convenience Bank
+2095|Garage Tek
+2096|Gateway
+2097|GMAC Insurance
+2098|Handyman Matters
+2099|Hardware Hank
+2100|Harmon Glass
+2101|The Hartford
+2102|Help-U-Sell Real Estate
+2103|HomeVestors
+2104|Homewood Suites
+2105|Hot Stuff Foods
+2106|HouseMaster
+2107|Fruit Flowers
+2108|Intelligent Office
+2109|JAN-PRO
+2110|Joey's Only Seafood Restaurant
+2112|Kiddie Academy
+2113|KITCHEN SOLVERS INC
+2114|Kumon Math & Reading
+2115|LMI
+2116|Lil Angels
+2117|The Little Gym
+2118|The Maids
+2119|Maui Wowi
+2120|Mercury Auto Insurance
+2121|Moe's Southwest Grill
+2122|Mr. Appliance
+2124|NBSC
+2125|Norwalk
+2126|Oxford Learning
+2127|Papa's Pizza To-Go
+2128|Passport Heatlh
+2129|Planet Beach
+2130|Postal Connections
+2131|PPG
+2132|RE/MAX
+2133|Red Roof Inn
+2134|Relax the Back
+2135|Right at Home
+2136|The Right One
+2137|Ruth's Chris Steak House
+2138|Santa Barbara Bank & Trust
+2139|Schnucks
+2140|Scotts
+2143|Sunbelt
+2144|Tropik Sun
+2145|Tunex
+2146|Tutoring Club
+2147|We're Rolling
+2148|Wing Zone
+2149|Women's Health Boutique
+2150|Woodcraft
+2151|AAAR
+2152|Pirtek
+2153|Plato's Closet
+2154|Primus
+2155|Pro Golf
+2156|Pump It Up
+2157|Safeco
+2158|Sandle Sales Institute
+2159|Save It Now!
+2160|Semonin
+2161|Shorewest
+2162|Stematic
+2163|Tropical Smoothie
+2164|U.S. Lawns
+2165|United Financial Services
+2166|Zying Asian Grill
+2167|Cardsmart
+2168|The Carlyle Group
+2170|Cruise Planners
+2171|Econotax
+2172|Fish Window Cleaning
+2173|AmerisourceBergen Corporation
+2174|Flyi
+2175|It's Just Lunch
+2176|Meijer
+2177|Netspace
+2178|Rezcity
+2179|Russell & Jeffcoat Realtors
+2180|Smart & Final
+2181|Tower
+2182|US Airways
+2183|ANCHORLINE YACHT
+2184|The Embers
+2185|LAPELS
+2186|PIEDMONT FEDERAL
+2187|PREMIER SERVICE
+2188|SPARTAN STORES
+2189|ARA SERVICES INC
+2190|KINDERDANCE INT'L INC
+2191|TARGET PHARMACY
+2192|TRUE CARE
+2193|Shake's
+2194|Avenue
+2195|Babies R Us
+2196|RBC Bank
+2197|Bailey Banks & Biddle
+2198|Boaters World Marine Centers
+2200|Boscovs
+2201|Brooks Brothers
+2202|Cabelas
+2203|Calumet Photographic
+2204|Cathrines
+2205|Cost Plus World Market
+2206|Design Within Reach
+2207|Dicks Sporting Goods
+2208|Eastern Mountain Sports
+2209|Edwin Watts Golf
+2210|Gander Mountain
+2211|Golfsmith
+2212|Gottschalks
+2213|Home Decorators Collection
+2214|Joes Sports & Outdoor
+2215|JoS. A. Bank
+2216|LAMPS PLUS
+2217|The Land of Nod
+2218|Lands End
+2219|Lumber Liquidators
+2220|Northern Tool + Equipment
+2221|OSH Complete Home & Garden
+2222|Orvis
+2223|Patagonia
+2224|Peoples Jewelers
+2225|Plow & Hearth
+2226|REI
+2227|Rockler Woodworking and Hardware
+2228|Sam Ash Music Store
+2229|Sierra Trading Post
+2230|SKECHERS
+2231|Slumberland Furniture
+2232|Sur La Table
+2233|The Sharper Image
+2234|The Vitamin Shoppe
+2235|ULTA
+2236|Aeropostale
+2237|Aerosoles
+2238|Annas Linens
+2239|Apple Store
+2240|BC Sports Collectibles
+2241|Big Dog Sportswear
+2242|Boot Barn
+2243|Bose
+2244|Camping World
+2245|Crate&Barrel
+2246|Denver Mattress
+2247|Dunhams Sports
+2248|Hot Topic
+2249|Johnston & Murphy
+2250|Tommy Hilfiger
+2251|Bon-Ton
+2252|Chicos
+2253|Coldwater Creek
+2254|dELiA*s
+2255|Dick Blick
+2256|Do it Best Corp. 
+2257|Elder-Beerman
+2258|Frys
+2259|Furniture Row
+2260|Golf Galaxy
+2261|Goodys
+2262|HHGregg
+2263|iFloors
+2264|J. Crew
+2265|J. Jill
+2266|Jockey
+2267|Journeys
+2268|Journeys Kidz
+2269|Kenneth Cole
+2270|Kids Foot Locker
+2271|Kings Jewelry
+2272|Lady Foot Locker
+2273|Liz Claiborne
+2274|LOccitane
+2275|Lord & Taylor
+2276|Lucky Brand Jeans
+2277|Man Alive
+2278|Marty Shoes
+2279|MC Sports
+2280|Mikasa
+2281|Mimi Maternity
+2282|Modells
+2283|Nevada Bobs
+2284|Nike
+2285|Olympia Sports
+2286|Origins
+2287|P.C. Richard & Son
+2288|Perry Ellis
+2289|Pfaltzgraff
+2290|Pottery Barn
+2291|Pottery Barn Kids
+2292|Rampage
+2293|Reebok Store
+2294|Reeds Jeweler
+2295|Restoration Hardware
+2296|Riddles Jewelry
+2297|Rockport
+2299|Shoe Pavilion
+2300|Smith & Hawken
+2301|Sony Style
+2302|Sport Chalet
+2303|The Childrens Place
+2304|The Container Store
+2305|The Limited Too
+2306|Sports Authority
+2307|The Walking Company
+2308|Timberland
+2309|Tumi
+2310|Underground Station
+2311|White House / Black Market
+2312|Zumiez
+2313|Blommingdales
+2314|CKU
+2315|Armani Exchange
+2316|Anthropologie
+2317|Guess
+2318|Wet Seal
+2319|Vons
+2320|Nathan's Famous
+2321|Yogen Fruz
+2322|Wingstreet
+2323|Cinnabon
+2324|Huddle House
+2325|Five Guys
+2326|WIENERSCHNITZEL
+2327|In-N-Out
+2328|Tim Hortons
+2329|Texas Roadhouse
+2330|Landrys Restaurants
+2331|Green Burrito
+2332|Red Robin
+2333|Simple Simon's Pizza
+2334|California Pizza Kitchen
+2335|Macaroni Grill
+2336|Sizzler
+2337|Krispy Kreme
+2338|Village Inn
+2339|Tony Roma's
+2340|Potbelly Sandwich Works
+2341|Manchu Wok
+2342|Jason's Deli
+2343|Dickey's Barbecue Pit
+2344|L&L Hawaiian Barbecue
+2345|Carrabba's Italian Grill
+2346|Winchell's Donuts
+2347|Rubio's
+2348|Donatos Pizza
+2349|Taco Bueno
+2350|Back Yard Burgers
+2351|Bonefish Grill
+2352|The Great Steak & Potato Co.
+2353|Noodles & Company
+2354|Logan's Roadhouse
+2355|Bakers Square
+2356|The Cheesecake Factory
+2357|Taco Cabana
+2358|Pizza Ranch
+2359|Arctic Circle
+2360|Fosters Freeze
+2361|Pick Up Stix
+2362|Skyline Chili
+2363|Souplantation & Sweet Tomatoes
+2364|Surf City Squeeze
+2365|Coco's Bakery
+2366|Mrs. Winners Chicken
+2367|P.F. Chang's China Bistro
+2368|Pei Wei Asian Diner
+2369|Honey Dew Donuts
+2370|Gold Star Chili
+2371|Fatburger
+2372|Shane's Rib Shack
+2373|Carrows
+2374|Taco Mayo
+2375|Larry's Giant Subs
+2376|Daphne's Greek Cafe
+2377|Pollo Tropical
+2378|Paradise Bakery
+2379|Blake's Lotaburger
+2380|Runza
+2381|El Chico
+2382|Eat'n Park
+2383|Yum-Yum Donuts
+2384|Tijuana Flats
+2385|The Great American Bagel
+2386|Cosi
+2387|Happy Joe's
+2388|Cheeburger Cheeburger
+2389|Stewart's Drive-In
+2390|LaRosa's Pizzeria
+2391|Damon's Grill
+2392|Flemings Prime Steakhouse & Wine Bar
+2393|Wolfgang Puck Express
+2394|Charlie Brown's Steakhouse
+2395|Elephant Bar Restaurant
+2396|Which Wich
+2397|Sub Station II

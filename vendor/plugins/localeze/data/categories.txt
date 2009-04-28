@@ -1,0 +1,390 @@
+1000000|Automobile - Dealers
+2000000|Real Estate - Appraisers
+3000000|Residential Contractors
+4000000|Real Estate - Title Companies
+5000000|Furniture
+6000000|Automobile - Parts & Accessories
+7000000|Dentists
+8000000|Automobile - Rentals
+9000000|Automobile - Towing
+10000000|Motorcycles & Motor Sports
+11000000|Automobile - Tires
+12000000|Florists
+13000000|Insurance
+14000000|Veterinarians
+15000000|Physicians - Gastroenterology
+16000000|Contractors - Plumbers & Plumbing
+17000000|Body Piercing & Tattoos
+18000000|Physicians - Dermatology
+19000000|Physicians - Ear, Nose & Throat
+20000000|Physicians - Oncology & Hematology
+21000000|Hotels, Motels, & Lodging
+22000000|Physicians - Neurology & Neurosurgery
+23000000|Physicians - Pediatrics
+24000000|Physicians - Podiatry
+25000000|Physical Therapy & Rehabilitation
+26000000|Pharmacies
+27000000|Physicians - Pathology
+28000000|Child Care Centers & Services
+29000000|Nurseries & Garden Centers
+30000000|Physicians - Endocrinology & Diabetes
+31000000|Allergy & Immunology
+32000000|Physicians - Cardiovascular & Pulmonary
+33000000|Restaurants
+34000000|Office Services, Supplies & Equipment
+35000000|Banks & Credit Unions
+36000000|Locksmiths, Safes & Vaults
+37000000|Physicians - Plastic & Cosmetic Surgery
+38000000|Physicians - Obstetrics & Gynecology
+39000000|Physicians - Orthopedics
+40000000|Lawn Maintenance
+41000000|Sporting Goods
+42000000|Contractors - Electrical
+43000000|Schools - Public & Academic
+44000000|Physicians - Psychiatry
+45000000|Schools - Colleges & Universities
+46000000|Beauty Salons & Day Spas
+47000000|Religious Services & Organizations
+48000000|Physicians - Nephrology & Urology
+49000000|Tree Service
+50000000|Bookstores
+51000000|Bicycle Sales & Service
+52000000|Pest & Animal Control
+53000000|Hair Salons & Barbers
+54000000|Concert Halls & Theaters
+55000000|Movie Theaters
+56000000|Real Estate - Brokers & Agents
+57000000|Real Estate - Investments
+58000000|Automobile - Repairs & Services
+59000000|Catering & Bartending Services
+60000000|Physicians - General
+61000000|Moving Services
+62000000|Hair & Beauty Supplies, Service & Equipment
+63000000|Dry Cleaners
+64000000|Employment Agencies
+65000000|Contractors - Painting
+66000000|Groceries
+67000000|Contractors - Roofing
+68000000|Chiropractors
+69000000|Antiques
+70000000|Jewelry
+71000000|Photographers
+72000000|Law - Business & Corporate
+73000000|Law - Criminal
+74000000|Law - Divorce & Family
+75000000|Law - Driving & Traffic
+76000000|Law - Malpractice
+77000000|Law - Patent, Trademark & Copyright
+78000000|Law - Personal Injury & Property Damage
+79000000|Law - Real Estate
+80000000|Law - Wills & Estate Planning
+81000000|Law - Governmental Issues
+82000000|Law - Financial & Bankruptcy
+83000000|Law - Labor & Employment
+84000000|Law - Juvenile
+85000000|Bakeries
+86000000|Gift Shops
+87000000|Nursing Homes
+88000000|Bowling
+89000000|Wireless Communications
+90000000|Massage
+91000000|Photographic Equipment
+92000000|Tax Preparation
+93000000|Electronics - Computers
+94000000|Adoption Services
+95000000|Airlines & Airports
+96000000|Adult Entertainment
+97000000|Architects
+98000000|Shoes & Shoe Repairs
+99000000|Artists & Art Dealers
+100000000|Pawn Shops & Discount Stores
+101000000|Dancing Instruction
+102000000|Bail Bonds
+103000000|Newspapers
+104000000|Welding
+105000000|Advertising
+106000000|Contractors - Sewer
+107000000|Security Guards & Patrols
+108000000|Fire & Water - Damage & Restoration
+109000000|Sports Clubs
+110000000|Water Heaters
+111000000|Propane
+112000000|Recycling Centers
+113000000|Waste Management
+114000000|Appraisers
+115000000|Costume Shops
+116000000|Health & Diet Food Products
+117000000|Music Stores
+118000000|Arts & Crafts Supplies
+119000000|Musical Instruments
+120000000|Graphic Design
+121000000|Psychics & Astrologers
+122000000|Check Cashing & Money Transfers
+123000000|Contractors - Computer
+124000000|Fences
+125000000|Wedding Supplies & Services
+126000000|Birth Control & Abortion Services
+127000000|Counseling Services
+128000000|Loans & Mortgages
+129000000|Logging & Sawmills
+130000000|Painting Supplies
+131000000|Contractors - Concrete
+132000000|Garage Doors
+133000000|Telecommunications Equipment & Services
+134000000|Security Systems & Services
+135000000|Guns & Gunsmiths
+136000000|Carpet & Flooring
+137000000|Hardware Tools & Services
+138000000|Bars, Taverns & Cocktail Lounges
+139000000|Travel & Tourism
+140000000|Liquor Stores
+141000000|Agricultural Equipment & Supplies
+142000000|Contractors - Tile, Marble & Granite
+143000000|Petroleum Services & Equipment
+144000000|Convenience Stores & Service Stations
+145000000|Cargo & Freight Services
+146000000|Alternative Medicine
+147000000|Public & Social Services
+148000000|Contractors - Building
+149000000|Printing & Copying Equipment & Services
+150000000|Clothing & Accessories
+151000000|Contractors - Excavation & Wrecking
+152000000|Automobile - Body Repairs & Painting
+153000000|Medical Equipment & Supplies
+154000000|Consultants - Environment
+155000000|Forestry
+156000000|Financial Planning & Investments
+157000000|Heating, Ventilation & Air Conditioning
+158000000|Ethnic Foods
+159000000|Horse Services & Equipment
+160000000|Water Filtration & Treatment
+161000000|Storage Containers, Facilities & Warehouses
+162000000|Schools - Training & Vocational
+163000000|Video Rentals & Sales
+164000000|Video Production & Duplication
+165000000|Veterinarian Equipment & Supplies
+166000000|Vending Machines
+167000000|Vacuum Cleaners
+168000000|Utilities - Gas, Water & Electric
+169000000|Upholstery
+170000000|Uniforms
+171000000|Truck Parts & Accessories
+172000000|Trophies & Engraving
+173000000|Toy & Game Stores
+174000000|Housing Assistance & Shelters
+175000000|Transportation Services
+176000000|Accounting & Bookkeeping Services
+177000000|Translating & Interpreting Services
+178000000|Hunting & Fishing Sites
+179000000|Machine Shops
+180000000|Tobacco Products
+181000000|Ticket Sales
+182000000|Theatrical Managers & Producers
+183000000|Theatrical Equipment & Supplies
+184000000|Table & Tent Rental
+185000000|Taxidermy
+186000000|Awnings, Canopies & Tarps
+187000000|Swimming Pool Equipment & Supplies
+188000000|Swimming Pool Construction
+189000000|Electronics - Home Entertainment
+190000000|Surveyors Equipment & Services
+191000000|Aircraft Charters & Rentals
+192000000|Sprinklers & Irrigation
+193000000|Animal Shelters & Humane Societies
+194000000|Sports & Recreation Facilities
+195000000|Educational Services
+196000000|Spas, Saunas & Hot Tubs
+197000000|Retirement & Assisted Living Facilities
+198000000|Appliance Repair & Supplies
+199000000|Singing Telegrams
+200000000|Ice & Ice Machines
+201000000|Contractors - Siding
+202000000|Shopping Malls & Centers
+203000000|Shopping & Errand Services
+204000000|Sewing Supplies & Services
+205000000|Investigation Services
+206000000|Service Station Equipment & Supplies
+207000000|Senior Citizen Centers & Services
+208000000|Laundromats
+209000000|Secretarial Services
+210000000|SCUBA Diving
+211000000|Screen Printing & Embroidery
+212000000|Scientific Equipment & Supplies
+213000000|Rubber
+214000000|Boat Dealers & Equipment
+215000000|Restaurant Equipment & Supplies
+216000000|Ambulance & Rescue Services
+217000000|Boat Services
+218000000|Contractors - Drywall
+219000000|Boat Charters & Rentals
+220000000|Formal Wear
+221000000|Religious Goods
+222000000|Butchers & Meat Processing
+223000000|Trailers & Recreational Vehicles
+224000000|Post Offices & Mail Services
+225000000|Chemicals & Gases
+226000000|Martial Arts Instruction
+227000000|Contractors - Masonry
+228000000|Legal Services
+229000000|Coffee Houses
+230000000|Lighting Fixtures
+231000000|Fuel, Oil & Coal
+232000000|Real Estate - Property Management
+233000000|Collectibles
+234000000|Real Estate - Commercial & Industrial
+235000000|Real Estate - Apartments & Condominiums
+236000000|Physicians - Optometry & Opthalmology
+237000000|Railroads
+238000000|Pump Sales & Service
+239000000|Publishers
+240000000|Agricultural Production
+241000000|Pet Services & Supplies
+242000000|Pregnancy & Childbirth Services
+243000000|Portable Toilet Rental
+244000000|Plumbing Supplies
+245000000|Contractors - Carpentry
+246000000|Drug & Alcohol Resources
+247000000|Plastics
+248000000|Medical Laboratories
+249000000|Water Well, Pipe Line & Drilling Services
+250000000|Photo Finishing
+251000000|Electronics - Equipment & Services
+252000000|Prosthetics & Orthopedic Supplies
+253000000|Electronics - Dealers
+254000000|Mental Health Services
+255000000|Payment Handling Equipment & Supplies
+256000000|Contractors - Paving
+257000000|Party Supplies
+258000000|Consultants - Entertainment
+259000000|Fire Protection Systems & Services
+260000000|Schools - Parochial & Private
+261000000|Consultants - Food
+262000000|Parking Facilities
+263000000|International Trade
+264000000|Hobby & Model Supplies
+265000000|Packaging Supplies & Equipment
+266000000|Refrigeration Sales & Service
+267000000|Health Services
+268000000|Outdoor Recreation
+269000000|Inventory Control & Equipment
+270000000|Nurses
+271000000|Music Production Services
+272000000|Music Instruction
+273000000|Museums & Zoological Gardens
+274000000|Manufacturing & Assembly
+275000000|Modeling
+276000000|Mattresses & Bedding
+277000000|Mobile Home Parks
+278000000|Mobile Home Dealers & Services
+279000000|Metal
+280000000|AIDS Resources
+281000000|Aircraft Dealers & Services
+282000000|Archery
+283000000|Electronics - Audio Visual
+284000000|Automation & Control Systems
+285000000|Beverage Sales & Distribution
+286000000|Yoga Instruction
+287000000|Commercial & Industrial Vehicles & Machinery
+288000000|Craft & Cooking Instruction
+289000000|Credit Counseling & Bankruptcy Services
+290000000|Convention & Meeting Facilities
+291000000|Disabled Persons Services
+292000000|Document & Records Services
+293000000|Drinking Water Distributors
+294000000|Disaster Preparation & Recovery
+295000000|Educational Supplies
+296000000|Elevators
+297000000|Engineers
+298000000|Entertainers & Entertainment
+299000000|Collection Agencies & Repossessions
+300000000|Contractors - Deck & Patio
+301000000|Hazardous Materials Management
+302000000|Personal Coaching
+303000000|Landscaping Services & Supplies
+304000000|Archaeologic Services
+305000000|Auctions
+306000000|Fiberglass
+307000000|Bagel & Donut Shops
+308000000|Fireplaces
+309000000|Bakery Equipment & Supplies
+310000000|First Aid & Safety
+311000000|Contractors - Marine
+312000000|Marine Equipment & Supplies
+313000000|Beer & Wine Making Equipment & Supplies
+314000000|Electronics - Batteries
+315000000|Real Estate - Development
+316000000|Pool Tables & Billiards
+317000000|Junk & Scrap Dealers
+318000000|Research - Medical
+319000000|Law Enforcement & Public Safety
+320000000|Gymnastics Instruction
+321000000|Business Brokers & Franchising
+322000000|Signs, Displays, Flags & Banners
+323000000|Dancing Supplies & Apparel
+324000000|Escort Services
+325000000|Dating Services
+326000000|Gambling & Gaming
+327000000|Fairgrounds & Rodeos
+328000000|Dental Equipment & Supplies
+329000000|Agricultural Services
+330000000|Fashion Design
+331000000|Generators
+332000000|Geologic Services
+333000000|Fur Goods & Services
+334000000|Libraries
+335000000|Laundry Services
+336000000|Fund Raising & Financial Aid
+337000000|Automobile - License & Title Services
+338000000|Laundry Supplies
+339000000|Appliances
+340000000|Campgrounds & RV Parks
+341000000|Organizations & Associations
+342000000|Diet, Nutrition & Weight Management
+343000000|Contractors - Foundation
+344000000|Internet Services
+345000000|Electronics - Telephone
+346000000|Fraternities & Sororities
+347000000|Septic Tanks
+348000000|Funeral, Burial, & Cremation
+349000000|Hearing Aids & Testing
+350000000|Cleaning Services & Supplies
+351000000|Interior Designers & Decorators
+352000000|Glass Products & Services
+353000000|Health & Fitness Clubs
+354000000|Broadcasting & Media Production
+355000000|Cabinets & Countertops
+356000000|Automobile - Wash & Detailing
+357000000|Golf Courses & Ranges
+358000000|Tanning Salons
+359000000|Housewares & Home Decor
+360000000|Home Improvement & Remodeling Services
+361000000|Cable & Satellite Equipment & Services
+362000000|Consultants - Business
+363000000|Construction Supplies & Services
+364000000|Hospitals, Clinics & Medical Centers
+365000000|Arcades
+366000000|Camps & Training
+367000000|Cemeteries
+368000000|Contractors - Insulation
+369000000|Electronics - Printers
+370000000|Food & Beverage Vendors
+371000000|Government Services
+372000000|Graveside Monuments
+373000000|Inspection Services
+374000000|Marinas
+375000000|Physicians - Proctology
+376000000|Radio Communication Equipment
+377000000|Swimming Pool Maintenance & Services
+378000000|Variety Stores
+379000000|Wildlife Sanctuaries
+380000000|Physicians - Anesthesiology
+381000000|Physicians - Radiology
+382000000|Physicians - Fertility & Sterility
+383000000|Portable Buildings
+384000000|Repair Services
+385000000|Writing Services
+386000000|Textiles
+387000000|Fireworks
+388000000|Biotechnology
+389000000|Caretakers
+390000000|Research Services

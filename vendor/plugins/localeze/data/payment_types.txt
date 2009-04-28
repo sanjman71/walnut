@@ -1,0 +1,8 @@
+1|Cash
+2|Check
+3|Visa
+4|Master Card
+5|Discover
+6|American Express
+7|Diners
+8|Debit
