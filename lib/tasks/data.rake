@@ -1,4 +1,4 @@
-namespace :localeze do
+namespace :data do
   
   # Timing: ~ 1 hour
   desc "Import localeze categories and attributes as tags and tag groups"
