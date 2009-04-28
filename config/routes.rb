@@ -50,6 +50,9 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/events/:country/:state', :controller => 'events', :action => 'state'
   map.connect     '/events/:country', :controller => 'events', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
   
+  # search
+  map.connect     '/search/:country/:state/:city/:what', :controller => 'search', :action => 'index', :city => /[a-z-]+/
+    
   # tag group routes
   map.resources   :taggs
   

@@ -178,6 +178,13 @@ class ApplicationController < ActionController::Base
     return true
   end
   
+  def normalize_page_number
+    if params[:page] == '1'
+      # redirect to url without page number
+      redirect_to(:page => nil) and return
+    end
+  end
+  
   def init_ga_events(category, localities)
     @ga_events ||= []
     

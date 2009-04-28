@@ -1,7 +1,7 @@
 namespace :events do
   
   desc "Initialize events, event categories, event venues."
-  task :init => ["import_categories", "create_cities", "mark_cities", "import_venues", "map_venues"]
+  task :init => ["import_categories", "create_cities", "mark_cities", "import_venues"]
   
   desc "Import event categories from eventful"
   task :import_categories do

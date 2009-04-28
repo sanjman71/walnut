@@ -230,12 +230,6 @@ class PlacesController < ApplicationController
     when 'recommended'
       return "Recommended places near #{where}"
     end
-  end
-  
-  def normalize_page_number
-    if params[:page] == '1'
-      # redirect to url without page number
-      redirect_to(:page => nil) and return
-    end
-  end
+  end  
+
 end

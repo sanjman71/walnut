@@ -1,0 +1,9 @@
+.span-2.date
+  = render(:partial => 'events/calendar_date', :locals => {:date => event.start_at})
+
+.span-15.info.last
+  %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
+    = event.name
+  %h4.venue.margin-bottom-5{:style => 'color: #555;'}
+    = event.event_venue.name
+    %span{:style => 'font-size: 0.8em; padding-left: 3px;'}= link_to "Details", event.url
