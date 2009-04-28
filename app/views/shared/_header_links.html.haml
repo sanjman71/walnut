@@ -1,10 +1,4 @@
--# hide search bar when showing events
-- if params[:controller] == 'events'
-  - search_bar_style = 'hidden'
-- else
-  - search_bar_style = 'visible'
- 
-.span-24.last#search_places{:style => "visibility: #{search_bar_style};"}
+.span-24.last#search_places{:style => "visibility: visible;"}
   = render(:partial => 'shared/search_bar')
 .span-24.last#header_links{:style => 'text-align: right;'}
   -# show these links in any state

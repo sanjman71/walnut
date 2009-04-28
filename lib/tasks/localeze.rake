@@ -15,7 +15,7 @@ namespace :localeze do
     
     # intialiaze page parameters, limit
     page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
-    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
+    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 1000
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     offset        = (page - 1) * per_page
      
@@ -165,7 +165,7 @@ namespace :localeze do
     
     # intialiaze page parameters, limit
     page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
-    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
+    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 1000
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     offset        = (page - 1) * per_page
      

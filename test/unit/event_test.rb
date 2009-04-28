@@ -43,6 +43,10 @@ class EventTest < ActiveSupport::TestCase
         assert_equal ["music", "concert"], @event.event_tags.collect(&:name)
       end
       
+      should "increment event_venue.events_count" do
+        assert_equal 1, @event_venue.events_count
+      end
+      
       context "then remove event category" do
         setup do
           @event.event_categories.delete(@event_category)
@@ -50,7 +54,19 @@ class EventTest < ActiveSupport::TestCase
 
         should_change "EventCategoryMapping.count", :by => -1
 
-        should "apply category tags to event" do
+        should "remove category tags from event" do
+          assert_equal [], @event.event_tags.collect(&:name)
+        end
+      end
+      
+      context "then remove event that has an event category" do
+        setup do
+          @event.destroy
+        end
+        
+        should_change "EventCategoryMapping.count", :by => -1
+
+        should "remove category tags from event" do
           assert_equal [], @event.event_tags.collect(&:name)
         end
       end

@@ -3,7 +3,30 @@ require 'test/factories'
 
 class SearchTest < ActiveSupport::TestCase
   
-  context "search localities" do
+  context "search with" do
+    setup do
+      @us       = Factory.create(:us)
+      @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+      @chicago  = Factory(:city, :name => "Chicago", :state => @il)
+      @with     = Search.with(@il, @chicago)
+    end
+    
+    should "have hash with :state_id" do
+      assert_equal Hash[:state_id => @il.id, :city_id => @chicago.id], @with
+    end
+  end
+  
+  context "search tag_count_options" do
+    setup do
+      @options = Search.tag_count_options(100)
+    end
+    
+    should "have group, facets, limit, max_matches keys" do
+      assert_equal Hash[:facets => "tag_ids", :group_by => "tag_ids", :group_clause => "@count desc", :limit => 100, :max_matches => 100], @options
+    end
+  end
+  
+  context "search parse localities" do
     context "with state and no 'what'" do
       setup do
         @us     = Factory.create(:us)

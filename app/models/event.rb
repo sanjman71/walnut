@@ -5,7 +5,7 @@ class Event < ActiveRecord::Base
   belongs_to                :event_venue, :counter_cache => :events_count
   has_one                   :location, :through => :event_venue
 
-  has_many                  :event_category_mappings
+  has_many                  :event_category_mappings, :dependent => :destroy
   has_many                  :event_categories, :through => :event_category_mappings, :after_add => :after_add_category, :after_remove => :after_remove_category
   
   acts_as_taggable_on       :event_tags
@@ -29,6 +29,8 @@ class Event < ActiveRecord::Base
     # event tags
     indexes event_tags.name, :as => :event_tags
     has event_tags(:id), :as => :event_tag_ids, :facet => true
+    # use start_at as search_rank
+    has start_at, :type => :integer, :as => :search_rank
   end
   
   @@get_method      = "events/get"

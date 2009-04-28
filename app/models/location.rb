@@ -49,7 +49,7 @@ class Location < ActiveRecord::Base
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
     has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # other attributes
-    indexes search_rank, :as => :search_rank, :sortable => true
+    has search_rank, :type => :integer, :as => :search_rank
     has places.chain_id, :type => :integer, :as => :chain_ids
     has recommendations_count, :type => :integer, :as => :recommendations
     has events_count, :type => :integer, :as => :events, :facet => true

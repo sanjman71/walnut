@@ -1,7 +1,7 @@
 namespace :events do
   
-  desc "Initialize events, event categories, event venues."
-  task :init => ["import_categories", "create_cities", "mark_cities", "import_venues"]
+  desc "Initialize event categories, event venues."
+  task :init => ["import_categories", "import_venues"]
   
   desc "Import event categories from eventful"
   task :import_categories do
@@ -10,40 +10,41 @@ namespace :events do
     puts "#{Time.now}: imported #{imported} eventful categories"
   end
 
-  desc "Create cities with events"
-  task :create_cities do
-    # initialize cities
-    ["Chicago", "Charlotte", "New York", "Philadelphia"].sort.each do |s|
-      EventCity.create(:name => s)
-    end
-    
-    puts "#{Time.now}: #{EventCity.count} cities are considered event cities"
-  end
-  
-  desc "Mark cities with events"
-  task :mark_cities do
-    marked = 0
-    
-    EventCity.all.each do |event_city|
-      # map to a city object
-      city = City.find_by_name(event_city.name)
-      next if city.blank?
-      city.events = 1
-      city.save
-      marked += 1
-    end
-    
-    puts "#{Time.now}: marked #{marked} cities as having events"
-  end
+  # desc "Create cities with events"
+  # task :create_cities do
+  #   # initialize cities
+  #   ["Chicago", "Charlotte", "New York", "Philadelphia"].sort.each do |s|
+  #     EventCity.create(:name => s)
+  #   end
+  #   
+  #   puts "#{Time.now}: #{EventCity.count} cities are considered event cities"
+  # end
+  # 
+  # desc "Mark cities with events"
+  # task :mark_cities do
+  #   marked = 0
+  #   
+  #   EventCity.all.each do |event_city|
+  #     # map to a city object
+  #     city = City.find_by_name(event_city.name)
+  #     next if city.blank?
+  #     city.events = 1
+  #     city.save
+  #     marked += 1
+  #   end
+  #   
+  #   puts "#{Time.now}: marked #{marked} cities as having events"
+  # end
 
   desc "Import event venues from eventful"
   task :import_venues do
     puts "#{Time.now}: importing eventful venues"
-    imported = EventStream::Init.venues(:limit => 100)
+    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
+    imported = EventStream::Init.venues(:limit => limit)
     puts "#{Time.now}: imported #{imported} eventful venues"
   end
   
-  desc "Map event venues to locations"
+  desc "Map event venues to locations, using sphinx to match locations"
   task :map_venues do
     marked = 0
     
@@ -111,9 +112,6 @@ namespace :events do
         options[:end_at]    = event['stop_time'] if event['stop_time']
         # create event with associated venue
         venue.events.push(Event.create(options))
-        
-        # xxx - create 1 event per venue
-        break
       end
       
       venue.events.each do |event|
@@ -131,7 +129,7 @@ namespace :events do
           EventCategory.find_by_source_id(category['id'])
         end
         
-        # create event category mappings
+        # associate event categories with events
         @categories.compact.each do |category|
           puts "*** category: #{category}, event: #{event}"
           event.event_categories.push(category)

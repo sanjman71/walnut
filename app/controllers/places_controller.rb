@@ -16,12 +16,13 @@ class PlacesController < ApplicationController
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     # generate tag counts using facets
-    @tags   = tag_counts(:conditions => {:city_id => @city.id})
+    # @tags     = tag_counts(:conditions => {:city_id => @city.id})
     
-    # generate city specific tag counts
-    # @tags = @city.places.tag_counts(:order => "count desc", :limit => 150).sort_by(&:name)
+    options   = {:with => Search.with(@city)}.update(Search.tag_count_options(150))
+    @facets   = Location.facets(options)
+    @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    @title  = "#{@city.name}, #{@state.name} Yellow Pages"
+    @title    = "#{@city.name}, #{@state.name} Yellow Pages"
   end
 
   def neighborhood
@@ -47,36 +48,7 @@ class PlacesController < ApplicationController
     
     @title  = "#{@state.name} #{@zip.name} Yellow Pages"
   end
-  
-  def search
-    # resolve where parameter
-    @locality = Locality.resolve(params[:where].to_s)
-    @what     = params[:what].to_s.parameterize
     
-    if @locality.blank?
-      redirect_to(:action => 'error', :locality => 'unknown') and return
-    end
-    
-    case @locality.class.to_s
-    when 'City'
-      @state    = @locality.state
-      @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :what => @what) and return
-    when 'Zip'
-      @state    = @locality.state
-      @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :what => @what) and return
-    when 'Neighborhood'
-      @city     = @locality.city
-      @state    = @city.state
-      @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
-    when 'State'
-      raise Exception, "not allowed to search by state"
-    end
-    
-  end
-  
   def index
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
@@ -194,13 +166,13 @@ class PlacesController < ApplicationController
     @facets     = Location.facets(options)
     @tag_ids    = @facets[facet_name.to_sym]
     @tags       = Tag.find(@tag_ids.keys, :order => "name")
-
+  
     # set tag.taggings_count to faceted value, and freeze tag objects
     @tags.each do |tag|
       tag.taggings_count = @tag_ids[tag.id]
       tag.freeze
     end
-
+  
     @tags
   end
 

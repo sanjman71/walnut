@@ -41,10 +41,6 @@ class CreateEvents < ActiveRecord::Migration
       t.references  :event_category
       t.timestamps
     end
-    
-    create_table :event_cities, :force => :true do |t|
-      t.string  :name,  :limit => 50
-    end
   end
 
   def self.down
@@ -52,6 +48,5 @@ class CreateEvents < ActiveRecord::Migration
     drop_table :event_venues
     drop_table :events
     drop_table :event_category_mappings
-    drop_table :event_cities
   end
 end

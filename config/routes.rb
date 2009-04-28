@@ -13,7 +13,6 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/places/error/:locality', :controller => 'places', :action => 'error'
   
   # places [locality, tag] routes
-  map.connect     '/places/search', :controller => 'places', :action => 'search'
   map.connect     '/places/:country/:state/:city/n/:neighborhood/:what', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/:filter', :controller => 'places', :action => 'index', :city => /[a-z-]+/, :filter => /recommended/
@@ -51,6 +50,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/events/:country', :controller => 'events', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
   
   # search
+  map.connect     '/search/resolve', :controller => 'search', :action => 'resolve', :conditions => {:method => :post}
   map.connect     '/search/:country/:state/:city/:what', :controller => 'search', :action => 'index', :city => /[a-z-]+/
     
   # tag group routes

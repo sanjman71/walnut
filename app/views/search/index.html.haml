@@ -35,8 +35,9 @@
   .span-19.last
     - @objects.each do |object|
       .span-18.prepend-1.letterbox[object]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
-        - if object.is_a?(Location)
+        - case object.class.to_s
+        - when 'Location'
           = render(:partial => 'location', :locals => {:location => object, :what => @what, :tags => @tags})
-        - elsif object.is_a?(Event)
+        - when 'Event'
           = render(:partial => 'event', :locals => {:event => object, :what => @what, :tags => @tags})
         

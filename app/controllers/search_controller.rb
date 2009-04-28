@@ -14,8 +14,36 @@ class SearchController < ApplicationController
     @with           = @search.field(:locality_hash)
 
     @objects        = ThinkingSphinx::Search.search(@what, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20)
-
-    # raise Exception, "found #{@objects.size} results"
+  end
+  
+  def resolve
+    # resolve where parameter
+    @locality = Locality.resolve(params[:where].to_s)
+    @what     = params[:what].to_s.parameterize
+    
+    if @locality.blank?
+      redirect_to(:action => 'error', :locality => 'unknown') and return
+    end
+    
+    case @locality.class.to_s
+    when 'City'
+      @state    = @locality.state
+      @country  = @state.country
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :what => @what) and return
+    when 'Zip'
+      @state    = @locality.state
+      @country  = @state.country
+      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :what => @what) and return
+    when 'Neighborhood'
+      @city     = @locality.city
+      @state    = @city.state
+      @country  = @state.country
+      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
+    when 'State'
+      raise Exception, "search by state not supported"
+    else
+      redirect_to(root_path)
+    end
   end
   
 end
