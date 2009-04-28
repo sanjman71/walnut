@@ -4,7 +4,6 @@ require 'test/factories'
 class ZipTest < ActiveSupport::TestCase
 
   should_belong_to    :state
-  should_have_many    :cities
   should_have_many    :locations
   
   def setup

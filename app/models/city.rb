@@ -2,8 +2,6 @@ class City < ActiveRecord::Base
   validates_presence_of       :name, :state_id
   validates_uniqueness_of     :name, :scope => :state_id
   belongs_to                  :state, :counter_cache => true
-  has_many                    :city_zips
-  has_many                    :zips, :through => :city_zips
   has_many                    :neighborhoods
   has_many                    :locations
   

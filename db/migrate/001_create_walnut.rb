@@ -71,14 +71,6 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :location_neighborhoods, :location_id, :name => "index_ln_on_locations"
     add_index :location_neighborhoods, :neighborhood_id, :name => "index_ln_on_neighborhoods"
     
-    create_table :city_zips do |t|
-      t.references  :city
-      t.references  :zip
-    end
-
-    add_index :city_zips, :city_id
-    add_index :city_zips, :zip_id
-    
     create_table :locations do |t|
       t.string      :name,                  :limit => 30
       t.string      :street_address,        :default => nil

@@ -16,8 +16,6 @@ class PlacesController < ApplicationController
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     # generate tag counts using facets
-    # @tags     = tag_counts(:conditions => {:city_id => @city.id})
-    
     options   = {:with => Search.with(@city)}.update(Search.tag_count_options(150))
     @facets   = Location.facets(options)
     @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
@@ -29,24 +27,22 @@ class PlacesController < ApplicationController
     # @country, @state, @city, @neighborhood all initialized in before filter
 
     # generate tag counts using facets
-    @tags   = tag_counts(:conditions => {:neighborhood_ids => @neighborhood.id})
+    options   = {:with => Search.with(@neighborhood)}.update(Search.tag_count_options(150))
+    @facets   = Location.facets(options)
+    @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    # generate neighborhood specific tag counts
-    # @tags   = @neighborhood.locations.places.tag_counts.sort_by(&:name)
-    
-    @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
+    @title    = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
   end
   
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
 
     # generate tag counts using facets
-    @tags   = tag_counts(:conditions => {:zip_id => @zip.id})
-
-    # generate zip specific tag counts
-    # @tags   = @zip.places.tag_counts.sort_by(&:name)
+    options   = {:with => Search.with(@zip)}.update(Search.tag_count_options(150))
+    @facets   = Location.facets(options)
+    @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    @title  = "#{@state.name} #{@zip.name} Yellow Pages"
+    @title    = "#{@state.name} #{@zip.name} Yellow Pages"
   end
     
   def index
@@ -155,27 +151,6 @@ class PlacesController < ApplicationController
   
   protected
   
-  def tag_counts(options={})
-    # search facets by tag_ids
-    facet_name  = "tag_ids"
-    options.update(:facets => facet_name, :group_by => facet_name, :group_clause => "@count desc")
-    # use default tag limit if no limit or max_matches were specified
-    tag_limit   = 150
-    options.update(:limit => tag_limit) unless options[:limit]
-    options.update(:max_matches => tag_limit) unless options[:max_matches]
-    @facets     = Location.facets(options)
-    @tag_ids    = @facets[facet_name.to_sym]
-    @tags       = Tag.find(@tag_ids.keys, :order => "name")
-  
-    # set tag.taggings_count to faceted value, and freeze tag objects
-    @tags.each do |tag|
-      tag.taggings_count = @tag_ids[tag.id]
-      tag.freeze
-    end
-  
-    @tags
-  end
-
   def build_search_title(options={})
     what    = options[:what] || ''
     filter  = options[:filter] || ''
