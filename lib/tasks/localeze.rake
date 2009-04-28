@@ -13,13 +13,17 @@ namespace :localeze do
     taggs     = 0
     skipped   = 0
     
-    page      = 1
-    per_page  = 100
-    offset    = (page - 1) * per_page
-    limit     = 2**30
+    # intialiaze page parameters, limit
+    page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
+    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
+    limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    offset        = (page - 1) * per_page
+     
+    # initialize conditions hash
+    conditions    = {:tag_groups_count => 0}
     
     # find places with no tag groups
-    until (places = Place.find(:all, :conditions => {:tag_groups_count => 0}, :include => :locations, :offset => offset, :limit => per_page)).blank?
+    until (places = Place.find(:all, :conditions => conditions, :include => :locations, :offset => offset, :limit => per_page)).blank?
       places.collect(&:locations).flatten.each do |location|
         # track number of locations checked
         checked     += 1
@@ -27,8 +31,8 @@ namespace :localeze do
         place       = location.place
         
         record      = Localeze::BaseRecord.find(location.source_id)
-        categories  = record.get(:categories)
-        attributes  = record.get(:attributes)
+        categories  = record.categories
+        attributes  = record.attributes
         groups      = []
          
         attributes.each do |attribute|
@@ -98,6 +102,15 @@ namespace :localeze do
   
   desc "Import localeze chains"
   task :import_chains do
+    # intialiaze page parameters, limit
+    page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
+    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
+    limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    offset        = (page - 1) * per_page
+     
+    # initialize conditions hash
+    conditions    = {}
+    
     added   = 0
     exists  = 0
     places  = 0
@@ -105,7 +118,7 @@ namespace :localeze do
     puts "#{Time.now}: importing all localeze chains"
     
     page = 1
-    until (chains = Localeze::Chain.find(:all, :params => {:page => page})).blank?
+    until (chains = Localeze::Chain.find(:all, :conditions => conditions, :limit => per_page, :offset => offset)).blank?
       chains.each do |localeze_chain|
         if chain = Chain.find_by_name(localeze_chain.name)
           # already exists
@@ -139,7 +152,9 @@ namespace :localeze do
         end
       end
       
-      page += 1
+      # increment page and offset
+      page  += 1
+      offset = (page - 1) * per_page
     end
       
     puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported, and mapped #{places} places to chains"
@@ -152,9 +167,10 @@ namespace :localeze do
     page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
     per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    offset        = (page - 1) * per_page
      
-    # initialize params hash
-    params        = {:page => page, :per_page => per_page}
+    # initialize conditions hash
+    conditions    = {}
     
     if ENV["CITY"] and ENV["STATE"]
       city        = ENV["CITY"].titleize
@@ -169,7 +185,7 @@ namespace :localeze do
         exit
       end
       
-      params.update({:city => city.name, :state => state.code})
+      conditions.update({:city => city.name, :state => state.code})
       
       puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{limit}, page: #{page}, per page: #{per_page}"
     else
@@ -184,7 +200,7 @@ namespace :localeze do
     
     @country    = Country.find_by_code("US")
     
-    until (records = Localeze::BaseRecord.find(:all, :params => params)).blank?
+    until (records = Localeze::BaseRecord.find(:all, :conditions => conditions, :limit => per_page, :offset => offset)).blank?
       records.each do |record|
         # check if record has already been imported
         if Location.find_by_source(record).first
@@ -194,7 +210,7 @@ namespace :localeze do
         end
       
         # find state
-        @state = State.find_by_code(record.state)
+        @state = @country.states.find_by_code(record.state)
       
         if @state.blank?
           # invalid state
@@ -258,7 +274,7 @@ namespace :localeze do
         end
         
         # check for chain
-        if !record.chain_id.blank? and localeze_chain = Localeze::Chain.find(record.chain_id)
+        if !record.chain_id.blank? and localeze_chain = Localeze::Chain.find_by_id(record.chain_id)
           # find or create local chain object
           chain = Chain.find_by_name(localeze_chain.name) || Chain.create(:name => localeze_chain.name)
           # add chain
@@ -280,8 +296,9 @@ namespace :localeze do
         end
       end
       
-      # increment page
-      params[:page] = params[:page] + 1
+      # increment page and offset
+      page  += 1
+      offset = (page - 1) * per_page
     end
     
     puts "#{Time.now}: completed, #{added} added, #{exists} already imported, #{errors} errors"

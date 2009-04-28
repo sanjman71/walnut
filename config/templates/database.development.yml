@@ -17,7 +17,16 @@ shared_authentication_development:
   database: peanut_development
   username: rails
   password: rails
-  
+
+localeze_development:
+  encoding: utf8
+  adapter: mysql
+  host: localhost
+  port: 3306
+  database: localeze_development
+  username: rails
+  password: rails
+    
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
@@ -38,3 +47,13 @@ shared_authentication_test:
   database: walnut_test
   username: rails
   password: rails
+
+localeze_test:
+  encoding: utf8
+  adapter: mysql
+  host: localhost
+  port: 3306
+  database: localeze_test
+  username: rails
+  password: rails
+

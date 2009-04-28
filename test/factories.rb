@@ -38,10 +38,26 @@ Factory.define :user do |u|
   u.phone                 "9999999999"
 end
 
+Factory.define :event_venue do |o|
+  o.name                  "Event Venue"
+  o.source_type           EventSource::Eventful
+  o.source_id             { |s| Factory.next :source_id }
+end
+
+Factory.define :event_category do |o|
+  o.name                  "Event Category"
+  o.source_type           EventSource::Eventful
+  o.source_id             { |s| Factory.next :source_id }
+end
+
 Factory.sequence :user_name do |n|
   "User #{n}"
 end
 
 Factory.sequence :user_email do |n|
   "user#{n}@walnut.com"
+end
+
+Factory.sequence :source_id do |n|
+  n
 end

@@ -1,7 +1,11 @@
 namespace :events do
   
+  desc "Initialize events, event categories, event venues."
+  task :init => ["import_categories", "create_cities", "mark_cities", "import_venues", "map_venues"]
+  
   desc "Import event categories from eventful"
   task :import_categories do
+    puts "#{Time.now}: importing eventful categories"
     imported = EventStream::Init.categories
     puts "#{Time.now}: imported #{imported} eventful categories"
   end
@@ -69,7 +73,7 @@ namespace :events do
       venue.save
       marked += 1
       
-      puts "#{Time.now}: *** marked location #{location.locatable.name}:#{location.street_address} as an event venue for #{venue.name}"
+      puts "#{Time.now}: *** marked location #{location.place.name}:#{location.street_address} as an event venue for #{venue.name}"
     end
     
     puts "#{Time.now}: completed, marked #{marked} locations as event venues"
@@ -87,8 +91,8 @@ namespace :events do
     @events     = @results['events'] ? @results['events']['event'] : []
     @istart     = Event.count
 
-    # import events from all venues
-    EventVenue.all.each do |venue|
+    # import events for all mapped venues
+    EventVenue.mapped.each do |venue|
       begin
         @results  = venue.get
         @events   = @results['events']['event']
@@ -105,7 +109,33 @@ namespace :events do
         options = {:name => event['title'], :url => event['url'], :source_type => venue.source_type, :source_id => event['id']}
         options[:start_at]  = event['start_time'] if event['start_time']
         options[:end_at]    = event['stop_time'] if event['stop_time']
+        # create event with associated venue
         venue.events.push(Event.create(options))
+        
+        # xxx - create 1 event per venue
+        break
+      end
+      
+      venue.events.each do |event|
+        begin
+          @results    = event.get
+          @categories = @results['categories']['category']
+        rescue Exception => e
+          puts "xxx exception: #{e.message}"
+          next
+        end
+
+        # map to an event category object
+        @categories = @categories.map do |category|
+          puts "*** category: #{category}"
+          EventCategory.find_by_source_id(category['id'])
+        end
+        
+        # create event category mappings
+        @categories.compact.each do |category|
+          puts "*** category: #{category}, event: #{event}"
+          event.event_categories.push(category)
+        end
       end
     end
     

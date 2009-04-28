@@ -6,9 +6,6 @@ To get the application up and running:
   - rake init:all
 
 2. Import localeze data.
-  - Start the localeze web service (defaults to port 3002)
-    - e.g. ./script/server -p 3002
-    
   - Import records by city
     - rake localeze:import_records CITY='Chicago' STATE='IL'      # 8700
     - rake localeze:import_records CITY='Charlotte' STATE='NC'    # 3726

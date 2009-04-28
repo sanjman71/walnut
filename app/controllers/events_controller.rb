@@ -4,22 +4,34 @@ class EventsController < ApplicationController
   def country
     # @country initialized in before filter
     
+    # find faceted event count by city
+    @city_facet = "city_id"
+    @facets     = Event.facets(:facets => @city_facet)
+    @city_ids   = @facets[@city_facet.to_sym]
+    @cities     = City.find(@city_ids.keys, :order => "name", :include => :state)
+    
     @title  = "#{@country.name} Events Directory"
   end
       
   def state
     # @country, @state  all initialized in before filter
-    
+
     @title  = "#{@state.name} Events Directory"
   end
 
   def city
     # @country, @state, @city all initialized in before filter
 
-    # find all categories
-    @categories = EventCategory.order_by_name
+    # find faceted event category count in the specified city
+    @category_facet = "event_category_ids"
+    @facets         = Event.facets(:with => {:city_id => 1}, :facets => @category_facet)
+    @category_ids   = @facets[@category_facet.to_sym]
+    @categories     = EventCategory.find(@category_ids.keys, :order => "name")
     
-    @title      = "#{@city.name} Events Directory"
+    # find all categories
+    # @categories = EventCategory.order_by_name
+    
+    @title          = "#{@city.name} Events Directory"
   end
   
   def search
@@ -64,16 +76,19 @@ class EventsController < ApplicationController
     end
     
     # find city events
-    @results    = EventStream::Search.call(@conditions)
-    @events     = @results['events'] ? @results['events']['event'] : []
+    @with     = {:city_id => @city.id}
+    @with.update(:event_category_ids => @category.id) if @category
+    @events   = Event.search(:with => @with, :include => :event_venue, :page => 1, :per_page => 20)
     
-    # sort events by date
-    @events     = @events.sort_by { |e| e['start_time'] if e['start_time'] }
-      
-    @total      = @results['total_items']
-    @count      = @results['page_items']   # the number of events on this page
-    @first_item = @results['first_item']   # the first item number on this page, e.g. 11
-    @last_item  = @results['last_item']    # the last item number on this page, e.g. 20
+    # find city events, sort by date
+    # @results    = EventStream::Search.call(@conditions)
+    # @events     = @results['events'] ? @results['events']['event'] : []
+    # @events     = @events.sort_by { |e| e['start_time'] if e['start_time'] }
+    #   
+    # @total      = @results['total_items']
+    # @count      = @results['page_items']   # the number of events on this page
+    # @first_item = @results['first_item']   # the first item number on this page, e.g. 11
+    # @last_item  = @results['last_item']    # the last item number on this page, e.g. 20
     
     # find popular categories
     @categories = EventCategory.popular.order_by_name - [@category]

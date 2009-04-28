@@ -5,6 +5,7 @@ class CreateEvents < ActiveRecord::Migration
       t.string    :source_type,   :limit => 20, :null => false
       t.string    :source_id,     :limit => 50, :null => false
       t.integer   :popularity,    :default => 0
+      t.string    :tag_list,      :limit => 150
     end
     
     add_index :event_categories, :name
@@ -32,17 +33,25 @@ class CreateEvents < ActiveRecord::Migration
       t.datetime    :end_at
       t.string      :source_type,   :limit => 20, :null => false
       t.string      :source_id,     :limit => 50, :null => false
+      t.timestamps
+    end
+    
+    create_table :event_category_mappings, :force => :true do |t|
+      t.references  :event
+      t.references  :event_category
+      t.timestamps
     end
     
     create_table :event_cities, :force => :true do |t|
-      t.string  :name
+      t.string  :name,  :limit => 50
     end
   end
 
   def self.down
     drop_table :event_categories
-    drop_table :event_cities
     drop_table :event_venues
     drop_table :events
+    drop_table :event_category_mappings
+    drop_table :event_cities
   end
 end
