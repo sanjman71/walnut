@@ -1,5 +1,7 @@
 namespace :events do
   
+  @@max_per_page  = 100
+  
   desc "Initialize event categories, event venues."
   task :init => ["import_categories", "import_venues"]
   
@@ -79,13 +81,36 @@ namespace :events do
     
     puts "#{Time.now}: completed, marked #{marked} locations as event venues"
   end
-  
-  desc "Import events"
-  task :import_events do
+
+  desc "Mark popular events"
+  task :mark_popular_events do
     # build events search conditions
     @city = ENV["CITY"] ? ENV["CITY"] : City.first
 
-    puts "#{Time.now}: importing #{@city.name} events"
+    puts "#{Time.now}: marking popular #{@city.name} events"
+    
+    @conditions = {:location => @city.name, :date => 'Future', :page_size => @@max_per_page, :sort_order => 'popularity'}
+    @results    = EventStream::Search.call(@conditions)
+    @events     = @results['events'] ? @results['events']['event'] : []
+    @popular    = 0
+    
+    puts "#{Time.now}: *** found #{@events.size} popular events"
+    
+    @events.each do |eventful|
+      next if (event = Event.find_by_source_id(eventful['id'])).blank?
+      event.popular!(true)
+      @popular += 1
+    end
+    
+    puts "#{Time.now}: completed, marked #{@popular} events as popular"
+  end
+  
+  desc "Import venue events"
+  task :import_venue_events do
+    # build events search conditions
+    @city = ENV["CITY"] ? ENV["CITY"] : City.first
+
+    puts "#{Time.now}: importing #{@city.name} venue events"
 
     @conditions = {:location => @city.name, :date => 'Future', :page_size => 50, :sort_order => 'popularity'}
     @results    = EventStream::Search.call(@conditions)
@@ -104,17 +129,23 @@ namespace :events do
       
       next if @events.blank?
       
-      @events.each do |event|
-        puts "*** #{event['title']}, url: #{event['url']}"
+      @events.each do |eventful|
+        options = {:name => eventful['title'], :url => eventful['url'], :source_type => venue.source_type, :source_id => eventful['id']}
+        options[:start_at]  = eventful['start_time'] if eventful['start_time']
+        options[:end_at]    = eventful['stop_time'] if eventful['stop_time']
 
-        options = {:name => event['title'], :url => event['url'], :source_type => venue.source_type, :source_id => event['id']}
-        options[:start_at]  = event['start_time'] if event['start_time']
-        options[:end_at]    = event['stop_time'] if event['stop_time']
+        next if event = Event.find_by_source_id(eventful['id'])
+
+        puts "*** #{eventful['title']}, url: #{eventful['url']}"
+
         # create event with associated venue
         venue.events.push(Event.create(options))
       end
       
       venue.events.each do |event|
+        # skip if event already has categories
+        next if !event.event_categories.blank?
+        
         begin
           @results    = event.get
           @categories = @results['categories']['category']
@@ -123,7 +154,7 @@ namespace :events do
           next
         end
 
-        # map to an event category object
+        # map eventful category id to an event category object
         @categories = @categories.map do |category|
           puts "*** category: #{category}"
           EventCategory.find_by_source_id(category['id'])
@@ -131,23 +162,11 @@ namespace :events do
         
         # associate event categories with events
         @categories.compact.each do |category|
-          puts "*** category: #{category}, event: #{event}"
+          puts "*** category: #{category.name}, event: #{event.name}"
           event.event_categories.push(category)
         end
       end
     end
-    
-    # @events.each do |event|
-    #   # lookup the event venue
-    #   next if (venue = EventVenue.find_by_source_id_and_source_type(event['venue_id'], 'eventful')).blank?
-    # 
-    #   puts "*** creating event #{event['title']} @ #{venue.name}"
-    #   
-    #   options = {:name => event['title'], :url => event['url'], :source_type => venue.source_type, :source_id => event['id']}
-    #   options[:start_at]  = event['start_time'] if event['start_time']
-    #   options[:end_at]    = event['stop_time'] if event['stop_time']
-    #   venue.events.push(Event.create(options))
-    # end
 
     @iend = Event.count
 

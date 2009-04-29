@@ -82,7 +82,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
       t.references  :source,                :polymorphic => true, :default => nil
-      t.integer     :search_rank,           :default => 0 # used to order search results
+      t.integer     :popularity,            :default => 0 # used to order search results
       t.integer     :recommendations_count, :default => 0
       t.integer     :events_count,          :default => 0
       t.integer     :status,                :default => 0
@@ -90,7 +90,7 @@ class CreateWalnut < ActiveRecord::Migration
     end
             
     add_index :locations, [:source_id, :source_type], :name => "index_locations_on_source"
-    add_index :locations, [:search_rank]
+    add_index :locations, [:popularity]
     add_index :locations, [:recommendations_count]
     add_index :locations, [:city_id], :name => "index_locations_on_city"
     

@@ -40,7 +40,6 @@ class Location < ActiveRecord::Base
     indexes street_address, :as => :street_address
     indexes places.name, :as => :place_names
     indexes places.tags.name, :as => :place_tags
-    indexes events.name, :as => :event_names
     has places.tags(:id), :as => :tag_ids, :facet => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
@@ -49,7 +48,7 @@ class Location < ActiveRecord::Base
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
     has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # other attributes
-    has search_rank, :type => :integer, :as => :search_rank
+    has popularity, :type => :integer, :as => :popularity
     has places.chain_id, :type => :integer, :as => :chain_ids
     has recommendations_count, :type => :integer, :as => :recommendations
     has events_count, :type => :integer, :as => :events, :facet => true

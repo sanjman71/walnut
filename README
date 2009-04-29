@@ -24,13 +24,10 @@ To get the application up and running:
 4. Import neighborhoods
   - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
   - rake init:urban_neighborhoods CITY='Charlotte' STATE='NC'
-   
-5. Map cities to zips.
-  - rake init:city_zips
 
-6. Build the sphinx index, without re-creating the configuration file:
+5. Build the sphinx index, without re-creating the configuration file:
   - rake ts:index INDEX_ONLY=true
   
-7. Start the sphinx dameon:
+6. Start the sphinx dameon:
   - rake ts:start
   

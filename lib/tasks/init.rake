@@ -182,27 +182,27 @@ namespace :init do
     puts "#{Time.now}: initialized chain stores #{chains.collect{ |h| h[:name]}.join(",")}"
   end
   
-  desc "Initialize city to zip mappings"
-  task :city_zips do
-    Location.all.each do |location|
-      # find location city, zip localities
-      localities = location.localities.select { |locality| [City, Zip].include?(locality.class) }
-      
-      # partition areas by type
-      groups  = localities.partition { |locality| locality.is_a?(City) }
-      
-      cities  = groups.first
-      zips    = groups.last
-      
-      cities.each do |city_locality|
-        zips.each do |zip_locality|
-          CityZip.create(:city => city_locality, :zip => zip_locality)
-        end
-      end
-    end
-    
-    puts "#{Time.now}: initialized city to zip mappings"
-  end
+  # desc "Initialize city to zip mappings"
+  # task :city_zips do
+  #   Location.all.each do |location|
+  #     # find location city, zip localities
+  #     localities = location.localities.select { |locality| [City, Zip].include?(locality.class) }
+  #     
+  #     # partition areas by type
+  #     groups  = localities.partition { |locality| locality.is_a?(City) }
+  #     
+  #     cities  = groups.first
+  #     zips    = groups.last
+  #     
+  #     cities.each do |city_locality|
+  #       zips.each do |zip_locality|
+  #         CityZip.create(:city => city_locality, :zip => zip_locality)
+  #       end
+  #     end
+  #   end
+  #   
+  #   puts "#{Time.now}: initialized city to zip mappings"
+  # end
   
   desc "Geocode all locations"
   task :geocode_latlngs do

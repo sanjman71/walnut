@@ -28,6 +28,7 @@ class CreateEvents < ActiveRecord::Migration
     create_table :events, :force => :true do |t|
       t.string      :name,          :limit => 100, :null => false
       t.references  :event_venue
+      t.integer     :popularity,    :default => 0
       t.string      :url,           :limit => 200
       t.datetime    :start_at
       t.datetime    :end_at

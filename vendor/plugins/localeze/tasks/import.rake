@@ -11,8 +11,8 @@ namespace :localeze do
   # 167874  In Your Life|||||||||||||
   
   # Timing: ~ 5 minutes
-  # ~ 127K Chicago base records
-  desc "Clean base records .txt file, and create .csv file"
+  # ~ 127951 Chicago base records
+  desc "Clean base records txt file"
   task :clean_base_records do
     # check for filters
     city    = ENV["CITY"] ? ENV["CITY"].titleize : nil
@@ -51,8 +51,8 @@ namespace :localeze do
   
   # Timing: ~1 minute to import 10K records
   desc "Import base records"
-  task :import_base_records do 
-    klass     = BaseRecord
+  task :import_base_records do
+    klass     = Localeze::BaseRecord
     columns   = [:id, :chain_id, :pubdate, :businessname, :stdname, :subdepartment, :housenumber, :predirectional, :streetname, :streettype,
                  :postdirectional, :apttype, :aptnumber, :exppubcity, :city, :state, :zip, :plus4, :dpc, :carrierroute, :statefips,
                  :countyfips, :z4type, :censustract, :censusblockgroup, :censusblockid, :msa, :cbsa, :mcd, :addresssensitivity, 
@@ -74,7 +74,7 @@ namespace :localeze do
       next if city and row[14] != city
       
       # skip if record exists
-      next if BaseRecord.exists?(:id => row[0])
+      next if klass.exists?(:id => row[0])
       
       klass.import columns, [row], options 
       imported += 1
@@ -86,13 +86,13 @@ namespace :localeze do
   end
   
   def find_all_base_record_ids
-    BaseRecord.find(:all, :select => ["id"]).collect(&:id)
+    Localeze::BaseRecord.find(:all, :select => ["id"]).collect(&:id)
   end
 
   # Timing: ~272 minutes 
   desc "Import company headings"
   task :import_company_headings do
-    klass     = CompanyHeading
+    klass     = Localeze::CompanyHeading
     columns   = [:id, :base_record_id, :normalized_detail_id, :condensed_detail_id, :category_id, :relevancy]
     file      = "#{LOCALEZE_DATA_DIR}CompanyHeadings.txt"
     options   = { :validate => false }
@@ -113,7 +113,7 @@ namespace :localeze do
       klass.import columns, [value], options
       id += 1
       
-      puts "#{Time.now}: *** added #{id} records" if (id % 50) == 0
+      puts "#{Time.now}: *** added #{id} records" if (id % 100) == 0
     end
 
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
@@ -122,7 +122,7 @@ namespace :localeze do
   # Timing: a long time
   desc "Import company (structured) attributes"
   task :import_company_attributes do
-    klass     = CompanyAttribute
+    klass     = Localeze::CompanyAttribute
     columns   = [:id, :base_record_id, :name, :group_name, :group_type, :category_id]
     file      = "#{LOCALEZE_DATA_DIR}CompanyAttributes.txt"
     options   = { :validate => false } 
@@ -149,33 +149,34 @@ namespace :localeze do
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
 
-  desc "Import company unstructured attributes"
-  task :import_unstructured_attributes do
-    klass   = CompanyUnstructuredAttribute
-    columns = [:id, :base_record_id, :name, :relevancy]
-    file    = "#{RAILS_ROOT}/company_unstructured_attributes.txt"
-    values  = []
-    options = { :validate => false } 
-    id      = 1
-    base_ids  = find_all_base_record_ids
-    
-    # truncate table
-    klass.delete_all
-    
-    puts "#{Time.now}: importing file #{file}, starting with #{klass.count} objects" 
-    FasterCSV.foreach(file, :row_sep => "\r\n", :col_sep => '|') do |row|
-      base_record_id, name, relevancy = row
-      
-      # check that the associated base record exists
-      next unless base_ids.include?(base_record_id.to_i)
-      
-      value = [id, base_record_id, name, relevancy]
-      values << value
-      id += 1
-    end
-
-    puts "#{Time.now}: completed, ended with #{klass.count} objects" 
-  end
+  # Timing: ?
+  # desc "Import company unstructured attributes"
+  # task :import_unstructured_attributes do
+  #   klass   = CompanyUnstructuredAttribute
+  #   columns = [:id, :base_record_id, :name, :relevancy]
+  #   file    = "#{RAILS_ROOT}/company_unstructured_attributes.txt"
+  #   values  = []
+  #   options = { :validate => false } 
+  #   id      = 1
+  #   base_ids  = find_all_base_record_ids
+  #   
+  #   # truncate table
+  #   klass.delete_all
+  #   
+  #   puts "#{Time.now}: importing file #{file}, starting with #{klass.count} objects" 
+  #   FasterCSV.foreach(file, :row_sep => "\r\n", :col_sep => '|') do |row|
+  #     base_record_id, name, relevancy = row
+  #     
+  #     # check that the associated base record exists
+  #     next unless base_ids.include?(base_record_id.to_i)
+  #     
+  #     value = [id, base_record_id, name, relevancy]
+  #     values << value
+  #     id += 1
+  #   end
+  # 
+  #   puts "#{Time.now}: completed, ended with #{klass.count} objects" 
+  # end
 
   desc "Import company custom attributes"
   task :import_custom_attributes do
@@ -228,6 +229,7 @@ namespace :localeze do
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
 
+  # Timing: ?
   desc "Import company phones"
   task :import_company_phones do
     klass   = CompanyPhone

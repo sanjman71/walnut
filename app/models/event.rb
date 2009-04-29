@@ -16,8 +16,12 @@ class Event < ActiveRecord::Base
   delegate                  :zip, :to => '(location or return nil)'
   delegate                  :neighborhoods, :to => '(location or return nil)'
 
+  named_scope :popular,     { :conditions => ["popularity > 0"] }
+  
   define_index do
     indexes name, :as => :name
+    has start_at, :as => :start_at
+    has popularity, :type => :integer, :as => :popularity
     # locality attributes, all faceted
     has location.country_id, :type => :integer, :as => :country_id, :facet => true
     has location.state_id, :type => :integer, :as => :state_id, :facet => true
@@ -27,10 +31,8 @@ class Event < ActiveRecord::Base
     # event categories
     has event_categories(:id), :as => :event_category_ids, :facet => true
     # event tags
-    indexes event_tags.name, :as => :event_tags
-    has event_tags(:id), :as => :event_tag_ids, :facet => true
-    # use start_at as search_rank
-    has start_at, :type => :integer, :as => :search_rank
+    indexes event_tags.name, :as => :tags
+    has event_tags(:id), :as => :tag_ids, :facet => true
   end
   
   @@get_method      = "events/get"
@@ -39,6 +41,10 @@ class Event < ActiveRecord::Base
   def get(options={})
     get_options = {:id => self.source_id}
     EventVenue.session.call(@@get_method, get_options.update(options))
+  end
+  
+  def popular!(b)
+    self.update_attribute(:popularity, b ? 100 : 0)
   end
   
   protected

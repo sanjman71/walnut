@@ -81,26 +81,23 @@ class PlacesController < ApplicationController
     @locations      = Location.search(@sphinx_query,
                                       :conditions => @conditions, 
                                       :include => [:places, :city, :state, :zip],
-                                      :order => :search_rank, :sort_mode => :desc,
+                                      :order => :popularity, :sort_mode => :desc,
                                       :page => params[:page], :per_page => 20)
 
 
     if @city or @zip
-      # build facets for a city or zip search
-      # @facets = Location.facets(@sphinx_query, :conditions => @conditions)
+      # build facets for city or zip searches
       @facets = Location.facets(@sphinx_query, :conditions => @conditions, :facets => ["city_id", "zip_id", "neighborhood_ids"])
 
       if @city
-        # find related zips
-        @zips = Zip.find(@facets[:zip_id].keys)
-        
-        # find related neighborhoods using faceted search results
-        @neighborhoods = Neighborhood.find(@facets[:neighborhood_ids].keys)
+        # find zips and neighborhoods facet
+        @zips           = Search.load_from_facets(@facets, Zip)
+        @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
       end
 
       if @zip
-        # find related cities
-        @cities = City.find(@facets[:city_id].keys)
+        # find cities facet
+        @cities = Search.load_from_facets(@facets, City)
       end
     end
   end
