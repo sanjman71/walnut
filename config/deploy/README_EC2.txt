@@ -57,3 +57,20 @@ Need an nginx init.d script file.
 Uninstalled rack 1.0.0, replaced with rack 0.9.1 - startup failure.
   undefined method `new' for "Rack::Lock":String (NoMethodError)
 
+Switched to regular /usr/bin/ruby
+Need mkmf to do anything useful. Basic Ubuntu requires this additional apt
+286  sudo apt-get install ruby1.8-dev
+
+As expected, using this ruby:
+install rubygems
+install rails
+289  sudo gem install rails -v 2.3.2
+
+install all gems
+
+Had to install fastthread and mysql gems by hand
+
+Then run 
+291  sudo /usr/bin/gem install passenger --no-rdoc --no-ri
+305  sudo passenger-install-nginx-module
+

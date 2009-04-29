@@ -54,7 +54,7 @@ namespace :rails do
 
   desc "Install Rails"
   task :install_rails, :roles => :app do
-    sudo "#{gem_path}gem install rails -v#{rails_version}"
+    sudo "#{gem_path}gem install rails -v#{rails_version} --no-rdoc --no-ri"
   end
 
   desc "Set the owner of the app directory"

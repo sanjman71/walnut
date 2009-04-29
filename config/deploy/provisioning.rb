@@ -33,9 +33,9 @@ set :install_apache, false
 set :install_nginx, false # Don't install nginx here if want to use passenger with it - the passenger installer will build nginx
 # Don't install ruby - It's already there, and we want to use REE anyway
 set :install_ruby, false
-set :install_rubygems, false
-set :install_ruby_enterprise, true
-set :gem_path, "/opt/ruby-enterprise/bin/"
+set :install_rubygems, true
+set :install_ruby_enterprise, false
+set :gem_path, "/usr/bin/"
 
 # Install passenger
 set :install_passenger, true

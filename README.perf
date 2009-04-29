@@ -1,0 +1,25 @@
+To do a profile:
+
+Install the ruby-prof gem:
+sudo gem install ruby-prof
+
+Install the request profiler plugin:
+script/plugin install git://github.com/rails/request_profiler.git
+
+Create a script to use, for example:
+  # profile_script.rb
+  get '/'
+  post '/user', :user => { :login => 'rails' }
+or
+  # profile_script.rb
+  get '/events/us/il/chicago'
+or
+  get '/places/us/il/chicago'
+or
+  get '/places/us/il/chicago/something'
+
+Run:
+/script/performance/request -n 10 --open "cat %s >> /home/peanut/foo.txt" profile_script.rb
+
+Query reviewer - plugin
+
