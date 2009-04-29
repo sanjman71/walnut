@@ -58,10 +58,11 @@ namespace :thinking_sphinx do
     ThinkingSphinx::Deltas::Job.cancel_thinking_sphinx_jobs
     
     config = ThinkingSphinx::Configuration.instance
-    unless ENV["INDEX_ONLY"] == "true"
-      puts "Generating Configuration to #{config.config_file}"
-      config.build
-    end
+    # skk - use configure task to build configuration file
+    # unless ENV["INDEX_ONLY"] == "true"
+    #   puts "Generating Configuration to #{config.config_file}"
+    #   config.build
+    # end
         
     FileUtils.mkdir_p config.searchd_file_path
     cmd = "#{config.bin_path}indexer --config #{config.config_file} --all"
