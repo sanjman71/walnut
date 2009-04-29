@@ -22,15 +22,16 @@ class EventsController < ApplicationController
   def city
     # @country, @state, @city all initialized in before filter
 
-    # find faceted event category count in the specified city
+    # find faceted event categories in the specified city
     @category_facet = "event_category_ids"
     @facets         = Event.facets(:with => {:city_id => 1}, :facets => @category_facet)
-    @category_ids   = @facets[@category_facet.to_sym]
-    @categories     = EventCategory.find(@category_ids.keys, :order => "name")
-    
-    # find all categories
-    # @categories = EventCategory.order_by_name
-    
+    @categories     = Search.load_from_facets(@facets, EventCategory).sort_by { |o| o.name }
+
+    # generate tag counts using facets
+    options         = {:with => Search.with(@city)}.update(Search.tag_count_options(150))
+    @facets         = Event.facets(options)
+    @tags           = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+
     @title          = "#{@city.name} Events Directory"
   end
   

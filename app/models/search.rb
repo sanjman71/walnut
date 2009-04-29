@@ -110,7 +110,7 @@ class Search
         eager_load.push(:state) if ["City", "Zip"].include?(model.to_s)
         # e.g. City facet key is :city_id
         objects.push(model.find(facets[class_to_attribute_symbol(model)].keys, :include => eager_load))
-      when "Neighborhood"
+      when "Neighborhood", "EventCategory"
         # eager load associations
         eager_load.push(:city) if ["Neighborhood"].include?(model.to_s)
         # e.g. Neighborhood facet key is :neighborhood_ids
@@ -141,7 +141,7 @@ class Search
     case model.to_s
     when "City", "Zip", "State", "Country"
       model.to_s.foreign_key.to_sym
-    when "Neighborhood", "Tag"
+    when "Neighborhood", "Tag", "EventCategory"
       model.to_s.foreign_key.pluralize.to_sym
     end
   end

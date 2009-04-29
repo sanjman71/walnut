@@ -191,13 +191,41 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  def init_ga_events(category, localities)
+  def build_search_title(options={})
+    what    = options[:what] || ''
+    filter  = options[:filter] || ''
+
+    raise ArgumentError if what.blank? and filter.blank?
+    
+    if options[:state] and options[:city] and options[:neighborhood]
+      where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
+    elsif options[:state] and options[:city]
+      where = "#{options[:city].name}, #{options[:state].name}"
+    elsif options[:state] and options[:zip]
+      where = "#{options[:state].name}, #{options[:zip].name}"
+    else
+      raise Exception, "invalid search"
+    end
+
+    # use 'what' if its available
+    unless what.blank?
+      return "#{what.titleize} near #{where}"
+    end
+    
+    # otherwise use 'filter'
+    case filter
+    when 'recommended'
+      return "Recommended places near #{where}"
+    end
+  end  
+  
+  def init_ga_events(controller, localities)
     @ga_events ||= []
     
-    case category
-    when 'events', 'places'
+    case controller
+    when 'events', 'places', 'search'
       Array(localities).compact.each do |locality|
-        @ga_events.push("pageTracker._trackEvent('#{category.titleize}', '#{locality.class.to_s}', '#{locality.name}');")
+        @ga_events.push("pageTracker._trackEvent('#{controller.titleize}', '#{locality.class.to_s}', '#{locality.name}');")
       end
     else
     end

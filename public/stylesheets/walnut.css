@@ -114,6 +114,14 @@ a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
 a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
                                                   { font-size: 2.0em; }
 
+/* place link styles */
+
+a.place.name                                      { color: #5500BB; font-size: 1.1em; font-weight: bold; }
+a.place.name:hover                                { color: #FFFFFF; background-color: #5500BB; }
+
+.place.indicator                                  { text-align: center; width: 40px; height: 13px; border: 1px solid #DDDDDD; padding-bottom: 0; 
+                                                    background: #5500BB none repeat scroll 0 0; display: block; }
+
 /* event link styles */
 
 a.event.sort                                      { color: #5500BB; font-size: 1.1em; font-weight: bold; } 
@@ -185,7 +193,7 @@ span.example                                      { color: #666666; font-style: 
 
 /* locality styles */
 
-.popular_tags                                     { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
+.popular_tags, .popular_categories                { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
 .popular_cities, .popular_neighborhoods           { color: #666666; font-size: 1.5em; padding-bottom: 5px; }
 
 .city_zips, .city_neighborhoods                   { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 

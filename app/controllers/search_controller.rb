@@ -14,6 +14,10 @@ class SearchController < ApplicationController
     @with           = @search.field(:locality_hash)
 
     @objects        = ThinkingSphinx::Search.search(@what, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20)
+
+    # build search title based on what, city, neighborhood, zip search
+    @title          = build_search_title(:what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @h1             = @title
   end
   
   def resolve

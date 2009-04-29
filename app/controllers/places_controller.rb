@@ -145,35 +145,5 @@ class PlacesController < ApplicationController
   def error
     @title    = "Search error"
   end
-  
-  protected
-  
-  def build_search_title(options={})
-    what    = options[:what] || ''
-    filter  = options[:filter] || ''
-
-    raise ArgumentError if what.blank? and filter.blank?
-    
-    if options[:state] and options[:city] and options[:neighborhood]
-      where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
-    elsif options[:state] and options[:city]
-      where = "#{options[:city].name}, #{options[:state].name}"
-    elsif options[:state] and options[:zip]
-      where = "#{options[:state].name}, #{options[:zip].name}"
-    else
-      raise Exception, "invalid search"
-    end
-
-    # use 'what' if its available
-    unless what.blank?
-      return "#{what.titleize} near #{where}"
-    end
-    
-    # otherwise use 'filter'
-    case filter
-    when 'recommended'
-      return "Recommended places near #{where}"
-    end
-  end  
 
 end
