@@ -2,7 +2,6 @@ require "#{RAILS_ROOT}/config/environment"
 require 'fastercsv'
 require 'ar-extensions'
 
-
 namespace :localeze do
   namespace :shared do
     

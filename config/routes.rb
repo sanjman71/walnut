@@ -57,12 +57,15 @@ ActionController::Routing::Routes.draw do |map|
   
   # search
   map.connect     '/search/resolve', :controller => 'search', :action => 'resolve', :conditions => {:method => :post}
+  map.connect     '/search/:country/:state/:city/n/:neighborhood/tag/:tag', :controller => 'search', :action => 'index', :neighborhood => /[a-z-]+/
+  map.connect     '/search/:country/:state/:city/n/:neighborhood/:what', :controller => 'search', :action => 'index', :neighborhood => /[a-z-]+/
+  map.connect     '/search/:country/:state/:city/n/:neighborhood', :controller => 'search', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     '/search/:country/:state/:city/tag/:tag', :controller => 'search', :action => 'index', :city => /[a-z-]+/
   map.connect     '/search/:country/:state/:city/:what', :controller => 'search', :action => 'index', :city => /[a-z-]+/
   map.connect     '/search/:country/:state/:city', :controller => 'search', :action => 'city', :city => /[a-z-]+/ # city must be lowercase
   map.connect     '/search/:country/:state', :controller => 'search', :action => 'state'
   map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
-    
+
   
   # tag group routes
   map.resources   :taggs

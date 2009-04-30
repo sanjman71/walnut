@@ -26,7 +26,7 @@
   
   - @cities.each do |city|
     - klasses = ["locality"].push(cycle('even', 'odd'))
-    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to city.name, url_for(:controller => 'places', :action => 'city', :country => @country, :state => city.state, :city => city), :class => klasses.join(" ")
+    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to city.name, url_for(:controller => 'search', :action => 'city', :country => @country, :state => city.state, :city => city), :class => klasses.join(" ")
 
   %hr.space
 
@@ -36,5 +36,5 @@
   - @neighborhoods.each do |hood|
     - klasses = ["locality"].push(cycle('even', 'odd'))
     - city    = hood.city
-    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to hood.name, url_for(:controller => 'places', :action => 'neighborhood', :country => @country, :state => city.state, :city => city, :neighborhood => hood), :class => klasses.join(" ")
+    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to hood.name, url_for(:controller => 'search', :action => 'neighborhood', :country => @country, :state => city.state, :city => city, :neighborhood => hood), :class => klasses.join(" ")
         

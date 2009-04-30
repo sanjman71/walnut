@@ -125,12 +125,10 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
 
-      # find city zips using a faceted search
-      @facets         = Location.facets(:with => {:city_id => @city.id}, :facets => ["zip_id"])
+      # find city zips and neighborhoods using a faceted search
+      @facets         = Location.facets(:with => Search.with(@city), :facets => ["zip_id", "neighborhood_ids"])
       @zips           = Search.load_from_facets(@facets, Zip)
-
-      # find city neighborhoods through database relationship
-      @neighborhoods  = @city.neighborhoods
+      @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
 
       # track events
       track_where_ga_event(params[:controller], @city)

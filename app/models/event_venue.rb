@@ -5,7 +5,7 @@ class EventVenue < ActiveRecord::Base
   validates_uniqueness_of   :name
   
   belongs_to                :location
-  has_many                  :events, :after_add => :set_events_count, :after_remove => :set_events_count
+  has_many                  :events, :after_add => :after_add_event, :after_remove => :after_remove_event
   
   # find event venues that have been mapped/unmapped to locations
   named_scope :mapped,          { :conditions => ["location_id > 0"] }
@@ -36,10 +36,16 @@ class EventVenue < ActiveRecord::Base
   
   protected
   
-  def set_events_count(event)
-    # set location events counter
-    return if location.blank?
-    location.update_attribute(:events_count, events.size)
+  def after_add_event(event)
+    return if event.blank? or location.blank?
+    # increment location's events_count
+    Location.increment_counter(:events_count, location.id)
   end
   
+  def after_remove_event(event)
+    return if event.blank? or location.blank?
+    # decrement location's events_count
+    Location.decrement_counter(:events_count, location.id)
+  end
+    
 end

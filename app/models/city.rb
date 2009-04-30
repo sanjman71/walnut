@@ -5,8 +5,6 @@ class City < ActiveRecord::Base
   has_many                    :neighborhoods
   has_many                    :locations
   
-  after_save                  :update_events
-  
   acts_as_mappable
   
   include NameParam
@@ -16,9 +14,6 @@ class City < ActiveRecord::Base
   
   # find cities with locations
   named_scope :with_locations,    { :conditions => ["locations_count > 0"] }
-
-  # find cities with events
-  named_scope :with_events,       { :conditions => ["events > 0"] }
   
   # order cities by location count
   named_scope :order_by_density,  { :order => "locations_count DESC" }
@@ -48,23 +43,6 @@ class City < ActiveRecord::Base
 
   def has_locations?
     self.locations_count > 0
-  end
-  
-  def has_events?
-    self.events > 0
-  end
-  
-  protected
-  
-  def update_events
-    # key on 'events' changes
-    events = self.changes['events']
-    return if events.blank?
-    old_id, new_id = events
-    if new_id == 1
-      # set state event flag
-      self.state.update_attribute(:events, 1)
-    end
   end
   
 end

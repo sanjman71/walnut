@@ -28,18 +28,6 @@ class CityTest < ActiveSupport::TestCase
       should "have to_s method return Chicago" do
         assert_equal "Chicago", @chicago.to_s
       end
-      
-      context "update events flag" do
-        setup do
-          @chicago.events = 1
-          @chicago.save
-          @il.reload
-        end
-        
-        should "have set state events flag" do
-          assert_equal 1, @il.events
-        end
-      end
     end
     
     context "new york" do

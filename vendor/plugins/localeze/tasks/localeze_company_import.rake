@@ -12,12 +12,19 @@ namespace :localeze do
     # 167874  In Your Life|||||||||||||
   
     # Task Import:
-    #   - ~ 127951 Chicago base records - ~5 minutes
-    desc "Clean base records txt file"
+    #   - ~ 127951 Chicago base records took ~5 minutes
+    #   - ~ 437274 CBSA 16980 (Chicagoland) base records took ~5 minutes
+    desc "Clean base records txt file, either with CITY or CBSA"
     task :clean_base_records do
       # check for filters
       city    = ENV["CITY"] ? ENV["CITY"].titleize : nil
-
+      cbsa    = ENV["CBSA"] ? ENV["CBSA"].to_s.strip : nil
+      
+      if city.blank? and cbsa.blank?
+        puts "usage error: missing CITY or CBSA"
+        exit
+      end
+      
       input   = "#{LOCALEZE_COMPANY_DATA_DIR}/BaseRecords.txt"
       output  = "#{LOCALEZE_COMPANY_DATA_DIR}/BaseRecords.csv"
       cleaned = 0
@@ -31,6 +38,10 @@ namespace :localeze do
       
             if city
               next unless s.match(/\|#{city}\|/)
+            end
+
+            if cbsa
+              next unless s.match(/\|#{cbsa}\|/)
             end
         
             if s.match(/"/)

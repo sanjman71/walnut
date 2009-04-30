@@ -6,9 +6,6 @@
     = link_to("#{pluralize(@city.locations_count, 'location')}", url_for(:action => 'index', :what => 'anything'), :class => 'locality search')
     == &nbsp;|&nbsp;
     = link_to("Recommended Places", url_for(:action => 'index', :filter => 'recommended'), :class => 'locality search')
-    - if @city.has_events?
-      == &nbsp;|&nbsp;
-      = link_to("#{@city.name} Events", url_for(:controller => 'events', :action => 'city'), :class => 'locality search')      
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
 

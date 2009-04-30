@@ -1,6 +1,22 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
-  before_filter   :init_localities, :only => [:index]
+  before_filter   :init_localities, :only => [:city, :index]
+
+  def city
+    # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
+    
+    # generate location tag counts
+    options       = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
+    @facets       = Location.facets(options)
+    @tags         = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    
+    # find city events
+    @facets       = Event.facets(:with => Search.with(@city), :facets => "city_id")
+    @events_count = @facets[:city_id][@city.id]
+    
+    @title        = "#{@city.name}, #{@state.name} Yellow Pages"
+    @h1           = "Browse #{@city.name}, #{@state.name}"
+  end
 
   def index
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
@@ -18,12 +34,12 @@ class SearchController < ApplicationController
     @objects        = ThinkingSphinx::Search.search(@query, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20,
                                                     :order => :popularity, :sort_mode => :desc)
 
-    # track what event
-    track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
-
     # build search title based on what, city, neighborhood, zip search
     @title          = build_search_title(:tag => @tag, :what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
+
+    # track what event
+    track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
   end
   
   def resolve

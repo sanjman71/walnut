@@ -101,12 +101,12 @@ class PlacesController < ApplicationController
     nearby_miles    = 20
     @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles) unless @city.blank?
 
-    # track what event
-    track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
-    
     # build search title based on [what, filter] and city, neighborhood, zip search
     @title  = build_search_title(:what => @what, :tag => @tag, :filter => @filter, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
+
+    # track what event
+    track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
   end
   
   def show
