@@ -23,27 +23,6 @@ module Localeze
 
     has_many      :company_phones, :class_name => "Localeze::CompanyPhone"
 
-    # find all unique categories
-    def categories
-      (categories1 + categories2).uniq 
-    end
-
-    # def tags
-    #   # just use categories
-    #   @tags ||= categories.collect{ |o| o.tags }.flatten.uniq
-    # end
-
-    # condensed and normalized details collection
-    def details
-      condensed_details + normalized_details
-    end
-
-    # structured attributes collection
-    def attributes
-      company_attributes
-      # company_attributes + company_unstructured_attributes
-    end
-    
     def street_address
       [housenumber, predirectional, streetname, streettype, postdirectional, apttype, aptnumber].reject(&:blank?).join(" ")
     end
@@ -58,6 +37,28 @@ module Localeze
       return true if self.latitude and self.longitude
       false
     end
+
+    # find all unique categories
+    def categories
+      (categories1 + categories2).uniq 
+    end
+
+    # structured attributes collection
+    def attributes
+      company_attributes
+      # company_attributes + company_unstructured_attributes
+    end
+
+    # def tags
+    #   # just use categories
+    #   @tags ||= categories.collect{ |o| o.tags }.flatten.uniq
+    # end
+
+    # condensed and normalized details collection
+    # def details
+    #   condensed_details + normalized_details
+    # end
+
   end
   
 end
