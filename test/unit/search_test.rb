@@ -8,7 +8,7 @@ class SearchTest < ActiveSupport::TestCase
       @us       = Factory.create(:us)
       @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
       @chicago  = Factory(:city, :name => "Chicago", :state => @il)
-      @with     = Search.with(@il, @chicago)
+      @with     = Search.with(@il, @chicago, nil)
     end
     
     should "have hash with :state_id" do
@@ -16,9 +16,9 @@ class SearchTest < ActiveSupport::TestCase
     end
   end
   
-  context "search tag_count_options" do
+  context "search tag_group_options" do
     setup do
-      @options = Search.tag_count_options(100)
+      @options = Search.tag_group_options(100)
     end
     
     should "have group, facets, limit, max_matches keys" do
@@ -43,6 +43,10 @@ class SearchTest < ActiveSupport::TestCase
       should "have no place tags" do
         assert_equal [], @search.place_tags
         assert_equal "", @search.field(:place_tags)
+      end
+      
+      should "have empty query" do
+        assert_equal "", @search.query
       end
       
       should "have no multiple field tags on name and place_tags" do
@@ -70,6 +74,10 @@ class SearchTest < ActiveSupport::TestCase
         assert_equal [], @search.place_tags
         assert_equal "", @search.field(:place_tags)
       end
+
+      should "have empty query" do
+        assert_equal "", @search.query
+      end
     end
     
     context "with what 'coffee shop'" do
@@ -88,6 +96,10 @@ class SearchTest < ActiveSupport::TestCase
       should "have place tags" do
         assert_equal ["coffee", "shop"], @search.place_tags
         assert_equal "coffee | shop", @search.field(:place_tags)
+      end
+      
+      should "have valid query" do
+        assert_equal "coffee | shop", @search.query
       end
       
       should "have multiple field tags on name and place_tags" do
@@ -115,6 +127,10 @@ class SearchTest < ActiveSupport::TestCase
       should "have no place tags" do
         assert_equal [], @search.place_tags
         assert_equal '', @search.field(:place_tags)
+      end
+    
+      should "have empty query" do
+        assert_equal "", @search.query
       end
     
       should "have no field tags on name and place_tags" do

@@ -35,7 +35,7 @@ class Event < ActiveRecord::Base
     has event_tags(:id), :as => :tag_ids, :facet => true
   end
   
-  @@get_method      = "events/get"
+  @@get_method  = "events/get"
   
   # get event info, e.g. tags, categories, ...
   def get(options={})
@@ -46,20 +46,35 @@ class Event < ActiveRecord::Base
   def popular!(b)
     self.update_attribute(:popularity, b ? 100 : 0)
   end
+
+  def apply_category_tags!(category)
+    return false if category.blank? or category.tags.blank?
+    self.event_tag_list.add(category.tags.split(",")) 
+    self.save
+  end
+
+  def remove_category_tags!(category)
+    return false if category.blank? or category.tags.blank?
+    category.tags.split(",").each { |s| self.event_tag_list.remove(s) }
+    self.save
+  end
   
   protected
   
   def after_add_category(category)
-    return if category.tag_list.blank?
-    # add tags and save object
-    self.event_tag_list.add(category.tag_list.split(",")) 
-    self.save
+    return if category.tags.blank?
+    # add category tags and save object
+    apply_category_tags!(category)
+    # increment counter cache
+    EventCategory.increment_counter(:events_count, category.id)
   end
   
   def after_remove_category(category)
-    return if category.tag_list.blank?
-    # remove tags and save object
-    category.tag_list.split(",").each { |s| self.event_tag_list.remove(s) }
-    self.save
+    return if category.tags.blank?
+    # remove category tags and save object
+    remove_category_tags!(category)
+    # decrement counter cache
+    EventCategory.decrement_counter(:events_count, category.id)
   end
+  
 end

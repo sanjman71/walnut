@@ -12,31 +12,40 @@ namespace :events do
     puts "#{Time.now}: imported #{imported} eventful categories"
   end
 
-  # desc "Create cities with events"
-  # task :create_cities do
-  #   # initialize cities
-  #   ["Chicago", "Charlotte", "New York", "Philadelphia"].sort.each do |s|
-  #     EventCity.create(:name => s)
-  #   end
-  #   
-  #   puts "#{Time.now}: #{EventCity.count} cities are considered event cities"
-  # end
-  # 
-  # desc "Mark cities with events"
-  # task :mark_cities do
-  #   marked = 0
-  #   
-  #   EventCity.all.each do |event_city|
-  #     # map to a city object
-  #     city = City.find_by_name(event_city.name)
-  #     next if city.blank?
-  #     city.events = 1
-  #     city.save
-  #     marked += 1
-  #   end
-  #   
-  #   puts "#{Time.now}: marked #{marked} cities as having events"
-  # end
+  desc "Initialize tags for each category"
+  task :import_category_tags do
+    klass     = EventCategory
+    columns   = [:name, :tags]
+    file      = "#{RAILS_ROOT}/data/event_categories.txt"
+    values    = []
+    options   = { :validate => false }
+    imported  = 0
+    
+    puts "#{Time.now}: parsing file #{file}" 
+    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+      name, tags = row
+      
+      # find event category by name
+      next unless event_category = EventCategory.find_by_name(name)
+      
+      event_category.tags = tags.strip
+      event_category.save
+      imported += 1
+    end
+
+    puts "#{Time.now}: completed, added tags to #{imported} categories" 
+  end
+
+  desc "Apply category tags to events"
+  task :apply_category_tags do
+    puts "#{Time.now}: applying category tags to all events in each category"
+    EventCategory.all.each do |event_category|
+      event_category.events.each do |event|
+        event.apply_category_tags!(event_category)
+      end
+    end
+    puts "#{Time.now}: completed"
+  end
 
   desc "Import event venues from eventful"
   task :import_venues do

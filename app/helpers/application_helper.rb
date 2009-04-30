@@ -32,12 +32,14 @@ module ApplicationHelper
   def build_search_route(where, options={})
     case where
     when 'city'
-      url_for(:action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], :what => options[:what])
+      url_for(:controller => params[:controller], :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+              :tag => options[:tag], :what => options[:what])
     when 'zip'
-      url_for(:action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], :what => options[:what])
+      url_for(:controller => params[:controller], :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
+              :tag => options[:tag], :what => options[:what])
     when 'neighborhood'
-      url_for(:action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
-              :neighborhood => options[:neighborhood], :what => options[:what])
+      url_for(:controller => params[:controller], :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+              :neighborhood => options[:neighborhood], :tag => options[:tag], :what => options[:what])
     else
       raise ArgumentError, "no route for #{where}"
     end

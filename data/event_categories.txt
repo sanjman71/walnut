@@ -1,0 +1,28 @@
+Concerts, Live Music|music,concerts
+Conferences|conferences
+Festivals|festivals
+Food, Wine|food,wine
+Fundraisers|fundraisers
+Galleries, Art|art,galleries
+Health, Wellness|health
+Kids, Family|family,kids
+Learning|learning
+Literary|literary
+Movies, Film|film,movies
+Museums, Sights|museums,sights
+Neighborhood|neighborhood
+Nightlife, Singles|singles,nightlife
+On Campus, Alumni|alumni,campus
+Organizations|organizations
+Outdoors, Recreation|outdoors
+Pets, Animals|animals,pets
+Politics, Causes|politics
+Sales, Retail|retail
+Science|science
+Spirituality|spirituality
+Sports|sports
+Technology|technology
+Theatre, Comedy|comedy,theatre
+Travel, Tours|travel
+Work, Business|work
+Other|other

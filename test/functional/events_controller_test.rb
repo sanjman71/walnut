@@ -12,9 +12,11 @@ class EventsControllerTest < ActionController::TestCase
 
   # city route
   should_route :get, '/events/us/il/chicago', :controller => 'events', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
-  # city tag route
+  # city tag routes
   should_route :get, '/events/us/il/chicago/festivals',
                :controller => 'events', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :what => 'festivals'
+  should_route :get, '/events/us/il/chicago/tag/festivals',
+               :controller => 'events', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'festivals'
 
   # city category route
   should_route :get, '/events/us/il/chicago/category/music',
@@ -24,10 +26,6 @@ class EventsControllerTest < ActionController::TestCase
   should_route :get, '/events/us/il/chicago/popular',
                :controller => 'events', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :sort => 'popular'
                
-  # city keyword/q route
-  should_route :get, '/events/us/il/chicago/q/techno',
-               :controller => 'events', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :q => 'techno'
-  
   # city search route
   should_route :get, '/events/us/il/chicago/search', 
                :controller => 'events', :action => 'search', :country => 'us', :state => 'il', :city => 'chicago'

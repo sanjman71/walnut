@@ -18,4 +18,4 @@
     - else
       - location_tags.each do |place_tag|
         - klasses = Array(what).any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
-        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => 'places', :action => 'index', :what => place_tag.name.parameterize}, :class => klasses.join(" "), :style => "padding: 0 2px;"
+        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => params[:controller], :action => 'index', :tag => place_tag.name.parameterize}, :class => klasses.join(" "), :style => "padding: 0 2px;"

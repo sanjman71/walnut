@@ -26,7 +26,7 @@ To get the application up and running:
   - rake init:urban_neighborhoods CITY='Charlotte' STATE='NC'
 
 5. Build the sphinx index, without re-creating the configuration file:
-  - rake ts:index INDEX_ONLY=true
+  - rake ts:index
   
 6. Start the sphinx dameon:
   - rake ts:start

@@ -10,6 +10,9 @@ class HomeController < ApplicationController
     # @cities         = City.with_locations.order_by_density.all(:limit => 30)
     # @neighborhoods  = Neighborhood.with_locations.order_by_density.all(:limit => 10, :include => :city)
 
+    # track event
+    track_home_ga_event(params[:controller], "Index")
+
     respond_to do |format|
       format.html
     end

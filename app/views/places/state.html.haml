@@ -1,7 +1,7 @@
 - title(@title)
 
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-20
-  %h2== #{@state.name} State Page
+  %h2= @h1
   %h5= "#{pluralize(@state.locations_count, 'location')}"
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => nil})

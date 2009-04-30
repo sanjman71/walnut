@@ -5,7 +5,8 @@ class CreateEvents < ActiveRecord::Migration
       t.string    :source_type,   :limit => 20, :null => false
       t.string    :source_id,     :limit => 50, :null => false
       t.integer   :popularity,    :default => 0
-      t.string    :tag_list,      :limit => 150
+      t.string    :tags,          :limit => 150
+      t.integer   :events_count,  :default => 0  # counter cache
     end
     
     add_index :event_categories, :name

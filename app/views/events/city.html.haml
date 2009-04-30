@@ -2,10 +2,10 @@
 
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
   .span-13
-    %h2= @title
-  .span-10.last
-    #event_search
-      = render(:partial => 'event_search', :locals => {:object => @city, :url => url_for(:action => 'search')})
+    %h2= @h1
+  -#.span-10.last
+    -##event_search
+      -#= render(:partial => 'event_search', :locals => {:object => @city, :url => url_for(:action => 'search')})
       
   .span-23.last
     %h5
@@ -20,11 +20,11 @@
     
 %hr.space
 
-%h3.span-23.prepend-1#categories
-  .popular_categories== Event Categories
-  - @categories.each do |category|
-    - klasses = ["event", "category"].push(cycle('even', 'odd'))
-    %span.small[category]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(category.name, url_for(:action => 'index', :category => category.to_param), :class => klasses.join(" "))
+/ %h3.span-23.prepend-1#categories
+/   .popular_categories== Event Categories
+/   - @categories.each do |category|
+/     - klasses = ["event", "category"].push(cycle('even', 'odd'))
+/     %span.small[category]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(category.name, url_for(:action => 'index', :category => category.to_param), :class => klasses.join(" "))
 
 %hr.space
 

@@ -13,11 +13,14 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/places/error/:locality', :controller => 'places', :action => 'error'
   
   # places [locality, tag] routes
+  map.connect     '/places/:country/:state/:city/n/:neighborhood/tag/:tag', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/n/:neighborhood/:what', :controller => 'places', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/n/:neighborhood', :controller => 'places', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/:filter', :controller => 'places', :action => 'index', :city => /[a-z-]+/, :filter => /recommended/
+  map.connect     '/places/:country/:state/:city/tag/:tag', :controller => 'places', :action => 'index', :city => /[a-z-]+/
   map.connect     '/places/:country/:state/:city/:what', :controller => 'places', :action => 'index', :city => /[a-z-]+/
-  map.connect     '/places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/
+  map.connect     '/places/:country/:state/:city', :controller => 'places', :action => 'city', :city => /[a-z-]+/ # city must be lowercase
+  map.connect     '/places/:country/:state/:zip/tag/:tag', :controller => 'places', :action => 'index', :zip => /\d{5}/ # zip must be 5 digits
   map.connect     '/places/:country/:state/:zip/:what', :controller => 'places', :action => 'index', :zip => /\d{5}/ # zip must be 5 digits
   map.connect     '/places/:country/:state/:zip', :controller => 'places', :action => 'zip', :zip => /\d{5}/
   map.connect     '/places/:country/:state', :controller => 'places', :action => 'state'
@@ -39,20 +42,28 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/events/:country/:state/:city/n/:neighborhood/:what', :controller => 'events', :action => 'index', :neighborhood => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/n/:neighborhood', :controller => 'events', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/search', :controller => 'events', :action => 'search', :city => /[a-z-]+/
-  map.connect     '/events/:country/:state/:city/q/:q', :controller => 'events', :action => 'index', :city => /[a-z-]+/
+  map.connect     '/events/:country/:state/:city/tag/:tag', :controller => 'events', :action => 'index', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/:sort', :controller => 'events', :action => 'index', :city => /[a-z-]+/, :sort => /popular/
   map.connect     '/events/:country/:state/:city/category/:category', :controller => 'events', :action => 'index', :city => /[a-z-]+/
-  map.connect     '/events/:country/:state/:city/:what', :controller => 'events', :action => 'index', :city => /[a-z-]+/
+  map.connect     '/events/:country/:state/:city/:what', :controller => 'events', :action => 'index', :city => /[a-z-]+/ # city must be lowercase
   map.connect     '/events/:country/:state/:city', :controller => 'events', :action => 'city', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:zip/:what', :controller => 'events', :action => 'index', :zip => /\d{5}/ # zip must be 5 digits
   map.connect     '/events/:country/:state/:zip', :controller => 'events', :action => 'zip', :zip => /\d{5}/
   map.connect     '/events/:country/:state', :controller => 'events', :action => 'state'
   map.connect     '/events/:country', :controller => 'events', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
+
+  # search error route
+  map.connect     '/search/error/:locality', :controller => 'search', :action => 'error'
   
   # search
   map.connect     '/search/resolve', :controller => 'search', :action => 'resolve', :conditions => {:method => :post}
+  map.connect     '/search/:country/:state/:city/tag/:tag', :controller => 'search', :action => 'index', :city => /[a-z-]+/
   map.connect     '/search/:country/:state/:city/:what', :controller => 'search', :action => 'index', :city => /[a-z-]+/
+  map.connect     '/search/:country/:state/:city', :controller => 'search', :action => 'city', :city => /[a-z-]+/ # city must be lowercase
+  map.connect     '/search/:country/:state', :controller => 'search', :action => 'state'
+  map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
     
+  
   # tag group routes
   map.resources   :taggs
   

@@ -1,0 +1,4 @@
+%h4{:style => 'font-weight: bold;'}= name
+%ul
+  - tags.each do |tag|
+    %li= link_to tag.name, url_for(:tag => tag.name.parameterize)

@@ -5,13 +5,18 @@
 - zips1   = zips.slice(0,index1)
 - zips2   = zips.slice(index1, index1)
 
+-# build basic url options
+- url_options = Hash[:action => 'index']
+- url_options.update(:tag => tag.parameterize) unless tag.blank?
+- url_options.update(:what => what.parameterize) unless what.blank?
+
 .span-4
   .span-2
     %ul
       - zips1.each do |zip|
-        %li.zip= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what.parameterize)
+        %li.zip= link_to zip.name, url_for(url_options.update(:zip => zip))
 
   .span-2.last
     %ul
       - zips2.each do |zip|
-        %li.zip= link_to zip.name, url_for(:action => 'index', :zip => zip, :what => what.parameterize)
+        %li.zip= link_to zip.name, url_for(url_options.update(:zip => zip))

@@ -89,7 +89,7 @@ namespace :localeze do
     Localeze::BaseRecord.find(:all, :select => ["id"]).collect(&:id)
   end
 
-  # Timing: ~272 minutes 
+  # Timing: ~11750000 records in 507 minutes
   desc "Import company headings"
   task :import_company_headings do
     klass     = Localeze::CompanyHeading
@@ -97,7 +97,6 @@ namespace :localeze do
     file      = "#{LOCALEZE_DATA_DIR}CompanyHeadings.txt"
     options   = { :validate => false }
     id        = 1
-    base_ids  = find_all_base_record_ids
   
     # truncate table
     klass.delete_all
@@ -106,14 +105,11 @@ namespace :localeze do
     FasterCSV.foreach(file, :row_sep => "\r\n", :col_sep => '|') do |row|
       base_record_id, normalized_detail_id, condensed_detail_id, category_id, relevancy = row
       
-      # check that the associated base record exists
-      next unless base_ids.include?(base_record_id.to_i)
-
       value = [id] + row
       klass.import columns, [value], options
       id += 1
       
-      puts "#{Time.now}: *** added #{id} records" if (id % 100) == 0
+      puts "#{Time.now}: *** added #{id} records" if (id % 10000) == 0
     end
 
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
@@ -127,7 +123,7 @@ namespace :localeze do
     file      = "#{LOCALEZE_DATA_DIR}CompanyAttributes.txt"
     options   = { :validate => false } 
     id        = 1
-    base_ids  = find_all_base_record_ids
+    # base_ids  = find_all_base_record_ids
     
     # truncate table
     klass.delete_all
@@ -137,13 +133,13 @@ namespace :localeze do
       base_record_id, xxx, name, group_name, group_type, category_id = row
       
       # check that the associated base record exists
-      next unless base_ids.include?(base_record_id.to_i)
+      # next unless base_ids.include?(base_record_id.to_i)
       
       value = [id, base_record_id, name, group_name, group_type, category_id]
       klass.import columns, [value], options
       id += 1
 
-      puts "#{Time.now}: *** added #{id} records" if (id % 50) == 0
+      puts "#{Time.now}: *** added #{id} records" if (id % 10000) == 0
     end
 
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 

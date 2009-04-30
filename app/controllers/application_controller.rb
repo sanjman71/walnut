@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
   
   include RecommendationsHelper
+  include GoogleAnalyticsEventsHelper
   
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
@@ -91,7 +92,7 @@ class ApplicationController < ActionController::Base
         @states = @country.states.with_events
       end
       # track events
-      init_ga_events(params[:controller], @country)
+      track_where_ga_event(params[:controller], @country)
       return true
     else
       # find the specified state for all other cases
@@ -115,7 +116,7 @@ class ApplicationController < ActionController::Base
       end
 
       # track events
-      init_ga_events(params[:controller], @state)
+      track_where_ga_event(params[:controller], @state)
     when 'city'
       # find city, and all city zips and neighborhoods
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
@@ -132,7 +133,7 @@ class ApplicationController < ActionController::Base
       @neighborhoods  = @city.neighborhoods
 
       # track events
-      init_ga_events(params[:controller], @city)
+      track_where_ga_event(params[:controller], @city)
     when 'neighborhood'
       # find city and neighborhood
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
@@ -144,7 +145,7 @@ class ApplicationController < ActionController::Base
       end
 
       # track events
-      init_ga_events(params[:controller], @neighborhood)
+      track_where_ga_event(params[:controller], @neighborhood)
     when 'zip'
       # find zip and all zip cities
       @zip      = @state.zips.find_by_name(params[:zip].to_s)
@@ -158,7 +159,7 @@ class ApplicationController < ActionController::Base
       @cities   = Search.load_from_facets(@facets, City)
 
       # track events
-      init_ga_events(params[:controller], @zip)
+      track_where_ga_event(params[:controller], @zip)
     when 'index'
       # find city, zip and/or neighborhood
       # city or zip must be specified; if its a city, neighborhood is optional
@@ -174,10 +175,10 @@ class ApplicationController < ActionController::Base
       # track events
       if @neighborhood
         # track only the neighborhood event
-        init_ga_events(params[:controller], [@neighborhood])
+        track_where_ga_event(params[:controller], [@neighborhood])
       else
         # track city or zip event
-        init_ga_events(params[:controller], [@city, @zip].compact)
+        track_where_ga_event(params[:controller], [@city, @zip].compact)
       end
     end
     
@@ -192,10 +193,12 @@ class ApplicationController < ActionController::Base
   end
   
   def build_search_title(options={})
-    what    = options[:what] || ''
-    filter  = options[:filter] || ''
+    tag       = options[:tag] || ''
+    what      = options[:what] || ''
+    category  = options[:category] || ''
+    filter    = options[:filter] || ''
 
-    raise ArgumentError if what.blank? and filter.blank?
+    raise ArgumentError if tag.blank? and what.blank? and category.blank? and filter.blank?
     
     if options[:state] and options[:city] and options[:neighborhood]
       where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
@@ -207,28 +210,30 @@ class ApplicationController < ActionController::Base
       raise Exception, "invalid search"
     end
 
-    # use 'what' if its available
-    unless what.blank?
-      return "#{what.titleize} near #{where}"
+    # use 'tag', 'what', then 'category'
+    if !tag.blank?
+      subject = tag
+    elsif !what.blank?
+      subject = what
+    elsif !category.blank?
+      subject = category
     end
     
-    # otherwise use 'filter'
-    case filter
-    when 'recommended'
-      return "Recommended places near #{where}"
+    # add specifics based on the controller
+    case params['controller']
+    when 'places'
+      subject += " Places"
+    when 'events' 
+      subject += " Events"
     end
+      
+    return "#{subject.titleize} near #{where}"
+    # 
+    # # otherwise use 'filter'
+    # case filter
+    # when 'recommended'
+    #   return "Recommended places near #{where}"
+    # end
   end  
-  
-  def init_ga_events(controller, localities)
-    @ga_events ||= []
     
-    case controller
-    when 'events', 'places', 'search'
-      Array(localities).compact.each do |locality|
-        @ga_events.push("pageTracker._trackEvent('#{controller.titleize}', '#{locality.class.to_s}', '#{locality.name}');")
-      end
-    else
-    end
-  end
-  
 end

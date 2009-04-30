@@ -1,4 +1,8 @@
+- url_options = Hash[:action => 'index', :city => city]
+- url_options.update(:tag => tag.parameterize) unless tag.blank?
+- url_options.update(:what => what.parameterize) unless what.blank?
+
 %h4.neighborhood.related== #{city.name} Neighborhoods
 %ul
   - neighborhoods.each do |hood|
-    %li= link_to hood.name, url_for(:action => 'index', :city => city, :neighborhood => hood, :what => what.parameterize)
+    %li= link_to hood.name, url_for(url_options.update(:neighborhood => hood))

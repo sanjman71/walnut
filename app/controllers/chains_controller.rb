@@ -7,6 +7,9 @@ class ChainsController < ApplicationController
     
     @title    = "Chain Store Locator"
     @h1       = "Chain Stores"
+
+    # track event
+    track_chain_ga_event(params[:controller], "Index")
   end
 
   def country
@@ -15,11 +18,14 @@ class ChainsController < ApplicationController
 
     # facet search by chain id
     @facets   = Location.facets(:conditions => {:chain_ids => @chain.id}, :facets => ["country_id", "state_id"])
-    @states   = State.find(@facets[:state_id].keys)
+    @states   = Search.load_from_facets(@facets, State)
     # count locations in country
     @count    = @facets[:country_id][@country.id]
 
     @title    = "#{@chain.name} Store Locator"
+    
+    # track event
+    track_chain_ga_event(params[:controller], @chain, @country)
   end
   
   def state
@@ -28,11 +34,14 @@ class ChainsController < ApplicationController
     
     # facet search by chain id and state id
     @facets   = Location.facets(:conditions => {:chain_ids => @chain.id, :state_id => @state.id}, :facets => ["city_id", "state_id"])
-    @cities   = City.find(@facets[:city_id].keys)
+    @cities   = Search.load_from_facets(@facets, City)
     # count locations in state
     @count    = @facets[:state_id][@state.id]
 
     @title    = "#{@chain.name} Locations in #{@state.name}"
+
+    # track event
+    track_chain_ga_event(params[:controller], @chain, @state)
   end
   
   def city
@@ -41,6 +50,9 @@ class ChainsController < ApplicationController
     @locations  = Location.search(:conditions => {:chain_ids => @chain.id, :city_id => @city.id}, :include => [:state, :city, :zip])
 
     @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
+
+    # track event
+    track_chain_ga_event(params[:controller], @chain, @city)
   end
   
   protected

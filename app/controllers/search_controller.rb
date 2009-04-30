@@ -5,18 +5,24 @@ class SearchController < ApplicationController
   def index
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
+    @tag            = params[:tag].to_s.from_url_param
     @what           = params[:what].to_s.from_url_param
     
     # handle special case of 'something' to find a random what
     @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'something'
 
-    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @what)
+    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag.blank? ? @what : @tag)
+    @query          = @search.query
     @with           = @search.field(:locality_hash)
 
-    @objects        = ThinkingSphinx::Search.search(@what, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20)
+    @objects        = ThinkingSphinx::Search.search(@query, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20,
+                                                    :order => :popularity, :sort_mode => :desc)
+
+    # track what event
+    track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
 
     # build search title based on what, city, neighborhood, zip search
-    @title          = build_search_title(:what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @title          = build_search_title(:tag => @tag, :what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
   end
   
@@ -48,6 +54,10 @@ class SearchController < ApplicationController
     else
       redirect_to(root_path)
     end
+  end
+  
+  def error
+    @title  = "Search Error"
   end
   
 end

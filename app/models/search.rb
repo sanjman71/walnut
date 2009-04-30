@@ -11,6 +11,11 @@ class Search
     # handle special anything search
     @place_tags     = [] if @place_tags == @@anything_search
   end
+
+  # build query as an 'or' of each tag
+  def query
+    @place_tags.join(" | ")
+  end
   
   def field(field)
     case field
@@ -85,14 +90,14 @@ class Search
   
   def self.with(*args)
     hash = Hash.new
-    Array(args).each do |locality|
+    Array(args).compact.each do |locality|
       hash[class_to_attribute_symbol(locality.class)] = locality.id
     end
     hash
   end
   
-  def self.tag_count_options(limit)
-    # note: we need to set max_matches to get by the per_page limit
+  def self.tag_group_options(limit)
+    # note: we need to set max_matches to override the per_page limit
     Hash[:facets => "tag_ids", :group_by => "tag_ids", :group_clause => "@count desc", :limit => limit.to_i, :max_matches => limit.to_i]
   end
   
