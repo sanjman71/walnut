@@ -43,7 +43,7 @@ namespace :data do
 
           if tags_list.blank?
             # puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}"
-            LOCALEZE_TAGS_LOGGER.debug("*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
+            DATA_TAGS_LOGGER.debug("*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
             skipped += 1
           end
 
@@ -65,7 +65,7 @@ namespace :data do
           
           # a category should match exactly 1 tag group
           if tag_groups.size != 1
-            LOCALEZE_TAGS_LOGGER.debug("#{Time.now}: xxx category #{category_name} mapped to #{tag_groups.size} tag groups")
+            DATA_TAGS_LOGGER.debug("#{Time.now}: xxx category #{category_name} mapped to #{tag_groups.size} tag groups")
             next
           end
           
@@ -226,15 +226,18 @@ namespace :data do
         if @state.blank?
           # invalid state
           errors += 1
-          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} invalid state #{record.state}")
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} invalid state #{record.state}")
           next
         end
         
         if record.city.blank? or record.zip.blank?
           errors += 1
-          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} missing city or zip")
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} missing city or zip")
           next
         end
+        
+        # fix localeze errors, and there are lots of them
+        record.normalize_city_and_state
         
         begin
           # get city if it exists, or validate and create if it doesn't
@@ -242,7 +245,7 @@ namespace :data do
         rescue Exception
           # log exception
           @city = nil
-          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate city:#{record.city} in state:#{@state.name}")
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate city:#{record.city} in state:#{@state.name}")
         end
       
         if @city.blank?
@@ -258,7 +261,7 @@ namespace :data do
         rescue Exception
           # log exception
           @zip = nil
-          LOCALEZE_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate zip:#{record.zip} in state:#{@state.name}")
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate zip:#{record.zip} in state:#{@state.name}")
         end
         
         if @zip.blank?

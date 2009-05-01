@@ -109,8 +109,8 @@ namespace :localeze do
     end
 
     # Navicat Import:
-    #  - ~18M records in 770 seconds
-    #  - .txt import, 6 columns, no id field, start with field1 as base_record_id
+    #  - ~18M records in 11 minutes
+    #  - ~18M records in 20 minutes
     # Task Import: 
     #  - import ~11750000 records in 507 minutes
     desc "Import company headings"
@@ -139,8 +139,8 @@ namespace :localeze do
     end
   
     # Navicat Import:  
-    #  - ~12.5M records in 880 seconds
-    #  - ~12.5M records in 3000 seconds
+    #  - ~12.5M records in 15 minutes
+    #  - ~12.5M records in 50 minutes
     # Task Import: 
     #  - ~5000000 records in 236 minutes
     desc "Import company (structured) attributes"
