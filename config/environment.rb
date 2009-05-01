@@ -90,6 +90,7 @@ end
 
 # Extend ruby classes
 require "#{RAILS_ROOT}/lib/string.rb"
+require "#{RAILS_ROOT}/lib/hash.rb"
 require "#{RAILS_ROOT}/lib/math.rb"
 
 # create special localeze loggers
