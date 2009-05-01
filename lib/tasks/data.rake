@@ -1,6 +1,6 @@
 namespace :data do
   
-  # Timing: ~ 1 hour
+  # Performance: ~ 1 hour
   desc "Import localeze categories and attributes as tags and tag groups"
   task :import_tags do
     
@@ -42,7 +42,7 @@ namespace :data do
           tags_list   = Localeze::TagFilter.to_tags(group_name, attr_name)
 
           if tags_list.blank?
-            puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}"
+            # puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}"
             LOCALEZE_TAGS_LOGGER.debug("*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
             skipped += 1
           end
@@ -160,7 +160,10 @@ namespace :data do
     puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported, and mapped #{places} places to chains"
   end
   
-  desc "Import localeze records, by city and state"
+  # Performance:
+  #  - import 10K records in ~14 minutes
+  #  - import 250K records in ~240 minutes
+  desc "Import localeze records, by city and state or cbsa"
   task :import_records do |t|
     
     # intialiaze page parameters, limit
@@ -184,10 +187,18 @@ namespace :data do
         puts "#{Time.now}: invalid city or state"
         exit
       end
-      
+
+      # build conditions for city and state
       conditions.update({:city => city.name, :state => state.code})
       
       puts "#{Time.now}: importing localeze records for #{city}:#{state_code}, limit: #{limit}, page: #{page}, per page: #{per_page}"
+    elsif ENV["CBSA"]
+      cbsa  = ENV["CBSA"].to_s.strip
+
+      # build conditions for cbsa
+      conditions.update({:cbsa => cbsa})
+
+      puts "#{Time.now}: importing localeze records for cbsa #{cbsa}, limit: #{limit}, page: #{page}, per page: #{per_page}"
     else
       # import all records
       puts "#{Time.now}: importing all localeze records, limit: #{limit}, page: #{page}, per page: #{per_page}"

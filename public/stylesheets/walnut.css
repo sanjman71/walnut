@@ -193,8 +193,9 @@ span.example                                      { color: #666666; font-style: 
 
 /* locality styles */
 
-.popular_tags, .popular_categories                { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
-.popular_cities, .popular_neighborhoods           { color: #666666; font-size: 1.5em; padding-bottom: 5px; }
+.popular.tags, .popular.categories, .popular.events                
+                                                  { color: #111111; font-weight: bold; font-size: 1.3em; padding-bottom: 10px; }
+.popular.cities, .popular.neighborhoods           { color: #666666; font-size: 1.5em; padding-bottom: 5px; }
 
 .city_zips, .city_neighborhoods                   { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
 .zip_cities                                       { color: #111111; font-weight: bold; font-size: 0.8.em; padding-bottom: 10px; } 
@@ -202,7 +203,7 @@ span.example                                      { color: #666666; font-style: 
 .state_cities                                     { color: #111111; font-weight: bold; padding-bottom: 10px; }
 .state_zips                                       { color: #111111; font-weight: bold; padding-bottom: 10px; }
 
-.neighborhood.related, .zip.related, .city.related
+.neighborhood.related, .zip.related, .city.related, .city.nearby
                                                   { color: #111111;  font-weight: bold; }
 
 span.neighborhood                                 { margin-right: 2px; }

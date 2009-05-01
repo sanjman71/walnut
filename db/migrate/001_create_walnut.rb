@@ -38,6 +38,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :cities, :state_id
     add_index :cities, :locations_count
     add_index :cities, [:state_id, :locations_count], :name => "index_cities_on_state_and_locations"
+    add_index :cities, [:state_id, :name], :name => "index_cities_on_state_and_name"
     
     create_table :zips do |t|
       t.string      :name,                  :limit => 10, :default => nil

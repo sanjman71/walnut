@@ -9,7 +9,8 @@
 %hr.space
 
 %h3.span-20.prepend-1
-  = render(:partial => 'places/popular_tags', :locals => {:tags => @tags, :locality_type => 'zip', :locality_params => {:country => @country, :state => @state, :zip => @zip}})
+  - unless @popular_tags.blank?
+    = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'zip', :locality_params => {:country => @country, :state => @state, :zip => @zip}})
     
 %hr.space
 

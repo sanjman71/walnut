@@ -1,4 +1,4 @@
-%h4== Nearby Cities
+%h4.city.nearby== Nearby Cities
 %ul
   - nearby_cities.each do |city|
     %li= link_to city.name, url_for(:action => 'index', :city => city, :what => what.parameterize)

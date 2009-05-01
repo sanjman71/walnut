@@ -1,0 +1,6 @@
+.popular.events== Popular Events
+
+- events.each do |event|
+  - klasses = ["event"].push(cycle('even', 'odd'))
+  %span.small[event]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(event.name, event.url, :class => klasses.join(" "))
+

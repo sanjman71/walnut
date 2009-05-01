@@ -17,37 +17,37 @@ class PlacesController < ApplicationController
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
-    # generate tag counts using facets
-    options   = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
-    @facets   = Location.facets(options)
-    @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    # generate popular tag counts
+    options       = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
+    @facets       = Location.facets(options)
+    @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    @title    = "Browse Places in #{@city.name}, #{@state.name}"
-    @h1       = @title
+    @title        = "Browse Places in #{@city.name}, #{@state.name}"
+    @h1           = @title
   end
 
   def neighborhood
     # @country, @state, @city, @neighborhood all initialized in before filter
 
-    # generate tag counts using facets
-    options   = {:with => Search.with(@neighborhood)}.update(Search.tag_group_options(150))
-    @facets   = Location.facets(options)
-    @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    # generate popular tag counts
+    options       = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
+    @facets       = Location.facets(options)
+    @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    @title    = "Browse Places in #{@neighborhood.name}, #{@city.name}, #{@state.name}"
-    @h1       = @title
+    @title        = "Browse Places in #{@neighborhood.name}, #{@city.name}, #{@state.name}"
+    @h1           = @title
   end
   
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
 
-    # generate tag counts using facets
-    options   = {:with => Search.with(@zip)}.update(Search.tag_group_options(150))
-    @facets   = Location.facets(options)
-    @tags     = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    # generate popular tag counts
+    options       = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
+    @facets       = Location.facets(options)
+    @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    @title    = "Browse Places in #{@state.name} #{@zip.name}"
-    @h1       = @title
+    @title        = "Browse Places in #{@state.name} #{@zip.name}"
+    @h1           = @title
   end
     
   def index

@@ -3,13 +3,14 @@ class HomeController < ApplicationController
     @country        = Country.default
     
     # find popular cities and neighborhoods
-    @facets         = Location.facets(:with => {:country_id => @country.id}, :facets => ["city_id", "neighborhood_ids"])
+    options         = Search.with(@country).update(Search.city_group_options(10))
+    @facets         = Location.facets(options)
     @cities         = Search.load_from_facets(@facets, City)
+    
+    options         = Search.with(@country).update(Search.neighborhood_group_options(10))
+    @facets         = Location.facets(options)
     @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
     
-    # @cities         = City.with_locations.order_by_density.all(:limit => 30)
-    # @neighborhoods  = Neighborhood.with_locations.order_by_density.all(:limit => 10, :include => :city)
-
     # track event
     track_home_ga_event(params[:controller], "Index")
 

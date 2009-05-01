@@ -1,6 +1,18 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
-  before_filter   :init_localities, :only => [:city, :index]
+  before_filter   :init_localities, :only => [:country, :state, :city, :index]
+
+  def country
+    # @country, @states initialized in before filter
+    @title  = "Browse Places and Events in #{@country.name}"
+    @h1     = "Browse Places and Events by State"
+  end
+
+  def state
+    # @country, @state, @cities, @zips all initialized in before filter
+    @title  = "Browse Places and Events in #{@state.name}"
+    @h1     = @title
+  end
 
   def city
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
@@ -8,14 +20,23 @@ class SearchController < ApplicationController
     # generate location tag counts
     options       = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
     @facets       = Location.facets(options)
-    @tags         = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     
-    # find city events
+    # find city events count and popular city events
     @facets       = Event.facets(:with => Search.with(@city), :facets => "city_id")
-    @events_count = @facets[:city_id][@city.id]
+    @events_count = @facets[:city_id][@city.id].to_i
+    
+    if @events_count > 0
+      # find most popular city events
+      @with           = Search.with(@city).update(:popularity => 1..100)
+      @popular_events = Event.search(:with => @with, :limit => 5)
+    else
+      # no popular events
+      @popular_events = []
+    end
     
     @title        = "#{@city.name}, #{@state.name} Yellow Pages"
-    @h1           = "Browse #{@city.name}, #{@state.name}"
+    @h1           = "Browse Places and Events in #{@city.name}, #{@state.name}"
   end
 
   def index
@@ -34,6 +55,14 @@ class SearchController < ApplicationController
     @objects        = ThinkingSphinx::Search.search(@query, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20,
                                                     :order => :popularity, :sort_mode => :desc)
 
+    # find objects by class
+    @klasses        = Hash.new([])
+    @objects.each do |object|
+      @klasses[object.class.to_s] += [object]
+    end
+
+    @locality_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
+    
     # build search title based on what, city, neighborhood, zip search
     @title          = build_search_title(:tag => @tag, :what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title

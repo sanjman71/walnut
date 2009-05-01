@@ -18,6 +18,9 @@ class City < ActiveRecord::Base
   # order cities by location count
   named_scope :order_by_density,  { :order => "locations_count DESC" }
   
+  # order cities by name
+  named_scope :order_by_name,     { :order => "name ASC" }
+  
   # the special anywhere object
   def self.anywhere(state=nil)
     City.new do |o|

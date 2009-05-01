@@ -1175,7 +1175,7 @@
 1502|Geico
 1503|Discount Tire
 1505|American Leak Detection
-1506|Ben & Jerry¿s
+1506|Ben & JerryÂ¿s
 1507|Hollywood Tans
 1508|CompUSA
 1509|Accountemps
@@ -1349,7 +1349,7 @@
 1688|Cousins Subs
 1689|Creative Colors International
 1690|Crestcom
-1691|D¿Angelo
+1691|DÂ¿Angelo
 1692|Market Baskets
 1693|The Dentist's Choice
 1694|DirectBuy
@@ -1366,7 +1366,7 @@
 1705|The Entrepreneur's Source
 1706|EPIC
 1707|Erie Insurance
-1708|Executive Tans¿
+1708|Executive TansÂ¿
 1709|FAST-FIX
 1710|FastFrame
 1711|National City
@@ -1408,7 +1408,7 @@
 1748|Interface Financial Group
 1749|IBEW
 1750|Island Ink-Jet
-1751|It¿s A Grind
+1751|ItÂ¿s A Grind
 1752|Jack Gaughen Realtor
 1753|Jani-King
 1754|Janney
@@ -1547,7 +1547,7 @@
 1892|Batteries Plus
 1893|Booster Juice
 1894|Boston Pizza
-1895|Breadeaúx Pizza
+1895|BreadeaÃºx Pizza
 1896|British Airways
 1897|Burnet
 1898|Cape Air 
@@ -1659,7 +1659,7 @@
 2014|At Work Personnel Services
 2015|Bad Ass Coffee
 2016|California Closets
-2017|Christmas Décor
+2017|Christmas DÃ©cor
 2019|Geeks on Call
 2020|Limited Brands
 2021|Liberty Fitness
@@ -1720,7 +1720,7 @@
 2083|Cookies by Design
 2084|Coverall
 2085|Crown Trophy
-2086|Décor & You
+2086|DÃ©cor & You
 2087|Drama Kids
 2088|DRY-B-LO
 2089|Express Mart

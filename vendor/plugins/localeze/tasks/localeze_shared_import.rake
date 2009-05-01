@@ -7,6 +7,8 @@ namespace :localeze do
     
     LOCALEZE_DATA_DIR = "#{RAILS_ROOT}/vendor/plugins/localeze/data"
     
+    # Task Import:
+    #  - works fine
     desc "Import localeze categories"
     task :import_categories do
       klass     = Localeze::Category
@@ -25,6 +27,8 @@ namespace :localeze do
       puts "#{Time.now}: completed, ended with #{klass.count} objects" 
     end
 
+    # Task Import:
+    #  * failed with 'illegal quote' error
     desc "Import localeze chains"
     task :import_chains do
       klass     = Localeze::Chain

@@ -27,18 +27,33 @@ module ApplicationHelper
     "<div class=\"#{type.to_s}\">#{msg}</div>"
   end
   
-  # build a place search route
+  def build_places_search_route(where, options={})
+    build_search_route('places', where, options)
+  end
+  
+  alias :build_locations_search_route :build_places_search_route
+  
+  # build search route based on the controller in the current request
   # note: searching can only be done by city, zip or neighborhood
-  def build_search_route(where, options={})
+  def build_search_route(klass, where, options={})
+    # normalize klass
+    klass = klass.to_s.downcase.pluralize
+    
+    # map klass if necessary
+    case klass
+    when 'locations'
+      klass = 'places'
+    end
+    
     case where
     when 'city'
-      url_for(:controller => params[:controller], :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+      url_for(:controller => klass, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
               :tag => options[:tag], :what => options[:what])
     when 'zip'
-      url_for(:controller => params[:controller], :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
+      url_for(:controller => klass, :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
               :tag => options[:tag], :what => options[:what])
     when 'neighborhood'
-      url_for(:controller => params[:controller], :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+      url_for(:controller => klass, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
               :neighborhood => options[:neighborhood], :tag => options[:tag], :what => options[:what])
     else
       raise ArgumentError, "no route for #{where}"

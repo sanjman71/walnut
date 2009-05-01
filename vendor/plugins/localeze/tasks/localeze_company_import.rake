@@ -12,8 +12,8 @@ namespace :localeze do
     # 167874  In Your Life|||||||||||||
   
     # Task Import:
-    #   - ~ 127951 Chicago base records took ~5 minutes
-    #   - ~ 437274 CBSA 16980 (Chicagoland) base records took ~5 minutes
+    #   - import ~ 127951 Chicago base records took ~5 minutes
+    #   - import ~ 437274 CBSA 16980 (Chicagoland) base records took ~5 minutes
     desc "Clean base records txt file, either with CITY or CBSA"
     task :clean_base_records do
       # check for filters
@@ -61,9 +61,12 @@ namespace :localeze do
       puts "#{Time.now}: completed, cleaned #{cleaned} records, wrote #{wrote} records"
     end
   
+    # Navicat Import:
+    #  - import ~437K records in ~3 minutes
+    #  - .txt import
     # Task Import: 
-    #  - ~1 minute to import 10K records
-    #  - ~12 minutes to import 121K records
+    #  - import 10K records in ~1 minute
+    #  - import 121K records in ~12 minutes
     desc "Import base records"
     task :import_base_records do
       klass     = Localeze::BaseRecord
@@ -79,14 +82,16 @@ namespace :localeze do
       options   = { :validate => false }
       limit     = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
       city      = ENV["CITY"] ? ENV["CITY"].titleize : nil
+      cbsa      = ENV["CBSA"] ? ENV["CBSA"].to_s.strip : nil
       imported  = 0
     
-      puts "#{Time.now}: importing file #{file}, city: #{city}, limit: #{limit}, starting with #{klass.count} objects"
+      puts "#{Time.now}: importing file #{file}, city: #{city}, cbsa: #{cbsa}, limit: #{limit}, starting with #{klass.count} objects"
 
       FasterCSV.foreach(file, :row_sep => "\r\n", :col_sep => '|') do |row|
-        # filter by city
+        # filter by city or cbsa
         next if city and row[14] != city
-      
+        next if cbsa and row[27] != cbsa
+        
         # skip if record exists
         next if klass.exists?(:id => row[0])
       
@@ -103,11 +108,11 @@ namespace :localeze do
       Localeze::BaseRecord.find(:all, :select => ["id"]).collect(&:id)
     end
 
-    # Navicat Import:  
+    # Navicat Import:
     #  - ~18M records in 770 seconds
-    #  - 6 columns, no id field, start with field1 as base_record_id
+    #  - .txt import, 6 columns, no id field, start with field1 as base_record_id
     # Task Import: 
-    #  - ~11750000 records in 507 minutes
+    #  - import ~11750000 records in 507 minutes
     desc "Import company headings"
     task :import_company_headings do
       klass     = Localeze::CompanyHeading
@@ -135,7 +140,7 @@ namespace :localeze do
   
     # Navicat Import:  
     #  - ~12.5M records in 880 seconds
-    #  - 6 columns, no id field, start with field1 as base_record_id, skip field2
+    #  - ~12.5M records in 3000 seconds
     # Task Import: 
     #  - ~5000000 records in 236 minutes
     desc "Import company (structured) attributes"
@@ -163,7 +168,7 @@ namespace :localeze do
       puts "#{Time.now}: completed, ended with #{klass.count} objects" 
     end
 
-    # Timing: ?
+    # Performance: ?
     # desc "Import company unstructured attributes"
     # task :import_unstructured_attributes do
     #   klass   = CompanyUnstructuredAttribute
@@ -242,7 +247,7 @@ namespace :localeze do
       puts "#{Time.now}: completed, ended with #{klass.count} objects" 
     end
 
-    # Timing: ?
+    # Performance: ?
     desc "Import company phones"
     task :import_company_phones do
       klass   = CompanyPhone

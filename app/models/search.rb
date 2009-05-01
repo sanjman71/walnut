@@ -100,6 +100,16 @@ class Search
     # note: we need to set max_matches to override the per_page limit
     Hash[:facets => "tag_ids", :group_by => "tag_ids", :group_clause => "@count desc", :limit => limit.to_i, :max_matches => limit.to_i]
   end
+
+  def self.city_group_options(limit)
+    # note: we need to set max_matches to override the per_page limit
+    Hash[:facets => "city_id", :group_by => "city_id", :group_clause => "@count desc", :limit => limit.to_i, :max_matches => limit.to_i]
+  end
+
+  def self.neighborhood_group_options(limit)
+    # note: we need to set max_matches to override the per_page limit
+    Hash[:facets => "neighborhood_ids", :group_by => "neighborhood_ids", :group_clause => "@count desc", :limit => limit.to_i, :max_matches => limit.to_i]
+  end
   
   # load the specified model(s) from the facets collection
   def self.load_from_facets(facets, models=[])

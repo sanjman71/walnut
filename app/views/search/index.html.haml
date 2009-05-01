@@ -31,7 +31,16 @@
     %h4= page_entries_info @objects unless @objects.blank?
   .span-4.prepend-5.last
     = will_paginate(@objects, :page_links => false)
-
+  .span-19.last
+    - if @klasses.keys.size > 0
+      -# show number of results by type
+      - @klasses.keys.each do |klass|
+        %span{:style => 'font-weight: bold; color: #111111;'}
+          = pluralize(@klasses[klass].size, klass)
+          == -
+          = link_to("Search #{klass.pluralize} only", build_search_route(klass, 'city', @locality_params.merge(:tag => @tag, :what => @what).compact), :style => 'font-weight: bold; color: #007700;')
+          = "&nbsp;|&nbsp;" unless klass == @klasses.keys[-1]
+    
   .span-19.last
     - @objects.each do |object|
       .span-18.prepend-1.letterbox[object]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}

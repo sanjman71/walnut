@@ -84,7 +84,7 @@ class ApplicationController < ActionController::Base
     case params[:action]
     when 'country'
       case params[:controller]
-      when 'places'
+      when 'places', 'search'
         # find all states with locations
         @states = @country.states.with_locations
       when 'events'
@@ -108,11 +108,14 @@ class ApplicationController < ActionController::Base
       case params[:controller]
       when 'places'
         # find all state cities and zips with locations
-        @cities = @state.cities.with_locations
+        @cities = @state.cities.with_locations.order_by_name
         @zips   = @state.zips.with_locations
       when 'events'
         # find all state cities with events
         @cities = @state.cities.with_events
+      when 'search'
+        # find all state cities
+        @cities = @state.cities.order_by_name
       end
 
       # track events
