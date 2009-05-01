@@ -27,12 +27,6 @@ module ApplicationHelper
     "<div class=\"#{type.to_s}\">#{msg}</div>"
   end
   
-  def build_places_search_route(where, options={})
-    build_search_route('places', where, options)
-  end
-  
-  alias :build_locations_search_route :build_places_search_route
-  
   # build search route based on the controller in the current request
   # note: searching can only be done by city, zip or neighborhood
   def build_search_route(klass, where, options={})
