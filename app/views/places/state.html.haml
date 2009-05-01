@@ -4,7 +4,7 @@
   %h2= @h1
   %h5= "#{pluralize(@state.locations_count, 'location')}"
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :zip => nil})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => nil, :zip => nil})
   
 %hr.space
 
