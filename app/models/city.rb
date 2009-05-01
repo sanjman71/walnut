@@ -48,4 +48,9 @@ class City < ActiveRecord::Base
     self.locations_count > 0
   end
   
+  # convert city to a string of attributes separated by '|'
+  def to_pipe
+    [self.name, self.state_id. self.lat, self.lng].join("|")
+  end
+  
 end

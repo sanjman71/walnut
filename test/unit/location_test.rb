@@ -60,12 +60,17 @@ class LocationTest < ActiveSupport::TestCase
       setup do
         @location.country = @ca
         @location.save
+        @us.reload
         @ca.reload
       end
 
       # should "have ca country area tag" do
       #   assert_equal ["Canada"], @location.locality_tag_list
       # end
+
+      should "decrement us locations_count" do
+        assert_equal 0, @us.locations_count
+      end
 
       should "increment ca locations_count" do
         assert_equal 1, @ca.locations_count
@@ -279,6 +284,12 @@ class LocationTest < ActiveSupport::TestCase
       should "set neighborhood locations to []" do
         assert_equal [], @river_north.locations
       end
+      
+      should "decrement neighborhood and locations counter caches" do
+        assert_equal 0, @river_north.locations_count
+        assert_equal 0, @location.neighborhoods_count
+      end
+      
     end
   end
 end

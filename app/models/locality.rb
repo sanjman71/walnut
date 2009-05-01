@@ -59,8 +59,11 @@ class Locality
     
     if geoloc.provider == 'google'
       if geoloc.precision == type.to_s.downcase
-        # create city or zip
-        object = Kernel.const_get(type.to_s.titleize).create(:name => name, :state => state, :lat => geoloc.lat, :lng => geoloc.lng)
+        # find or create city or zip
+        # note: we use the geoloc name as the 'official' name, which allows mis-spellings to be normalized by the geocoder
+        name   = geoloc.send(type.to_s.downcase)
+        klass  = Kernel.const_get(type.to_s.titleize)
+        object = klass.find_by_name_and_state_id(name, state.id) || klass.create(:name => name, :state => state, :lat => geoloc.lat, :lng => geoloc.lng)
       else
         raise LocalityError, "invalid #{type}"
       end

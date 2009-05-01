@@ -99,7 +99,8 @@ class PlacesController < ApplicationController
     
     # find nearby cities if its a city search, where nearby is defined with a mile radius range
     nearby_miles    = 20
-    @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles) unless @city.blank?
+    nearby_limit    = 10
+    @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit) unless @city.blank?
 
     # build search title based on [what, filter] and city, neighborhood, zip search
     @title  = build_search_title(:what => @what, :tag => @tag, :filter => @filter, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)

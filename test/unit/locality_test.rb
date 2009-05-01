@@ -90,6 +90,20 @@ class LocalityTest < ActiveSupport::TestCase
     end
   end
 
+  context "validate city" do
+    context "mis-spelled city la grange pk" do
+      setup do
+        @il         = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @la_grange  = Factory(:city, :name => "La Grange Park", :state => @il)
+        @object     = Locality.validate(@il, 'city', "La Grange Pk")
+      end
+
+      should "normalize and validate to la grange city object" do
+        assert_equal @la_grange, @object
+      end
+    end
+  end
+  
   context "geocode zip" do
     context "60654" do
       setup do

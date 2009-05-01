@@ -133,6 +133,9 @@ class Location < ActiveRecord::Base
   
   def before_remove_neighborhood(hood)
     return if hood.blank?
+    # decrement counter caches
+    Neighborhood.decrement_counter(:locations_count, hood.id)
+    Location.decrement_counter(:neighborhoods_count, self.id)
     # remove locality tag
     # locality_tag_list.remove(hood.name)
     # save
