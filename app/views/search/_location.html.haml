@@ -1,9 +1,10 @@
 - what = nil unless local_assigns.has_key?(what)
 - tags = [] unless local_assigns.has_key?(tags)
+- color = "_purple"
 
-.mappable.unselected.span-10.last{:id => "mappable_#{index}", :lat => location.lat, :lng => location.lng, :index => index, :html => "<strong>#{link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+.mappable.unselected.span-10.last{:id => "mappable_#{index}", :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
   .span-1.icon-div
-    %img{:src => "http://www.google.com/mapfiles/marker" + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
+    %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
 
   .span-9.last.info
     %h4.name.margin-bottom-5
@@ -11,6 +12,7 @@
     %span.address.margin-bottom-5{:style => 'font-size: 1.2em; color: #555;'}
       = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
     %br
+    / *** I removed the tags from the Search results listing. Killian ***
     / %span.tags.bottom
     /   - location_tags = location.place.tags.sort_by(&:name)
     /   - if location_tags.empty?

@@ -15,9 +15,10 @@ $(document).ready(function() {
           {
             lat = latlng.attributes["lat"].nodeValue;
             lng = latlng.attributes["lng"].nodeValue;
+            color = latlng.attributes["color"].nodeValue;
             glatlng = new GLatLng(lat, lng);
-            html = latlng.attributes["html"].nodeValue;            
-            markers[i] = createMarker(glatlng, html, i);
+            html = latlng.attributes["html"].nodeValue;
+            markers[i] = createMarker(glatlng, html, i, color);
             map.addOverlay(markers[i]);
             bounds.extend(glatlng);
           }
@@ -51,11 +52,11 @@ function setSelected(index)
   $("#mappable_" + index).addClass("selected").removeClass("unselected");
 }
 
-function createMarker(glatlng, html, index) {
+function createMarker(glatlng, html, index, color) {
   // Create a lettered icon for this point using our icon class
   var letter = String.fromCharCode("A".charCodeAt(0) + index);
   var letteredIcon = new GIcon(baseIcon);
-  letteredIcon.image = "http://www.google.com/mapfiles/marker" + letter + ".png";
+  letteredIcon.image = "http://www.google.com/mapfiles/marker" + color + letter + ".png";
 
   // Set up our GMarkerOptions object
   markerOptions = { icon:letteredIcon, clickable: true };

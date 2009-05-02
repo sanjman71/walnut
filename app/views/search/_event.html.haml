@@ -1,7 +1,8 @@
-.mappable.unselected.span-10.last{:id => "mappable_#{index}", :lat => event.location.lat, :lng => event.location.lng, :index => index, :html => "<strong>#{event.name}</strong><br/>At #{event.event_venue.name}<br/>#{link_to "Details", event.url}"}
+- color = "_orange"
+.mappable.unselected.span-10.last{:id => "mappable_#{index}", :lat => event.location.lat, :lng => event.location.lng, :index => index, :color => color, :html => "<strong>#{event.name}</strong><br/>At #{event.event_venue.name}<br/>#{link_to "Details", event.url}"}
 
   .span-1
-    %img{:src => "http://www.google.com/mapfiles/marker" + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
+    %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
 
   .span-7.info
     %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
