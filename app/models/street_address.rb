@@ -17,12 +17,21 @@ class StreetAddress
   def self.normalize(s)
     s = s.to_s.downcase
     normalizations = [[".", ""], [",", ""], ["street", "st"], ["avenue", "ave"], ["drive", "dr"], ["#", "ste"], ["boulevard", "blvd"], 
-                      ["court", "ct"], ["plaza", "plz"], 
-                      ["north", "n"], ["south", "s"], ["east", "e"], ["west", "w"]
+                      ["court", "ct"], ["plaza", "plz"]
                      ]
     normalizations.each do |tuple|
+      # these can be anywhere in the street address
       s.send("gsub!", tuple[0], tuple[1])
     end
+    
+    directionals = [["north", "n"], ["south", "s"], ["east", "e"], ["west", "w"]]
+    directionals.each do |tuple|
+      # these must be in the middle of the street address
+      if s.match(/\s#{tuple[0]}\s/)
+        s.send("gsub!", tuple[0], tuple[1])
+      end
+    end
+    
     s.split.collect { |token| ["and"].include?(token) ? token : token.capitalize  }.join(" ")
   end
   
@@ -146,7 +155,7 @@ class StreetAddress
   
   # returns true if the string is a valid predirectional
   def self.predirectional?(s)
-    return true if s =~ /^\w$/
+    return true if s =~ /^\w{1,1}$/
     return false
   end
 

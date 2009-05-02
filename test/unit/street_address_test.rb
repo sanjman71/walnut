@@ -37,6 +37,17 @@ class StreetAddressTest < ActiveSupport::TestCase
       end
     end
     
+    context "for an address with a pre directional and 'south' in its street name" do
+      setup do
+        @address = "3745 North Southport Avenue"
+      end
+      
+      should "have components" do
+        assert_equal Hash[:housenumber => "3745", :predirectional => "N", :streetname => "Southport", :streettype => "Ave"], 
+                     StreetAddress.components(@address) 
+      end
+    end
+    
     context "for an address with a suite number" do
       setup do
         @address = "200 W Grand Ave # 2103"
