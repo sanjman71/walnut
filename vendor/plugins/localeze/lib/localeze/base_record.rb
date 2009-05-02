@@ -26,8 +26,8 @@ module Localeze
     has_many      :company_phones, :class_name => "Localeze::CompanyPhone"
 
 
-    # city, state corrections table
-    @@city_state_corrections  = nil
+    # city corrections file
+    @@city_corrections  = nil
     
     def street_address
       [housenumber, predirectional, streetname, streettype, postdirectional, apttype, aptnumber].reject(&:blank?).join(" ")
@@ -55,10 +55,10 @@ module Localeze
       # company_attributes + company_unstructured_attributes
     end
 
-    # fix any errors in the localeze city, state fields
+    # fix localeze city errors
     # note: these errors have been collected after running many imports
     def normalize_city_and_state
-      hash    = self.class.load_city_state_corrections
+      hash    = self.class.load_city_corrections
       errors  = 0
       
       return errors if !hash.has_key?(state)
@@ -87,20 +87,20 @@ module Localeze
 
     protected
 
-    def self.load_city_state_corrections
-      if @@city_state_corrections.blank?
+    def self.load_city_corrections
+      if @@city_corrections.blank?
         hash = Hash.new({})
-        file = "#{RAILS_ROOT}/vendor/plugins/localeze/data/city_state_corrections.txt"
+        file = "#{RAILS_ROOT}/vendor/plugins/localeze/data/city_corrections.txt"
 
         FasterCSV.foreach(file, :col_sep => '|') do |row|
           state_code, wrong_city, right_city = row
           hash[state_code] = hash[state_code].merge(wrong_city.strip => right_city.strip)
         end
 
-        @@city_state_corrections = hash
+        @@city_corrections = hash
       end
       
-      @@city_state_corrections
+      @@city_corrections
     end
 
   end
