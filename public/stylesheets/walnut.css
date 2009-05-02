@@ -156,7 +156,7 @@ div.instructions ul                               { font-size: 12px; }
 .pagination a                                     { background: #FF6600; color: #111111; }
 .pagination a:hover                               { color: #FFFFFF; }
 
-.pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
+.pagination span, .pagination a                   { display: block; width: 60px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
                                                     text-decoration: none; }
 
 .pagination span.disabled                         { background: #EEEEEE; color: #999999;}
@@ -219,3 +219,8 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 
 .recommendations                                  { font-weight: bold; }
 .recommendations.bold                             { color: #008800; font-weight: bold; }
+
+.mappable.selected                                { border: 1px solid black;}
+.mappable.unselected                              { border: 1px solid white;}
+.mappable .icon-div                               { }
+.mappable .icon                                   { top: 50%; margin-top: 5px; margin: 2px;}

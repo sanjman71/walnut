@@ -1,21 +1,23 @@
 - what = nil unless local_assigns.has_key?(what)
 - tags = [] unless local_assigns.has_key?(tags)
 
-.span-2.date
-  %span.place.indicator== &nbsp;
+.mappable.unselected.span-10.last{:id => "mappable_#{index}", :lat => location.lat, :lng => location.lng, :index => index, :html => "<strong>#{link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+  .span-1.icon-div
+    %img{:src => "http://www.google.com/mapfiles/marker" + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
 
-.span-16.info.last
-  %h4.name.margin-bottom-5
-    = link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}, :class => 'place name'
-  %span.address.margin-bottom-5{:style => 'font-size: 1.2em; color: #555;'}
-    = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
-  %br
-  %span.tags.bottom
-    - location_tags = location.place.tags.sort_by(&:name)
-    - if location_tags.empty?
-      -# empty tag to take up space
-      == &nbsp;
-    - else
-      - location_tags.each do |place_tag|
-        - klasses = Array(what).any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
-        %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => params[:controller], :action => 'index', :tag => place_tag.name.parameterize}, :class => klasses.join(" "), :style => "padding: 0 2px;"
+  .span-9.last.info
+    %h4.name.margin-bottom-5
+      = link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}, :class => 'place name'
+    %span.address.margin-bottom-5{:style => 'font-size: 1.2em; color: #555;'}
+      = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
+    %br
+    / %span.tags.bottom
+    /   - location_tags = location.place.tags.sort_by(&:name)
+    /   - if location_tags.empty?
+    /     -# empty tag to take up space
+    /     == &nbsp;
+    /   - else
+    /     - location_tags.each do |place_tag|
+    /       - klasses = Array(what).any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
+    /       %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => params[:controller], :action => 'index', :tag => place_tag.name.parameterize}, :class => klasses.join(" "), :style => "padding: 0 2px;"
+
