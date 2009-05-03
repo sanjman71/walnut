@@ -33,8 +33,8 @@
 .span-19.last#search
   .span-10
     %h4= page_entries_info @objects unless @objects.blank?
-  .span-4.prepend-5.last
-    = will_paginate(@objects, :page_links => false)
+  .span-9.last
+    = will_paginate(@objects, :page_links => true)
 
   .span-19.last
     - if @klasses.keys.size > 0
@@ -56,10 +56,12 @@
   .span-9.last
     .jmap#map{:style => "width: 350px; height: 400px;"}
 
+  %hr.space
+  
   .span-10
     %h4= page_entries_info @objects unless @objects.blank?
-  .span-4.prepend-5.last
-    = will_paginate(@objects, :page_links => false)
+  .span-9.last
+    = will_paginate(@objects, :page_links => true)
 
   .span-19.last
     -# show a google ad
