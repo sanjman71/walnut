@@ -39,18 +39,26 @@ class EventVenue < ActiveRecord::Base
     [self.name, self.search_name, self.address_name].join("|")
   end
   
-  protected
-  
-  # def after_add_event(event)
-  #   return if event.blank? or location.blank?
-  #   # increment location's events_count
-  #   Location.increment_counter(:events_count, location.id)
-  # end
-  
-  # def after_remove_event(event)
-  #   return if event.blank? or location.blank?
-  #   # decrement location's events_count
-  #   Location.decrement_counter(:events_count, location.id)
-  # end
+  def self.import(city, options)
+    page_number   = options[:page] ? options[:page].to_i : 1
+    page_size     = options[:per_page] ? options[:per_page].to_i : 50
     
+    @results      = EventVenue.search(:sort_order => 'popularity', :location => city.name, :page_number => page_number, :page_size => page_size)
+    @venues       = @results['venues'] ? @results['venues']['venue'] : []
+    
+    @total        = @results['total_items']
+    @count        = @results['page_items']   # the number of events on this page
+    @first_item   = @results['first_item']   # the first item number on this page, e.g. 11
+    @last_item    = @results['last_item']    # the last item number on this page, e.g. 20
+    
+    start_count   = EventVenue.count
+    
+    @venues.each do |venue|
+      EventVenue.create(:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], 
+                        :source_type => EventSource::Eventful, :source_id => venue['id'])
+    end
+    
+    imported = EventVenue.count - start_count
+  end
+  
 end

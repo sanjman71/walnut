@@ -3,12 +3,12 @@ namespace :events do
   @@max_per_page  = 100
   
   desc "Initialize event categories, event venues."
-  task :init => ["import_categories", "import_category_tags", "import_venues"]
+  task :init => ["import_categories", "import_category_tags"]
   
   desc "Import event categories from eventful"
   task :import_categories do
     puts "#{Time.now}: importing eventful categories"
-    imported = EventStream::Init.categories
+    imported = EventCategory.import
     puts "#{Time.now}: imported #{imported} eventful categories"
   end
 
@@ -49,10 +49,27 @@ namespace :events do
 
   desc "Import event venues from eventful"
   task :import_venues do
-    puts "#{Time.now}: importing eventful venues"
     limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
-    imported = EventStream::Init.venues(:page => 3, :limit => limit)
-    puts "#{Time.now}: imported #{imported} eventful venues"
+    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
+    
+    if city.blank?
+      puts "usage: missing CITY"
+      exit
+    end
+    
+    page      = 1
+    per_page  = 50
+    imported  = 0
+    
+    puts "#{Time.now}: importing #{limit} #{city.name} eventful venues"
+
+    while imported < limit
+    # Range.new(1,pages).each do |page|
+      imported += EventVenue.import(city, :page => page, :per_page => per_page)
+      page     += 1
+    end
+    
+    puts "#{Time.now}: imported #{imported} #{city.name} eventful venues"
   end
   
   desc "Import event venue metadata, e.g. search name, address name ..."
@@ -147,7 +164,7 @@ namespace :events do
       puts "#{Time.now}: *** marked location #{location.place.name}:#{location.street_address} as event venue:#{venue.name}"
     end
     
-    puts "#{Time.now}: completed, marked #{marked} locations as event venues, skipped #{skipped} event venues"
+    puts "#{Time.now}: completed, #{EventVenue.count} total event venues, marked #{marked} locations as event venues, skipped #{skipped} event venues"
   end
 
   desc "Mark popular events"
@@ -173,21 +190,30 @@ namespace :events do
     puts "#{Time.now}: completed, marked #{@popular} events as popular"
   end
   
-  desc "Import venue events from eventful"
-  task :import_venue_events do
+  desc "Import city events from eventful"
+  task :import_events do
     # build events search conditions
-    @city = ENV["CITY"] ? ENV["CITY"] : City.first
+    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
+    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
 
-    puts "#{Time.now}: importing #{@city.name} venue events"
+    if city.blank?
+      puts "usage: missing CITY"
+      exit
+    end
 
-    @conditions = {:location => @city.name, :date => 'Future', :page_size => 50, :sort_order => 'popularity'}
+    puts "#{Time.now}: importing #{city.name} events for mapped venues"
+
+    per_page    = 50
+    imported    = 0
+    @conditions = {:location => city.name, :date => 'Future', :page_size => per_page, :sort_order => 'popularity'}
     @results    = EventStream::Search.call(@conditions)
     @events     = @results['events'] ? @results['events']['event'] : []
     @istart     = Event.count
 
     # import events for all mapped venues
-    # EventVenue.mapped.each do |venue|
-    EventVenue.mapped.all(:limit => 1).each do |venue|
+    EventVenue.mapped.each do |venue|
+      break if imported >= limit
+      
       begin
         @results  = venue.get
         @events   = @results['events']['event']
@@ -229,7 +255,7 @@ namespace :events do
 
         # map eventful category id to an event category object
         @categories = @categories.map do |category|
-          puts "*** category: #{category}"
+          # puts "*** category: #{category}"
           EventCategory.find_by_source_id(category['id'])
         end
         
