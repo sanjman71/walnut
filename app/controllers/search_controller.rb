@@ -52,7 +52,7 @@ class SearchController < ApplicationController
     @query          = @search.query
     @with           = @search.field(:locality_hash)
 
-    @objects        = ThinkingSphinx::Search.search(@query, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 20,
+    @objects        = ThinkingSphinx::Search.search(@query, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 5,
                                                     :order => :popularity, :sort_mode => :desc)
 
     # find objects by class
