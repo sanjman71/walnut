@@ -46,14 +46,14 @@ module ApplicationHelper
   def build_search_route(klass, where, options={})
     # map klass to a controller
     case klass.to_s.downcase
-    when 'location', 'place'
+    when 'location', 'locations', 'place', 'places'
       controller = 'places'
-    when 'event'
+    when 'event', 'events'
       controller = 'events'
     when 'search'
       controller = 'search'
     else
-      raise Exception, "invalid klass for search route"
+      raise Exception, "invalid klass #{klass} for search route"
     end
     
     case where

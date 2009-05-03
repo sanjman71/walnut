@@ -41,8 +41,6 @@
       -# show number of results by type
       - @klasses.keys.each do |klass|
         %span{:style => 'font-weight: bold; color: #111111;'}
-          = pluralize(@klasses[klass].size, klass)
-          == -
           = link_to("Search #{klass.pluralize} only", build_search_route(klass, 'city', @locality_params.merge(:tag => @tag, :what => @what).compact), :style => 'font-weight: bold; color: #007700;')
           = "&nbsp;|&nbsp;" unless klass == @klasses.keys[-1]
     
