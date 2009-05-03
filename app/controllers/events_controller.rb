@@ -81,7 +81,6 @@ class EventsController < ApplicationController
         
     # find city events
     @search     = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag.blank? ? @what : @tag)
-    # @tags       = @search.place_tags
     @query      = @search.query
     @with       = Search.with(@city)
     @with.update(:event_category_ids => @category.id) if @category

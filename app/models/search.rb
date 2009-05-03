@@ -1,15 +1,15 @@
 class Search
-  attr_reader :locality_tags, :locality_hash, :place_tags
+  attr_reader :locality_tags, :locality_hash
   
   @@anything_search = ["anything"]
   
   def initialize(options={})
     @locality_tags  = options[:locality_tags] || []
     @locality_hash  = options[:locality_hash] || Hash.new
-    @place_tags     = options[:place_tags] || []
+    @query          = options[:query] || []
     
     # handle special anything search
-    @place_tags     = [] if @place_tags == @@anything_search
+    @query          = [] if @query == @@anything_search
   end
 
   # build query as an 'or' of each tag
@@ -20,9 +20,9 @@ class Search
     
     case operator
     when 'or'
-      @place_tags.join(" | ")
+      @query.join(" | ")
     when 'and'
-      @place_tags.join(" ")
+      @query.join(" ")
     end
   end
   
@@ -30,10 +30,8 @@ class Search
     case field
     when :locality_tags, "locality_tags"
       @locality_tags.join(" ")
-    when :locality_hash
+    when :locality_hash, "locality_hash"
       @locality_hash
-    when :place_tags, "place_tags"
-      @place_tags.join(" | ")
     else
       raise ArgumentError, "invalid field"
     end
@@ -91,10 +89,16 @@ class Search
       hash
     end
     
-    # split what into tokens, normalize each token
-    place_tags = what.to_s.split.map { |s| s.gsub(/\'/, '') }
+    # split what into tokens, and normalize token
+    query = what.to_s.split.map { |s| s = normalize(s) }
     
-    Search.new(:locality_tags => locality_tags, :locality_hash => locality_hash, :place_tags => place_tags)
+    Search.new(:locality_tags => locality_tags, :locality_hash => locality_hash, :query => query)
+  end
+  
+  # normalize the specified token
+  def self.normalize(s)
+    # remove quotes
+    s.gsub(/\'/, '')
   end
   
   def self.with(*args)

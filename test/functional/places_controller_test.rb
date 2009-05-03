@@ -73,18 +73,9 @@ class PlacesControllerTest < ActionController::TestCase
       should_assign_to(:country) { @us }
       should_assign_to(:state) { @il }
       should_assign_to(:city) { @chicago }
-      should_assign_to :what
-      should_assign_to :search
-      should_assign_to :tags
-      should_assign_to :title
-      
-      should "have tags ['food']" do
-        assert_equal ["food"], assigns(:tags)
-      end
-      
-      should "have title 'Food near Chicago, Illinois'" do
-        assert_equal 'Food Places near Chicago, Illinois', assigns(:title)
-      end
+      should_assign_to :what, :search, :title
+      should_assign_to(:query) { "food" }
+      should_assign_to(:title) { "Food Places near Chicago, Illinois" }
     end
   end
 end

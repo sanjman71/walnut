@@ -65,7 +65,6 @@ class PlacesController < ApplicationController
     # use 'where' param as locality_hash with/conditions filter
     # use filter' to narrow search conditions
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag.blank? ? @what : @tag)
-    @tags           = @search.place_tags
     @query          = @search.query
     @with           = Search.with(@country, @state, @city, @neighborhood, @zip)
 
