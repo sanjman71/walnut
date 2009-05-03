@@ -16,7 +16,7 @@ namespace :db do
     
     cmd = "#{mysqldump} #{mysqldump_options} -u#{username} -p#{password} -h#{host} #{database_name} | gzip -c > #{backup_dir}/#{backup_file}"
     
-    puts "#{Time.now}: creating backup #{backup_file}"
+    puts "#{Time.now}: creating backup in backups/#{backup_file}"
     system cmd
     puts "#{Time.now}: created backup"
     

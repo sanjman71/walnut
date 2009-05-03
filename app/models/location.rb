@@ -9,7 +9,7 @@ class Location < ActiveRecord::Base
   has_many                :location_places
   has_many                :places, :through => :location_places
   has_one                 :event_venue
-  has_many                :events, :through => :event_venue
+  has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
   
   after_save              :after_save_callback
   
@@ -21,13 +21,6 @@ class Location < ActiveRecord::Base
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
-  # named_scope :places,    lambda { {:conditions => ["locatable_type = 'Place'"], :include => :locatable } } do 
-  #                           def tag_counts
-  #                             # delegate to locatable
-  #                             self.collect { |o| o.locatable.tag_counts }.flatten
-  #                           end
-  #                         end
-
   named_scope :recommended,         { :conditions => ["recommendations_count > 0"] }
   named_scope :event_venues,        { :conditions => ["events_count > 0"] }
 
@@ -140,4 +133,17 @@ class Location < ActiveRecord::Base
     # locality_tag_list.remove(hood.name)
     # save
   end
+  
+  def after_add_event(event)
+    return if event.blank?
+    # increment events_count
+    Location.increment_counter(:events_count, self.id)
+  end
+  
+  def after_remove_event(event)
+    return if event.blank?
+    # decrement events_count
+    Location.decrement_counter(:events_count, self.id)
+  end
+  
 end

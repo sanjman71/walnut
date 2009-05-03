@@ -5,7 +5,7 @@ class EventVenue < ActiveRecord::Base
   validates_uniqueness_of   :name
   
   belongs_to                :location
-  has_many                  :events, :after_add => :after_add_event, :after_remove => :after_remove_event
+  has_many                  :events#, :after_add => :after_add_event, :after_remove => :after_remove_event
   
   # find event venues that have been mapped/unmapped to locations
   named_scope :mapped,          { :conditions => ["location_id > 0"] }
@@ -33,19 +33,24 @@ class EventVenue < ActiveRecord::Base
     get_options = {:id => self.source_id}
     EventVenue.session.call(@@get_method, get_options.update(options))
   end
+
+  # convert object to a string of attributes separated by '|'
+  def to_pipe
+    [self.name, self.search_name, self.address_name].join("|")
+  end
   
   protected
   
-  def after_add_event(event)
-    return if event.blank? or location.blank?
-    # increment location's events_count
-    Location.increment_counter(:events_count, location.id)
-  end
+  # def after_add_event(event)
+  #   return if event.blank? or location.blank?
+  #   # increment location's events_count
+  #   Location.increment_counter(:events_count, location.id)
+  # end
   
-  def after_remove_event(event)
-    return if event.blank? or location.blank?
-    # decrement location's events_count
-    Location.decrement_counter(:events_count, location.id)
-  end
+  # def after_remove_event(event)
+  #   return if event.blank? or location.blank?
+  #   # decrement location's events_count
+  #   Location.decrement_counter(:events_count, location.id)
+  # end
     
 end

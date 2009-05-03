@@ -40,9 +40,10 @@ module EventStream
     end
     
     def self.venues(options)
+      page_number   = options[:page] ? options[:page].to_i : 1
       page_size     = options[:limit] ? options[:limit].to_i : 50
       
-      @results      = EventVenue.search(:sort_order => 'popularity', :location => 'Chicago', :page_size => page_size)
+      @results      = EventVenue.search(:sort_order => 'popularity', :location => 'Chicago', :page_number => page_number, :page_size => page_size)
       @venues       = @results['venues'] ? @results['venues']['venue'] : []
       
       @total        = @results['total_items']

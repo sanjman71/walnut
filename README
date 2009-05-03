@@ -30,6 +30,12 @@ To get the application up and running:
   - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
   - rake init:urban_neighborhoods CITY='Charlotte' STATE='NC'
 
+5. Import and map event categories, event venues and events.
+  - rake events:init
+  - rake events:import_category_tags
+  - rake events:map_venues
+  - rake events:import_venue_events
+  
 5. Build the sphinx index, without re-creating the configuration file:
   - rake ts:index
   

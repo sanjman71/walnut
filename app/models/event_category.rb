@@ -12,7 +12,7 @@ class EventCategory < ActiveRecord::Base
     self.source_id.dasherize
   end
   
-  # convert event category to a string of attributes separated by '|'
+  # convert object to a string of attributes separated by '|'
   def to_pipe
     [self.name, self.tags].join("|")
   end

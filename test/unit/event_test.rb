@@ -4,10 +4,8 @@ require 'test/factories'
 class EventTest < ActiveSupport::TestCase
   
   should_validate_presence_of :name
-  should_validate_presence_of :source_type
-  should_validate_presence_of :source_id
   should_belong_to            :event_venue
-  should_have_one             :location
+  should_belong_to            :location
   should_have_many            :event_categories
   should_have_many            :event_tags
   
@@ -25,23 +23,31 @@ class EventTest < ActiveSupport::TestCase
   
   context "create event" do
     setup do
-      # @event = Event.create(:name => "Fall Out Boy", :event_venue_id => @event_venue.id, :source_type => EventSource::Eventful, :source_id => "1")
       @event = Event.new(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1")
-      @event_venue.events.push(@event)
       assert @event.valid?
+      @event_venue.events.push(@event)
       @event_venue.reload
+      @location.events.push(@event)
       @location.reload
       @chicago.reload
     end
     
     should_change "Event.count", :by => 1
     
-    should "increment event venue's event count" do
-      assert_equal 1, @event_venue.events_count
+    should "add event to location events collection" do
+      assert_equal [@event], @location.events
     end
-    
+
     should "increment location's event count" do
       assert_equal 1, @location.events_count
+    end
+    
+    should "add event to event venue events collection" do
+      assert_equal [@event], @event_venue.events
+    end
+    
+    should "increment event venue's event count" do
+      assert_equal 1, @event_venue.events_count
     end
 
     context "then add event category with tags" do
@@ -80,6 +86,7 @@ class EventTest < ActiveSupport::TestCase
       context "then remove event that has an event category" do
         setup do
           @event_venue.events.delete(@event)
+          @location.events.delete(@event)
           @event.destroy
           @event_venue.reload
           @location.reload
@@ -92,12 +99,20 @@ class EventTest < ActiveSupport::TestCase
           assert_equal [], @event.event_tags.collect(&:name)
         end
 
-        should "decrement venue's event count" do
-          assert_equal 0, @event_venue.events_count
+        should "remove event from location event collection" do
+          assert_equal [], @location.events
+        end
+        
+        should "decrement location event count" do
+          assert_equal 0, @location.events_count
         end
 
-        should "decrement location's event count" do
-          assert_equal 0, @location.events_count
+        should "remove event from venue event collection" do
+          assert_equal [], @event_venue.events
+        end
+
+        should "decrement venue event count" do
+          assert_equal 0, @event_venue.events_count
         end
       end
     end

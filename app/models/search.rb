@@ -13,8 +13,17 @@ class Search
   end
 
   # build query as an 'or' of each tag
-  def query
-    @place_tags.join(" | ")
+  # options:
+  #  - :operator => 'or', 'and', defaults to 'or'
+  def query(options={})
+    operator = options[:operator] ? options[:operator].to_s : 'or'
+    
+    case operator
+    when 'or'
+      @place_tags.join(" | ")
+    when 'and'
+      @place_tags.join(" ")
+    end
   end
   
   def field(field)
@@ -82,8 +91,8 @@ class Search
       hash
     end
     
-    # split what into tokens
-    place_tags = what.to_s.split
+    # split what into tokens, normalize each token
+    place_tags = what.to_s.split.map { |s| s.gsub(/\'/, '') }
     
     Search.new(:locality_tags => locality_tags, :locality_hash => locality_hash, :place_tags => place_tags)
   end

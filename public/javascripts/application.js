@@ -14,8 +14,11 @@ $.fn.init_input_hints = function() {
 
   // show the display text
   el.each(function(i) {
+    if ($(this).attr('value') == '') {
+      // add hint if the value is initially empty
       $(this).attr('value', $(this).attr('title'));
       $(this).addClass('hint');
+    }
   });
 
   // hook up the blur & focus

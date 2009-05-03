@@ -4,8 +4,7 @@ require 'ar-extensions'
 namespace :init do
 
   desc "Initialize default values."
-  # task :all => [:countries, :states, :locations, "db:populate:places", :tags, :chains, :city_zips, :geocode_latlngs]
-  task :all => [:countries, :states, :cities, :state_zips, :tag_groups, "rp:init", "events:init"]
+  task :all => [:countries, :states, :cities, :state_zips, :tag_groups, "rp:init"]
 
   desc "Initialize countries."
   task :countries do
@@ -38,7 +37,7 @@ namespace :init do
     puts "#{Time.now}: initialized states"
   end
   
-  desc "Initialize first set of cities"
+  desc "Initialize basic set of cities"
   task :cities do
 
     ["IL"].each do |code|
@@ -82,6 +81,9 @@ namespace :init do
         Locality.validate(@state, 'city', city_name)
       end
     end
+    
+    # import communities as cities
+    Community.import
     
     puts "#{Time.now}: initialized cities"
   end

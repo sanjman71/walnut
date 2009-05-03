@@ -98,8 +98,12 @@ class SearchTest < ActiveSupport::TestCase
         assert_equal "coffee | shop", @search.field(:place_tags)
       end
       
-      should "have valid query" do
+      should "have valid default query" do
         assert_equal "coffee | shop", @search.query
+      end
+
+      should "have valid default query" do
+        assert_equal "coffee shop", @search.query(:operator => :and)
       end
       
       should "have multiple field tags on name and place_tags" do
@@ -108,6 +112,18 @@ class SearchTest < ActiveSupport::TestCase
 
       should "have multiple field tags on place_tags" do
         assert_equal "@(place_tags) coffee | shop", @search.multiple_fields(:place_tags)
+      end
+    end
+    
+    context "with what 'schuba's'" do
+      setup do
+        @us     = Factory.create(:us)
+        @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @search = Search.parse([@us, @il], "schuba's")
+      end
+
+      should "have query with quote removed" do
+        assert_equal "schubas", @search.query
       end
     end
     

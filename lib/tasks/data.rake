@@ -43,7 +43,7 @@ namespace :data do
 
           if tags_list.blank?
             # puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}"
-            DATA_TAGS_LOGGER.debug("*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
+            DATA_TAGS_LOGGER.debug("xxx skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
             skipped += 1
           end
 
@@ -54,10 +54,7 @@ namespace :data do
             tagged += 1
           end
         end
-           
-        # xxx testing attributes
-        next
-        
+
         categories.each do |category|
           # map category to a tag group
           category_name = category['name'].gsub("&", "and")
@@ -82,7 +79,7 @@ namespace :data do
         groups.each do |group|
           next if group.places.include?(place)
           group.places.push(place)
-          puts "*** mapped group: '#{group.name}' to place: #{place.name}:#{place.id}"
+          # puts "*** mapped group: '#{group.name}' to place: #{place.name}:#{place.id}"
           mapped += 1
         end
                        
@@ -163,6 +160,7 @@ namespace :data do
   # Performance:
   #  - import 10K records in ~14 minutes
   #  - import 250K records in ~240 minutes
+  #  - import 437K records in ~450 minutes
   desc "Import localeze records, by city and state or cbsa"
   task :import_records do |t|
     
