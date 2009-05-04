@@ -24,6 +24,13 @@ class SearchControllerTest < ActionController::TestCase
   should_route :get, '/search/us/il/chicago/n/river-north/tag/soccer', 
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', :tag => 'soccer'
 
+  # zip search tag routes
+  should_route :get, '/search/us/il/60610/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :what => 'food'
+  should_route :get, '/search/us/il/60610/tag/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food'
+
+
   # error route
   should_route :get, '/search/error/country', :controller => 'search', :action => 'error', :locality => 'country'
   should_route :get, '/search/error/unknown', :controller => 'search', :action => 'error', :locality => 'unknown'

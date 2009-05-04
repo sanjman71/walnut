@@ -15,13 +15,13 @@
 
 .span-5#sidebar
   #neighborhoods
-    = render(:partial => 'city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag, :what => @what}) unless @neighborhoods.blank?
+    = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag, :what => @what}) unless @neighborhoods.blank?
   #zips
-    = render(:partial => 'city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag, :what => @what}) unless @zips.blank?
+    = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag, :what => @what}) unless @zips.blank?
   #cities
-    = render(:partial => 'zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag, :what => @what}) unless @cities.blank?
+    = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag, :what => @what}) unless @cities.blank?
   #nearby_cities
-    = render(:partial => 'nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :what => @what}) unless @nearby_cities.blank?
+    = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :what => @what}) unless @nearby_cities.blank?
   
   -# show another google ad
   = google_ad(160, 600)

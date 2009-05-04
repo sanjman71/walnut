@@ -209,6 +209,9 @@ span.example                                      { color: #666666; font-style: 
 .neighborhood.related, .zip.related, .city.related, .city.nearby, .tags.related
                                                   { color: #111111;  font-weight: bold; }
 
+a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.related.neighborhood
+                                                  { font-weight: normal; color: #0099FF; }
+
 span.neighborhood                                 { margin-right: 2px; }
 
 a.locality.search                                 { color: #5500BB; font-size: 1.1em; }

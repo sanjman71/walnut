@@ -70,6 +70,29 @@ class SearchController < ApplicationController
       array     += Search.load_from_facets(facets, Tag).collect(&:name) - [@raw_query]
     end
 
+    if @city or @zip
+      # build facets for city or zip searches
+      @facets = Location.facets(@sphinx_query, :with => @with, :facets => ["city_id", "zip_id", "neighborhood_ids"])
+
+      if @city
+        # find zips and neighborhoods facet
+        @zips           = Search.load_from_facets(@facets, Zip)
+        @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
+      end
+
+      if @zip
+        # find cities facet
+        @cities = Search.load_from_facets(@facets, City)
+      end
+      
+      if @city
+        # find nearby cities if its a city search, where nearby is defined with a mile radius range
+        nearby_miles    = 20
+        nearby_limit    = 5
+        @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
+      end
+    end
+    
     @locality_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
     
     # build search title based on what, city, neighborhood, zip search
