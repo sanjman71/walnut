@@ -14,9 +14,11 @@ class Event < ActiveRecord::Base
   delegate                  :city, :to => '(location or return nil)'
   delegate                  :zip, :to => '(location or return nil)'
   delegate                  :neighborhoods, :to => '(location or return nil)'
+  delegate                  :lat, :to => '(location or return nil)'
+  delegate                  :lng, :to => '(location or return nil)'
 
   named_scope :popular,     { :conditions => ["popularity > 0"] }
-  
+
   define_index do
     indexes name, :as => :name
     has start_at, :as => :start_at
@@ -58,8 +60,14 @@ class Event < ActiveRecord::Base
     self.save
   end
   
+  # returns true iff the location has a latitude and longitude 
+  def mappable?
+    return true if self.lat and self.lng
+    false
+  end
+
   protected
-  
+
   def after_add_category(category)
     return if category.tags.blank?
     # add category tags and save object
