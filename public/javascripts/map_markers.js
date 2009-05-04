@@ -18,8 +18,9 @@ $(document).ready(function() {
             color = latlng.attributes["color"].nodeValue;
             glatlng = new GLatLng(lat, lng);
             html = latlng.attributes["html"].nodeValue;
-            markers[i] = createMarker(glatlng, html, i, color);
-            map.addOverlay(markers[i]);
+            index = parseInt(latlng.attributes["index"].nodeValue);
+            markers[index] = createMarker(glatlng, html, index, color);
+            map.addOverlay(markers[index]);
             bounds.extend(glatlng);
           }
         );

@@ -1,5 +1,8 @@
 - color = "_orange"
-.mappable.unselected.span-10.last{:id => "mappable_#{index}", :lat => event.location.lat, :lng => event.location.lng, :index => index, :color => color, :html => "<strong>#{event.name}</strong><br/>At #{event.event_venue.name}<br/>#{link_to "Details", event.url}"}
+- klasses = []
+- klasses.push("mappable") if event.mappable?
+
+.unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => event.location.lat, :lng => event.location.lng, :index => index, :color => color, :html => "<strong>#{event.name}</strong><br/>At #{event.event_venue.name}<br/>#{link_to "Details", event.url}"}
 
   .span-1
     %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}

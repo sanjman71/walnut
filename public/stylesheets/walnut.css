@@ -154,7 +154,7 @@ div.instructions ul                               { font-size: 12px; }
 /* pagination styles */
 
 .pagination a                                     { background: #EEEEEE; color: #111111; }
-.pagination a:hover                               { background: #333333; color: #0099FF; }
+.pagination a:hover                               { background: #3300BB; color: #0099FF; }
 
 .pagination span, .pagination a                   { display: block; width: 12px; text-align: center; margin-right: 0px; padding: 0.2em 0.2em; 
                                                     float: left; text-decoration: none; }
