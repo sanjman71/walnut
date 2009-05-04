@@ -1,4 +1,6 @@
 - title(@title)
+- robots('index', 'follow') unless @objects.blank? or params[:page].to_i > 1
+
 -# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
 - content_for :javascript do
   %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
@@ -34,7 +36,13 @@
 
 .span-19.last#search
   .span-10
-    %h4= page_entries_info @objects unless @objects.blank?
+    %h4
+      - if @objects.blank?
+        %span{:style => 'font-size: 0.9em; font-weight: bold;'}
+          == No search results.
+          == Please check your search criteria and try again
+      - else
+        = page_entries_info @objects
   .span-9.last
     = will_paginate(@objects, :page_links => true)
 
@@ -56,7 +64,8 @@
           = render(:partial => 'event', :locals => {:event => object, :what => @what, :tags => @tags, :index => i})
 
   .span-9.last
-    .jmap#map{:style => "width: 350px; height: 400px;"}
+    - unless @objects.blank?
+      .jmap#map{:style => "width: 350px; height: 400px;"}
 
   %hr.space
   
@@ -66,5 +75,6 @@
     = will_paginate(@objects, :page_links => true)
 
   .span-19.last
-    -# show a google ad
-    = google_ad(728, 90, 'image')
+    - unless @objects.blank?
+      -# show a google ad
+      = google_ad(728, 90, 'image')
