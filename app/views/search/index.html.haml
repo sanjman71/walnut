@@ -21,16 +21,14 @@
   #related_tags
     = render(:partial => 'search/related_tags', :locals => {:title => "Related Searches", :tags => @related_tags}) unless @related_tags.blank?
   #neighborhoods
-    = render(:partial => 'city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :what => @what}) unless @neighborhoods.blank?
+    = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag, :what => @what}) unless @neighborhoods.blank?
   #zips
-    = render(:partial => 'city_zips', :locals => {:zips => @zips, :city => @city, :what => @what}) unless @zips.blank?
+    = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag, :what => @what}) unless @zips.blank?
   #cities
-    = render(:partial => 'zip_cities', :locals => {:cities => @cities, :zip => @zip, :what => @what}) unless @cities.blank?
+    = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag, :what => @what}) unless @cities.blank?
   #nearby_cities
-    = render(:partial => 'nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :what => @what}) unless @nearby_cities.blank?
+    = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :what => @what}) unless @nearby_cities.blank?
 
-  %hr.space
-  
   -# show another google ad
   = google_ad(160, 600)
 
@@ -44,7 +42,7 @@
     - if @klasses.keys.size > 0
       -# show number of results by type
       - @klasses.keys.each do |klass|
-        %span{:style => 'font-weight: bold; font-size: 1.1em; color: #0099FF;'}
+        %span{:style => 'font-weight: bold; font-size: 1.1em;'}
           = link_to("Search #{klass.pluralize} only", build_search_route(klass, 'city', @locality_params.merge(:tag => @tag, :what => @what).compact), :style => 'color: #0099FF;')
           = "&nbsp;|&nbsp;" unless klass == @klasses.keys[-1]
     

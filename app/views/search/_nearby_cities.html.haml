@@ -1,9 +1,8 @@
--# build basic url options
 - url_options = Hash[:action => 'index']
 - url_options.update(:tag => tag.parameterize) unless tag.blank?
 - url_options.update(:what => what.parameterize) unless what.blank?
 
-%h4.city.related== Nearby Cities
+%h4.city.nearby.bottom== Nearby Cities
 %ul
-  - cities.each do |city|
-    %li= link_to city.name, url_for(url_options.update(:city => city))
+  - nearby_cities.each do |city|
+    %li= link_to(city.name, url_for(url_options.update(:city => city)), :class => 'city nearby')

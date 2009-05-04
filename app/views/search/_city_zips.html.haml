@@ -1,4 +1,4 @@
-%h4.zip.related== #{city.name} Zip Codes
+%h4.zip.related.bottom== #{city.name} Zip Codes
 
 -# split zips into 2 lists of equal size
 - index1  = zips.length.even? ? zips.length/2 : zips.length/2 + 1
@@ -14,9 +14,9 @@
   .span-2
     %ul
       - zips1.each do |zip|
-        %li.zip= link_to zip.name, url_for(url_options.update(:zip => zip))
+        %li.zip= link_to(zip.name, url_for(url_options.update(:zip => zip)), :class => 'related zip')
 
   .span-2.last
     %ul
       - zips2.each do |zip|
-        %li.zip= link_to zip.name, url_for(url_options.update(:zip => zip))
+        %li.zip= link_to(zip.name, url_for(url_options.update(:zip => zip)), :class => 'related zip')

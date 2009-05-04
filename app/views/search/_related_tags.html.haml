@@ -1,6 +1,8 @@
 %h4.tags.related.bottom= title
 
 - tags.each do |tag|
-  - klasses   = ["tag"]
-  %span{:style => "white-space: nowrap; padding-right: 3px; font-size: 1.2em;"}= link_to(tag, url_for(:tag => tag.parameterize), :class => klasses.join, :style => 'color: #0099FF;')
+  - klasses = ["tag related"]
+  %span{:style => "white-space: nowrap; padding-right: 3px; font-size: 1.1em;"}= link_to(tag, url_for(:tag => tag.parameterize), :class => klasses.join)
 
+
+%hr.space
