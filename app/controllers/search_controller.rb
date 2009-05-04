@@ -48,7 +48,8 @@ class SearchController < ApplicationController
     # handle special case of 'something' to find a random what
     @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'something'
 
-    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag.blank? ? @what : @tag)
+    @raw_query      = @tag.blank? ? @what : @tag
+    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @raw_query)
     @query          = @search.query
     @with           = @search.field(:locality_hash)
 
@@ -59,6 +60,14 @@ class SearchController < ApplicationController
     @klasses        = Hash.new([])
     @objects.each do |object|
       @klasses[object.class.to_s] += [object]
+    end
+
+    # find related tags by class
+    related_size    = 11
+    @related_tags   = [Location, Event].inject([]) do |array, klass|
+      options   = {:with => Search.with(@city)}.update(Search.tag_group_options(related_size))
+      facets    = klass.facets(@query, options)
+      array     += Search.load_from_facets(facets, Tag).collect(&:name) - [@raw_query]
     end
 
     @locality_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}

@@ -206,7 +206,7 @@ span.example                                      { color: #666666; font-style: 
 .state_cities                                     { color: #111111; font-weight: bold; padding-bottom: 10px; }
 .state_zips                                       { color: #111111; font-weight: bold; padding-bottom: 10px; }
 
-.neighborhood.related, .zip.related, .city.related, .city.nearby
+.neighborhood.related, .zip.related, .city.related, .city.nearby, .tags.related
                                                   { color: #111111;  font-weight: bold; }
 
 span.neighborhood                                 { margin-right: 2px; }

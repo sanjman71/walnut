@@ -18,6 +18,8 @@
 %hr.space
 
 .span-5#sidebar
+  #related_tags
+    = render(:partial => 'search/related_tags', :locals => {:title => "Related Searches", :tags => @related_tags}) unless @related_tags.blank?
   #neighborhoods
     = render(:partial => 'city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :what => @what}) unless @neighborhoods.blank?
   #zips
@@ -27,6 +29,8 @@
   #nearby_cities
     = render(:partial => 'nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :what => @what}) unless @nearby_cities.blank?
 
+  %hr.space
+  
   -# show another google ad
   = google_ad(160, 600)
 
@@ -40,8 +44,8 @@
     - if @klasses.keys.size > 0
       -# show number of results by type
       - @klasses.keys.each do |klass|
-        %span{:style => 'font-weight: bold; color: #111111;'}
-          = link_to("Search #{klass.pluralize} only", build_search_route(klass, 'city', @locality_params.merge(:tag => @tag, :what => @what).compact), :style => 'font-weight: bold; color: #007700;')
+        %span{:style => 'font-weight: bold; font-size: 1.1em; color: #0099FF;'}
+          = link_to("Search #{klass.pluralize} only", build_search_route(klass, 'city', @locality_params.merge(:tag => @tag, :what => @what).compact), :style => 'color: #0099FF;')
           = "&nbsp;|&nbsp;" unless klass == @klasses.keys[-1]
     
   .span-10
