@@ -362,6 +362,7 @@ module ThinkingSphinx
         options[:class].sphinx_facets.inject(hash) do |hash, facet|
           if facets.include?(facet.attribute_name)
             options[:group_by] = facet.attribute_name
+            options[:group_clause] = "@count desc" unless options[:group_clause]
             hash.add_from_results facet, search_for_ids(*(args + [options]))
           end
           hash
