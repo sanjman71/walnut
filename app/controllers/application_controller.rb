@@ -112,7 +112,12 @@ class ApplicationController < ActionController::Base
         @zips   = @state.zips.with_locations
       when 'events'
         # find all state cities with events
-        @cities = @state.cities.with_events
+        self.class.benchmark("Benchmarking #{@state.name} cities with events") do
+          # find city events
+          city_limit  = 10
+          @facets     = Event.facets(:with => Search.with(@state), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
+          @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
+        end
       when 'search'
         # find all state cities
         @cities = @state.cities.order_by_name
@@ -128,11 +133,17 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
 
-      # find city zips and neighborhoods using a faceted search
-      @facets         = Location.facets(:with => Search.with(@city), :facets => ["zip_id", "neighborhood_ids"])
-      @zips           = Search.load_from_facets(@facets, Zip)
-      @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
+      self.class.benchmark("Benchmarking #{@city.name} zips using facets") do
+        # find city zips and neighborhoods using a faceted search
+        zip_limit   = 200
+        @facets     = Location.facets(:with => Search.with(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
+        @zips       = Search.load_from_facets(@facets, Zip)
+      end
 
+      self.class.benchmark("Benchmarking #{@city.name} neighborhoods using database") do
+        @neighborhoods  = @city.neighborhoods.with_locations.order_by_density(:limit => 100)
+      end
+      
       # track events
       track_where_ga_event(params[:controller], @city)
     when 'neighborhood'
@@ -155,10 +166,13 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'zip') and return
       end
 
-      # find city zips using a faceted search
-      @facets   = Location.facets(:with => {:zip_id => @zip.id}, :facets => ["city_id"])
-      @cities   = Search.load_from_facets(@facets, City)
-
+      self.class.benchmark("Benchmarking #{@zip.name} cities using facets") do
+        # find zip cities using a faceted search
+        city_limit  = 20
+        @facets     = Location.facets(:with => Search.with(@zip), :facets => ["city_id"], :limit => city_limit, :max_matches => city_limit)
+        @cities     = Search.load_from_facets(@facets, City)
+      end
+      
       # track events
       track_where_ga_event(params[:controller], @zip)
     when 'index'

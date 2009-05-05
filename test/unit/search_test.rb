@@ -16,16 +16,6 @@ class SearchTest < ActiveSupport::TestCase
     end
   end
   
-  context "search tag_group_options" do
-    setup do
-      @options = Search.tag_group_options(100)
-    end
-    
-    should "have group, facets, limit, max_matches keys" do
-      assert_equal Hash[:facets => "tag_ids", :group_by => "tag_ids", :group_clause => "@count desc", :limit => 100, :max_matches => 100], @options
-    end
-  end
-  
   context "search parse localities" do
     context "with state and no 'what'" do
       setup do

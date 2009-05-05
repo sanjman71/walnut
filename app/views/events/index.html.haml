@@ -23,7 +23,7 @@
   / #categories
   /   = render(:partial => 'events/categories', :locals => {:categories => @categories, :name => "Popular Categories"}) unless @categories.blank?
   #tags
-    = render(:partial => 'events/tags', :locals => {:tags => @tags, :name => "Popular Tags"}) unless @tags.blank?
+    = render(:partial => 'events/tags', :locals => {:tags => @popular_tags, :name => "Popular Tags"}) unless @popular_tags.blank?
   
   -# show another google ad
   = google_ad(160, 600)

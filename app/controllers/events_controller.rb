@@ -5,24 +5,19 @@ class EventsController < ApplicationController
   def country
     # @country initialized in before filter
     
-    # find city by events by country
-    @city_facet = "city_id"
-    @with       = Search.with(@country)
-    @facets     = Event.facets(:facets => @city_facet)
-    @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
+    self.class.benchmark("Benchmarking #{@country.name} cities with events") do
+      # find city events
+      city_limit  = 10
+      @facets     = Event.facets(:with => Search.with(@country), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
+      @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
+    end
     
     @title      = "#{@country.name} Events Directory"
     @h1         = @title
   end
       
   def state
-    # @country, @state  all initialized in before filter
-
-    # find events by city in this state
-    @city_facet = "city_id"
-    @with       = Search.with(@state)
-    @facets     = Event.facets(:facets => @city_facet)
-    @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
+    # @country, @state, @cities all initialized in before filter
 
     @title      = "#{@state.name} Events Directory"
     @h1         = @title
@@ -36,13 +31,15 @@ class EventsController < ApplicationController
     # @facets         = Event.facets(:with => {:city_id => 1}, :facets => @category_facet)
     # @categories     = Search.load_from_facets(@facets, EventCategory).sort_by { |o| o.name }
 
-    # generate tag counts using facets
-    options         = {:with => Search.with(@city)}.update(Search.tag_group_options(150))
-    @facets         = Event.facets(options)
-    @tags           = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
+      # build city tag cloud
+      tag_limit     = 150
+      @facets       = Event.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    end
 
-    @title          = "#{@city.name} Events Directory"
-    @h1             = @title
+    @title  = "#{@city.name} Events Directory"
+    @h1     = @title
   end
   
   def search
@@ -84,16 +81,21 @@ class EventsController < ApplicationController
     @query      = @search.query
     @with       = Search.with(@city)
     @with.update(:event_category_ids => @category.id) if @category
-    @events     = Event.search(@query, :with => @with, :include => :event_venue, :page => params[:page], :per_page => 20)
-        
+    
+    self.class.benchmark("Benchmarking #{@city.name} event search") do
+      @events   = Event.search(@query, :with => @with, :include => :event_venue, :page => params[:page], :per_page => 20)
+    end
+    
     # find popular categories
     # @categories = EventCategory.popular.order_by_name - [@category]
     
-    # find popular tags
-    options     = {:with => @with}.update(Search.tag_group_options(10))
-    @facets     = Event.facets(options)
-    @tags       = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }.delete_if { |t| t.name == @tag }
-    
+    self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
+      # build city tag cloud
+      tag_limit     = 150
+      @facets       = Event.facets(:with => @with, :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    end
+
     # build search title based on [what, filter] and city, neighborhood, zip search
     @title  = build_search_title(:what => @what, :tag => @tag, :category => @category ? @category.name : '', :filter => @filter, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
