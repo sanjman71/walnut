@@ -1,19 +1,29 @@
 class HomeController < ApplicationController
   def index
-    @country        = Country.default
+    @country = Country.default
+
+    # find a city to highlight
+    @city = City.order_by_density.all(:limit => 1, :include => :state).first
     
+    # find city events
+    @with = Search.with(@city)
+    # @with.update(:popularity => 1..1000)
+    
+    self.class.benchmark("Benchmarking #{@city.name} popular events") do
+      event_limit = 6
+      @events     = Event.search(@query, :with => @with, :include => :event_venue, :page => 1, :per_page => event_limit, :order => :popularity, :sort_mode => :desc)
+    end
+
     # find popular cities and neighborhoods
     
-    self.class.benchmark("Benchmarking popular cities") do
+    self.class.benchmark("Benchmarking popular cities using database") do
       city_limit      = 10
-      @facets         = Location.facets(:with => Search.with(@country), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
-      @cities         = Search.load_from_facets(@facets, City)
+      @cities         = City.order_by_density.all(:limit => city_limit, :include => :state)
     end
-    
-    self.class.benchmark("Benchmarking popular neighborhoods") do
+
+    self.class.benchmark("Benchmarking popular neighborhoods using database") do
       hood_limit      = 10
-      @facets         = Location.facets(:with => Search.with(@country), :facets => "neighborhood_ids", :limit => hood_limit, :max_matches => hood_limit)
-      @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
+      @neighborhoods  = Neighborhood.order_by_density.all(:limit => hood_limit, :include => :city)
     end
     
     # track event

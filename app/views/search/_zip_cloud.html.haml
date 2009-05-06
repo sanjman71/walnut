@@ -2,4 +2,5 @@
 
 - zips.each do |zip|
   - klasses = ["locality"].push(cycle('even', 'odd'))
-  %span.small[zip]= link_to(zip, url_for(:action => params[:controller], :action => 'zip', :country => country, :state => state, :zip => zip), :class => klasses.join(" "))
+  -#%span.small[zip]= link_to(zip, url_for(:action => params[:controller], :action => 'zip', :country => country, :state => state, :zip => zip), :class => klasses.join(" "))
+  %span.small[zip]= link_to(zip, build_zip_route(params[:controller], country, state, zip), :class => klasses.join(" "))

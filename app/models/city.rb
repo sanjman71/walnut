@@ -34,6 +34,10 @@ class City < ActiveRecord::Base
     self.id == 0
   end
   
+  def to_param
+    self.name.parameterize.to_s
+  end
+  
   def geocode_latlng(options={})
     force = options.has_key?(:force) ? options[:force] : false
     return true if self.lat and self.lng and !force

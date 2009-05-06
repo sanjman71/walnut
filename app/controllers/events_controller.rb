@@ -53,37 +53,23 @@ class EventsController < ApplicationController
     @what       = params[:what].to_s.from_url_param
     
     @category   = params[:category] ? EventCategory.find_by_source_id(params[:category].underscore) : nil
-    @sort       = params[:sort]
+    @filter     = params[:filter]
     
-    if @sort and @category
-      # is this allowed?
+
+    if @tag.blank? and @what.blank? and @filter.blank? and @category.blank?
+      # redirect to default filter
+      redirect_to(url_for(:filter => 'popularity')) and return
     end
     
-    if @tag.blank? and @what.blank? and @sort.blank? and @category.blank?
-      # redirect to default sort
-      redirect_to(url_for(:sort => 'popularity')) and return
-    end
-    
-    # if @sort
-    #   case @sort
-    #   when 'popular'
-    #     # @conditions[:sort_order] = 'popularity'
-    #     @title  = "#{@city.name} Popular Events"
-    #   end
-    # end
-    # 
-    # if @category
-    #   @title  = "#{@city.name} #{@category.name.singularize.titleize} Events"
-    # end
-        
     # find city events
     @search     = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag.blank? ? @what : @tag)
     @query      = @search.query
     @with       = Search.with(@city)
     @with.update(:event_category_ids => @category.id) if @category
+    @with.update(:popularity => 1..1000) if @filter
     
     self.class.benchmark("Benchmarking #{@city.name} event search") do
-      @events   = Event.search(@query, :with => @with, :include => :event_venue, :page => params[:page], :per_page => 20)
+      @events   = Event.search(@query, :with => @with, :include => :event_venue, :page => params[:page], :per_page => 20, :order => :start_at)
     end
     
     # find popular categories

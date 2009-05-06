@@ -1,6 +1,6 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
-  before_filter   :init_localities, :only => [:country, :state, :city, :index]
+  before_filter   :init_localities, :only => [:country, :state, :city, :zip, :index]
 
   def country
     # @country, @states initialized in before filter
@@ -44,6 +44,20 @@ class SearchController < ApplicationController
     @h1           = "Search Places and Events in #{@city.name}, #{@state.name}"
   end
 
+  def zip
+    # @country, @state, @zip and @cities all initialized in before filter
+
+    self.class.benchmark("Benchmarking #{@zip.name} tag cloud") do
+      # build tag cloud
+      tag_limit     = 150
+      @facets       = Location.facets(:with => Search.with(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    end
+
+    @title        = "#{@state.name} #{@zip.name} Yellow Pages"
+    @h1           = "Search Places and Events in #{@state.name} #{@zip.name}"
+  end
+  
   def index
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
@@ -72,8 +86,9 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking related search tags") do
       # find related tags by class
       related_size    = 11
+      search_with     = @city ? Search.with(@city) : Search.with(@zip)
       @related_tags   = [Location, Event].inject([]) do |array, klass|
-        facets  = klass.facets(@query, :with => Search.with(@city), :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
+        facets  = klass.facets(@query, :with => search_with, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
         array  += Search.load_from_facets(facets, Tag).collect(&:name) - [@raw_query]
       end
     end

@@ -63,6 +63,7 @@ namespace :localeze do
   
     # Navicat Import:
     #  - import ~437K records in ~3 minutes
+    #  - import 15725783 records in 14343 seconds
     #  - .txt import
     # Task Import: 
     #  - import 10K records in ~1 minute

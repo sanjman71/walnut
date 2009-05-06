@@ -58,11 +58,13 @@ module ApplicationHelper
     
     case where
     when 'city'
-      url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
-              :tag => options[:tag], :what => options[:what])
+      build_city_search_route(controller, options[:country], options[:state], options[:city], options)
+      # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+      #         :tag => options[:tag], :what => options[:what])
     when 'zip'
-      url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
-              :tag => options[:tag], :what => options[:what])
+      build_zip_search_route(controller, options[:country], options[:state], options[:zip], options)
+      # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
+      #         :tag => options[:tag], :what => options[:what])
     when 'neighborhood'
       url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
               :neighborhood => options[:neighborhood], :tag => options[:tag], :what => options[:what])
@@ -96,4 +98,32 @@ module ApplicationHelper
     end
   end
   
+  # url_for optimizations
+
+  def build_zip_route(controller, country, state, zip)
+    "/#{controller}/#{country.to_param}/#{state.to_param}/#{zip.to_param}"
+  end
+  
+  def build_city_search_route(controller, country, state, city, options={})
+    route = "/#{controller}/#{country.to_param}/#{state.to_param}/#{city.to_param}" + build_where_route_part(options)
+  end
+
+  def build_zip_search_route(controller, country, state, zip, options={})
+    route = "/#{controller}/#{country.to_param}/#{state.to_param}/#{zip.to_param}" + build_where_route_part(options)
+  end
+  
+  def build_neighborhood_search_route(controller, country, state, city, neighborhood, options={})
+    route = "/#{controller}/#{country.to_param}/#{state.to_param}/#{city.to_param}/n/#{neighborhood.to_param}" + build_where_route_part(options) 
+  end
+
+  def build_where_route_part(options)
+    if options[:tag]
+      "/tag/#{options[:tag]}"
+    elsif options[:where]
+      "/#{options[:where]}"
+    else
+      ""
+    end
+  end
+
 end

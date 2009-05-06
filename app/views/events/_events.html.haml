@@ -3,7 +3,7 @@
     - date = event.is_a?(Event) ? event.start_at : Time.parse(event['start_time'])
     
     .span-2.date
-      = render(:partial => 'calendar_date', :locals => {:date => date})
+      = render(:partial => 'events/calendar_date', :locals => {:date => date})
     
     .span-15.info.last
       %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}

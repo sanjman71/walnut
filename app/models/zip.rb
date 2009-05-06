@@ -19,5 +19,9 @@ class Zip < ActiveRecord::Base
       "#{zip.id}|#{zip.name}|#{zip.state_id}|#{zip.lat}|#{zip.lng}"
     end
   end
-    
+
+  def to_param
+    self.name
+  end
+
 end

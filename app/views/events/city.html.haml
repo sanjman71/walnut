@@ -9,7 +9,7 @@
       
   .span-23.last
     %h5
-      = link_to("Popular Events", url_for(:action => 'index', :sort => 'popular'), :class => 'event sort')
+      = link_to("Popular Events", url_for(:action => 'index', :filter => 'popular'), :class => 'event sort')
       - if @city.has_locations?
         == &nbsp;|&nbsp;
         = link_to("#{@city.name} Places", url_for(:controller => 'places', :action => 'city'), :class => 'locality search')

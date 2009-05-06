@@ -90,7 +90,7 @@ a.admin:link, a.admin:visited                     { font-size: 11px; font-weight
 a.admin:hover                                     { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
 
 a.header.link:link, a.header.link:visited         { color: #FFFFFF; }
-a.header.link:hover                               { background-color: #008800; text-decoration: none; }
+a.header.link:hover                               { background-color: #5500BB; text-decoration: none; }
 
 /* signup styles */
 
@@ -230,3 +230,11 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 .mappable.unselected                              { border: 1px solid white;}
 .mappable .icon-div                               { }
 .mappable .icon                                   { top: 50%; margin-top: 5px; margin: 2px;}
+
+/* footer styles */
+
+div#footer                                        { margin: 0; margin-top: 150px; min-width: 900px; min-height: 50px; overflow: hidden; padding: 15px 0px 0px 0px; 
+                                                    position: relative; text-align: left; background-color: #444444; }
+
+a.footer.link                                     { color: #FFFFFF; font-size: 1.1em; } 
+a.footer.link:hover                               { color: #FFFFFF; background-color: #5500BB; }

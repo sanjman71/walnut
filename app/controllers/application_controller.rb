@@ -28,6 +28,8 @@ class ApplicationController < ActionController::Base
   # Default application layout
   layout 'home'
   
+  has_sms_fu
+
   # check user privileges against the pre-loaded memory collection instead of using the database
   def has_privilege?(p, *args)
     authorizable  = args[0]
@@ -160,7 +162,7 @@ class ApplicationController < ActionController::Base
       track_where_ga_event(params[:controller], @neighborhood)
     when 'zip'
       # find zip and all zip cities
-      @zip      = @state.zips.find_by_name(params[:zip].to_s)
+      @zip = @state.zips.find_by_name(params[:zip].to_s)
 
       if @zip.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'zip') and return
@@ -232,6 +234,8 @@ class ApplicationController < ActionController::Base
       subject = what
     elsif !category.blank?
       subject = category
+    elsif !filter.blank?
+      subject = filter
     end
     
     # add specifics based on the controller
@@ -243,12 +247,6 @@ class ApplicationController < ActionController::Base
     end
       
     return "#{subject.titleize} near #{where}"
-    # 
-    # # otherwise use 'filter'
-    # case filter
-    # when 'recommended'
-    #   return "Recommended places near #{where}"
-    # end
   end  
     
 end

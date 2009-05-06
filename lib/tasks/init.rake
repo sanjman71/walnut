@@ -4,7 +4,7 @@ require 'ar-extensions'
 namespace :init do
 
   desc "Initialize default values."
-  task :all => [:countries, :states, :cities, :state_zips, :tag_groups, :admin_users, "rp:init"]
+  task :all => [:countries, :states, :cities, :communities, :state_zips, :tag_groups, :admin_users, "rp:init"]
 
   desc "Initialize admin users"
   task :admin_users do 
@@ -105,11 +105,16 @@ namespace :init do
         Locality.validate(@state, 'city', city_name)
       end
     end
-    
+
+    puts "#{Time.now}: initialized cities"
+  end
+  
+  "Initialize communities, which are treated as cities"
+  task :communities do
     # import communities as cities
     Community.import
-    
-    puts "#{Time.now}: initialized cities"
+
+    puts "#{Time.now}: initialized communities"
   end
   
   desc "Init locations."

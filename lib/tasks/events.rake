@@ -97,17 +97,26 @@ namespace :events do
   
   desc "Map event venues to locations, using sphinx to match locations"
   task :map_venues do
-    filter  = ENV["FILTER"].to_s
-    marked  = 0
-    skipped = 0
+    filter      = ENV["FILTER"].to_s
+    city_name   = ENV["CITY"].to_s
+    checked     = 0
+    marked      = 0
+    skipped     = 0
     
-    EventVenue.unmapped.each do |venue|
+    if city_name.blank?
+      puts "usage: missing CITY"
+      exit
+    end
+    
+    EventVenue.unmapped.city(city_name).each do |venue|
       city = City.find_by_name(venue.city)
       if city.blank?
         puts "#{Time.now}: xxx could not find venue city #{venue.city}"
         next
       end
-            
+      
+      checked += 1
+      
       # search for venue by name (try search name first), and by city and street address (try address name first)
       if !venue.search_name.blank?
         # use exact search name
@@ -164,18 +173,24 @@ namespace :events do
       puts "#{Time.now}: *** marked location #{location.place.name}:#{location.street_address} as event venue:#{venue.name}"
     end
     
-    puts "#{Time.now}: completed, #{EventVenue.count} total event venues, marked #{marked} locations as event venues, skipped #{skipped} event venues"
+    puts "#{Time.now}: completed, checked #{checked} event venues, marked #{marked} locations as event venues, skipped #{skipped} event venues"
   end
 
   desc "Mark popular events"
   task :mark_popular_events do
     # build events search conditions
-    @city = ENV["CITY"] ? ENV["CITY"] : City.first
+    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
+    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
 
-    puts "#{Time.now}: marking popular #{@city.name} events"
+    if city.blank?
+      puts "usage: missing CITY"
+      exit
+    end
+
+    puts "#{Time.now}: marking #{city.name} popular events"
     
-    @conditions = {:location => @city.name, :date => 'Future', :page_size => @@max_per_page, :sort_order => 'popularity'}
-    @results    = EventStream::Search.call(@conditions)
+    conditions  = {:location => city.name, :date => 'Future', :page_size => @@max_per_page, :sort_order => 'popularity'}
+    @results    = EventStream::Search.call(conditions)
     @events     = @results['events'] ? @results['events']['event'] : []
     @popular    = 0
     
@@ -193,7 +208,7 @@ namespace :events do
   desc "Import city events from eventful"
   task :import_events do
     # build events search conditions
-    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
+    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
     limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
 
     if city.blank?

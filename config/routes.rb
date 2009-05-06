@@ -43,7 +43,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/events/:country/:state/:city/n/:neighborhood', :controller => 'events', :action => 'neighborhood', :neighborhood => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/search', :controller => 'events', :action => 'search', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/tag/:tag', :controller => 'events', :action => 'index', :city => /[a-z-]+/
-  map.connect     '/events/:country/:state/:city/:sort', :controller => 'events', :action => 'index', :city => /[a-z-]+/, :sort => /popular/
+  map.connect     '/events/:country/:state/:city/filter/:filter', :controller => 'events', :action => 'index', :city => /[a-z-]+/, :filter => /popular/
   map.connect     '/events/:country/:state/:city/category/:category', :controller => 'events', :action => 'index', :city => /[a-z-]+/
   map.connect     '/events/:country/:state/:city/:what', :controller => 'events', :action => 'index', :city => /[a-z-]+/ # city must be lowercase
   map.connect     '/events/:country/:state/:city', :controller => 'events', :action => 'city', :city => /[a-z-]+/
@@ -83,6 +83,8 @@ ActionController::Routing::Routes.draw do |map|
   
   # map the root to the home controller
   map.root        :controller => 'home', :action => 'index'
+  
+  map.about       '/about', :controller => 'home', :action => 'about'
   
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}

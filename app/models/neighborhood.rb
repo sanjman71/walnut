@@ -12,4 +12,10 @@ class Neighborhood < ActiveRecord::Base
 
   # order neighborhoods by location count
   named_scope :order_by_density,      {:order => "locations_count DESC"}
+  
+
+  def to_param
+    self.name.parameterize.to_s
+  end
+
 end

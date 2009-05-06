@@ -7,6 +7,8 @@ class EventVenue < ActiveRecord::Base
   belongs_to                :location
   has_many                  :events#, :after_add => :after_add_event, :after_remove => :after_remove_event
   
+  named_scope :city,            lambda { |s| { :conditions => {:city => s}} }
+  
   # find event venues that have been mapped/unmapped to locations
   named_scope :mapped,          { :conditions => ["location_id > 0"] }
   named_scope :unmapped,        { :conditions => ["location_id is NULL"] }
