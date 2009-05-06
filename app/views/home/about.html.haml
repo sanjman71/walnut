@@ -1,0 +1,22 @@
+- title('About')
+
+.span-23.prepend-1.padding-top-10
+  %h3{:style => 'color: #666666;'}== What?
+  %h2== We make it really easy to find local businesses online, while promoting positive marketing and offering local businesses web based services that allow them to interact with their customers more effectively.
+  
+  / %h3{:style => 'color: #666666;'}== Why?
+  / %h2== Its not always easy to find a local business online.  We are trying to fix that by making it really easy to find the places you are looking for.
+  / %h2== Its not always easy to find a local business online, and there is an abundance of negative marketing everywhere you look.  It makes it hard to see through the clutter.
+
+  %h3{:style => 'color: #666666;'}== How?
+  %h4{:style => 'line-height: 1.5em; font-size: 1.4em;'}
+    = highlight("Find places by selecting popular cities or neighborhoods, and then searching by popular tags.  Or use the search bar at the top of the page to search based on your own criteria.", ["places", "popular cities or neighborhoods", "popular tags"], :highlighter => '<strong class="highlight muted">\1</strong>')
+    = highlight("If you like a place, recommend it.", 'recommend', :highlighter => '<strong class="highlight muted">\1</strong>')
+    %hr.space
+    = highlight("Find local events in your city", "events", :highlighter => '<strong class="highlight muted">\1</strong>')
+    = highlight(", or publish upcoming events to get the word out.", ["publish"], :highlighter => '<strong class="highlight muted">\1</strong>')
+    
+  %h4{:style => 'line-height: 1.5em; font-size: 1.4em;'}
+    = highlight("Find business services to help your business market its services, generate revenue, increase efficiency and increase customer loyalty.  Our first business service is online scheduling.  Try it out for free.", ["business services", "online scheduling"], :highlighter => '<strong class="highlight muted">\1</strong>')
+
+          

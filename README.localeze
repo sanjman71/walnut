@@ -1,0 +1,32 @@
+== Localeze Installation
+
+Instructions for importing localeze data into the database localeze_#{RAILS_ENV}.
+
+0. Create the database 
+
+1. Import the shared tables used by company-specific data
+  - rake localeze:shared:import_categories
+  x rake localeze:shared:import_chains  # this dies because of an 'illegal quoting' error on line 188
+  - navicat import chains file
+  
+2. Import the company specific tables
+  - load base records ...
+    - rake localeze:company:import_base_records CBSA=16980 LIMIT=10
+    * or
+    - navicat settings
+      - import as .txt file with '|' separator
+      - use default field mappings
+  
+  - load company attributes
+    - navicat settings:
+      - import as .txt file with '|' separator
+      - no id field
+      - field1 is base_record_id 
+      - skip field2
+    
+  - load company headings
+    - navicat settings:
+      - import as .txt file with '|' separator
+      - no id field
+      - field1 is base_record_id 
+
