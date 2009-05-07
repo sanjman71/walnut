@@ -153,7 +153,8 @@ class SearchController < ApplicationController
   def resolve
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
-    @what     = params[:what].to_s.parameterize
+    # normalize what parameter
+    @what     = Search.normalize(params[:what].to_s).parameterize
     
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return
