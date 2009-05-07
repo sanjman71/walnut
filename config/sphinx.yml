@@ -1,6 +1,12 @@
 development:
   max_matches: 50
+  # Ignore single quotes
+  ignore_chars: U+0027
 production:
   max_matches: 50
+  # Ignore single quotes
+  ignore_chars: U+0027
 test:
   max_matches: 50
+  # Ignore single quotes
+  ignore_chars: U+0027
