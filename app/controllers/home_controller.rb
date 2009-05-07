@@ -10,20 +10,22 @@ class HomeController < ApplicationController
     # @with.update(:popularity => 1..1000)
     
     self.class.benchmark("Benchmarking #{@city.name} popular events") do
-      event_limit = 6
-      @events     = Event.search(@query, :with => @with, :include => :event_venue, :page => 1, :per_page => event_limit, :order => :popularity, :sort_mode => :desc)
+      Rails.cache.fetch("#{@city.name}:popular:events") do
+        event_limit = 6
+        @events     = Event.search(@query, :with => @with, :include => :event_venue, :page => 1, :per_page => event_limit, :order => :popularity, :sort_mode => :desc)
+      end
     end
 
     # find popular cities and neighborhoods
     
     self.class.benchmark("Benchmarking popular cities using database") do
       city_limit      = 10
-      @cities         = City.order_by_density.all(:limit => city_limit, :include => :state)
+      @cities         = City.with_locations.order_by_density.all(:limit => city_limit, :include => :state)
     end
 
     self.class.benchmark("Benchmarking popular neighborhoods using database") do
       hood_limit      = 10
-      @neighborhoods  = Neighborhood.order_by_density.all(:limit => hood_limit, :include => :city)
+      @neighborhoods  = Neighborhood.with_locations.order_by_density.all(:limit => hood_limit, :include => :city)
     end
     
     # track event

@@ -1,0 +1,21 @@
+- title(@title)
+- robots('index', 'follow')
+
+.span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
+  %h2= @h1
+  %h5
+    = link_to("Search #{pluralize(@neighborhood.name, 'Places and Events')}", url_for(:action => 'index', :what => 'anything'), :class => 'locality search')
+    - if @city.has_locations?
+      == &nbsp;|&nbsp;
+      = link_to("Search #{@neighborhood.name} Places", url_for(:controller => 'places', :action => 'neighborhood'), :class => 'locality search')
+    - if @events_count > 0
+      == &nbsp;|&nbsp;
+      = link_to("Search #{@neighborhood.name} Events", url_for(:controller => 'events', :action => 'neighborhood'), :class => 'locality search')
+  %h4#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
+
+%hr.space
+
+%h3.span-23.prepend-1#tags
+  - unless @popular_tags.blank?
+    = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'neighborhood', :locality_params => {:country => @country, :state => @state, :city => @city, :neighborhood => @neighborhood}})

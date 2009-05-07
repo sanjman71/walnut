@@ -28,6 +28,12 @@
 
 %hr.space
 
+%h3.span-23.prepend-1#neighborhoods
+  - unless @neighborhoods.blank?
+    = render(:partial => 'search/neighborhood_cloud', :locals => {:title => "#{@city.name} Neighborhoods", :neighborhoods => @neighborhoods, :country => @country, :state => @state, :city => @city})
+
+%hr.space
+
 %h3.span-23.prepend-1#zips
   - unless @zips.blank?
     = render(:partial => 'search/zip_cloud', :locals => {:title => "#{@city.name} Zip Codes", :zips => @zips, :country => @country, :state => @state})

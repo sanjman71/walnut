@@ -1,5 +1,5 @@
 -# build basic url options
-- url_options = Hash[:action => 'index']
+- url_options = Hash[:action => 'index', :neighborhood => nil, :zip => nil]
 - url_options.update(:tag => tag.parameterize) unless tag.blank?
 - url_options.update(:what => what.parameterize) unless what.blank?
 

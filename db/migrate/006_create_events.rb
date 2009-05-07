@@ -14,14 +14,14 @@ class CreateEvents < ActiveRecord::Migration
     add_index :event_categories, :source_id
     
     create_table :event_venues, :force => :true do |t|
-      t.string      :name,          :limit => 150, :null => false
-      t.string      :city,          :limit => 50, :null => false
+      t.string      :name,            :limit => 150, :null => false
+      t.string      :city,            :limit => 50, :null => false
       t.string      :address
-      t.string      :source_type,   :limit => 20, :null => false
-      t.string      :source_id,     :limit => 50, :null => false
-      t.string      :search_name,   :limit => 150
-      t.string      :address_name,  :limit => 100
-      t.integer     :events_count,  :default => 0
+      t.string      :source_type,     :limit => 20, :null => false
+      t.string      :source_id,       :limit => 50, :null => false
+      t.string      :search_name,     :limit => 150
+      t.string      :search_address,  :limit => 100
+      t.integer     :events_count,    :default => 0
       t.references  :location
     end
     

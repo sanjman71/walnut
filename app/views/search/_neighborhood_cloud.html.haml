@@ -1,0 +1,5 @@
+.city_neighborhoods= title
+
+- neighborhoods.each do |neighborhood|
+  - klasses = ["locality"].push(cycle('even', 'odd'))
+  %span.small[neighborhood]= link_to(neighborhood, build_neighborhood_search_route(params[:controller], country, state, city, neighborhood), :class => klasses.join(" "))

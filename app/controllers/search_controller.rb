@@ -1,6 +1,6 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
-  before_filter   :init_localities, :only => [:country, :state, :city, :zip, :index]
+  before_filter   :init_localities, :only => [:country, :state, :city, :neighborhood, :zip, :index]
 
   def country
     # @country, @states initialized in before filter
@@ -18,7 +18,7 @@ class SearchController < ApplicationController
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
-      # build city tag cloud
+      # build tag cloud
       tag_limit     = 150
       @facets       = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
       @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
@@ -42,6 +42,27 @@ class SearchController < ApplicationController
     
     @title        = "#{@city.name}, #{@state.name} Yellow Pages"
     @h1           = "Search Places and Events in #{@city.name}, #{@state.name}"
+  end
+
+  def neighborhood
+    # @country, @state, @city, @neighborhood all initialized in before filter
+
+    self.class.benchmark("Benchmarking #{@neighborhood.name} tag cloud") do
+      # build tag cloud
+      tag_limit     = 150
+      @facets       = Location.facets(:with => Search.with(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+    end
+
+    self.class.benchmark("Benchmarking #{@neighborhood.name} popular events") do
+      # find events count and popular events
+      event_limit   = 10
+      @facets       = Event.facets(:with => Search.with(@neighborhood), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
+      @events_count = @facets[:city_id][@city.id].to_i
+    end
+    
+    @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
+    @h1     = "Search Places and Events in #{@neighborhood.name}, #{@city.name}, #{@state.name}"
   end
 
   def zip
@@ -86,17 +107,24 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking related search tags") do
       # find related tags by class
       related_size    = 11
-      search_with     = @city ? Search.with(@city) : Search.with(@zip)
       @related_tags   = [Location, Event].inject([]) do |array, klass|
-        facets  = klass.facets(@query, :with => search_with, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
+        facets  = klass.facets(@query, :with => @with, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
         array  += Search.load_from_facets(facets, Tag).collect(&:name) - [@raw_query]
       end
     end
     
     self.class.benchmark("Benchmarking related cities, zips, neighborhoods") do
-      if @city
+      if @neighborhood
+        # build neighborhood cities
+        @cities = Array(@neighborhood.city)
+        # build zip facets
+        limit   = 10
+        @facets = Location.facets(@query, :with => @with, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
+        @zips   = Search.load_from_facets(@facets, Zip)
+      elsif @city
         # build zip and neighborhood facets
-        @facets         = Location.facets(@query, :with => @with, :facets => ["zip_id", "neighborhood_ids"])
+        limit           = 10
+        @facets         = Location.facets(@query, :with => @with, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
         @zips           = Search.load_from_facets(@facets, Zip)
         @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
 
@@ -106,7 +134,8 @@ class SearchController < ApplicationController
         @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
       elsif @zip
         # build city facets
-        @facets = Location.facets(@query, :with => @with, :facets => ["city_id"])
+        limit   = 5
+        @facets = Location.facets(@query, :with => @with, :facets => ["city_id"], :limit => limit, :max_matches => limit)
         @cities = Search.load_from_facets(@facets, City)
       end
     end

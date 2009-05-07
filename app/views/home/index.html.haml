@@ -12,13 +12,14 @@
   %hr.space
   
   .span-10
-    - @events.each_with_index do |object, i|
-      .span-10.letterbox[object]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
-        - case object.class.to_s
-        - when 'Location'
-          = render(:partial => 'search/location', :locals => {:location => object, :what => @what, :tags => @tags, :index => i})
-        - when 'Event'
-          = render(:partial => 'search/event', :locals => {:event => object, :what => @what, :tags => @tags, :index => i})
+    - unless @events.blank?
+      - @events.each_with_index do |object, i|
+        .span-10.letterbox[object]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
+          - case object.class.to_s
+          - when 'Location'
+            = render(:partial => 'search/location', :locals => {:location => object, :what => @what, :tags => @tags, :index => i})
+          - when 'Event'
+            = render(:partial => 'search/event', :locals => {:event => object, :what => @what, :tags => @tags, :index => i})
 
   .span-13.last
     - unless @events.blank?

@@ -16,6 +16,9 @@ config.action_controller.perform_caching             = false
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
 
+# Configure the rails cache
+config.cache_store = :file_store, '/tmp'
+
 # Google maps api key - http://www.walnut.dev
 GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBRKHyjCFHczuSNpLv6PJ7BM1sjczBSR9dLPitiritgQPAQhDKJM7I0E9g"
 GOOGLE_MAPS_API_URL = "http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{GOOGLE_MAPS_API_KEY}"
