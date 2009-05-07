@@ -20,7 +20,7 @@
         = render(:partial => "shared/header_links")
 
     -# main container
-    .container{:class => $BlueprintGrid ? 'showgrid' : ''}
+    .container#container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .prepend-1.span-14
         = display_flash
       = yield

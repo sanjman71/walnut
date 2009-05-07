@@ -233,8 +233,16 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 
 /* footer styles */
 
-div#footer                                        { margin: 0; margin-top: 150px; min-width: 900px; min-height: 50px; overflow: hidden; padding: 15px 0px 0px 0px; 
-                                                    position: relative; text-align: left; background-color: #444444; }
+/* stretch the html, body, and container elements to full window height */
+html, body, #container                            { height: 100%; }
+body > #container                                 { height: auto; min-height: 100%; }
+
+/* adding padding to the main conainer, add more than the footer height */
+div#container                                     { padding-bottom: 8em; }
+
+/* place the footer after the main container, creating a body overflow */
+div#footer                                        { clear: both; position: relative; z-index: 10; height: 5em; margin-top: -5em;
+                                                    background-color: #444444; padding-top: 15px; min-width: 900px; text-align: left; }
 
 a.footer.link                                     { color: #FFFFFF; font-size: 1.1em; } 
 a.footer.link:hover                               { color: #FFFFFF; background-color: #5500BB; }
