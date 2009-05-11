@@ -11,6 +11,7 @@ class StreetAddress
   #
   #  - examples with normalization
   #  - 200 West Grand Ave. => 200 W Grand Ave
+  #  - 216 Eleventh => 216 11th
   
   # normalize a street address, e.g:
   #  - 200 West Grand Avenue => 200 W Grand Ave
@@ -32,6 +33,18 @@ class StreetAddress
       end
     end
     
+    ordinals = [["first", "1st"], ["second", "2nd"], ["third", "3rd"], ["fourth", "4th"], ["fifth", "5th"], ["sixth", "6th"], ["seventh", "7th"],
+                ["eighth", "8th"], ["ninth", "9th"], ["tenth", "10th"], ["eleventh", "11th"], ["twelfth", "12th"], ["thirteenth", "13th"],
+                ["fourteenth", "14th"], ["fifteenth", "15th"], ["sixteenth", "16th"], ["seventeenth", "17th"], ["eighteenth", "18th"],
+                ["ninteenth", "19th"], ["twentieth", "20th"]
+               ]
+    ordinals.each do |tuple|
+      # these must be in the middle or end of the street address
+      if s.match(/\s#{tuple[0]}/)
+        s.send("gsub!", tuple[0], tuple[1])
+      end
+    end
+
     s.split.collect { |token| ["and"].include?(token) ? token : token.capitalize  }.join(" ")
   end
   

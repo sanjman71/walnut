@@ -23,6 +23,17 @@ class StreetAddressTest < ActiveSupport::TestCase
         assert_equal "200 W Grand Ave", StreetAddress.normalize(@address)
       end
     end
+    
+    context "with 'Second' street name" do
+      setup do
+        @address = "216 Eleventh"
+      end
+      
+      should "change Eleventh to 11th" do
+        assert_equal "216 11th", StreetAddress.normalize(@address)
+      end
+    end
+    
   end
   
   context "get street address components" do
