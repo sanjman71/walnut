@@ -11,13 +11,13 @@ config.whiny_nils = true
 # Show full error reports and disable caching
 config.action_controller.consider_all_requests_local = true
 config.action_view.debug_rjs                         = true
-config.action_controller.perform_caching             = false
+config.action_controller.perform_caching             = true
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
 
 # Configure the rails cache
-config.cache_store = :file_store, '/tmp'
+config.cache_store = :file_store, "#{RAILS_ROOT}/tmp/cache"
 
 # Google maps api key - http://www.walnut.dev
 GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBRKHyjCFHczuSNpLv6PJ7BM1sjczBSR9dLPitiritgQPAQhDKJM7I0E9g"

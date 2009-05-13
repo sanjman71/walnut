@@ -28,7 +28,8 @@
 
 %h3.span-23.prepend-1#tags
   - unless @popular_tags.blank?
-    = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'city', :locality_params => {:country => @country, :state => @state, :city => @city}})
+    - cache("#{@city.name.parameterize}:tag_cloud") do
+      = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'city', :locality_params => {:country => @country, :state => @state, :city => @city}})
 
 %hr.space
 

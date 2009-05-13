@@ -18,10 +18,12 @@ class SearchController < ApplicationController
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
-      # build tag cloud
-      tag_limit     = 150
-      @facets       = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+      @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:tag_cloud", :expires_in => 2.minutes) do
+        # build tag cloud
+        tag_limit = 150
+        facets    = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+      end
     end
     
     self.class.benchmark("Benchmarking #{@city.name} popular events") do
