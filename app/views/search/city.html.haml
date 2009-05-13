@@ -28,19 +28,20 @@
 
 %h3.span-23.prepend-1#tags
   - unless @popular_tags.blank?
-    - cache("#{@city.name.parameterize}:tag_cloud") do
+    - cache("#{@city.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
       = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'city', :locality_params => {:country => @country, :state => @state, :city => @city}})
 
 %hr.space
 
 %h3.span-23.prepend-1#neighborhoods
   - unless @neighborhoods.blank?
-    = render(:partial => 'search/neighborhood_cloud', :locals => {:title => "#{@city.name} Neighborhoods", :neighborhoods => @neighborhoods, :country => @country, :state => @state, :city => @city})
+    - cache("#{@city.name.parameterize}:neighborhoods", :expires_in => CacheExpire.localities) do
+      = render(:partial => 'search/neighborhood_cloud', :locals => {:title => "#{@city.name} Neighborhoods", :neighborhoods => @neighborhoods, :country => @country, :state => @state, :city => @city})
 
 %hr.space
 
 %h3.span-23.prepend-1#zips
   - unless @zips.blank?
-    - cache("#{@city.name.parameterize}:zips") do
+    - cache("#{@city.name.parameterize}:zips", :expires_in => CacheExpire.localities) do
       = render(:partial => 'search/zip_cloud', :locals => {:title => "#{@city.name} Zip Codes", :zips => @zips, :country => @country, :state => @state})
    

@@ -136,7 +136,7 @@ class ApplicationController < ActionController::Base
       end
 
       self.class.benchmark("Benchmarking #{@city.name} zips using facets") do
-        @zips = Rails.cache.fetch("#{@city.name.parameterize}:zips", :expires_in => 2.minutes) do
+        @zips = Rails.cache.fetch("#{@city.name.parameterize}:zips", :expires_in => CacheExpire.localities) do
           zip_limit = 200
           facets    = Location.facets(:with => Search.with(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
           Search.load_from_facets(facets, Zip)
@@ -170,10 +170,11 @@ class ApplicationController < ActionController::Base
       end
 
       self.class.benchmark("Benchmarking #{@zip.name} cities using facets") do
-        # find zip cities using a faceted search
-        city_limit  = 20
-        @facets     = Location.facets(:with => Search.with(@zip), :facets => ["city_id"], :limit => city_limit, :max_matches => city_limit)
-        @cities     = Search.load_from_facets(@facets, City)
+        @cities = Rails.cache.fetch("#{@zip.name}:cities", :expires_in => CacheExpire.localities) do
+          city_limit  = 20
+          facets      = Location.facets(:with => Search.with(@zip), :facets => ["city_id"], :limit => city_limit, :max_matches => city_limit)
+          Search.load_from_facets(facets, City)
+        end
       end
       
       # track events

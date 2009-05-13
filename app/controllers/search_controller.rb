@@ -18,7 +18,7 @@ class SearchController < ApplicationController
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
-      @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:tag_cloud", :expires_in => 2.minutes) do
+      @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud
         tag_limit = 150
         facets    = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
@@ -27,7 +27,7 @@ class SearchController < ApplicationController
     end
     
     self.class.benchmark("Benchmarking #{@city.name} popular events") do
-      @events_count, @popular_events = Rails.cache.fetch("#{@city.name.parameterize}:popular_events", :expires_in => 2.minutes) do
+      @events_count, @popular_events = Rails.cache.fetch("#{@city.name.parameterize}:popular_events", :expires_in => CacheExpire.events) do
         # find city events count and popular events
         event_limit     = 10
         facets          = Event.facets(:with => Search.with(@city), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
@@ -37,10 +37,7 @@ class SearchController < ApplicationController
         [events_count, popular_events]
         # if events_count > 0
         #   # find most popular city events
-        #   Event.search(:with => Search.with(@city).update(:popularity => 1..100), :limit => 5)
-        # else
-        #   # no popular events
-        #   []
+        #   popular_events = Event.search(:with => Search.with(@city).update(:popularity => 1..100), :limit => 5)
         # end
       end
     end
@@ -53,10 +50,12 @@ class SearchController < ApplicationController
     # @country, @state, @city, @neighborhood all initialized in before filter
 
     self.class.benchmark("Benchmarking #{@neighborhood.name} tag cloud") do
-      # build tag cloud
-      tag_limit     = 150
-      @facets       = Location.facets(:with => Search.with(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+      @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
+        # build tag cloud
+        tag_limit = 150
+        facets    = Location.facets(:with => Search.with(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+      end
     end
 
     self.class.benchmark("Benchmarking #{@neighborhood.name} popular events") do
@@ -74,10 +73,12 @@ class SearchController < ApplicationController
     # @country, @state, @zip and @cities all initialized in before filter
 
     self.class.benchmark("Benchmarking #{@zip.name} tag cloud") do
-      # build tag cloud
-      tag_limit     = 150
-      @facets       = Location.facets(:with => Search.with(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-      @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
+      @popular_tags = Rails.cache.fetch("#{@zip.name}:tag_cloud", :expires_in => CacheExpire.tags) do
+        # build tag cloud
+        tag_limit = 150
+        facets    = Location.facets(:with => Search.with(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+      end
     end
 
     @title        = "#{@state.name} #{@zip.name} Yellow Pages"

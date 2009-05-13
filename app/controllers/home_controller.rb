@@ -9,11 +9,11 @@ class HomeController < ApplicationController
     @featured_with = Search.with(@featured_city)
     featured_limit = 5
 
-    # self.class.benchmark("Benchmarking #{@featured_city.name} popular events") do
-    @featured_events = Rails.cache.fetch("#{@featured_city.name.parameterize}:popular:events") do
-      Event.search(:with => @featured_with, :include => :event_venue, :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+    self.class.benchmark("Benchmarking #{@featured_city.name} popular events") do
+      @featured_events = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured_events", :expires_in => CacheExpire.events) do
+        Event.search(:with => @featured_with, :include => :event_venue, :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+      end
     end
-    # end
 
     # find popular cities and neighborhoods
     
