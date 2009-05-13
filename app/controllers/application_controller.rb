@@ -136,10 +136,11 @@ class ApplicationController < ActionController::Base
       end
 
       self.class.benchmark("Benchmarking #{@city.name} zips using facets") do
-        # find city zips and neighborhoods using a faceted search
-        zip_limit   = 200
-        @facets     = Location.facets(:with => Search.with(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
-        @zips       = Search.load_from_facets(@facets, Zip)
+        @zips = Rails.cache.fetch("#{@city.name.parameterize}:zips", :expires_in => 2.minutes) do
+          zip_limit = 200
+          facets    = Location.facets(:with => Search.with(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
+          Search.load_from_facets(facets, Zip)
+        end
       end
 
       self.class.benchmark("Benchmarking #{@city.name} neighborhoods using database") do

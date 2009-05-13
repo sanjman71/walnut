@@ -27,19 +27,22 @@ class SearchController < ApplicationController
     end
     
     self.class.benchmark("Benchmarking #{@city.name} popular events") do
-      # find city events count and popular events
-      event_limit   = 10
-      @facets       = Event.facets(:with => Search.with(@city), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
-      @events_count = @facets[:city_id][@city.id].to_i
-    
-      # if @events_count > 0
-      #   # find most popular city events
-      #   @with           = Search.with(@city).update(:popularity => 1..100)
-      #   @popular_events = Event.search(:with => @with, :limit => 5)
-      # else
-      #   # no popular events
-      #   @popular_events = []
-      # end
+      @events_count, @popular_events = Rails.cache.fetch("#{@city.name.parameterize}:popular_events", :expires_in => 2.minutes) do
+        # find city events count and popular events
+        event_limit     = 10
+        facets          = Event.facets(:with => Search.with(@city), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
+        events_count    = facets[:city_id][@city.id].to_i
+        popular_events  = []
+        
+        [events_count, popular_events]
+        # if events_count > 0
+        #   # find most popular city events
+        #   Event.search(:with => Search.with(@city).update(:popularity => 1..100), :limit => 5)
+        # else
+        #   # no popular events
+        #   []
+        # end
+      end
     end
     
     @title        = "#{@city.name}, #{@state.name} Yellow Pages"

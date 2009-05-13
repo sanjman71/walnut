@@ -41,5 +41,6 @@
 
 %h3.span-23.prepend-1#zips
   - unless @zips.blank?
-    = render(:partial => 'search/zip_cloud', :locals => {:title => "#{@city.name} Zip Codes", :zips => @zips, :country => @country, :state => @state})
+    - cache("#{@city.name.parameterize}:zips") do
+      = render(:partial => 'search/zip_cloud', :locals => {:title => "#{@city.name} Zip Codes", :zips => @zips, :country => @country, :state => @state})
    
