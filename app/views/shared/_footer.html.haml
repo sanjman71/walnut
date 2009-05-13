@@ -2,3 +2,5 @@
   = link_to('About', about_path, :class => 'footer link')
   == &nbsp&nbsp;&nbsp;
   = link_to('Contact Us', '', :class => 'footer link')
+  == &nbsp&nbsp;&nbsp;
+  = link_to('Search by State', url_for(:controller => 'search', :action => 'country', :country => @country || Country.default), :class => 'footer link')
