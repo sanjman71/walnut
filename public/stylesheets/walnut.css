@@ -227,8 +227,10 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 .recommendations                                  { font-weight: bold; }
 .recommendations.bold                             { color: #008800; font-weight: bold; }
 
-.mappable.selected                                { border: 1px solid black;}
-.mappable.unselected                              { border: 1px solid white;}
+/* mappable objects */
+
+.mappable.selected                                { background-color: #EDF3FE; }
+.mappable.unselected                              { background-color: #FFFFFF; }
 .mappable .icon-div                               { }
 .mappable .icon                                   { top: 50%; margin-top: 5px; margin: 2px;}
 
