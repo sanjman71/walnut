@@ -1,28 +1,29 @@
-- rows = tags.size.odd? ? tags.size/2 + 1 : tags.size/2
+-#- rows = tags.size.odd? ? tags.size/2 + 1 : tags.size/2
+- rows = tags.size/3 + (tags.size % 3 > 0 ? 1 : 0)
 
 - (0..rows-1).each do |row|
-  - tag1 = tags[row*2]
-  - tag2 = tags[row*2+1]
+  - tag1 = tags[row*3]
+  - tag2 = tags[row*3+1]
+  - tag3 = tags[row*3+2]
   
   .span-24.last.letterbox{:style => "border-bottom:2px solid #eee;"}
   
-    .span-8.prepend-1.border
+    .span-6.prepend-1.border
       %h3{:style => 'margin-bottom: 3px;'}
         = tag1.name
       .span-2{:style => 'color: #777777;'}
         == Count: #{tag1.taggings_count}
     
     - unless tag2.blank?
-      .span-8.prepend-1.last
+      .span-6.prepend-1.border
         %h3{:style => 'margin-bottom: 3px;'}
           = tag2.name
         .span-2{:style => 'color: #777777;'}
           == Count: #{tag2.taggings_count}
-  
-/ - tags.each do |tag|
-/   .span-23.prepend-1.letterbox[tag]{:style => "border-bottom:2px solid #eee;"}
-/     .span-13
-/       %h3{:style => 'margin-bottom: 3px;'}
-/         = tag.name
-/       .span-2
-/         == Count: #{tag.taggings_count}
+          
+    - unless tag3.blank?
+      .span-6.prepend-1.last
+        %h3{:style => 'margin-bottom: 3px;'}
+          = tag3.name
+        .span-2{:style => 'color: #777777;'}
+          == Count: #{tag3.taggings_count}
