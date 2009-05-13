@@ -1,0 +1,20 @@
+- venues.each do |venue|
+  .span-18.venue.letterbox{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
+    .span-15.info.last
+      %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
+        = venue.name
+      %h4.address.margin-bottom-5
+        == #{venue.address},
+        = venue.city
+        = venue.zip
+      %h5.popularity.bottom
+        == Popularity:
+        = venue.popularity
+      %h5.mapping.bottom{:style => 'color: #555;'}
+        - if venue.mapped?
+          == Mapped to
+          = link_to venue.location.place.name, place_path(venue.location)
+          == &nbsp;|&nbsp;
+          == Events: #{venue.location.events_count}
+        - else
+          = link_to 'Add this place', add_venue_path(venue)

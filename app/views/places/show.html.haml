@@ -4,7 +4,15 @@
 - javascript("jquery.jmap", "maps", "places")
 
 .span-23.box
-  %h1= @h1
+  %h1
+    = @h1
+    - if has_privilege?('manage site')
+      %span{:style => 'font-size: 0.4em; color: #777777;'}
+        == #{@location.source_type}:#{@location.source_id}
+        - if @location.event_venue
+          == &nbsp;|&nbsp;
+          == Venue
+          
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
 

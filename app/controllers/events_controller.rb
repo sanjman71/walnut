@@ -26,11 +26,6 @@ class EventsController < ApplicationController
   def city
     # @country, @state, @city all initialized in before filter
 
-    # find faceted event categories in the specified city
-    # @category_facet = "event_category_ids"
-    # @facets         = Event.facets(:with => {:city_id => 1}, :facets => @category_facet)
-    # @categories     = Search.load_from_facets(@facets, EventCategory).sort_by { |o| o.name }
-
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
       # build city tag cloud
       tag_limit     = 150

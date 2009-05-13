@@ -1,4 +1,4 @@
-- @groups.each do |group|
+- groups.each do |group|
   .prepend-1.span-15.letterbox{:class => cycle("shaded", "")}[group]
     .span-13
       %h3{:style => 'margin-bottom: 3px;'}
@@ -11,6 +11,6 @@
       == Tags:
       = group.tag_list.join(", ")
     .span-2.last
-      = link_to 'Edit', edit_tagg_path(group)
-      == &nbsp;|&nbsp;
       = link_to 'Show', tagg_path(group)
+      == &nbsp;|&nbsp;
+      = link_to 'Edit', edit_tagg_path(group)

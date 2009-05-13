@@ -122,8 +122,8 @@
 122|Construction Supplies and Services|building supplies,construction management,construction services
 123|Research Services|
 124|Caretakers|
-125|Sports Clubs|
-126|Beauty Salons and Day Spas|
+125|Sports Clubs|gyms,sports clubs
+126|Beauty Salons and Day Spas|beauty salon,day spa,nail salon,spa salon
 127|Law Enforcement and Public Safety|
 128|Engineers|
 129|Martial Arts Instruction|martial arts school,martial arts training
@@ -164,8 +164,8 @@
 164|Wireless Communications|
 165|Real Estate - Appraisers|
 166|Collection Agencies and Repossessions|
-167|Florists|
-168|Document and Records Services|
+167|Florists|bouquets,delivery,floral,flowers
+168|Document and Records Services|document imaging,document management
 169|Retirement and Assisted Living Facilities|
 170|Aircraft Dealers and Services|aircraft maintenance,aviation
 171|Alternative Medicine|alternative medicine,herbal medicine,holistic medicine,homeopathy,natural medicine
@@ -173,10 +173,10 @@
 173|Contractors - Masonry|
 174|Camps and Training|
 175|Fences|
-176|Shoes and Shoe Repairs|
+176|Shoes and Shoe Repairs|boots,footwear,shoe repairs,shoes
 177|Psychics and Astrologers|
 178|Disaster Preparation and Recovery|
-179|Broadcasting and Media Production|
+179|Broadcasting and Media Production|film production,television production,video production
 180|Golf Courses and Ranges|
 181|Adult Entertainment|
 182|Entertainers and Entertainment|
@@ -204,7 +204,7 @@
 204|Mobile Home Dealers and Services|
 205|Swimming Pool Maintenance and Services|
 206|Repair Services|
-207|Sewing Supplies and Services|
+207|Sewing Supplies and Services|fabric,sewing supplies
 208|Mattresses and Bedding|
 209|Motorcycles and Motor Sports|
 210|Fire Protection Systems and Services|
@@ -218,9 +218,163 @@
 218|Sporting Goods|
 219|Surveyors Equipment and Services|
 220|Contractors - Concrete|
-221|Heating, Ventilation and Air Conditioning|
+221|Heating, Ventilation and Air Conditioning|air conditioning,heating,hvac
 222|Diet, Nutrition and Weight Management|
 223|Contractors - Tile, Marble and Granite|
 224|Utilities - Gas, Water and Electric|
 225|Signs, Displays, Flags and Banners|
 226|Event Venues|events
+227|Contractors - Insulation|
+228|Contractors - Deck and Patio|
+229|Internet Services|
+230|Electronics - Home Entertainment|
+231|Contractors - Siding|
+232|Law - Wills and Estate Planning|
+233|Law - Governmental Issues|
+234|Water Heaters|
+235|Contractors - Drywall|
+236|Fire and Water - Damage and Restoration|
+237|Arts and Crafts Supplies|
+238|Catering and Bartending Services|bartending,catering
+239|Yoga Instruction|
+240|Contractors - Carpentry|
+241|Law - Divorce and Family|
+242|Photo Finishing|
+243|Tanning Salons|
+244|Health and Diet Food Products|
+245|Plastics|
+246|Spas, Saunas and Hot Tubs|
+247|Petroleum Services and Equipment|
+248|Textiles|
+249|Consultants - Food|
+250|Contractors - Marine|
+251|Fraternities and Sororities|
+252|Educational Services|
+253|Law - Malpractice|
+254|Law - Real Estate|
+255|Law - Business and Corporate|
+256|Libraries|
+257|Physicians - Pediatrics|
+258|Dancing Instruction|
+259|Boat Services|
+260|Physicians - Endocrinology and Diabetes|
+261|Physicians - Radiology|
+262|Ticket Sales|
+263|Movie Theaters|
+264|Museums and Zoological Gardens|
+265|Fashion Design|
+266|Dating Services|
+267|Vending Machines|
+268|Writing Services|
+269|Lighting Fixtures|
+270|Secretarial Services|
+271|Bowling|
+272|Gymnastics Instruction|
+273|Arcades|
+274|Railroads|
+275|Tree Service|
+276|Physicians - Neurology and Neurosurgery|
+277|Beverage Sales and Distribution|beverage distributors,beverage industry
+278|Cable and Satellite Equipment and Services|
+279|Physicians - Pathology|
+280|Physicians - Proctology|
+281|Elevators|
+282|Pest and Animal Control|
+283|Personal Coaching|
+284|Costume Shops|
+285|Laundry Supplies|
+286|Rubber|
+287|Birth Control and Abortion Services|
+288|Agricultural Services|agricultural,agriculture,farming
+289|Outdoor Recreation|
+290|Boat Charters and Rentals|
+291|Mobile Home Parks|
+292|Fund Raising and Financial Aid|
+293|Printing and Copying Equipment and Services|
+294|Scuba Diving|
+295|Refrigeration Sales and Service|
+296|Water Filtration and Treatment|
+297|Physicians - Plastic and Cosmetic Surgery|
+298|Funeral, Burial, and Cremation|
+299|Translating and Interpreting Services|
+300|Payment Handling Equipment and Supplies|
+301|Cemeteries|
+302|Prosthetics and Orthopedic Supplies|
+303|Credit Counseling and Bankruptcy Services|
+304|Scientific Equipment and Supplies|
+305|Disabled Persons Services|
+306|Inventory Control and Equipment|
+307|Portable Buildings|
+308|Physicians - Dermatology|
+309|Junk and Scrap Dealers|recycling
+310|Educational Supplies|
+311|Campgrounds and Rv Parks|
+312|Generators|
+313|Animal Shelters and Humane Societies|
+314|Vacuum Cleaners|
+315|Convention and Meeting Facilities|
+316|Consultants - Entertainment|
+317|Machine Shops|
+318|Pool Tables and Billiards|
+319|Dental Equipment and Supplies|
+320|Video Production and Duplication|
+321|Fuel, Oil and Coal|
+322|Graveside Monuments|
+323|Truck Parts and Accessories|
+324|Housing Assistance and Shelters|
+325|Research - Medical|
+326|Schools - Parochial and Private|
+327|Theatrical Managers and Producers|
+328|Horse Services and Equipment|
+329|Music Production Services|
+330|Aircraft Charters and Rentals|
+331|Ice and Ice Machines|
+332|Service Station Equipment and Supplies|
+333|Hunting and Fishing Sites|
+334|Awnings, Canopies and Tarps|
+335|Fur Goods and Services|
+336|Marinas|
+337|Physicians - Gastroenterology|
+338|Theatrical Equipment and Supplies|
+339|Allergy and Immunology|
+340|Physicians - Ear, Nose and Throat|
+341|Nursing Homes|
+342|Automation and Control Systems|
+343|Physicians - Anesthesiology|
+344|Water Well, Pipe Line and Drilling Services|
+345|Drug and Alcohol Resources|
+346|Archaeologic Services|
+347|Appliance Repair and Supplies|
+348|Geologic Services|
+349|Pump Sales and Service|
+350|Forestry|
+351|Law - Patent, Trademark and Copyright|
+352|Religious Goods|
+353|Butchers and Meat Processing|
+354|Music Instruction|
+355|Beer and Wine Making Equipment and Supplies|
+356|Guns and Gunsmiths|
+357|Aids Resources|aids,herpes,hiv,std
+358|Electronics - Telephone|
+359|Gambling and Gaming|
+360|Portable Toilet Rental|
+361|Physicians - Fertility and Sterility|
+362|Escort Services|
+363|Hearing Aids and Testing|
+364|Marine Equipment and Supplies|
+365|Fairgrounds and Rodeos|
+366|Drinking Water Distributors|
+367|Archery|
+368|Singing Telegrams|
+369|Automobile - License and Title Services|
+370|Law - Juvenile|
+371|First Aid and Safety|
+372|Fiberglass|
+373|Real Estate - Investments|
+374|Bakery Equipment and Supplies|
+375|Table and Tent Rental|
+376|Ethnic Foods|
+377|Lawn Maintenance|
+378|Fireworks|
+379|Law - Driving and Traffic|
+380|Dancing Supplies and Apparel|

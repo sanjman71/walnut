@@ -20,14 +20,13 @@
 
 - @places.each do |place|
   .prepend-1.span-23.letterbox{:class => cycle("shaded", "")}[place]
-    .span-13
-      %h3{:style => 'margin-bottom: 3px;'}
-        = place.name
-      .span-2
-        == Locations: #{place.locations_count}
-      %br
-      == Tags:
-      = place.tag_list.join(", ")
+    %h3{:style => 'margin-bottom: 3px;'}
+      = place.name
+    .span-2
+      == Locations: #{place.locations_count}
+    %br
+    == Tags:
+    = place.tag_list.join(", ")
 
 
 %hr.space

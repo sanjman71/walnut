@@ -13,12 +13,19 @@ class EventTest < ActiveSupport::TestCase
     @us             = Factory(:us)
     @il             = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
     @chicago        = Factory(:city, :name => "Chicago", :state => @il)
-    @location       = Location.create(:name => "Legion of Doom", :city => @chicago)
+    @location       = Location.create(:name => "Legion of Doom", :city => @chicago, :source_id => 100, :source_type => "Somebody")
     assert @location.valid?
-    @event_venue    = Factory(:event_venue, :name => "House of Orange", :location_id => @location.id)
+    @event_venue    = Factory(:event_venue, :name => "House of Pain", :location_id => @location.id)
     assert @event_venue.valid?
     @event_category = Factory(:event_category, :name => "Music", :tags => "music,concert")
     assert @event_category.valid?
+  end
+  
+  context "validate event venue" do
+    should "have location_source_id and location_source_type" do
+      assert_equal 100, @event_venue.location_source_id
+      assert_equal "Somebody", @event_venue.location_source_type
+    end
   end
   
   context "create event" do

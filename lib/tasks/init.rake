@@ -301,7 +301,7 @@ namespace :init do
       city  = state.cities.find_by_name(city)
       
       if state.blank? or city.blank?
-        puts "*** invalid city, state"
+        puts "*** invalid city or state"
         exit
       end
       

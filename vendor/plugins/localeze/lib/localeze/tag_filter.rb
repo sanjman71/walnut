@@ -4,17 +4,30 @@ module Localeze
 
     # @@attr_group_names_to_tags_list = ["Chains & Franchises", "Meals Served"]
     # the attributes for these group names are used as tags
-    @@valid_group_names_for_tags  = ["Financial Services", "General Tax Services", "Hair Services", "Insurance", 
-                                     "Menu Items", "Menus", "Painting Services", "Products", "Spa Services", "Venues", "Wireless Providers"
+    @@valid_group_names_for_tags  = ["Accessories", "Clothing", "Dance Styles", 
+                                     "Facilities", "Facility Features", "Fine Art", "Financial Services", "Finished Products", "Footwear Repair",
+                                     "General Tax Services", "Hair Services", "Insurance", 
+                                     "Menu Items", "Menus", "Moving Vehicles", 
+                                     "Painting Services", "Pest Types", "Pet Care Services", "Products", "Products & Supplies",
+                                     "Qualifications & Certifications", "Restaurant Style",
+                                     "Salon & Spa Services", "Spa Services", "Services", "Team Sports", "Technology",
+                                     "Vehicle Type", "Vehicles", "Veterinary Care", "Veterinary Specialities", "Venues", "Wireless Providers"
                                     ]
 
     # the attributes for these brands are used as tags
-    @@valid_brand_categories      = ["Apparel", "Appliances", "Beauty Products", "Cameras", "Cell Phones", "Coffee", "Computers", "Credit Cards", 
-                                     "Electronics", "Engine Parts", "Equipment", "Eyewear", "Fixtures", "Furniture", 
+    @@valid_brand_categories      = ["Apparel", "Apperal & Accessories", "Appliances", "Audio & Electronics", 
+                                     "Batteries", "Beauty Products", "Bedding", 
+                                     "Cables & Wires", "Cameras", "Cell Phones", "Coffee", "Computers", "Cosmetics", "Credit Cards", "Crock Pots",
+                                     "Data Storage", "Electronics", "Engine Parts", "Equipment", "Eyewear", 
+                                     "Fax Machines", "Fixtures", "Flooring", "Furniture", 
                                      "Gaming Systems", "Hair Care", "Hair Products", "Hardware", "Heaters", "Home Theater Systems",
                                      "Jewelry", "Lighting", "Mail Services", "Mattresses", "Memory Cards", "Nail Care", 
-                                     "Oil & Lube", "Paint", "Plumbing Supplies", "Shoes", "Tires", "Tires & Wheels", "Tools", 
-                                     "Vacuums", "Vehicles", "Watches",
+                                     "Oil & Lube", "Ovens & Stoves",
+                                     "Paint", "Plumbing Supplies", "Roofing",
+                                     "Salon Equipment", "Shirts", "Sinus Medication", "Shoes", "Skin Care & Cosmetics", "Soft Drinks", "Software",
+                                     "Telecommunications", "Tires", "Tires & Wheels", "Toner", "Tools", "Toys",
+                                     "Vacuums", "Vehicles", "Video Games", "Video Games & Systems",
+                                     "Watches", "Water Heaters", "Wireless Provider Services",
                                      "Yard Equipment"
                                     ]
     

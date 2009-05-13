@@ -47,25 +47,24 @@ namespace :events do
     puts "#{Time.now}: completed"
   end
 
-  desc "Import event venues from eventful"
+  desc "Import CITY event venues from eventful"
   task :import_venues do
     limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
     city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
     
     if city.blank?
-      puts "usage: missing CITY"
+      puts "usage: missing or invalid CITY"
       exit
     end
     
     page      = 1
-    per_page  = 50
+    per_page  = 10
     imported  = 0
     
     puts "#{Time.now}: importing #{limit} #{city.name} eventful venues"
 
     while imported < limit
-    # Range.new(1,pages).each do |page|
-      imported += EventVenue.import(city, :page => page, :per_page => per_page)
+      imported += EventVenue.import(city, :page => page, :per_page => per_page, :log => true)
       page     += 1
     end
     
@@ -78,7 +77,7 @@ namespace :events do
     file = "#{RAILS_ROOT}/data/event_venues.txt"
     puts "#{Time.now}: parsing file #{file}" 
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
-      name, search_name, address_name = row
+      name, search_name, search_address = row
     
       # find event venue
       event_venue = EventVenue.find_by_name(name)
@@ -86,8 +85,8 @@ namespace :events do
       
       # apply metadata
       options = {}
-      options[:search_name]   = search_name unless search_name.blank?
-      options[:address_name]  = address_name unless address_name.blank?
+      options[:search_name]     = search_name unless search_name.blank?
+      options[:search_address]  = search_address unless search_address.blank?
       
       next if options.blank?
       
@@ -95,21 +94,25 @@ namespace :events do
     end
   end
   
-  desc "Map event venues to locations, using sphinx to match locations"
+  desc "Map CITY event venues to locations, using sphinx to match locations"
   task :map_venues do
     filter      = ENV["FILTER"].to_s
     city_name   = ENV["CITY"].to_s
     checked     = 0
     marked      = 0
     skipped     = 0
+
+    # find count of already mapped venues
+    mapped      = EventVenue.city(city_name).mapped.size
     
     if city_name.blank?
       puts "usage: missing CITY"
       exit
     end
     
-    EventVenue.unmapped.city(city_name).each do |venue|
+    EventVenue.city(city_name).unmapped.each do |venue|
       city = City.find_by_name(venue.city)
+      
       if city.blank?
         puts "#{Time.now}: xxx could not find venue city #{venue.city}"
         next
@@ -127,30 +130,37 @@ namespace :events do
         name    = search.query
       end 
       
+      # break street address into components and normalize
       components  = StreetAddress.components(venue.address)
-      address     = venue.address_name.blank? ? "#{components[:housenumber]} #{components[:streetname]}" : venue.address_name
+      address     = venue.search_address.blank? ? StreetAddress.normalize("#{components[:housenumber]} #{components[:streetname]}") : venue.search_address
       
       if filter
         # apply filter
         next unless name.match(/#{filter}/i)
       end
       
-      # search with constraints
-      matches = Location.search(name, :conditions => {:city_id => city.id, :street_address => address})
+      # check if there a source id and type
+      if venue.location_source_id and venue.location_source_type
+        # find the location
+        matches = Location.find(:all, :conditions => {:source_id => venue.location_source_id, :source_type => venue.location_source_type})
+      else
+        # search with constraints
+        matches = Location.search(name, :conditions => {:city_id => city.id, :street_address => address})
+      end
       
       if matches.blank?
         puts "#{Time.now}: xxx no search matches for venue '#{name}', address #{address}"
         skipped += 1
         next
       elsif matches.size > 1
-        
+
         if search.blank?
           # too many matches
           puts "#{Time.now}: xxx found #{matches.size} matches for venue '#{name}', address #{address}"
           skipped += 1
           next
         end
-        
+
         # try again with a more restrictive search
         puts "#{Time.now}: found #{matches.size} matches for venue #{name}, address #{address} ... trying again"
 
@@ -173,11 +183,11 @@ namespace :events do
       puts "#{Time.now}: *** marked location #{location.place.name}:#{location.street_address} as event venue:#{venue.name}"
     end
     
-    puts "#{Time.now}: completed, checked #{checked} event venues, marked #{marked} locations as event venues, skipped #{skipped} event venues"
+    puts "#{Time.now}: completed, #{mapped} already mapped event venues, checked #{checked}, marked #{marked}, skipped #{skipped}"
   end
 
-  desc "Mark popular events"
-  task :mark_popular_events do
+  desc "Import popular CITY events from eventful"
+  task :import_popular_events do
     # build events search conditions
     city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
     limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
@@ -187,36 +197,7 @@ namespace :events do
       exit
     end
 
-    puts "#{Time.now}: marking #{city.name} popular events"
-    
-    conditions  = {:location => city.name, :date => 'Future', :page_size => @@max_per_page, :sort_order => 'popularity'}
-    @results    = EventStream::Search.call(conditions)
-    @events     = @results['events'] ? @results['events']['event'] : []
-    @popular    = 0
-    
-    puts "#{Time.now}: *** found #{@events.size} popular events"
-    
-    @events.each do |eventful|
-      next if (event = Event.find_by_source_id(eventful['id'])).blank?
-      event.popular!(true)
-      @popular += 1
-    end
-    
-    puts "#{Time.now}: completed, marked #{@popular} events as popular"
-  end
-  
-  desc "Import city events from eventful"
-  task :import_events do
-    # build events search conditions
-    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
-    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
-
-    if city.blank?
-      puts "usage: missing CITY"
-      exit
-    end
-
-    puts "#{Time.now}: importing #{city.name} events for mapped venues"
+    puts "#{Time.now}: importing #{city.name} events for mapped venues, limit #{limit}"
 
     per_page    = 50
     imported    = 0
@@ -225,63 +206,27 @@ namespace :events do
     @events     = @results['events'] ? @results['events']['event'] : []
     @istart     = Event.count
 
-    # import events for all mapped venues
-    EventVenue.mapped.each do |venue|
-      break if imported >= limit
+    @events.each do |eventful_event|
+      # map eventful event to an event venue
+      venue = EventVenue.find_by_source_id(eventful_event['venue_id'])
       
-      begin
-        @results  = venue.get
-        @events   = @results['events']['event']
-      rescue Exception => e
-        puts "xxx exception: #{e.message}"
+      if venue.blank?
+        puts "xxx missing venue: #{eventful_event['venue_name']}"
         next
       end
       
-      next if @events.blank?
-      
-      @events.each do |eventful|
-        options = {:name => eventful['title'], :url => eventful['url'], :source_type => venue.source_type, :source_id => eventful['id']}
-        options[:start_at]  = eventful['start_time'] if eventful['start_time']
-        options[:end_at]    = eventful['stop_time'] if eventful['stop_time']
-
-        next if event = Event.find_by_source_id(eventful['id'])
-
-        puts "*** #{eventful['title']}, url: #{eventful['url']}"
-        
-        # create event
-        event = Event.create(options)
-
-        # add event venue and location
-        venue.events.push(event)
-        venue.location.events.push(event)
+      if !venue.mapped?
+        puts "xxx unmapped venue: #{eventful_event['venue_name']}"
+        next
       end
       
-      venue.events.each do |event|
-        # skip if event already has categories
-        next if !event.event_categories.blank?
-        
-        begin
-          @results    = event.get
-          @categories = @results['categories']['category']
-        rescue Exception => e
-          puts "xxx exception: #{e.message}"
-          next
-        end
-
-        # map eventful category id to an event category object
-        @categories = @categories.map do |category|
-          # puts "*** category: #{category}"
-          EventCategory.find_by_source_id(category['id'])
-        end
-        
-        # associate event categories with events
-        @categories.compact.each do |category|
-          puts "*** category: #{category.name}, event: #{event.name}"
-          event.event_categories.push(category)
-        end
-      end
+      # import the event
+      event = venue.import_event(eventful_event, :log => true)
+      
+      # mark the event as popular
+      event.popular! unless event.blank?
     end
-
+    
     @iend = Event.count
 
     puts "#{Time.now}: completed, #{@iend} total events, imported #{@iend - @istart} events"

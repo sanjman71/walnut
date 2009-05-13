@@ -1,0 +1,70 @@
+-# defaults
+- event_venue_id = nil if local_assigns[:event_venue_id].nil?
+
+.location
+  - form_for @location, :url => submit_url, :html => {:id => 'edit_location_form'} do |form|
+    - if event_venue_id
+      = hidden_field_tag :event_venue_id, event_venue_id
+    
+    -# set user as source
+    = hidden_field_tag 'location[source_id]', current_user.id
+    = hidden_field_tag 'location[source_type]', current_user.class.to_s
+    
+    .span-20.last
+      .span-4.prepend-1.text-align-right.padding-top-5
+        %h3= form.label :name, "Name:"
+      .span-15.last
+        = form.text_field :name, :style => 'font-size: 1.5em;'
+    .span-20.last
+      .span-4.prepend-1.text-align-right.padding-top-5
+        %h3= form.label :street_address, "Street Address:"
+      .span-15.last
+        = form.text_field :street_address, :style => 'font-size: 1.5em;'
+    .span-20.last
+      .span-4.prepend-1.text-align-right.padding-top-5
+        %h3= form.label :city_id, "City:"
+      .span-15.last
+        -#= form.text_field :city, :style => 'font-size: 1.5em;'
+        = form.select(:city_id, @cities)
+    .span-20.last
+      .span-4.prepend-1.text-align-right.padding-top-5
+        %h3= form.label :state_id, "State:"
+      .span-15.last
+        -#= form.text_field :state, :style => 'font-size: 1.5em;'
+        = form.select(:state_id, @states)
+    .span-20.last
+      .span-4.prepend-1.text-align-right.padding-top-5
+        %h3= form.label :zip_id, "Zip:"
+      .span-15.last
+        - if !@zips.blank?
+          = form.select(:zip_id, @zips)
+        - else
+          = form.text_field :zip, :size => 5, :style => 'font-size: 1.5em;'
+    .span-20.last
+      .span-4.prepend-1.text-align-right.padding-top-5
+        %h3= form.label :country_id, "Country:"
+      .span-15.last
+        = form.select(:country_id, @countries)
+        
+    / .span-20.last
+    /   .span-4.prepend-1
+    /     %h3= form.label :phone, "Phone Number:"
+    /   .span-15.last
+    /     = form.text_field :phone, :size => 10
+    / .span-20.last
+    /   .span-4.prepend-1
+    /     %h3= form.label :email, "Email:"
+    /   .span-15.last
+    /     = form.text_field :email, :size => 10
+    / .span-20.last
+    /   .span-4.prepend-1
+    /     %h3= form.label :notes, "Notes:"
+    /   .span-15.last
+    /     = form.text_area :notes, :size => '40x3'
+        
+    %hr.space
+    
+    .span-20.prepend-1.last
+      = submit_tag form_submit || 'Submit', :class => 'big button'
+      == or
+      = link_to 'Cancel', root_path

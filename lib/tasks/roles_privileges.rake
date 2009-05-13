@@ -1,7 +1,7 @@
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init => [:admins, :tag_groups]
+  task :init => [:admins, :tag_groups, :tags]
 
   desc "Initialize admin users roles and privileges"
   task :admins do
@@ -23,6 +23,14 @@ namespace :rp do
     rtg = Badges::Privilege.create(:name=>"read tag groups")
     utg = Badges::Privilege.create(:name=>"update tag groups")
     dtg = Badges::Privilege.create(:name=>"delete tag groups")
+  end
+
+  desc "Initialize tags roles and privileges"
+  task :tags do 
+    ct = Badges::Privilege.create(:name=>"create tags")
+    rt = Badges::Privilege.create(:name=>"read tags")
+    ut = Badges::Privilege.create(:name=>"update tags")
+    dt = Badges::Privilege.create(:name=>"delete tags")
   end
   
 end

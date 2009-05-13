@@ -1,5 +1,45 @@
 namespace :tags do
   
+  desc "Find tags >= WORDS words in length"
+  task :find_min_words do
+    words = ENV["WORDS"].to_i
+    
+    if words == 0
+      puts "missing WORDS"
+      exit
+    end
+    
+    tags = Tag.all.select { |t| t.name.split.size >= words }
+    
+    puts "#{Time.now}: found #{tags.size} tags that are at least #{words} words in length"
+    
+    tags.each do |tag|
+      puts "*** #{tag.name}:#{tag.taggings_count}"
+    end
+    
+    puts "#{Time.now}: completed"
+  end
+  
+  desc "Find tags matching FILTER"
+  task :find do
+    filter = ENV["FILTER"] ? ENV["FILTER"] : nil
+    
+    if filter.blank?
+      puts "missing FILTER"
+      exit
+    end
+    
+    tags = Tag.all(:conditions => ["name REGEXP '%s'", filter])
+
+    puts "#{Time.now}: found #{tags.size} tags matching #{filter}"
+    
+    tags.each do |tag|
+      puts "*** #{tag.name}:#{tag.taggings_count}"
+    end
+    
+    puts "#{Time.now}: completed"
+  end
+  
   desc "Cleanup tags"
   task :cleanup do
     unused  = 0

@@ -3,17 +3,17 @@ class HomeController < ApplicationController
     @country = Country.default
 
     # find a city to highlight
-    @city = City.order_by_density.all(:limit => 1, :include => :state).first
+    @featured_city = find_featured_city
     
-    # find city events
-    @with = Search.with(@city)
+    # find featured city events
+    @featured_with = Search.with(@featured_city)
     # @with.update(:popularity => 1..1000)
     
-    self.class.benchmark("Benchmarking #{@city.name} popular events") do
-      Rails.cache.fetch("#{@city.name}:popular:events") do
-        event_limit = 6
-        @events     = Event.search(@query, :with => @with, :include => :event_venue, :page => 1, :per_page => event_limit, :order => :popularity, :sort_mode => :desc)
-      end
+    self.class.benchmark("Benchmarking #{@featured_city.name} popular events") do
+      # Rails.cache.fetch("#{@featured_city.name}:popular:events") do
+        event_limit       = 5
+        @featured_events  = Event.search(:with => @featured_with, :include => :event_venue, :page => 1, :per_page => event_limit, :order => :popularity, :sort_mode => :desc)
+      # end
     end
 
     # find popular cities and neighborhoods
@@ -41,6 +41,13 @@ class HomeController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  protected
+
+  # find a randomly selected featured city
+  def find_featured_city
+    City.order_by_density.all(:limit => 1, :include => :state, :order => 'rand()', :conditions => ["locations_count > 25000"]).first
   end
 
 end

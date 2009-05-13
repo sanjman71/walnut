@@ -10,7 +10,7 @@ class TaggsController < ApplicationController
       @groups       = TagGroup.order_by_name
       @search_text  = @groups.blank? ? "No Tag Groups" : "All Tag Groups (#{@groups.size})"
     when "empty"
-      @groups       = TagGroup.empty.order_by_name
+      @groups       = TagGroup.empty.order_by_places_count
       @search_text  = "Empty Tag Groups (#{@groups.size})"
     else
       @groups       = TagGroup.search_name_and_tags(@search).order_by_name
@@ -27,6 +27,7 @@ class TaggsController < ApplicationController
       # edit new group
       redirect_to(edit_tagg_path(@group))
     else
+      flash[:error] = "Tag Group #{@group.name} already exists"
       # back to index on an error
       redirect_to(taggs_path)
     end

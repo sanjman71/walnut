@@ -11,6 +11,7 @@ class TagGroup < ActiveRecord::Base
   named_scope                 :empty,                 { :conditions => ["tags = '' OR tags IS NULL"] }
   
   named_scope                 :order_by_name,         { :order => "name ASC" }
+  named_scope                 :order_by_places_count, { :order => "places_count DESC" }
   
   # tags have a limited word length
   TAG_MAX_WORDS = 3

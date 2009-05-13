@@ -11,7 +11,8 @@ class AddTagGroups < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :tag_groups, [:name]
+    add_index :tag_groups, :name
+    add_index :tag_groups, :places_count
     
     create_table :place_tag_groups do |t|
       t.references  :tag_group

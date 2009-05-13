@@ -27,6 +27,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/places/:country', :controller => 'places', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
   
   map.resources   :places, :only => [:index, :show]
+  map.resources   :locations, :only => [:create]
   
   # locations routes
   map.connect     '/locations/:id/recommend', :controller => 'locations', :action => 'recommend', :conditions => {:method => :post}
@@ -69,9 +70,17 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/search/:country/:state', :controller => 'search', :action => 'state', :state => /[a-z]{2}/ # state must be 2 letters
   map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
-  
   # tag group routes
   map.resources   :taggs
+
+  # tag routes
+  map.resources   :tags
+  
+  # event venue routes
+  map.city_venues       '/venues/:country/:state/:city', :controller => 'event_venues', :action => 'city', :city => /[a-z-]+/ # city must be lowercase
+  map.country_venues    '/venues/:country', :controller => 'event_venues', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
+  map.add_venue         '/venues/:id/add', :controller => 'event_venues', :action => 'add'
+  map.resources   :event_venues, :only => [:create]
   
   # zip routes
   map.connect     '/zips/error/:locality', :controller => 'zips', :action => 'error'

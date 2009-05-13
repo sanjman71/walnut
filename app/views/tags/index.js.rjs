@@ -1,0 +1,12 @@
+# update search text
+if @search_text
+  page["#pagination"].html(@search_text)
+else
+  page["#pagination"].html(render(:partial => 'pagination.html.haml', :locals => {:tags => @tags}))
+end
+
+# update groups list
+page["#tags"].html(render(:partial => 'tags.html.haml', :locals => {:tags => @tags}))
+
+# hide search progress bar
+page["#search_progress"].hide();

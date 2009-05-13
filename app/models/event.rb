@@ -44,8 +44,12 @@ class Event < ActiveRecord::Base
     EventVenue.session.call(@@get_method, get_options.update(options))
   end
   
-  def popular!(b)
-    self.update_attribute(:popularity, b ? 100 : 0)
+  def popular!
+    self.update_attribute(:popularity, 100)
+  end
+
+  def unpopular!
+    self.update_attribute(:popularity, 0)
   end
 
   def apply_category_tags!(category)

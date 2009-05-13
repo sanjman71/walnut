@@ -14,7 +14,7 @@ class Location < ActiveRecord::Base
   after_save              :after_save_callback
   
   # make sure only accessible attributes are written to from forms etc.
-	attr_accessible         :name, :country, :state, :city, :zip, :street_address, :lat, :lng, :source_id, :source_type
+	attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type
   
   # acts_as_taggable_on     :locality_tags
   

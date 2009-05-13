@@ -15,6 +15,7 @@ a img:hover                                       { background-color: green; }
 /* padding, border styles */
 
 .padding-5                                        { padding: 5px; }
+.padding-top-5                                    { padding-top: 5px; }
 .padding-top-10                                   { padding-top: 10px; }
 .padding-bottom-5                                 { padding-bottom: 5px; }
 .padding-bottom-10                                { padding-bottom: 10px; }
@@ -156,7 +157,7 @@ div.instructions ul                               { font-size: 12px; }
 .pagination a                                     { background: #EEEEEE; color: #111111; }
 .pagination a:hover                               { background: #3300BB; color: #0099FF; }
 
-.pagination span, .pagination a                   { display: block; width: 12px; text-align: center; margin-right: 0px; padding: 0.2em 0.2em; 
+.pagination span, .pagination a                   { display: block; width: 15px; text-align: center; margin-right: 0px; padding: 0.2em 0.2em; 
                                                     float: left; text-decoration: none; }
 
 .pagination span.current                          { background: #0099FF; color: #111111; }

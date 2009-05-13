@@ -1,0 +1,4 @@
+.span-8
+  %h4= page_entries_info tags unless tags.blank?
+.span-10.prepend-5.last
+  = will_paginate(tags, :page_links => true)

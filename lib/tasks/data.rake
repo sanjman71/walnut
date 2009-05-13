@@ -30,6 +30,9 @@ namespace :data do
         
         place       = location.place
         
+        # make sure location is from localeze
+        next unless Localeze::BaseRecord.to_s == location.source_type
+        
         record      = Localeze::BaseRecord.find(location.source_id)
         categories  = record.categories
         attributes  = record.attributes
@@ -59,6 +62,16 @@ namespace :data do
           # map category to a tag group
           category_name = category['name'].gsub("&", "and")
           tag_groups    = TagGroup.search_name(category_name)
+
+          if category_name == "Health Services"
+            # special case, find exact match
+            tag_groups  = TagGroup.find_all_by_name(category_name)
+          end
+          
+          # create tag group if there are 0 matches
+          if tag_groups.size == 0
+            tag_groups  = [TagGroup.create(:name => category_name)]
+          end
           
           # a category should match exactly 1 tag group
           if tag_groups.size != 1

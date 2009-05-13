@@ -1,6 +1,21 @@
-// live tag group search
+// live tag, tag group search
 $.fn.init_live_tag_group_search = function() {
   $("#live_search_for_tag_groups").keyup(function() {
+    var search_url  = this.url;
+    var search_term = this.value;
+    // execute search, throttle how often its called
+    var search_execution = function () {
+      $.get(search_url, {search : search_term}, null, "script");
+      // show search progress bar
+      $('#search_progress').show();
+    }.sleep(300);
+  
+    return false;
+  })
+}
+
+$.fn.init_live_tag_search = function() {
+  $("#live_search_for_tags").keyup(function() {
     var search_url  = this.url;
     var search_term = this.value;
     // execute search, throttle how often its called
@@ -18,6 +33,7 @@ $(document).ready(function() {
   
   // enable live search for tag groups
   $(document).init_live_tag_group_search();
+  $(document).init_live_tag_search();
 
   // search for all empty tag groups
   $("#search_empty_tag_groups").click(function() {

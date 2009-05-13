@@ -11,6 +11,10 @@
     - if @events_count > 0
       == &nbsp;|&nbsp;
       = link_to("Search #{@city.name} Events", url_for(:controller => 'events', :action => 'city'), :class => 'locality search')
+    - if has_privilege?("manage site")
+      == &nbsp;|&nbsp;
+      = link_to("Venues", city_venues_path(@country, @city.state, @city), :class => 'locality search')
+      
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
 
