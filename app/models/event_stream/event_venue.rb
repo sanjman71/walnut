@@ -16,8 +16,11 @@ class EventVenue < ActiveRecord::Base
   named_scope :mapped,            { :conditions => ["location_id > 0"] }
   named_scope :unmapped,          { :conditions => ["location_id is NULL"] }
   
-  named_scope :order_popularity,  { :order => "popularity DESC" }
+  # find event venues mapped to a localeze record location
+  named_scope :localeze,          { :conditions => {:location_source_type => "Localeze::BaseRecord"}}
   
+  named_scope :order_popularity,  { :order => "popularity DESC" }
+  named_scope :order_city,        { :order => "city ASC" }
 
   @@search_method   = "venues/search"
   @@get_method      = "venues/get"
@@ -41,9 +44,9 @@ class EventVenue < ActiveRecord::Base
     EventVenue.session.call(@@get_method, get_options.update(options))
   end
 
-  # convert object to a comma separated list of attributes
-  def to_csv
-    [self.city, self.name, self.location_source_type, self.location_source_id].join(",")
+  # convert object to a pipe separated list of attributes
+  def to_pipe
+    [self.city, self.name, self.location_source_type, self.location_source_id].join("|")
   end
 
   # returns true if the event venue is mapped to a location
