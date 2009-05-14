@@ -121,13 +121,13 @@ class Search
       when "City", "Zip", "State", "Country"
         # eager load associations
         eager_load.push(:state) if ["City", "Zip"].include?(model.to_s)
-        # e.g. City facet key is :city_id
-        objects.push(model.find(facets[class_to_attribute_symbol(model)].keys, :include => eager_load))
+        # e.g. City facet key is :city_id; remove invalid keys
+        objects.push(model.find(facets[class_to_attribute_symbol(model)].keys.zero_compact!, :include => eager_load))
       when "Neighborhood", "EventCategory"
         # eager load associations
         eager_load.push(:city) if ["Neighborhood"].include?(model.to_s)
-        # e.g. Neighborhood facet key is :neighborhood_ids
-        objects.push(model.find(facets[class_to_attribute_symbol(model)].keys, :include => eager_load))
+        # e.g. Neighborhood facet key is :neighborhood_ids; remove invalid keys
+        objects.push(model.find(facets[class_to_attribute_symbol(model)].keys.zero_compact!, :include => eager_load))
       when "Tag"
         # load tags and build tag counts
         tag_ids = facets[class_to_attribute_symbol(model)]
