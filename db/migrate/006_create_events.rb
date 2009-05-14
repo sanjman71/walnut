@@ -21,6 +21,7 @@ class CreateEvents < ActiveRecord::Migration
       t.string      :zip,             :limit => 10
       t.decimal     :lat,             :precision => 15, :scale => 10
       t.decimal     :lng,             :precision => 15, :scale => 10
+      t.string      :area_type
       t.integer     :popularity,      :default => 0
       t.string      :source_type,     :limit => 20, :null => false
       t.string      :source_id,       :limit => 50, :null => false
