@@ -229,7 +229,7 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 
 /* mappable objects */
 
-.mappable.selected                                { background-color: #EDF3FE; }
+.mappable.selected                                { background-color: #99DDFF; }
 .mappable.unselected                              { background-color: #FFFFFF; }
 .mappable .icon-div                               { }
 .mappable .icon                                   { top: 50%; margin-top: 5px; margin: 2px;}
