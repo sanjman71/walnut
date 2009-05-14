@@ -92,6 +92,7 @@ end
 require "#{RAILS_ROOT}/lib/string.rb"
 require "#{RAILS_ROOT}/lib/hash.rb"
 require "#{RAILS_ROOT}/lib/math.rb"
+require "#{RAILS_ROOT}/lib/array.rb"
 
 # create special localeze loggers
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
