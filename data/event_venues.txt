@@ -1,99 +1,84 @@
-Abbey Pub||
-Allstate Arena||
-Andy's|Andys Jazz Club|
-Apollo Theater (Chicago)|Apollo Theater|
-Aragon Ballroom|Aragon Entertainment Center|
-Arie Crown Theater||
-Art Institute of Chicago||
-Athenaeum Theatre||
-Auditorium Theatre||
-Beat Kitchen||
-Beverly Arts Center|Beverly Art Center|
-Bill's Blues Bar||
-Bottom Lounge||
-Briar Street Theatre||
-Buddy Guy's Legends||
-Cadillac Palace Theatre||
-Centre East Theatre||
-Charter One Pavilion||1300 Linn White
-Chicago Improv||
-Columbia College Chicago||
-Congress Theater||
-Country Club Hills Theater||
-Crobar Chicago||
-Cubby Bear Lounge||
-DarkRoom||
-Delilah's||
-Double Door||
-Durty Nellie's||
-Empty Bottle||
-Fado Irish Pub||
-Field Museum||
-First Midwest Bank Amphitheatre||
-FitzGerald's||
-Ford Center for the Performing Arts||
-Goose Island Wrigleyville|Goose Island Beer|
-Grant Park||
-Green Mill||
-Hard Rock Cafe Chicago|Hard Rock Cafe|
-Hawthorne Race Course||
-Heartland Cafe||
-Hideout||
-Home Depot||
-House of Blues - Chicago|House of Blues|
-Hyatt Regency Hotel||
-Instituto Cervantes of Chicago|Instituto Cervantes|
-Joe's Sports Bar||
-John G. Shedd Aquarium||
-Kingston Mines&nbsp;|Kingston Mines|
-LaSalle Bank Theatre (formerly Shubert)|Shubert Theatre|
-League of Chicago Theatres||
-Lollapalooza @ Grant Park||
-METRO!|Metro Smart Bar|
-Maine West High School||
-Marriott Theatre in Lincolnshire||
-Martyrs'|Martyrs|
-Mojoe's Rock House||
-Mojoes Coffee House||
-Music Box||
-Navy Pier||600 E Grand Ave
-Neo Nightclub|Neo|
-Northwestern University||
-Old Town School of Folk Music||
-Palatine Park District||
-Park West||322 W Armitage
-Pheasant Run Resort||
-Ravinia Festival||
-Reggies Rock Club|Reggies Music Club|
-Rialto Square Theatre||
-Riviera Theatre||
-Rosemont Theatre||
-Royal George Theatre||
-SONOTHEQUE NIGHTCLUB||
-Schuba's||
-Sears Centre||
-Serbian Cultural and Arts Center St. Sava||
-Shaw's Crab House and Oyster Bar|Shaws Crab House|
-Silvie's Lounge||
-Smart Bar||
-Soldier Field (1410 S. Museum Campus Drive) Chicago||
-Subterranean||
-Taste Of Chicago||
-The Chicago Theatre||
-The Elbo Room||
-The Mercury Theater||
-The Note||
-The Pearl Room||
-The Space (Evanston, IL)||
-Theatre Building Chicago||
-Toyota Park||
-U.S. Cellular Field||
-Underground Lounge||
-United Center||
-University of Chicago||
-Vic Theatre||
-Vision||
-WNUR 89.3 FM||
-Wrigley Done Right||
-Zanies Comedy Club||
-iO Theater||
+Brooklyn|Solomon's Porch Cafe|Localeze::BaseRecord|92177079
+Brooklyn|BAM Café|Localeze::BaseRecord|148050112
+Brooklyn|Union Pool|Localeze::BaseRecord|14088759
+Brooklyn|Pete's Candy Store|Localeze::BaseRecord|10403323
+Brooklyn|Galapagos|Localeze::BaseRecord|86327013
+Brooklyn|Europa Club|Localeze::BaseRecord|30122636
+Brooklyn|The Trash Bar (www.thetrashbar.com)|Localeze::BaseRecord|55273849
+Brooklyn|Studio B|Localeze::BaseRecord|148052528
+Brooklyn|Southpaw|Localeze::BaseRecord|86319079
+Brooklyn|Music Hall of Williamsburg|Localeze::BaseRecord|683990562
+Charlotte|Cans Bar &amp; Canteen|Localeze::BaseRecord|144419806
+Charlotte|Salvador Deli|Localeze::BaseRecord|151683130
+Charlotte|Actor's Theatre of Charlotte, The|Localeze::BaseRecord|349540
+Charlotte|The Charlotte Art League|Localeze::BaseRecord|2760446
+Charlotte|Metrolina Expo Center|Localeze::BaseRecord|67534172
+Charlotte|Time Warner Cable Arena (formerly Charlotte Bobcats Arena)|Localeze::BaseRecord|137655263
+Charlotte|Double Door Inn|Localeze::BaseRecord|691620790
+Charlotte|The Evening Muse|Localeze::BaseRecord|13377755
+Charlotte|Coyote Joe's|Localeze::BaseRecord|3569420
+Charlotte|Paramount's Carowinds Themepark|Localeze::BaseRecord|73664139
+Charlotte|KISS Lounge|Localeze::BaseRecord|692516195
+Charlotte|Evening Muse|Localeze::BaseRecord|13377755
+Charlotte|Charlotte's Underground|Localeze::BaseRecord|686677893
+Charlotte|The Neighborhood Theatre|Localeze::BaseRecord|56721808
+Charlotte|Visulite Theatre with Old 97's|Localeze::BaseRecord|14472408
+Charlotte|Charlotte Convention Center|Localeze::BaseRecord|15930104
+Charlotte|NC Blumenthal Performing Arts Center|Localeze::BaseRecord|136312368
+Charlotte|Ovens Auditorium|Localeze::BaseRecord|134402693
+Charlotte|Tremont Music Hall - Casbah|Localeze::BaseRecord|13863429
+Charlotte|Amos' Southend|Localeze::BaseRecord|861359
+Charlotte|Time Warner Cable Arena|Localeze::BaseRecord|144419829
+Charlotte|Verizon Wireless Amphitheatre Charlotte|Localeze::BaseRecord|14367393
+New York|Kenny's Castaways|Localeze::BaseRecord|55669121
+New York|Havana Central|Localeze::BaseRecord|147991327
+New York|Canal Room|Localeze::BaseRecord|110304981
+New York|Lyceum Theatre|Localeze::BaseRecord|154035994
+New York|Ambassador Theatre|Localeze::BaseRecord|154027218
+New York|Fat Cat Billiards & Jazz|Localeze::BaseRecord|88747988
+New York|Broadway Theatre|Localeze::BaseRecord|154028387
+New York|Richard Rodgers Theatre|Localeze::BaseRecord|17153673
+New York|Fat Baby|Localeze::BaseRecord|154012848
+New York|169 Bar|Localeze::BaseRecord|28007410
+New York|Booth Theatre|Localeze::BaseRecord|154036014
+New York|Maritime Hotel|Localeze::BaseRecord|685634836
+New York|Chelsea Art Museum|Localeze::BaseRecord|55616289
+New York|element|Localeze::BaseRecord|141923924
+New York|Drom NYC|Localeze::BaseRecord|688712495
+New York|Brooks Atkinson Theatre|Localeze::BaseRecord|17153580
+New York|Cake Shop|Localeze::BaseRecord|92144928
+New York|Astor Place Theatre|Localeze::BaseRecord|136209428
+New York|New Amsterdam Theatre|Localeze::BaseRecord|17144153
+New York|The Annex|Localeze::BaseRecord|143639649
+New York|The Delancey|Localeze::BaseRecord|92144993
+New York|Gershwin Theatre|Localeze::BaseRecord|21490011
+New York|Iridium Jazz Club|Localeze::BaseRecord|147980104
+New York|Club Pacha|Localeze::BaseRecord|135978819
+New York|Comix|Localeze::BaseRecord|145142937
+New York|Le Poisson Rouge|Localeze::BaseRecord|686736274
+New York|Arlene Grocery|Localeze::BaseRecord|28306709
+New York|Blue Note|Localeze::BaseRecord|1849781
+New York|Living Room|Localeze::BaseRecord|8162726
+New York|Apollo Theater|Localeze::BaseRecord|90669111
+New York|SOB's|Localeze::BaseRecord|55525877
+New York|Joe's Pub|Localeze::BaseRecord|147966465
+New York|BB Kings / Lucille's Bar & Grille|Localeze::BaseRecord|17144166
+New York|Roseland Ballroom|Localeze::BaseRecord|56455918
+New York|Mercury Lounge|Localeze::BaseRecord|55608683
+New York|Terminal 5|Localeze::BaseRecord|684837629
+New York|Beacon Theatre|Localeze::BaseRecord|147985538
+New York|Knitting Factory|Localeze::BaseRecord|688477871
+New York|The Bowery Ballroom|Localeze::BaseRecord|28306112
+New York|Radio City Music Hall|Localeze::BaseRecord|55633490
+New York|Madison Square Garden|Localeze::BaseRecord|133846415
+Philadelphia|Clark Park|Localeze::BaseRecord|10176882
+Philadelphia|Triumph Brewing Company|Localeze::BaseRecord|160883355
+Philadelphia|Dr. Watson's Pub|Localeze::BaseRecord|59888266
+Philadelphia|Fluid Nightclub|Localeze::BaseRecord|92297881
+Philadelphia|Shampoo|Localeze::BaseRecord|683962600
+Philadelphia|Chris' Jazz Cafe|Localeze::BaseRecord|32180110
+Philadelphia|McFadden's at the Ballpark|Localeze::BaseRecord|59866108
+Philadelphia|Comcast SportsNet|Localeze::BaseRecord|684871088
+Philadelphia|Theater of Living Arts|Localeze::BaseRecord|13585387
+Philadelphia|World Cafe Live|Localeze::BaseRecord|142712335
+

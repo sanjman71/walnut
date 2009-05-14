@@ -15,6 +15,8 @@
           == Mapped to
           = link_to venue.location.place.name, place_path(venue.location)
           == &nbsp;|&nbsp;
+          == Source - #{venue.location.source_type}:#{venue.location.source_id}
+          == &nbsp;|&nbsp;
           == Events: #{venue.location.events_count}
         - else
           = link_to 'Add this place', add_venue_path(venue)

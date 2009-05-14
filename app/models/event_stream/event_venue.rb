@@ -54,6 +54,47 @@ class EventVenue < ActiveRecord::Base
     !self.location_id.blank?
   end
   
+  # add the event venue as a place
+  def add_place(options={})
+    log     = options[:log] ? true : false
+    
+    # create location parameters
+    state   = State.find_by_name(self.state)
+    city    = state.cities.find_by_name(self.city) if state
+    
+    if state.blank? or city.blank?
+      if log
+        puts "#{Time.now}: venue has an invalid city or state"
+      end
+      
+      return 0
+    end
+
+    # create location
+    address = StreetAddress.normalize(self.address)
+    zip     = state.zips.find_by_name(self.zip)
+    options = {:name => "Venue", :street_address => address, :city => city, :state => state, :zip => zip, :country => Country.default}
+
+    options.merge!(:source_id => self.source_id, :source_type => self.source_type)
+    options.merge!(:lat => self.lat, :lng => self.lng) if self.lat and self.lng
+    location  = Location.create(options)
+  
+    # create place
+    place = Place.create(:name => self.name)
+    place.locations.push(location)
+    place.reload
+    
+    # map location to event venue
+    self.location = location
+    self.save
+    
+    if log
+      puts "#{Time.now}: *** added place: #{place.name}:#{location.name}:#{location.id}"
+    end
+    
+    return 1
+  end
+  
   # import venue events, and return the events imported
   def import_events(options={})
     limit     = options[:limit] ? options[:limit].to_i : 2**30
@@ -146,12 +187,18 @@ class EventVenue < ActiveRecord::Base
     start_count   = EventVenue.count
     
     @venues.each_with_index do |venue, index|
-      @popularity = @total - (@first_item + index)
-      object = EventVenue.create(:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], :zip => venue["postal_code"],
-                                 :popularity => @popularity, :source_type => EventSource::Eventful, :source_id => venue['id'])
+      popularity = @total - (@first_item + index)
+      options = {:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], :zip => venue["postal_code"],
+                 :popularity => popularity, :source_type => EventSource::Eventful, :source_id => venue['id']}
+      options[:lat] = venue['latitude'] if venue['latitude']
+      options[:lng] = venue['longitude'] if venue['longitude']
+      # map region to a state
+      state   = State.find_by_name(venue['region_name'])
+      options[:state] = state.name if state
+      object  = EventVenue.create(options)
 
       if object and log
-        puts "*** added event venue #{object.name}:#{object.city}:#{object.popularity}"
+        puts "*** added event venue #{object.name}:#{object.city}:#{object.state}:#{object.popularity}"
       end
     end
     

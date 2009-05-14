@@ -49,7 +49,7 @@ namespace :events do
 
   desc "Import CITY event venues from eventful"
   task :import_venues do
-    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 100
+    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 10
     city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
     
     if city.blank?
@@ -74,24 +74,25 @@ namespace :events do
   desc "Import event venue metadata, e.g. search name, address name ..."
   task :import_venue_metadata do
     
-    file = "#{RAILS_ROOT}/data/event_venues.txt"
-    puts "#{Time.now}: parsing file #{file}" 
+    file  = "#{RAILS_ROOT}/data/event_venues.txt"
+    count = 0
+    
+    puts "#{Time.now}: parsing file #{file}"
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
-      name, search_name, search_address = row
+      city, name, type, id = row
     
       # find event venue
       event_venue = EventVenue.find_by_name(name)
       next if event_venue.blank?
       
       # apply metadata
-      options = {}
-      options[:search_name]     = search_name unless search_name.blank?
-      options[:search_address]  = search_address unless search_address.blank?
-      
-      next if options.blank?
-      
+      options = {:location_source_type => type, :location_source_id => id}
       event_venue.update_attributes(options)
+      
+      count += 1
     end
+    
+    puts "#{Time.now}: completed, updated #{count} venues"
   end
   
   desc "Map CITY event venues to locations, using sphinx to match locations"
@@ -100,6 +101,7 @@ namespace :events do
     city_name   = ENV["CITY"].to_s
     checked     = 0
     marked      = 0
+    added       = 0
     skipped     = 0
 
     # find count of already mapped venues
@@ -120,19 +122,13 @@ namespace :events do
       
       checked += 1
       
-      # search for venue by name (try search name first), and by city and street address (try address name first)
-      if !venue.search_name.blank?
-        # use exact search name
-        name    = venue.search_name
-      else
-        # create search object to build query
-        search  = Search.parse([], venue.name)
-        name    = search.query
-      end 
+      # create search object to build query
+      search  = Search.parse([], venue.name)
+      name    = search.query
       
       # break street address into components and normalize
       components  = StreetAddress.components(venue.address)
-      address     = venue.search_address.blank? ? StreetAddress.normalize("#{components[:housenumber]} #{components[:streetname]}") : venue.search_address
+      address     = StreetAddress.normalize("#{components[:housenumber]} #{components[:streetname]}")
       
       if filter
         # apply filter
@@ -149,15 +145,18 @@ namespace :events do
       end
       
       if matches.blank?
+        # no matches
         puts "#{Time.now}: xxx no search matches for venue '#{name}', address #{address}"
-        skipped += 1
+        # added the event venue
+        added += venue.add_place(:log => true)
         next
       elsif matches.size > 1
 
         if search.blank?
           # too many matches
           puts "#{Time.now}: xxx found #{matches.size} matches for venue '#{name}', address #{address}"
-          skipped += 1
+          # add the event venue
+          added += venue.add_place(:log => true)
           next
         end
 
@@ -169,7 +168,8 @@ namespace :events do
         
         if matches.size != 1
           puts "#{Time.now}: xxx retry, found #{matches.size} matches for venue #{name}, address #{address}"
-          skipped += 1
+          # add the event venue
+          added += venue.add_place(:log => true)
           next
         end
       end
@@ -183,7 +183,7 @@ namespace :events do
       puts "#{Time.now}: *** marked location #{location.place.name}:#{location.street_address} as event venue:#{venue.name}"
     end
     
-    puts "#{Time.now}: completed, #{mapped} already mapped event venues, checked #{checked}, marked #{marked}, skipped #{skipped}"
+    puts "#{Time.now}: completed, started with #{mapped} event venues, checked #{checked}, marked #{marked}, added #{added}, skipped #{skipped}"
   end
 
   desc "Import popular CITY events from eventful"
@@ -237,8 +237,8 @@ namespace :events do
     puts "#{Time.now}: removing all events"
     
     Event.all.each do |event|
-      event.event_venue.events.delete(event)
-      event.location.events.delete(event)
+      event.event_venue.events.delete(event) unless event.event_venue.blank?
+      event.location.events.delete(event) unless event.location.blank?
       event.destroy
     end
     
