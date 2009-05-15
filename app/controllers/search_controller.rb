@@ -4,14 +4,14 @@ class SearchController < ApplicationController
 
   def country
     # @country, @states initialized in before filter
-    @title  = "Browse Places and Events in #{@country.name}"
-    @h1     = "Browse Places and Events by State"
+    @title  = "Search Places and Events in #{@country.name}"
+    @h1     = "Search Places and Events by State"
   end
 
   def state
     # @country, @state, @cities, @zips all initialized in before filter
-    @title  = "Browse Places and Events in #{@state.name}"
-    @h1     = @title
+    @title  = "Search Places and Events in #{@state.name}"
+    @h1     = "Search Places and Events by City"
   end
 
   def city

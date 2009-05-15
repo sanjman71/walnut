@@ -14,7 +14,7 @@
     .state_cities== #{@state.name} Cities
     - @cities.each_with_index do |city, i|
       - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-      %span.small[city]{:style => 'white-space: nowrap;'}= link_to(city, url_for(:action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
+      %span.small[city]{:style => 'white-space: nowrap; margin-right: 3px; font-weight: bold;'}= link_to(city, url_for(:action => 'city', :country => @country, :state => @state, :city => city), :class => klasses.join(" "))
 
 %hr.space
 
