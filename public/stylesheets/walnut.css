@@ -24,6 +24,8 @@ a img:hover                                       { background-color: green; }
 .margin-bottom-5                                  { margin-bottom: 5px; }
 
 .letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
+.letterbox-5                                      { padding-top: 5px; padding-bottom: 5px; }
+.letterbox-5.border_bottom                        { border-bottom: 2px solid #eee; }
 
 .text-align-right                                 { text-align: right; }
 .text-align-left                                  { text-align: left; }
@@ -235,6 +237,7 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 
 /* mappable objects */
 
+.mappable                                         { padding-top: 7px; padding-bottom: 7px; }
 .mappable.selected                                { background-color: #99DDFF; }
 .mappable.unselected                              { background-color: #FFFFFF; }
 .mappable .icon-div                               { }

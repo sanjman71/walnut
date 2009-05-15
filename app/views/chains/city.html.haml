@@ -26,7 +26,7 @@
   .span-10
     -# render chain places as regular search results
     - @locations.each_with_index do |location, i|
-      .span-10.letterbox[location]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
+      .span-10.letterbox-5.border_bottom[location]
         / Regular location
         = render(:partial => 'search/location', :locals => {:location => location, :what => @chain.name, :tags => [], :index => i, :color => "_purple", :nameclass => 'place'})
   
