@@ -271,7 +271,7 @@ class EventVenue < ActiveRecord::Base
     object  = EventVenue.create(options)
 
     if object and log
-      puts "*** added venue #{object.name}:#{object.city}:#{object.state}:#{object.zip}:#{object.area_type}"
+      puts "#{Time.now}: *** added venue #{object.name}:#{object.city}:#{object.state}:#{object.zip}:#{object.area_type}"
     end
     
     object
