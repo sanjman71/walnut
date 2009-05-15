@@ -39,7 +39,7 @@ $.fn.init_input_hints = function() {
   });
 }
 
-$.fn.init_search_places_form = function() {
+$.fn.init_search_objects_form = function() {
   /*
   // show hidden search places form onclick
   $("#search_link").click(function () {
@@ -48,7 +48,19 @@ $.fn.init_search_places_form = function() {
   })
   */
   
-  $("#search_places_form").submit(function() {
+  $("input:checkbox#search_locations, input:checkbox#search_events").click(function() {
+    if (this.checked) {
+      // uncheck all other check boxes
+      var $checkbox = this;
+      $("input:checkbox.search_klass").each(function() {
+        if (this != $checkbox) {
+          $(this).attr("checked", false);
+        }
+      })
+    }
+  })
+
+  $("#search_objects_form").submit(function() {
     // check field values
     var $search_what  = $(this).find("#search_what")
     var $search_where = $(this).find("#search_where")
@@ -87,5 +99,5 @@ $.fn.init_search_places_form = function() {
 
 $(document).ready(function() {
   $(document).init_input_hints();
-  $(document).init_search_places_form();
+  $(document).init_search_objects_form();
 })
