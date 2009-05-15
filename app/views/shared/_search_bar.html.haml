@@ -1,4 +1,4 @@
-- form_for(Place.new, :url => url_for(:controller => 'search', :action => 'resolve'), :method => :post, :html => {:id => 'search_places_form'}) do |f|
+- form_for(Place.new, :url => url_for(:controller => 'search', :action => 'resolve'), :method => :post, :html => {:id => 'search_objects_form'}) do |f|
   .span-10.prepend-1
     = label_tag "what", "What", :class => 'big', :style => 'padding-right: 5px;'
     = text_field_tag "search_what", '', :id => 'search_what', :name => 'what', :class => 'title', :style => 'width: 325px;', :title => 'e.g. pizza, soccer'
@@ -6,3 +6,9 @@
     = label_tag "search_where", "Where", :class => 'big', :style => 'padding-right: 5px;'
     = text_field_tag "where", current_search_locality, :id => 'search_where', :name => 'where', :class => 'title', :style => 'width: 325px;', :title => 'e.g. Chicago, IL'
     = submit_tag 'Search', :class => 'button big', :style => 'margin-left: 7px;'
+  .span-23.prepend-1.last
+    = check_box_tag '', 'locations', @search_klass ? @search_klass == 'locations' : false, :id => 'search_locations', :class => 'search_klass', :name => 'search_klass'
+    = label_tag 'search_locations', 'Search Locations only'
+    == &nbsp;
+    = check_box_tag '', 'events', @search_klass ? @search_klass == 'events' : false, :id => 'search_events', :class => 'search_klass', :name => 'search_klass'
+    = label_tag 'search_events', 'Search Events only'
