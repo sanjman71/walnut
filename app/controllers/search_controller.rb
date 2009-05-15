@@ -19,13 +19,20 @@ class SearchController < ApplicationController
     
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
       @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
-        # build tag cloud
+        # build tag cloud from location and event objects
         tag_limit = 150
         facets    = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-        Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+        tags      = Search.load_from_facets(facets, Tag)#.sort_by { |o| o.name }
+
+        tag_limit = 30
+        facets    = Event.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        tags      += Search.load_from_facets(facets, Tag)
+
+        # return sorted tags collection
+        tags.sort_by { |o| o.name }
       end
     end
-    
+
     self.class.benchmark("Benchmarking #{@city.name} popular events") do
       @events_count, @popular_events = Rails.cache.fetch("#{@city.name.parameterize}:popular_events", :expires_in => CacheExpire.events) do
         # find city events count and popular events
