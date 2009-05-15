@@ -39,7 +39,7 @@ class Event < ActiveRecord::Base
   def popular!
     # popularity value decreases the further away it is
     max_pop_value = 100
-    days_from_now = (self.start_at > Time.now) ? (self.start_at - Time.now) / 86400 : max_pop_value
+    days_from_now = (self.start_at > Time.now.beginning_of_day.utc) ? (self.start_at - Time.now) / 86400 : max_pop_value
     self.update_attribute(:popularity, max_pop_value - days_from_now)
   end
 
