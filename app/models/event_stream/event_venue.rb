@@ -22,26 +22,17 @@ class EventVenue < ActiveRecord::Base
   named_scope :order_popularity,  { :order => "popularity DESC" }
   named_scope :order_city,        { :order => "city ASC" }
 
-  @@search_method   = "venues/search"
-  @@get_method      = "venues/get"
+  @@search_method       = "venues/search"
+  @@get_method          = "venues/get"
+  @@event_get_method    = "events/get"
   
   def self.session
     @@session ||= Eventful::API.new(EVENTFUL_API_KEY)
   end
-
-  # search venues using the eventful api, with options:
-  #  - :keywords => string
-  #  - :location => e.g. "Chicago"
-  #  - :sort_order => 'popularity', 'relevance', or 'venue'; default is 'relevance'
-  def self.search(options={})
-    search_options = {:sort_order => 'relevance'}
-    session.call(@@search_method, search_options.update(options))
-  end
-
-  # get event venue info, e.g. events, ...
+  
+  # call class method
   def get(options={})
-    get_options = {:id => self.source_id}
-    EventVenue.session.call(@@get_method, get_options.update(options))
+    EventVenue.get(self.source_id, options)
   end
 
   # convert object to a pipe separated list of attributes
@@ -52,6 +43,84 @@ class EventVenue < ActiveRecord::Base
   # returns true if the event venue is mapped to a location
   def mapped?
     !self.location_id.blank?
+  end
+  
+  # try to map the venue to location
+  def map_to_location(options={})
+    log   = options[:log] ? true : false
+    
+    city  = City.find_by_name(self.city)
+    
+    if city.blank?
+      if log
+        puts "#{Time.now}: xxx could not find venue city #{self.city}"
+      end
+      
+      return 0
+    end
+    
+    # create search object to build query
+    search      = ::Search.parse([], self.name)
+    name        = search.query
+    
+    # break street address into components and normalize
+    components  = StreetAddress.components(self.address)
+    address     = StreetAddress.normalize("#{components[:housenumber]} #{components[:streetname]}")
+    
+    # check if there a source id and type
+    if self.location_source_id and self.location_source_type
+      # find the location
+      matches = Location.find(:all, :conditions => {:source_id => self.location_source_id, :source_type => self.location_source_type})
+    else
+      # search with constraints
+      matches = Location.search(name, :conditions => {:city_id => city.id, :street_address => address})
+    end
+    
+    if matches.blank?
+      # no matches
+      if log
+        puts "#{Time.now}: xxx no search matches for venue '#{name}', address #{address}"
+      end
+      
+      return 0
+    elsif matches.size > 1
+
+      if search.blank?
+        # too many matches
+        if log
+          puts "#{Time.now}: xxx found #{matches.size} matches for venue '#{name}', address #{address}"
+        end
+        
+        return 0
+      end
+
+      # try again with a more restrictive search
+      if log
+        puts "#{Time.now}: found #{matches.size} matches for venue #{name}, address #{address} ... trying again"
+      end
+      
+      name    = search.query(:operator => :and)
+      matches = Location.search(name, :conditions => {:city_id => city.id, :street_address => address})
+      
+      if matches.size != 1
+        # this search faield as well, its time to give up and just add the venue as a place
+        if log
+          puts "#{Time.now}: xxx retry, found #{matches.size} matches for venue #{name}, address #{address}"
+        end
+        
+        return 0
+      end
+    end
+        
+    # found a matching location, mark location as an event venue
+    self.location = matches.first
+    self.save
+
+    if log
+      puts "#{Time.now}: *** marked location: #{location.place.name}:#{location.street_address} as event venue:#{self.name}"
+    end
+    
+    return 1
   end
   
   # add the event venue as a place
@@ -89,13 +158,13 @@ class EventVenue < ActiveRecord::Base
     self.save
     
     if log
-      puts "#{Time.now}: *** added place: #{place.name}:#{location.name}:#{location.id}"
+      puts "#{Time.now}: *** added place: #{place.name}:#{location.name}:#{location.id} as an event venue"
     end
     
     return 1
   end
   
-  # import venue events, and return the events imported
+  # import venue events; return the events imported
   def import_events(options={})
     limit     = options[:limit] ? options[:limit].to_i : 2**30
     imported  = []
@@ -116,23 +185,23 @@ class EventVenue < ActiveRecord::Base
     imported
   end
 
-  def import_event(eventful_event, options={})
+  def import_event(event_hash, options={})
     log   = options[:log] ? true : false
     
     # check if event exits
-    event = Event.find_by_source_id(eventful_event['id'])
+    event = Event.find_by_source_id(event_hash['id'])
     
     return event if event
     
-    options  = {:name => eventful_event['title'], :url => eventful_event['url'], :source_type => self.source_type, :source_id => eventful_event['id']}
-    options[:start_at]  = eventful_event['start_time'] if eventful_event['start_time']
-    options[:end_at]    = eventful_event['stop_time'] if eventful_event['stop_time']
+    options  = {:name => event_hash['title'], :url => event_hash['url'], :source_type => self.source_type, :source_id => event_hash['id']}
+    options[:start_at]  = event_hash['start_time'] if event_hash['start_time']
+    options[:end_at]    = event_hash['stop_time'] if event_hash['stop_time']
     
     # create event
     event = Event.create(options)
 
     if log
-      puts "*** created event: #{event.name}"
+      puts "#{Time.now}: *** created event: #{event.name} @ #{self.name}"
     end
     
     # add event to event venue and location
@@ -142,32 +211,25 @@ class EventVenue < ActiveRecord::Base
     event
   end
   
-  # tag all venue's events with categories, which has the affect of applying category tags
-  def categorize_events(options={})
-    self.events.each do |event|
-      # skip if event already has categories
-      next if !event.event_categories.blank?
-      
-      begin
-        @results    = event.get
-        @categories = @results['categories']['category']
-      rescue Exception => e
-        puts "xxx exception: #{e.message}"
-        next
-      end
+  # search venues using the eventful api, with options:
+  #  - :keywords => string
+  #  - :location => e.g. "Chicago"
+  #  - :sort_order => 'popularity', 'relevance', or 'venue'; default is 'relevance'
+  def self.search(options={})
+    search_options = {:sort_order => 'relevance'}
+    session.call(@@search_method, search_options.update(options))
+  end
 
-      # map eventful category id to an event category object
-      @categories = @categories.map do |category|
-        # puts "*** category: #{category}"
-        EventCategory.find_by_source_id(category['id'])
-      end
-      
-      # associate event categories with events
-      @categories.compact.each do |category|
-        puts "*** category: #{category.name}, event: #{event.name}"
-        event.event_categories.push(category)
-      end
-    end
+  # get event venue info, e.g. events, ...
+  def self.get(id, options={})
+    get_options = {:id => id}
+    EventVenue.session.call(@@get_method, get_options.update(options))
+  end
+  
+  # get event info
+  def self.event_get(id, options={})
+    get_options = {:id => id}
+    EventVenue.session.call(@@event_get_method, get_options.update(options))
   end
   
   # import venues sorted by popularity
@@ -176,8 +238,8 @@ class EventVenue < ActiveRecord::Base
     page_size     = options[:per_page] ? options[:per_page].to_i : 50
     log           = options[:log] ? true : false
     
-    @results      = EventVenue.search(:sort_order => 'popularity', :location => city.name, :page_number => page_number, :page_size => page_size)
-    @venues       = @results['venues'] ? @results['venues']['venue'] : []
+    results       = EventVenue.search(:sort_order => 'popularity', :location => city.name, :page_number => page_number, :page_size => page_size)
+    venues        = results['venues'] ? results['venues']['venue'] : []
     
     @total        = @results['total_items']
     @count        = @results['page_items']   # the number of events on this page
@@ -186,25 +248,85 @@ class EventVenue < ActiveRecord::Base
     
     start_count   = EventVenue.count
     
-    @venues.each_with_index do |venue, index|
-      popularity = @total - (@first_item + index)
-      options = {:name => venue['venue_name'], :city => venue['city_name'], :address => venue['address'], :zip => venue["postal_code"],
-                 :popularity => popularity, :source_type => EventSource::Eventful, :source_id => venue['id']}
-      options[:lat] = venue['latitude'] if venue['latitude']
-      options[:lng] = venue['longitude'] if venue['longitude']
-      # map region to a state
-      state   = State.find_by_name(venue['region_name'])
-      options[:state] = state.name if state
-      object  = EventVenue.create(options)
-
-      if object and log
-        puts "*** added event venue #{object.name}:#{object.city}:#{object.state}:#{object.popularity}"
-      end
+    venues.each_with_index do |venue, index|
+      import_venue(venue, :log => log)
     end
     
     imported = EventVenue.count - start_count
   end
 
+  def self.import_venue(venue_hash, options={})
+    log     = options[:log] ? true : false
+    options = {:name => venue_hash['name'], :city => venue_hash['city'], :address => venue_hash['address'], :zip => venue_hash["postal_code"],
+               :source_type => EventSource::Eventful, :source_id => venue_hash['id']}
+    options[:lat] = venue_hash['latitude'] if venue_hash['latitude']
+    options[:lng] = venue_hash['longitude'] if venue_hash['longitude']
+    options[:area_type] = venue_hash['venue_type'] if venue_hash['venue_type']
+    
+    # map region name to a state
+    state   = State.find_by_name(venue_hash['region'])
+    options[:state] = state.name if state
+    
+    # create event venue
+    object  = EventVenue.create(options)
+
+    if object and log
+      puts "*** added venue #{object.name}:#{object.city}:#{object.state}:#{object.zip}:#{object.area_type}"
+    end
+    
+    object
+  end
+  
+  def self.import_metadata(city, options={})
+    file  = "#{RAILS_ROOT}/data/event_venues.txt"
+    count = 0
+    
+    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+      city_name, name, type, id = row
+
+      # apply city filter
+      next if city_name != city
+      
+      # find event venue
+      event_venue = EventVenue.find_by_name(name)
+      next if event_venue.blank?
+      next if event_venue.location_source_type and event_venue.location_source_id
+      
+      # apply metadata
+      options = {:location_source_type => type, :location_source_id => id}
+      event_venue.update_attributes(options)
+      
+      count += 1
+    end
+    
+    count
+  end
+  
+  def self.tag_event(event, options={})
+    log = options[:log] ? true : false
+
+    begin
+      results         = EventVenue.event_get(event.source_id)
+      categories_hash = results['categories']['category']
+    rescue Exception => e
+      puts "xxx exception: #{e.message}"
+      next
+    end
+
+    # map eventful category id to an event category object
+    categories = categories_hash.map do |category_hash|
+      EventCategory.find_by_source_id(category_hash['id'])
+    end.compact
+    
+    # associate event categories with events
+    categories.compact.each do |category|
+      if log
+        puts "#{Time.now}: *** tagging event: #{event.name} with category: #{category.name}"
+      end
+      event.event_categories.push(category)
+    end
+  end
+  
   protected
   
   # initialize location_source fields if the event venue has been mapped to a location

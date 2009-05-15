@@ -36,14 +36,6 @@ class Event < ActiveRecord::Base
     has event_tags(:id), :as => :tag_ids, :facet => true
   end
   
-  @@get_method  = "events/get"
-  
-  # get event info, e.g. tags, categories, ...
-  def get(options={})
-    get_options = {:id => self.source_id}
-    EventVenue.session.call(@@get_method, get_options.update(options))
-  end
-  
   def popular!
     self.update_attribute(:popularity, 100)
   end
