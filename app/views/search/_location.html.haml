@@ -15,7 +15,7 @@
       
     .span-9.last.info
       %h4.name.margin-bottom-5
-        = link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}, :class => 'place name'
+        = link_to location.place.name, location_path(location), :class => 'place name'
       %span.address.margin-bottom-5{:style => 'font-size: 1.2em; color: #555;'}
         = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
       %br

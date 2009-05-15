@@ -4,10 +4,11 @@ module Localeze
 
     # @@attr_group_names_to_tags_list = ["Chains & Franchises", "Meals Served"]
     # the attributes for these group names are used as tags
-    @@valid_group_names_for_tags  = ["Accessories", "Clothing", "Dance Styles", 
+    @@valid_group_names_for_tags  = ["Accessories", "Apparel", "Clothing", "Dance Styles", "Departments",
                                      "Facilities", "Facility Features", "Fine Art", "Financial Services", "Finished Products", "Footwear Repair",
                                      "General Tax Services", "Hair Services", "Insurance", 
-                                     "Menu Items", "Menus", "Moving Vehicles", 
+                                     "Menu Items", "Menus", "Moving Vehicles",
+                                     "Other Products",
                                      "Painting Services", "Pest Types", "Pet Care Services", "Products", "Products & Supplies",
                                      "Qualifications & Certifications", "Restaurant Style",
                                      "Salon & Spa Services", "Spa Services", "Services", "Team Sports", "Technology",
@@ -15,7 +16,7 @@ module Localeze
                                     ]
 
     # the attributes for these brands are used as tags
-    @@valid_brand_categories      = ["Apparel", "Apperal & Accessories", "Appliances", "Audio & Electronics", 
+    @@valid_brand_categories      = ["Apparel", "Apperal & Accessories", "Appliances", "Athletic", "Audio & Electronics", 
                                      "Batteries", "Beauty Products", "Bedding", 
                                      "Cables & Wires", "Cameras", "Cell Phones", "Coffee", "Computers", "Cosmetics", "Credit Cards", "Crock Pots",
                                      "Data Storage", "Electronics", "Engine Parts", "Equipment", "Eyewear", 

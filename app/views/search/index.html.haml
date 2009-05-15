@@ -47,12 +47,12 @@
     = will_paginate(@objects, :page_links => true)
 
   .span-19.last
-    - if @klasses.keys.size > 0
-      -# show number of results by type
-      - @klasses.keys.each do |klass|
+    - if @search_filters.keys.size > 0
+      -# filter search results by type
+      - @search_filters.keys.each do |klass|
         %span{:style => 'font-weight: bold; font-size: 1.1em;'}
           = link_to("Search #{klass.pluralize} only", build_search_route(klass, 'city', @locality_params.merge(:tag => @tag, :what => @what).compact), :style => 'color: #0099FF;')
-          = "&nbsp;|&nbsp;" unless klass == @klasses.keys[-1]
+          = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
     
   .span-10
     - @objects.each_with_index do |object, i|

@@ -41,33 +41,33 @@ module ApplicationHelper
     end
   end
   
-  # build search route based on the controller in the current request
+  # build search route based on the klass parameter
   # note: searching can only be done by city, zip or neighborhood
   def build_search_route(klass, where, options={})
-    # map klass to a controller
     case klass.to_s.downcase
     when 'location', 'locations', 'place', 'places'
-      controller = 'places'
+      klass = 'locations'
     when 'event', 'events'
-      controller = 'events'
+      klass = 'events'
     when 'search'
-      controller = 'search'
+      klass = 'search'
     else
       raise Exception, "invalid klass #{klass} for search route"
     end
     
     case where
     when 'city'
-      build_city_search_route(controller, options[:country], options[:state], options[:city], options)
+      build_city_search_route(klass, options[:country], options[:state], options[:city], options)
       # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
       #         :tag => options[:tag], :what => options[:what])
     when 'zip'
-      build_zip_search_route(controller, options[:country], options[:state], options[:zip], options)
+      build_zip_search_route(klass, options[:country], options[:state], options[:zip], options)
       # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
       #         :tag => options[:tag], :what => options[:what])
     when 'neighborhood'
-      url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
-              :neighborhood => options[:neighborhood], :tag => options[:tag], :what => options[:what])
+      build_neighborhood_search_route(klass, options[:country], options[:state], options[:city], options[:neighborhood], options)
+      # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
+      #         :neighborhood => options[:neighborhood], :tag => options[:tag], :what => options[:what])
     else
       raise ArgumentError, "no route for #{where}"
     end
@@ -82,17 +82,19 @@ module ApplicationHelper
   end
   
   def build_locality_route(locality, options={})
+    klass = 'search'
+    
     case locality.class.to_s
     when 'Country'
-      url_for(:action => 'country', :country => locality)
+      build_country_route(klass, locality)
     when 'State'
-      url_for(:action => 'state', :country => options[:country], :state => locality)
+      build_state_route(klass, options[:country], locality)
     when 'City'
-      url_for(:action => 'city', :country => options[:country], :state => options[:state], :city => locality)
+      build_city_route(klass, options[:country], options[:state], locality)
     when 'Zip'
-      url_for(:action => 'zip', :country => options[:country], :state => options[:state], :zip => locality)
+      build_zip_route(klass, options[:country], options[:state], locality)
     when 'Neighborhood'
-      url_for(:action => 'neighborhood', :country => options[:country], :state => options[:state], :city => options[:city], :neighborhood => locality)
+      build_neighborhood_route(klass, options[:country], options[:state], options[:city], locality)
     else
       ''
     end
@@ -100,27 +102,43 @@ module ApplicationHelper
   
   # url_for optimizations
 
-  def build_zip_route(controller, country, state, zip)
-    "/#{controller}/#{country.to_param}/#{state.to_param}/#{zip.to_param}"
+  def build_country_route(klass, country)
+    "/#{klass}/#{country.to_param}"
   end
   
-  def build_city_search_route(controller, country, state, city, options={})
-    route = "/#{controller}/#{country.to_param}/#{state.to_param}/#{city.to_param}" + build_where_route_part(options)
-  end
-
-  def build_zip_search_route(controller, country, state, zip, options={})
-    route = "/#{controller}/#{country.to_param}/#{state.to_param}/#{zip.to_param}" + build_where_route_part(options)
+  def build_state_route(klass, country, state)
+    "/#{klass}/#{country.to_param}/#{state.to_param}"
   end
   
-  def build_neighborhood_search_route(controller, country, state, city, neighborhood, options={})
-    route = "/#{controller}/#{country.to_param}/#{state.to_param}/#{city.to_param}/n/#{neighborhood.to_param}" + build_where_route_part(options) 
+  def build_city_route(klass, country, state, city)
+    "/#{klass}/#{country.to_param}/#{state.to_param}/#{city.to_param}"
+  end
+  
+  def build_neighborhood_route(klass, country, state, city, neighborhood)
+    "/#{klass}/#{country.to_param}/#{state.to_param}/#{city.to_param}/n/#{neighborhood.to_param}"
+  end
+  
+  def build_zip_route(klass, country, state, zip)
+    "/#{klass}/#{country.to_param}/#{state.to_param}/#{zip.to_param}"
+  end
+  
+  def build_city_search_route(klass, country, state, city, options={})
+    route = "/#{klass}/#{country.to_param}/#{state.to_param}/#{city.to_param}" + build_what_route_path(options)
   end
 
-  def build_where_route_part(options)
+  def build_zip_search_route(klass, country, state, zip, options={})
+    route = "/#{klass}/#{country.to_param}/#{state.to_param}/#{zip.to_param}" + build_what_route_path(options)
+  end
+  
+  def build_neighborhood_search_route(klass, country, state, city, neighborhood, options={})
+    route = "/#{klass}/#{country.to_param}/#{state.to_param}/#{city.to_param}/n/#{neighborhood.to_param}" + build_what_route_path(options) 
+  end
+
+  def build_what_route_path(options)
     if options[:tag]
       "/tag/#{options[:tag]}"
-    elsif options[:where]
-      "/#{options[:where]}"
+    elsif options[:what]
+      "/#{options[:what]}"
     else
       ""
     end

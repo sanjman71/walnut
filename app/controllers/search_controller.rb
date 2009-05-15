@@ -95,6 +95,7 @@ class SearchController < ApplicationController
   def index
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
+    @search_klass   = params[:klass]
     @tag            = params[:tag].to_s.from_url_param
     @what           = params[:what].to_s.from_url_param
     
@@ -105,24 +106,33 @@ class SearchController < ApplicationController
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @raw_query)
     @query          = @search.query
     @with           = @search.field(:locality_hash)
+    
+    case @search_klass
+    when 'search'
+      @klasses = [Event, Location]
+    when 'locations'
+      @klasses = [Location]
+    when 'events'
+      @klasses = [Event]
+    end
 
     self.class.benchmark("Benchmarking query '#{@query}'") do
-      @objects      = ThinkingSphinx::Search.search(@query, :classes => [Event, Location], :with => @with, :page => params[:page], :per_page => 5,
-                                                    :order => :popularity, :sort_mode => :desc)
-    end
-    
-    # find objects by class
-    @klasses        = Hash.new([])
-    @objects.each do |object|
-      @klasses[object.class.to_s] += [object]
+      @objects = ThinkingSphinx::Search.search(@query, :classes => @klasses, :with => @with, :page => params[:page], :per_page => 5,
+                                               :order => :popularity, :sort_mode => :desc)
     end
 
+    # filter objects by class if this was a generic search
+    @search_filters = Hash.new([])
+    @objects.each do |object|
+      @search_filters[object.class.to_s] += [object]
+    end if @search_klass == 'search'
+    
     self.class.benchmark("Benchmarking related search tags") do
       # find related tags by class
       related_size    = 11
-      @related_tags   = [Location, Event].inject([]) do |array, klass|
+      @related_tags   = @klasses.inject([]) do |array, klass|
         facets  = klass.facets(@query, :with => @with, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
-        array  += Search.load_from_facets(facets, Tag).collect(&:name) - [@raw_query]
+        array  += Search.load_from_facets(facets, Tag).collect(&:name).sort - [@raw_query]
       end
     end
     
@@ -172,28 +182,28 @@ class SearchController < ApplicationController
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return
     end
-    
+
     case @locality.class.to_s
     when 'City'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => 'search', :country => @country, :state => @state, :city => @locality, :what => @what) and return
     when 'Zip'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :zip => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => 'search', :country => @country, :state => @state, :zip => @locality, :what => @what) and return
     when 'Neighborhood'
       @city     = @locality.city
       @state    = @city.state
       @country  = @state.country
-      redirect_to(:action => 'index', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => 'search', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
     when 'State'
       raise Exception, "search by state not supported"
     else
       redirect_to(root_path)
     end
   end
-  
+
   def error
     @title  = "Search Error"
   end

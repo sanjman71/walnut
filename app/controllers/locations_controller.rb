@@ -1,5 +1,46 @@
 class LocationsController < ApplicationController
 
+  # GET /locations/1
+  def show
+    @location = Location.find(params[:id], :include => [:places])
+    @place    = @location.place unless @location.blank?
+
+    if @location.blank? or @place.blank?
+      redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
+    end
+
+    # initialize localities
+    @country          = @location.country
+    @state            = @location.state
+    @city             = @location.city
+    @zip              = @location.zip
+    @neighborhoods    = @location.neighborhoods
+    
+    # find nearby locations, within the same city, exclude this location, and sort by distance
+    @search           = Search.parse([@country, @state, @city])
+    @nearby_limit     = 7
+    
+    if @location.mappable?
+      @nearby_locations = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
+                                          :conditions => @search.field(:locality_hash),
+                                          :without_ids => @location.id,
+                                          :order => "@geodist ASC", 
+                                          :limit => @nearby_limit,
+                                          :include => [:places])
+
+      @nearby_event_venues = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
+                                             :conditions => @search.field(:locality_hash).update(:event_venue => 1..10),
+                                             :without_ids => @location.id,
+                                             :order => "@geodist ASC", 
+                                             :limit => @nearby_limit,
+                                             :include => [:places])
+    end
+    
+    # initialize title, h1 tags
+    @title    = @place.name
+    @h1       = @title
+  end
+
   # POST /locations
   def create
     begin
@@ -48,7 +89,7 @@ class LocationsController < ApplicationController
     if @place.valid? and @location.valid?
       flash[:notice] = 'Location was successfully created.'
       respond_to do |format|
-        format.html { redirect_to(place_path(@location)) }
+        format.html { redirect_to(location_path(@location)) }
       end
     else
       flash[:error] = 'Error creating location.'

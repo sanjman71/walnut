@@ -3,10 +3,10 @@
 .span-24.last#header_links{:style => 'text-align: right;'}
   -# show these links in any state
   = link_to 'Home', root_path, :class => 'header link'
-  == &nbsp;|&nbsp;
-  = link_to 'Browse Places', url_for(:controller => 'places', :action => 'country', :country => Country.default), :class => 'header link'
-  == &nbsp;|&nbsp;
-  = link_to 'Browse Events', url_for(:controller => 'events', :action => 'country', :country => Country.default), :class => 'header link'
+  / == &nbsp;|&nbsp;
+  / = link_to 'Browse Places', url_for(:controller => 'places', :action => 'country', :country => Country.default), :class => 'header link'
+  / == &nbsp;|&nbsp;
+  / = link_to 'Browse Events', url_for(:controller => 'events', :action => 'country', :country => Country.default), :class => 'header link'
   == &nbsp;|&nbsp;
   = link_to 'Chain Stores', chains_path, :class => 'header link'
 

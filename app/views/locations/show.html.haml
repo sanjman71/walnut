@@ -47,7 +47,7 @@
         == &nbsp;
       - else
         - tags.each do |tag|
-          %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to tag.name, build_search_route(params[:controller], 'city', :country => @country, :state => @state, :city => @city, :what => tag.name.parameterize)
+          %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :what => tag.name.parameterize)
       
     .span-9.last#locality_tags
       %h2== Geography Tags

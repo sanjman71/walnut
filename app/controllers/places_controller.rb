@@ -114,47 +114,7 @@ class PlacesController < ApplicationController
     # track what event
     track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
   end
-  
-  def show
-    @location = Location.find(params[:id], :include => [:places])
-    @place    = @location.place unless @location.blank?
 
-    if @location.blank? or @place.blank?
-      redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
-    end
-
-    # initialize localities
-    @country          = @location.country
-    @state            = @location.state
-    @city             = @location.city
-    @zip              = @location.zip
-    @neighborhoods    = @location.neighborhoods
-    
-    # find nearby locations, within the same city, exclude this location, and sort by distance
-    @search           = Search.parse([@country, @state, @city])
-    @nearby_limit     = 7
-    
-    if @location.mappable?
-      @nearby_locations = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
-                                          :conditions => @search.field(:locality_hash),
-                                          :without_ids => @location.id,
-                                          :order => "@geodist ASC", 
-                                          :limit => @nearby_limit,
-                                          :include => [:places])
-
-      @nearby_event_venues = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
-                                             :conditions => @search.field(:locality_hash).update(:event_venue => 1..10),
-                                             :without_ids => @location.id,
-                                             :order => "@geodist ASC", 
-                                             :limit => @nearby_limit,
-                                             :include => [:places])
-    end
-    
-    # initialize title, h1 tags
-    @title    = @place.name
-    @h1       = @title
-  end
-  
   def error
     @title    = "Places Search Error"
     
