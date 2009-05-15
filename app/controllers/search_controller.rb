@@ -10,6 +10,13 @@ class SearchController < ApplicationController
 
   def state
     # @country, @state, @cities, @zips all initialized in before filter
+    
+    # partition cities into 2 groups, popular and all
+    popular_threshold = 25000
+    @popular_cities, @all_cities = @cities.partition do |city|
+      city.locations_count > popular_threshold
+    end
+    
     @title  = "Search Places and Events in #{@state.name}"
     @h1     = "Search Places and Events by City"
   end
