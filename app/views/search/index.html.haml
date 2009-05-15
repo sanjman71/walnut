@@ -59,7 +59,12 @@
       .span-10.letterbox[object]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
         - case object.class.to_s
         - when 'Location'
-          = render(:partial => 'location', :locals => {:location => object, :what => @what, :tags => @tags, :index => i})
+          - if object.event_venue.nil?
+            / Regular location
+            = render(:partial => 'location', :locals => {:location => object, :what => @what, :tags => @tags, :index => i, :color => "_purple", :nameclass => 'place'})
+          - else
+            / Event location - use a different color from a typical location
+            = render(:partial => 'location', :locals => {:location => object, :what => @what, :tags => @tags, :index => i, :color => "_green", :nameclass => 'event-location'})
         - when 'Event'
           = render(:partial => 'event', :locals => {:event => object, :what => @what, :tags => @tags, :index => i})
 

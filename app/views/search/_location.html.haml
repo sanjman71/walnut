@@ -1,6 +1,7 @@
-- what = nil unless local_assigns.has_key?(what)
-- tags = [] unless local_assigns.has_key?(tags)
-- color = "_purple"
+/ - what = nil unless local_assigns.has_key?(:what)
+/ - tags = [] unless local_assigns.has_key?(:tags)
+- color = "_purple" unless local_assigns.has_key?(:color)
+- nameclass = "place" unless local_assigns.has_key?(:nameclass)
 - klasses = []
 - klasses.push("mappable") if location.mappable?
 
@@ -15,18 +16,7 @@
       
     .span-9.last.info
       %h4.name.margin-bottom-5
-        = link_to location.place.name, location_path(location), :class => 'place name'
+        = link_to location.place.name, location_path(location), :class => "#{nameclass} name"
       %span.address.margin-bottom-5{:style => 'font-size: 1.2em; color: #555;'}
         = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
       %br
-      / *** I removed the tags from the Search results listing. Killian ***
-      / %span.tags.bottom
-      /   - location_tags = location.place.tags.sort_by(&:name)
-      /   - if location_tags.empty?
-      /     -# empty tag to take up space
-      /     == &nbsp;
-      /   - else
-      /     - location_tags.each do |place_tag|
-      /       - klasses = Array(what).any? {|tag| place_tag.name.match(/#{tag}/)} ? ["current", "highlight"] : []
-      /       %span.tag{:style => 'font-size: 12px;'}= link_to place_tag, {:controller => params[:controller], :action => 'index', :tag => place_tag.name.parameterize}, :class => klasses.join(" "), :style => "padding: 0 2px;"
-
