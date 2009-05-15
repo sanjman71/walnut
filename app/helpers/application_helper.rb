@@ -78,12 +78,10 @@ module ApplicationHelper
     locality = options.values.flatten.compact.find { |o| o ? o.name == name : false }
     return '' if locality.blank?
     # build route using locality object
-    build_locality_route(locality, options)
+    build_locality_route('search', locality, options)
   end
   
-  def build_locality_route(locality, options={})
-    klass = 'search'
-    
+  def build_locality_route(klass, locality, options={})
     case locality.class.to_s
     when 'Country'
       build_country_route(klass, locality)

@@ -15,9 +15,9 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/locations/:id/recommend', :controller => 'locations', :action => 'recommend', :conditions => {:method => :post}
 
   # chains routes
-  map.connect     '/chains/:name/:country', :controller => 'chains', :action => 'country'
-  map.connect     '/chains/:name/:country/:state', :controller => 'chains', :action => 'state'
-  map.connect     '/chains/:name/:country/:state/:city', :controller => 'chains', :action => 'city'
+  map.connect     '/chains/:country/:id', :controller => 'chains', :action => 'country'
+  map.connect     '/chains/:country/:state/:id', :controller => 'chains', :action => 'state'
+  map.connect     '/chains/:country/:state/:city/:id', :controller => 'chains', :action => 'city'
   
   map.resources   :chains, :only => [:index]
 

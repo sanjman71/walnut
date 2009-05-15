@@ -4,7 +4,7 @@
   %h1= @title
   %h4== #{pluralize(@count, 'location')}
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'chains', :country => @country, :state => @state})
   
 .prepend-1.span-23.last#locations
   / %h2== Found #{pluralize(@locations.size, 'location')} in #{@state.name}

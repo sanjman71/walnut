@@ -1,9 +1,15 @@
 - title(@title)
+- robots('index', 'follow') unless @locations.blank? or params[:page].to_i > 1
+
+-# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
+- content_for :javascript do
+  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
+- javascript("jquery.jmap", "places", "map_markers")
 
 .span-23.prepend-1.mat.padding-top-10.padding-bottom-10
   %h1{:style => 'font-size: 2.0em;'}= @title
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'chains', :country => @country, :state => @state, :city => @city, :object => @chain})
 
 %hr.space{:style => 'padding-bottom: 20px;'}
 
@@ -12,5 +18,20 @@
   = google_ad(160, 600)
 
 .span-19.last
-  -# render chain places as regular search results
-  = render(:partial => 'places/places', :locals => {:locations => @locations, :what => @chain.name, :tags => []})
+  .span-10
+    %h4= page_entries_info @locations
+  .span-9.last
+    = will_paginate(@locations, :page_links => true)
+  
+  .span-10
+    -# render chain places as regular search results
+    - @locations.each_with_index do |location, i|
+      .span-10.letterbox[location]{:class => cycle("", ""), :style => "border-bottom:2px solid #eee;"}
+        / Regular location
+        = render(:partial => 'search/location', :locals => {:location => location, :what => @chain.name, :tags => [], :index => i, :color => "_purple", :nameclass => 'place'})
+  
+  .span-9.last
+    - unless @locations.blank?
+      .jmap#map{:style => "width: 350px; height: 400px;"}
+  
+  / = render(:partial => 'places/places', :locals => {:locations => @locations, :what => @chain.name, :tags => []})

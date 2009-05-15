@@ -7,13 +7,13 @@ class ChainsControllerTest < ActionController::TestCase
   should_route  :get, '/chains', :controller => 'chains', :action => 'index'
 
   # chains in a country
-  should_route  :get, '/chains/1/us', :controller => 'chains', :action => 'country', :name => 1, :country => 'us'
+  should_route  :get, '/chains/us/1', :controller => 'chains', :action => 'country', :country => 'us', :id => 1
   
   # chains in a state
-  should_route  :get, '/chains/1/us/il', 
-                :controller => 'chains', :action => 'state', :name => 1, :country => 'us', :state => 'il'
+  should_route  :get, '/chains/us/il/1', 
+                :controller => 'chains', :action => 'state', :country => 'us', :state => 'il', :id => 1
 
   # chains in a city
-  should_route  :get, '/chains/1/us/il/chicago',
-                :controller => 'chains', :action => 'city', :name => 1, :country => 'us', :state => 'il', :city => 'chicago'
+  should_route  :get, '/chains/us/il/chicago/1',
+                :controller => 'chains', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago', :id => 1
 end

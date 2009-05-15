@@ -174,6 +174,8 @@ class SearchController < ApplicationController
   end
   
   def resolve
+    # check search_klass parameter
+    @klass    = params[:search_klass] ? params[:search_klass] : 'search'
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
     # normalize what parameter
@@ -187,16 +189,16 @@ class SearchController < ApplicationController
     when 'City'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => 'search', :country => @country, :state => @state, :city => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @locality, :what => @what) and return
     when 'Zip'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => 'search', :country => @country, :state => @state, :zip => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :zip => @locality, :what => @what) and return
     when 'Neighborhood'
       @city     = @locality.city
       @state    = @city.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => 'search', :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
     when 'State'
       raise Exception, "search by state not supported"
     else

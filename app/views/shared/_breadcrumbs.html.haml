@@ -3,6 +3,8 @@
 - city          = nil unless local_assigns.has_key?(:city)
 - neighborhood  = nil unless local_assigns.has_key?(:neighborhood)
 - link_all      = nil unless local_assigns.has_key?(:link_all) # if true, link all breadcrumb objects
+- tree          = 'search' unless local_assigns.has_key?(:tree)
+- object        = nil unless local_assigns.has_key?(:object)
 
 - separator     = ">"
 
@@ -22,7 +24,12 @@
   - if index == size-1 and link_all.nil?
     %span{:class => klass}= locality.name
   - else
-    = link_to locality.name, build_locality_route(locality, localities), :class => klass
+    -# build locality route
+    - route = build_locality_route(tree, locality, localities)
+    -# append object
+    - if object
+      - route += "/#{object.to_param}"
+    = link_to locality.name, route, :class => klass
 
   -# show separator unless its the last object
   = separator unless index == size-1

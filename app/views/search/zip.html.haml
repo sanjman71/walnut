@@ -6,7 +6,7 @@
   %h5
     = link_to("Search #{pluralize(@zip.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :what => 'anything'), :class => 'locality search')
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :zip => @zip})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :zip => @zip})
 
 %hr.space
 

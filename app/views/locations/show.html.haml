@@ -14,7 +14,7 @@
           == Venue
           
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city, :link_all => true})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :link_all => true})
 
 .span-18.prepend-1.last
   .span-18#address_phone

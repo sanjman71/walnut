@@ -10,7 +10,7 @@
       = link_to("Venues", city_venues_path(@country, @city.state, @city), :class => 'locality search')
       
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:country => @country, :state => @state, :city => @city})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city})
 
 %hr.space
 

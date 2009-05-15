@@ -1,4 +1,5 @@
 class ChainsController < ApplicationController
+  before_filter   :normalize_page_number, :only => [:city]
   before_filter   :init_areas, :only => [:country, :state, :city]
 
   def index
@@ -14,7 +15,7 @@ class ChainsController < ApplicationController
 
   def country
     # @country initialized in before filter
-    @chain    = Chain.find(params[:name].to_i)
+    @chain    = Chain.find(params[:id])
 
     # facet search by chain id
     @facets   = Location.facets(:conditions => {:chain_ids => @chain.id}, :facets => ["country_id", "state_id"])
@@ -30,7 +31,7 @@ class ChainsController < ApplicationController
   
   def state
     # @country, @state initialized in before filter
-    @chain      = Chain.find(params[:name].to_i)
+    @chain    = Chain.find(params[:id])
     
     # facet search by chain id and state id
     @facets   = Location.facets(:conditions => {:chain_ids => @chain.id, :state_id => @state.id}, :facets => ["city_id", "state_id"])
@@ -46,8 +47,9 @@ class ChainsController < ApplicationController
   
   def city
     # @country, @state, @city initialized in before filter
-    @chain      = Chain.find(params[:name].to_i)
-    @locations  = Location.search(:conditions => {:chain_ids => @chain.id, :city_id => @city.id}, :include => [:state, :city, :zip])
+    @chain      = Chain.find(params[:id])
+    @locations  = Location.search(:with => {:chain_ids => @chain.id, :city_id => @city.id}, :include => [:state, :city, :zip],
+                                  :page => params[:page], :per_page => 5)
 
     @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
 
