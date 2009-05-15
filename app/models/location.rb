@@ -16,6 +16,9 @@ class Location < ActiveRecord::Base
   # make sure only accessible attributes are written to from forms etc.
 	attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type
   
+  # used to generated an seo friendly url parameter
+  acts_as_friendly_param  :place_name
+  
   # acts_as_taggable_on     :locality_tags
   
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
@@ -58,7 +61,11 @@ class Location < ActiveRecord::Base
   def place
     self.places.first
   end
-  
+
+  def place_name
+    self.place ? self.place.name : self.name
+  end
+
   # return collection of location's country, state, city, zip, neighborhoods
   def localities
     [country, state, city, zip].compact + neighborhoods.compact
