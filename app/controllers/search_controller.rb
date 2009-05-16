@@ -184,7 +184,7 @@ class SearchController < ApplicationController
     end
 
     # track what event
-    track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
+    track_what_ga_event(@search_klass, :tag => @tag, :what => @what)
   end
   
   def resolve

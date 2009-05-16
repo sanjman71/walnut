@@ -194,10 +194,10 @@ class ApplicationController < ActionController::Base
       # track events
       if @neighborhood
         # track only the neighborhood event
-        track_where_ga_event(params[:controller], [@neighborhood])
+        track_where_ga_event(params[:klass], [@neighborhood])
       else
         # track city or zip event
-        track_where_ga_event(params[:controller], [@city, @zip].compact)
+        track_where_ga_event(params[:klass], [@city, @zip].compact)
       end
     end
     

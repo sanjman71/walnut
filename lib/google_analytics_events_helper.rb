@@ -15,7 +15,7 @@ module GoogleAnalyticsEventsHelper
     # use controller as category, and locality as action
     
     case controller
-    when 'places', 'events', 'search'
+    when 'places', 'locations', 'events', 'search'
       Array(localities).compact.each do |locality|
         @ga_events.push("pageTracker._trackEvent('#{controller.titleize}', '#{locality.class.to_s}', '#{locality.name}');")
       end
@@ -39,7 +39,7 @@ module GoogleAnalyticsEventsHelper
     end
     
     case controller
-    when 'places', 'events', 'search'
+    when 'places', 'locations', 'events', 'search'
       @ga_events.push("pageTracker._trackEvent('#{controller.titleize}', '#{action}', '#{label}');")
     end
   end
