@@ -6,3 +6,4 @@ db/schema.rb
 public/system/*
 backups/
 config/database.yml
+.DS_Store
