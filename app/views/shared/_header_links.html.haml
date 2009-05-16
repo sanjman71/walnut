@@ -1,27 +1,30 @@
-.span-24.last#search_places{:style => "visibility: visible;"}
-  = render(:partial => 'shared/search_bar')
-.span-24.last#header_links{:style => 'text-align: right;'}
-  -# show these links always
-  = link_to 'Home', root_path, :class => 'header link'
-  == &nbsp;|&nbsp;
-  = link_to 'Chain Stores', chains_path, :class => 'header link'
+.span-24
+  .span-6
+    = link_to(image_tag("/images/WalnutPlaces.png", :height => '70px'), root_path)
+  .span-18.last#search_places{:style => "visibility: visible;"}
+    = render(:partial => 'shared/search_bar')
+  .span-18.last#header_links{:style => 'text-align: right;'}
+    -# show these links always
+    = link_to 'Home', root_path, :class => 'header link'
+    == &nbsp;|&nbsp;
+    = link_to 'Chain Stores', chains_path, :class => 'header link'
 
-  / == &nbsp;|&nbsp;
-  / = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :class => 'header link'
+    / == &nbsp;|&nbsp;
+    / = link_to 'Zip Code Finder', url_for(:controller => 'zips', :action => 'index'), :class => 'header link'
   
-  - if has_privilege?('manage site')
-    == &nbsp;|&nbsp;
-    = link_to 'Tag Groups', taggs_path, :class => 'header link'
-    == &nbsp;|&nbsp;
-    = link_to 'Tags', tags_path, :class => 'header link'
-    == &nbsp;|&nbsp;
-    = link_to 'Venues', country_venues_path(@country || Country.default), :class => 'header link'
-    == &nbsp;|&nbsp;
-    = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'header link')
+    - if has_privilege?('manage site')
+      == &nbsp;|&nbsp;
+      = link_to 'Tag Groups', taggs_path, :class => 'header link'
+      == &nbsp;|&nbsp;
+      = link_to 'Tags', tags_path, :class => 'header link'
+      == &nbsp;|&nbsp;
+      = link_to 'Venues', country_venues_path(@country || Country.default), :class => 'header link'
+      == &nbsp;|&nbsp;
+      = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'header link')
 
-  - if logged_in?
-    == &nbsp;|&nbsp;
-    = link_to('Log-out', logout_path, :class => 'header link')
-  - else
-    == &nbsp;|&nbsp;
-    = link_to('Log-in', login_path, :class => 'header link')
+    - if logged_in?
+      == &nbsp;|&nbsp;
+      = link_to('Log-out', logout_path, :class => 'header link')
+    - else
+      == &nbsp;|&nbsp;
+      = link_to('Log-in', login_path, :class => 'header link')
