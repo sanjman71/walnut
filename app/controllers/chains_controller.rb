@@ -53,6 +53,9 @@ class ChainsController < ApplicationController
 
     @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
 
+    # enable/disable robots
+    @robots     = params[:page].to_i == 0 ? true : false
+
     # track event
     track_chain_ga_event(params[:controller], @chain, @city)
   end

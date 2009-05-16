@@ -176,6 +176,13 @@ class SearchController < ApplicationController
     @title          = build_search_title(:tag => @tag, :what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
 
+    # enable/disable robots
+    if @search_klass == 'search' and params[:page].to_i == 0
+      @robots = true
+    else
+      @robots = false
+    end
+
     # track what event
     track_what_ga_event(params[:controller], :tag => @tag, :what => @what)
   end

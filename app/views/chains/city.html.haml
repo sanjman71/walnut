@@ -1,5 +1,5 @@
 - title(@title)
-- robots('index', 'follow') unless @locations.blank? or params[:page].to_i > 1
+- robots('index', 'follow') unless @locations.blank? or @robots == false
 
 -# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
 - content_for :javascript do
