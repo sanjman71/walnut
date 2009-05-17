@@ -20,7 +20,7 @@ class PlacesController < ApplicationController
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
       # build tag cloud
       tag_limit     = 150
-      @facets       = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @facets       = Location.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
       @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     end
     
@@ -34,7 +34,7 @@ class PlacesController < ApplicationController
     self.class.benchmark("Benchmarking #{@neighborhood.name} tag cloud") do
       # build tag cloud
       tag_limit     = 150
-      @facets       = Location.facets(:with => Search.with(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @facets       = Location.facets(:with => Search.attributes(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
       @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     end
 
@@ -48,7 +48,7 @@ class PlacesController < ApplicationController
     self.class.benchmark("Benchmarking #{@zip.name} tag cloud") do
       # build tag cloud
       tag_limit     = 150
-      @facets       = Location.facets(:with => Search.with(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @facets       = Location.facets(:with => Search.attributes(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
       @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     end
 
@@ -72,7 +72,7 @@ class PlacesController < ApplicationController
     # use filter' to narrow search conditions
     @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @tag.blank? ? @what : @tag)
     @query          = @search.query
-    @with           = Search.with(@country, @state, @city, @neighborhood, @zip)
+    @with           = Search.attributes(@country, @state, @city, @neighborhood, @zip)
 
     case @filter
     when 'recommended'

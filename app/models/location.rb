@@ -33,9 +33,9 @@ class Location < ActiveRecord::Base
   
   
   define_index do
-    indexes street_address, :as => :street_address
-    indexes places.name, :as => :place_names
-    indexes places.tags.name, :as => :place_tags
+    indexes places.name, :as => :name
+    indexes street_address, :as => :address
+    indexes places.tags.name, :as => :tags
     has places.tags(:id), :as => :tag_ids, :facet => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true

@@ -95,17 +95,92 @@ class Search
     Search.new(:locality_tags => locality_tags, :locality_hash => locality_hash, :query => query)
   end
   
-  # normalize the specified token
+  # normalize the string
   def self.normalize(s)
-    # remove quotes
-    s.gsub(/\'/, '')
+    # remove quotes, dashes
+    s.gsub(/['-]/, '').strip
   end
   
-  def self.with(*args)
+  # build sphinx attributes
+  def self.attributes(*args)
     hash = Hash.new
     Array(args).compact.each do |locality|
       hash[class_to_attribute_symbol(locality.class)] = locality.id
     end
+    hash
+  end
+  
+  def self.query(s)
+    hash        = Hash[:query_raw => s]
+    fields      = Hash.new
+    attributes  = Hash.new
+    
+    # valid fields and attributes
+    all_fields      = [:address, :name, :tags]
+    all_attributes  = [:events, :popularity]
+    
+    while true
+      if matches = s.match(/([a-z]+):([0-9a-z]+)/)
+        key   = matches[1].to_sym
+        value = matches[2]
+      
+        # removed matched string
+        s = s.gsub(/([a-z]+):([0-9a-z]+)/, '').strip
+      elsif matches = s.match(/([a-z]+):'([0-9a-z ]+)'/)
+        key   = matches[1].to_sym
+        value = matches[2]
+
+        # removed matched string
+        s = s.gsub(/([a-z]+):'([0-9a-z ]+)'/, '').strip
+      else
+        # no (more matches)
+        break
+      end
+    
+      if all_attributes.include?(key)
+        case key
+        when :events, :popularity
+          # value should be an int or a range
+          if value.to_i > 0
+            value = value.to_i..2**30
+          else
+            value = 0
+          end
+          attributes[key] = value
+        else
+          attributes[key] = value
+        end
+      elsif all_fields.include?(key)
+        # fields are usually strings
+        fields[key] = value.to_s
+      end
+      
+      # case field
+      # when :events, :popularity
+      #   # value should be an int or a range
+      #   if value.to_i > 0
+      #     value = value.to_i..2**30
+      #   else
+      #     value = 0
+      #   end
+      #   with[field] = value
+      # when :name, :tags
+      #   conditions[field] = value
+      # else
+      #   # default to condition
+      #   conditions[field] = value
+      # end
+    end
+    
+    # add query, both as default with implicity 'and' operator and explicit 'or' operator
+    tokenized           = normalize(s).strip.split#.map{ |s| s = normalize(s) }.compact
+    hash[:query_and]    = tokenized.join(" ")
+    hash[:query_or]     = tokenized.join(" | ")
+    
+    # add fields and attribuutes
+    hash[:attributes]   = attributes unless attributes.empty?
+    hash[:fields]       = fields unless fields.blank?
+    
     hash
   end
   

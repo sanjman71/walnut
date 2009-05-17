@@ -28,11 +28,11 @@ class SearchController < ApplicationController
       @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud from location and event objects
         tag_limit = 150
-        facets    = Location.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Location.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         tags      = Search.load_from_facets(facets, Tag)#.sort_by { |o| o.name }
 
         tag_limit = 30
-        facets    = Event.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Event.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         tags      += Search.load_from_facets(facets, Tag)
 
         # return sorted tags collection
@@ -44,14 +44,14 @@ class SearchController < ApplicationController
       @events_count, @popular_events = Rails.cache.fetch("#{@city.name.parameterize}:popular_events", :expires_in => CacheExpire.events) do
         # find city events count and popular events
         event_limit     = 10
-        facets          = Event.facets(:with => Search.with(@city), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
+        facets          = Event.facets(:with => Search.attributes(@city), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
         events_count    = facets[:city_id][@city.id].to_i
         popular_events  = []
         
         [events_count, popular_events]
         # if events_count > 0
         #   # find most popular city events
-        #   popular_events = Event.search(:with => Search.with(@city).update(:popularity => 1..100), :limit => 5)
+        #   popular_events = Event.search(:with => Search.attributes(@city).update(:popularity => 1..100), :limit => 5)
         # end
       end
     end
@@ -67,7 +67,7 @@ class SearchController < ApplicationController
       @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud
         tag_limit = 150
-        facets    = Location.facets(:with => Search.with(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Location.facets(:with => Search.attributes(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
       end
     end
@@ -75,7 +75,7 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking #{@neighborhood.name} popular events") do
       # find events count and popular events
       event_limit   = 10
-      @facets       = Event.facets(:with => Search.with(@neighborhood), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
+      @facets       = Event.facets(:with => Search.attributes(@neighborhood), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
       @events_count = @facets[:city_id][@city.id].to_i
     end
     
@@ -90,7 +90,7 @@ class SearchController < ApplicationController
       @popular_tags = Rails.cache.fetch("#{@zip.name}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud
         tag_limit = 150
-        facets    = Location.facets(:with => Search.with(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Location.facets(:with => Search.attributes(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
       end
     end
@@ -104,16 +104,19 @@ class SearchController < ApplicationController
     
     @search_klass   = params[:klass]
     @tag            = params[:tag].to_s.from_url_param
-    @what           = params[:what].to_s.from_url_param
-    
+    @what           = params[:what] ? session[:what] : ""
+
     # handle special case of 'something' to find a random what
     @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'something'
 
-    @raw_query      = @tag.blank? ? @what : @tag
-    @search         = Search.parse([@country, @state, @city, @neighborhood, @zip], @raw_query)
-    @query          = @search.query
-    @with           = @search.field(:locality_hash)
-    
+    @hash           = Search.query(!@tag.blank? ? @tag : @what)
+    @raw_query      = @hash[:query_raw]
+    @query          = @hash[:query_or]
+    @and_query      = @hash[:query_and]
+    @fields         = @hash[:fields]
+    @attributes     = @hash[:with] || Hash.new
+    @attributes     = Search.attributes(@country, @state, @city, @neighborhood, @zip).update(@attributes)
+
     case @search_klass
     when 'search'
       @klasses = [Event, Location]
@@ -124,7 +127,8 @@ class SearchController < ApplicationController
     end
 
     self.class.benchmark("Benchmarking query '#{@query}'") do
-      @objects = ThinkingSphinx::Search.search(@query, :classes => @klasses, :with => @with, :page => params[:page], :per_page => 5,
+      @objects = ThinkingSphinx::Search.search(@query, :classes => @klasses, :with => @attributes, :conditions => @fields,
+                                               :match_mode => :extended, :page => params[:page], :per_page => 5,
                                                :order => :popularity, :sort_mode => :desc)
     end
 
@@ -138,7 +142,7 @@ class SearchController < ApplicationController
       # find related tags by class
       related_size    = 11
       @related_tags   = @klasses.inject([]) do |array, klass|
-        facets  = klass.facets(@query, :with => @with, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
+        facets  = klass.facets(@and_query, :with => @attributes, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
         array  += Search.load_from_facets(facets, Tag).collect(&:name).sort - [@raw_query]
       end
     end
@@ -149,12 +153,12 @@ class SearchController < ApplicationController
         @cities = Array(@neighborhood.city)
         # build zip facets
         limit   = 10
-        @facets = Location.facets(@query, :with => @with, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
+        @facets = Location.facets(@and_query, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
         @zips   = Search.load_from_facets(@facets, Zip)
       elsif @city
         # build zip and neighborhood facets
         limit           = 10
-        @facets         = Location.facets(@query, :with => @with, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
+        @facets         = Location.facets(@and_query, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
         @zips           = Search.load_from_facets(@facets, Zip)
         @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
 
@@ -165,7 +169,7 @@ class SearchController < ApplicationController
       elsif @zip
         # build city facets
         limit   = 5
-        @facets = Location.facets(@query, :with => @with, :facets => ["city_id"], :limit => limit, :max_matches => limit)
+        @facets = Location.facets(@and_query, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
         @cities = Search.load_from_facets(@facets, City)
       end
     end
@@ -177,7 +181,7 @@ class SearchController < ApplicationController
     @h1             = @title
 
     # enable/disable robots
-    if @search_klass == 'search' and params[:page].to_i == 0
+    if @search_klass == 'search' and params[:page].to_i == 0 and !@tag.blank?
       @robots = true
     else
       @robots = false
@@ -193,7 +197,10 @@ class SearchController < ApplicationController
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
     # normalize what parameter
-    @what     = Search.normalize(params[:what].to_s).parameterize
+    @what     = 'what' #Search.normalize(params[:what].to_s).parameterize
+    
+    # cache what as part of session
+    session[:what] = params[:what].to_s
     
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return

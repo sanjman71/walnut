@@ -47,29 +47,29 @@ namespace :events do
     puts "#{Time.now}: completed"
   end
 
-  desc "Import CITY event venues from eventful"
-  task :import_venues do
-    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 10
-    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
-    
-    if city.blank?
-      puts "usage: missing or invalid CITY"
-      exit
-    end
-    
-    page      = 1
-    per_page  = 10
-    imported  = 0
-    
-    puts "#{Time.now}: importing #{limit} #{city.name} eventful venues"
-
-    while imported < limit
-      imported += EventVenue.import(city, :page => page, :per_page => per_page, :log => true)
-      page     += 1
-    end
-    
-    puts "#{Time.now}: imported #{imported} #{city.name} eventful venues"
-  end
+  # desc "Import CITY event venues from eventful"
+  # task :import_venues do
+  #   limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 10
+  #   city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s) : nil
+  #   
+  #   if city.blank?
+  #     puts "usage: missing or invalid CITY"
+  #     exit
+  #   end
+  #   
+  #   page      = 1
+  #   per_page  = 10
+  #   imported  = 0
+  #   
+  #   puts "#{Time.now}: importing #{limit} #{city.name} eventful venues"
+  # 
+  #   while imported < limit
+  #     imported += EventVenue.import(city, :page => page, :per_page => per_page, :log => true)
+  #     page     += 1
+  #   end
+  #   
+  #   puts "#{Time.now}: imported #{imported} #{city.name} eventful venues"
+  # end
   
   # desc "Import event venue metadata, e.g. search name, address name ..."
   # task :import_venue_metadata do
@@ -88,13 +88,14 @@ namespace :events do
       exit
     end
 
-    puts "#{Time.now}: importing #{city.name} events for mapped venues, limit #{limit}"
+    puts "#{Time.now}: importing #{city.name} events, limit #{limit}"
 
     page        = 1
     per_page    = 50
     imported    = 0
     checked     = 0
     missing     = 0
+    errors      = 0
     istart      = Event.count
     
     while imported < limit
@@ -112,14 +113,20 @@ namespace :events do
         
         if venue.blank? and city_name == city.name
           # missing venue in the requested city, add it
-          puts "#{Time.now}: adding venue: #{event_hash['venue_name']}"
+          puts "#{Time.now}: adding venue: #{event_hash['venue_name']}:#{event_hash['venue_id']}"
           
-          # get venue info
-          venue_hash = EventVenue.get(event_hash['venue_id'])
-          # add venue
-          venue = EventVenue.import_venue(venue_hash, :log => true)
-          # apply metadata
-          EventVenue.import_metadata(city.name)
+          begin
+            # get venue info
+            venue_hash = EventVenue.get(event_hash['venue_id'])
+            # add venue
+            venue = EventVenue.import_venue(venue_hash, :log => true)
+            # apply metadata
+            EventVenue.import_metadata(city.name)
+          rescue Exception => e
+            puts "#{Time.now}: xxx venue get exception, skipping: #{e.message}"
+            errors += 1
+            next
+          end
         end
         
         if venue.blank?
@@ -132,11 +139,12 @@ namespace :events do
         if !venue.mapped?
           # map the venue to a location if we need to
           venue.map_to_location(:log => true)
-          
-          if !venue.mapped?
-            # if its still not mapped, add the venue as a new place and location
-            venue.add_place(:log => true)
-          end
+
+          # skip adding venues as locations for now
+          # if !venue.mapped?
+          #   # if its still not mapped, add the venue as a new place and location
+          #   venue.add_place(:log => true)
+          # end
         end
         
         if !venue.mapped?

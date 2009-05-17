@@ -26,6 +26,7 @@ class CreateEvents < ActiveRecord::Migration
       t.string      :source_type,     :limit => 20, :null => false
       t.string      :source_id,       :limit => 50, :null => false
       t.integer     :events_count,    :default => 0
+      t.integer     :confidence,      :default => 0
       t.references  :location
       t.integer     :location_source_id
       t.string      :location_source_type

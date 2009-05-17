@@ -117,7 +117,7 @@ class ApplicationController < ActionController::Base
         self.class.benchmark("Benchmarking #{@state.name} cities with events") do
           # find city events
           city_limit  = 10
-          @facets     = Event.facets(:with => Search.with(@state), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
+          @facets     = Event.facets(:with => Search.attributes(@state), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
           @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
         end
       when 'search'
@@ -138,7 +138,7 @@ class ApplicationController < ActionController::Base
       self.class.benchmark("Benchmarking #{@city.name} zips using facets") do
         @zips = Rails.cache.fetch("#{@city.name.parameterize}:zips", :expires_in => CacheExpire.localities) do
           zip_limit = 200
-          facets    = Location.facets(:with => Search.with(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
+          facets    = Location.facets(:with => Search.attributes(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
           Search.load_from_facets(facets, Zip)
         end
       end
@@ -172,7 +172,7 @@ class ApplicationController < ActionController::Base
       self.class.benchmark("Benchmarking #{@zip.name} cities using facets") do
         @cities = Rails.cache.fetch("#{@zip.name}:cities", :expires_in => CacheExpire.localities) do
           city_limit  = 20
-          facets      = Location.facets(:with => Search.with(@zip), :facets => ["city_id"], :limit => city_limit, :max_matches => city_limit)
+          facets      = Location.facets(:with => Search.attributes(@zip), :facets => ["city_id"], :limit => city_limit, :max_matches => city_limit)
           Search.load_from_facets(facets, City)
         end
       end
@@ -214,10 +214,9 @@ class ApplicationController < ActionController::Base
   def build_search_title(options={})
     tag       = options[:tag] || ''
     what      = options[:what] || ''
-    category  = options[:category] || ''
     filter    = options[:filter] || ''
 
-    raise ArgumentError if tag.blank? and what.blank? and category.blank? and filter.blank?
+    raise ArgumentError if tag.blank? and what.blank? and filter.blank?
     
     if options[:state] and options[:city] and options[:neighborhood]
       where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
@@ -229,13 +228,11 @@ class ApplicationController < ActionController::Base
       raise Exception, "invalid search"
     end
 
-    # use 'tag', 'what', then 'category'
+    # use 'tag', then 'what', then 'filter'
     if !tag.blank?
       subject = tag
     elsif !what.blank?
       subject = what
-    elsif !category.blank?
-      subject = category
     elsif !filter.blank?
       subject = filter
     end

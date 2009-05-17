@@ -6,6 +6,8 @@
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'chains', :country => @country, :state => @state, :object => @chain})
   
+%hr.space
+
 %h4.prepend-1.span-14#cities
   - @cities.each_with_index do |city, i|
     - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]

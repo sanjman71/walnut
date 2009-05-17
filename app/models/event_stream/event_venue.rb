@@ -59,9 +59,9 @@ class EventVenue < ActiveRecord::Base
       return 0
     end
     
-    # create search object to build query
-    search      = ::Search.parse([], self.name)
-    name        = search.query
+    # build search query
+    hash        = ::Search.query(self.name)
+    name        = hash[:query_or]
     
     # break street address into components and normalize
     components  = StreetAddress.components(self.address)
@@ -69,43 +69,84 @@ class EventVenue < ActiveRecord::Base
     
     # check if there a source id and type
     if self.location_source_id and self.location_source_type
-      # find the location
+      # find the location using the source
       matches = Location.find(:all, :conditions => {:source_id => self.location_source_id, :source_type => self.location_source_type})
     else
       # search with constraints
-      matches = Location.search(name, :conditions => {:city_id => city.id, :street_address => address})
+      matches = Location.search(name, :with => ::Search.attributes(city), :conditions => {:address => address})
     end
     
     if matches.blank?
       # no matches
       if log
-        puts "#{Time.now}: xxx no search matches for venue '#{name}', address #{address}"
+        puts "#{Time.now}: xxx no search matches for venue '#{name}', address #{address} ... trying again with just the address"
+      end
+
+      # try again with just the address
+      matches = Location.search(:with => ::Search.attributes(city), :conditions => {:address => address})
+      
+      # this search failed as well, give up
+      if log
+        puts "#{Time.now}: xxx retry, found #{matches.size} matches for address #{address}"
       end
       
+      # confidence level depends on how many matches we found
+      case matches.size
+      when 0
+        self.update_attribute(:confidence, 0)
+      when 1
+        # address matches, but name did not
+        self.update_attribute(:confidence, 9)
+      when 2..5
+        self.update_attribute(:confidence, 7)
+      when 6..10
+        self.update_attribute(:confidence, 4)
+      else
+        self.update_attribute(:confidence, 0)
+      end
+
       return 0
     elsif matches.size > 1
 
-      if search.blank?
-        # too many matches
-        if log
-          puts "#{Time.now}: xxx found #{matches.size} matches for venue '#{name}', address #{address}"
-        end
-        
-        return 0
-      end
+      too_many = matches.size
+      
+      # if search.blank?
+      #   # too many matches
+      #   if log
+      #     puts "#{Time.now}: xxx found #{matches.size} matches for venue '#{name}', address #{address}"
+      #   end
+      #   
+      #   return 0
+      # end
 
       # try again with a more restrictive search
       if log
-        puts "#{Time.now}: found #{matches.size} matches for venue #{name}, address #{address} ... trying again"
+        puts "#{Time.now}: xxx found #{matches.size} matches for venue #{name}, address #{address} ... trying again"
       end
       
-      name    = search.query(:operator => :and)
-      matches = Location.search(name, :conditions => {:city_id => city.id, :street_address => address})
+      name    = hash[:query_and]
+      matches = Location.search(name, :with => ::Search.attributes(city), :conditions => {:address => address})
       
       if matches.size != 1
-        # this search faield as well, its time to give up and just add the venue as a place
+        # this search failed as well, give up
         if log
           puts "#{Time.now}: xxx retry, found #{matches.size} matches for venue #{name}, address #{address}"
+        end
+        
+        too_few = matches.size
+        
+        # confidence level depends on how many matches we found
+        case matches.size
+        when 0
+          self.update_attribute(:confidence, 6)
+        when 2
+          # 2 matches, 1 is probably the right one
+          self.update_attribute(:confidence, 8)
+        when 3..4
+          self.update_attribute(:confidence, 4)
+        else
+          # 5 or above, probably not a match
+          self.update_attribute(:confidence, 1)
         end
         
         return 0
@@ -113,7 +154,8 @@ class EventVenue < ActiveRecord::Base
     end
         
     # found a matching location, mark location as an event venue
-    self.location = matches.first
+    self.location   = matches.first
+    self.confidence = 10
     self.save
 
     if log

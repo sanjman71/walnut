@@ -8,7 +8,7 @@ class EventsController < ApplicationController
     self.class.benchmark("Benchmarking #{@country.name} cities with events") do
       # find city events
       city_limit  = 10
-      @facets     = Event.facets(:with => Search.with(@country), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
+      @facets     = Event.facets(:with => Search.attributes(@country), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
       @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
     end
     
@@ -29,7 +29,7 @@ class EventsController < ApplicationController
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
       # build city tag cloud
       tag_limit     = 150
-      @facets       = Event.facets(:with => Search.with(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+      @facets       = Event.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
       @popular_tags = Search.load_from_facets(@facets, Tag).sort_by { |o| o.name }
     end
 

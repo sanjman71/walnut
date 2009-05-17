@@ -14,6 +14,7 @@ class Event < ActiveRecord::Base
   delegate                  :city, :to => '(location or return nil)'
   delegate                  :zip, :to => '(location or return nil)'
   delegate                  :neighborhoods, :to => '(location or return nil)'
+  delegate                  :street_address, :to => '(location or return nil)'
   delegate                  :lat, :to => '(location or return nil)'
   delegate                  :lng, :to => '(location or return nil)'
 
@@ -21,8 +22,10 @@ class Event < ActiveRecord::Base
 
   define_index do
     indexes name, :as => :name
+    indexes location.street_address, :as => :address
     has start_at, :as => :start_at
     has popularity, :type => :integer, :as => :popularity
+    has location_id, :type => :integer, :as => :events, :facet => true
     # locality attributes, all faceted
     has location.country_id, :type => :integer, :as => :country_id, :facet => true
     has location.state_id, :type => :integer, :as => :state_id, :facet => true

@@ -17,19 +17,20 @@ class LocationsController < ApplicationController
     @neighborhoods    = @location.neighborhoods
     
     # find nearby locations, within the same city, exclude this location, and sort by distance
-    @search           = Search.parse([@country, @state, @city])
+    @hash             = Search.query("events:1")
+    @attributes       = Search.attributes(@country, @state, @city)
     @nearby_limit     = 7
     
     if @location.mappable?
       @nearby_locations = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
-                                          :conditions => @search.field(:locality_hash),
+                                          :with => @attributes,
                                           :without_ids => @location.id,
                                           :order => "@geodist ASC", 
                                           :limit => @nearby_limit,
                                           :include => [:places])
 
       @nearby_event_venues = Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
-                                             :conditions => @search.field(:locality_hash).update(:event_venue => 1..10),
+                                             :with => @attributes.update(@hash[:attributes]),
                                              :without_ids => @location.id,
                                              :order => "@geodist ASC", 
                                              :limit => @nearby_limit,
