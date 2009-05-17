@@ -1,99 +1,6 @@
 class Search
-  attr_reader :locality_tags, :locality_hash
   
-  @@anything_search = ["anything"]
-  
-  def initialize(options={})
-    @locality_tags  = options[:locality_tags] || []
-    @locality_hash  = options[:locality_hash] || Hash.new
-    @query          = options[:query] || []
-    
-    # handle special anything search
-    @query          = [] if @query == @@anything_search
-  end
-
-  # build query as an 'or' of each tag
-  # options:
-  #  - :operator => 'or', 'and', defaults to 'or'
-  def query(options={})
-    operator = options[:operator] ? options[:operator].to_s : 'or'
-    
-    case operator
-    when 'or'
-      @query.join(" | ")
-    when 'and'
-      @query.join(" ")
-    end
-  end
-  
-  def field(field)
-    case field
-    when :locality_tags, "locality_tags"
-      @locality_tags.join(" ")
-    when :locality_hash, "locality_hash"
-      @locality_hash
-    else
-      raise ArgumentError, "invalid field"
-    end
-  end
-  
-  def multiple_fields(*args)
-    # sort fields
-    fields      = Array(args).sort_by{|field| field.to_s}
-    # build field set
-    field_set   = "@(" + fields.join(",") + ")"
-    # build field value from the individual fields
-    field_value = fields.inject('') do |s, field_name|
-      begin
-        s += field(field_name)
-      rescue
-        # invalid field, skip it
-      end
-      s
-    end
-    
-    if field_value.blank?
-      # empty query
-      ""
-    else
-      # build the final query from the field set and field value
-      [field_set, field_value.strip].compact.join(" ").strip
-    end
-  end
-  
-  # parse search where and what values
-  def self.parse(where_collection, what=nil)
-    neighborhoods, others = Array(where_collection).compact.partition { |o| o.is_a?(Neighborhood) }
-
-    locality_tags = (others + neighborhoods).inject([]) do |array, locality|
-      array.push(locality.name) if locality
-      array
-    end
-    
-    # build locality hash from cities, states, zips countries
-    locality_hash = others.inject(Hash.new) do |hash, locality|
-      if locality
-        # locality key looks like 'city_id', 'zip_id', 'state_id', 'country_id'
-        key       = locality.class.to_s.foreign_key
-        hash[key] = locality.id
-      end
-      hash
-    end
-    
-    # add neighborhoods
-    locality_hash = neighborhoods.inject(locality_hash) do |hash, neighborhood|
-      if neighborhood
-        key       = neighborhood.class.to_s.foreign_key + "s"
-        hash[key] = neighborhood.id
-      end
-      hash
-    end
-    
-    # split what into tokens, and normalize token
-    query = what.to_s.split.map { |s| s = normalize(s) }
-    
-    Search.new(:locality_tags => locality_tags, :locality_hash => locality_hash, :query => query)
-  end
+  @@anything_search = "anything"
   
   # normalize the string
   def self.normalize(s)
@@ -154,23 +61,10 @@ class Search
         # fields are usually strings
         fields[key] = value.to_s
       end
-      
-      # case field
-      # when :events, :popularity
-      #   # value should be an int or a range
-      #   if value.to_i > 0
-      #     value = value.to_i..2**30
-      #   else
-      #     value = 0
-      #   end
-      #   with[field] = value
-      # when :name, :tags
-      #   conditions[field] = value
-      # else
-      #   # default to condition
-      #   conditions[field] = value
-      # end
     end
+    
+    # check for special anything search
+    s = s.gsub(@@anything_search, '')
     
     # add query, both as default with implicity 'and' operator and explicit 'or' operator
     tokenized           = normalize(s).strip.split#.map{ |s| s = normalize(s) }.compact
