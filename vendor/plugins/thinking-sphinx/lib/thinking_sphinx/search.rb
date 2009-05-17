@@ -386,7 +386,8 @@ module ThinkingSphinx
           options[:class], options[:conditions] || {}
         )
         client.filters   += filters
-        client.match_mode = :extended unless extra_query.empty?
+        # SK: don't change match_mode if it was specified in options
+        client.match_mode = :extended unless extra_query.empty? or options.has_key?(:match_mode)
         query             = [query, extra_query].join(' ')
         query.strip!  # Because "" and " " are not equivalent
                 
