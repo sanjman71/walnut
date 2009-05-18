@@ -9,6 +9,10 @@ class CacheExpire
   def self.tags
     5.minutes
   end
+
+  def self.locations
+    5.minutes
+  end
   
   def self.events
     5.minutes
