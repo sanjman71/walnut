@@ -9,6 +9,8 @@
     - if has_privilege?('manage site')
       %span{:style => 'font-size: 0.4em; color: #777777;'}
         == #{@location.source_type}:#{@location.source_id}
+        == &nbsp;|&nbsp;
+        == Digest:#{@location.digest}
         - if @location.event_venue
           == &nbsp;|&nbsp;
           == Venue
@@ -47,7 +49,7 @@
         == &nbsp;
       - else
         - tags.each do |tag|
-          %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :what => tag.name.parameterize)
+          %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.parameterize)
       
     .span-9.last#locality_tags
       %h2== Geography Tags
