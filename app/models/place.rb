@@ -3,7 +3,7 @@ class Place < ActiveRecord::Base
   belongs_to                :chain, :counter_cache => true
   
   has_many                  :location_places
-  has_many                  :locations, :through => :location_places, :after_remove => :after_remove_location
+  has_many                  :locations, :through => :location_places, :after_add => :after_add_location, :after_remove => :after_remove_location
 
   # TODO: find out why the counter cache field doesn't work without the before and after filters
   has_many                  :phone_numbers, :as => :callable, :after_add => :after_add_phone_number, :before_remove => :before_remove_phone_number
@@ -31,9 +31,23 @@ class Place < ActiveRecord::Base
     end
   end
   
+  def after_add_location(location)
+    return if location.blank?
+
+    # update location digest
+    location.digest = location.to_digest
+    location.save
+
+    # Note: incrementing the counter cache is done using built-in activerecord callback
+  end
+  
   def after_remove_location(location)
     return if location.blank?
-    
+
+    # update location digest
+    location.digest = location.to_digest
+    location.save
+
     # decrement locations_count counter cache
     # TODO: find out why the built-in counter cache doesn't work here
     Place.decrement_counter(:locations_count, id)

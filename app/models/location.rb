@@ -10,9 +10,10 @@ class Location < ActiveRecord::Base
   has_many                :places, :through => :location_places
   has_one                 :event_venue
   has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
-  
+
+  before_save             :before_save_callback
   after_save              :after_save_callback
-  
+
   # make sure only accessible attributes are written to from forms etc.
 	attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type
   
@@ -87,15 +88,37 @@ class Location < ActiveRecord::Base
     self.save
   end
   
+  # return md5 location digest
+  def to_digest
+    s = "#{self.place_name}:#{self.street_address}:#{self.city ? self.city.name : ''}:#{self.state ? self.state.name : ''}:#{self.zip ? self.zip.name : ''}:#{self.country ? self.country.name : ''}"
+    Digest::MD5.hexdigest(s)
+  end
+
   protected
   
+  # before_save callback to:
+  #  - update digest
+  def before_save_callback
+    changed_set = ["country_id", "state_id", "city_id", "zip_id", "name"]
+
+    self.changes.keys.each do |change|
+      # filter out unless its a locality or name
+      next unless changed_set.include?(change.to_s)
+      # update digest
+      self.digest = self.to_digest
+    end
+  end
+
   # after_save callback to:
   #  - increment/decrement locality counter caches
-  #  - update locality tags (e.g. country, state, city, zip) based on changes to the location object
+  #  x (deprecated) update locality tags (e.g. country, state, city, zip) based on changes to the location object
   def after_save_callback
+    changed_set = ["country_id", "state_id", "city_id", "zip_id"]
+    
     self.changes.keys.each do |change|
-      # filter out unless its an area
-      next unless ["country_id", "state_id", "city_id", "zip_id"].include?(change.to_s)
+      # filter out unless its a locality
+      next unless changed_set.include?(change.to_s)
+      
       begin
         # get class object
         klass_name  = change.split("_").first.titleize

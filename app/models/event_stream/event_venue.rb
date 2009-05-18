@@ -69,8 +69,20 @@ class EventVenue < ActiveRecord::Base
     
     # check if there a source id and type
     if self.location_source_id and self.location_source_type
-      # find the location using the source
-      matches = Location.find(:all, :conditions => {:source_id => self.location_source_id, :source_type => self.location_source_type})
+      # check the source type
+      if match = self.location_source_type.match(/Digest:(\w+)/)
+        # find the location using the digest
+        matches = Location.find_all_by_digest(match[1])
+      elsif match = self.location_source_type.match(/Localeze/)
+        # find the location using the source id and type
+        matches = Location.find(:all, :conditions => {:source_id => self.location_source_id, :source_type => self.location_source_type})
+      else
+        # invalid type
+        if log
+          puts "#{Time.now}: xxx invalid source type #{self.location_source_type}"
+        end
+        matches = []
+      end
     else
       # search with constraints
       matches = Location.search(name, :with => ::Search.attributes(city), :conditions => {:address => address})

@@ -19,13 +19,19 @@ class LocationTest < ActiveSupport::TestCase
   context "location with country" do
     setup do
       @location = Location.create(:name => "Home", :country => @us)
+      @location.reload
       @us.reload
+      @digest = @location.digest
     end
     
     should_change "Location.count", :by => 1
     
     should "have us as locality" do
       assert_equal [@us], @location.localities
+    end
+    
+    should "have a valid digest" do
+      assert_not_equal "", @digest
     end
     
     # should "have united states locality tag" do
@@ -40,13 +46,19 @@ class LocationTest < ActiveSupport::TestCase
       setup do
         @location.country = nil
         @location.save
+        @location.reload
         @us.reload
+        @digest2 = @location.digest
       end
 
       should "have us no localities" do
         assert_equal [], @location.localities
       end
 
+      should "have a changed digest" do
+        assert_not_equal @digest, @digest2
+      end
+      
       # should "have no locality tags" do
       #   assert_equal [], @location.locality_tag_list
       # end
@@ -60,13 +72,19 @@ class LocationTest < ActiveSupport::TestCase
       setup do
         @location.country = @ca
         @location.save
+        @location.reload
         @us.reload
         @ca.reload
+        @digest2 = @location.digest
       end
 
       # should "have ca country area tag" do
       #   assert_equal ["Canada"], @location.locality_tag_list
       # end
+
+      should "have a changed digest" do
+        assert_not_equal @digest, @digest2
+      end
 
       should "decrement us locations_count" do
         assert_equal 0, @us.locations_count
@@ -82,9 +100,15 @@ class LocationTest < ActiveSupport::TestCase
     setup do
       @location = Location.create(:name => "Home", :state => @il)
       @il.reload
+      @location.reload
+      @digest = @location.digest
     end
     
     should_change "Location.count", :by => 1
+
+    should "have a valid digest" do
+      assert_not_equal "", @digest
+    end
 
     # should "have illinois locality tag" do
     #   assert_equal ["Illinois"], @location.locality_tag_list
@@ -99,6 +123,12 @@ class LocationTest < ActiveSupport::TestCase
         @location.state = nil
         @location.save
         @il.reload
+        @location.reload
+        @digest2 = @location.digest
+      end
+
+      should "have a changed digest" do
+        assert_not_equal @digest, @digest2
       end
 
       # should "have no illinois locality tag" do
@@ -114,12 +144,19 @@ class LocationTest < ActiveSupport::TestCase
   context "location with a place and city" do
     setup do
       @location = Location.create(:name => "Home", :city => @chicago)
+      @location.reload
+      @digest = @location.digest
+      assert_not_equal "", @digest
       @place.locations.push(@location)
+      @place.reload
       @location.reload
       @chicago.reload
+      @digest1 = @location.digest
+      assert_not_equal @digest, @digest1
     end
     
     should_change "Location.count", :by => 1
+    should_change "LocationPlace.count", :by => 1
 
     # should "have chicago locality tag" do
     #   assert_equal ["Chicago"], @location.locality_tag_list
@@ -138,6 +175,8 @@ class LocationTest < ActiveSupport::TestCase
         @location.city = nil
         @location.save
         @chicago.reload
+        @location.reload
+        @digest2 = @location.digest
       end
 
       should "decrement chicago locations_count" do
@@ -147,6 +186,10 @@ class LocationTest < ActiveSupport::TestCase
       should "set chicago locations to []" do
         assert_equal [], @chicago.locations
       end
+
+      should "have a changed digest" do
+        assert_not_equal @digest1, @digest2
+      end
     end
     
     context "change city" do
@@ -155,6 +198,8 @@ class LocationTest < ActiveSupport::TestCase
         @location.city = @springfield
         @location.save
         @chicago.reload
+        @location.reload
+        @digest2 = @location.digest
       end
 
       # should "have springfield locality tag" do
@@ -168,16 +213,32 @@ class LocationTest < ActiveSupport::TestCase
       should "set springfield locations to [@location]" do
         assert_equal [@location], @springfield.locations
       end
+
+      should "have a changed digest" do
+        assert_not_equal @digest1, @digest2
+      end
     end
     
     context "remove place" do
       setup do
         @place.locations.delete(@location)
         @location.reload
+        @digest2 = @location.digest
       end
 
+      should_change "LocationPlace.count", :by => -1
+      
       should "leave chicago locations as [@location]" do
         assert_equal [@location], @chicago.locations
+      end
+
+      should "have no places associated with location" do
+        assert_equal [], @location.places
+      end
+      
+      should "have digest changed back to original digest" do
+        assert_not_equal @digest1, @digest2
+        assert_equal @digest, @digest2
       end
     end
   end
@@ -188,9 +249,11 @@ class LocationTest < ActiveSupport::TestCase
       @place.locations.push(@location)
       @location.reload
       @zip.reload
+      @digest = @location.digest
     end
     
     should_change "Location.count", :by => 1
+    should_change "LocationPlace.count", :by => 1
 
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
@@ -200,11 +263,17 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal [@location], @zip.locations
     end
     
+    should "have a valid digest" do
+      assert_not_equal "", @digest
+    end
+    
     context "remove zip" do
       setup do
         @location.zip = nil
         @location.save
         @zip.reload
+        @location.reload
+        @digest2 = @location.digest
       end
 
       # should "have no locality tags" do
@@ -218,6 +287,10 @@ class LocationTest < ActiveSupport::TestCase
       should "remove zip locations" do
         assert_equal [], @zip.locations
       end
+
+      should "have a changed digest" do
+        assert_not_equal @digest, @digest2
+      end
     end
     
     context "change zip" do
@@ -226,6 +299,8 @@ class LocationTest < ActiveSupport::TestCase
         @location.zip = @zip2
         @location.save
         @zip2.reload
+        @location.reload
+        @digest2 = @location.digest
       end
 
       # should "have 60610 locality tag" do
@@ -238,6 +313,10 @@ class LocationTest < ActiveSupport::TestCase
       
       should "set 60610 locations to [@location]" do
         assert_equal [@location], @zip2.locations
+      end
+
+      should "have a changed digest" do
+        assert_not_equal @digest, @digest2
       end
     end
   end
@@ -252,6 +331,7 @@ class LocationTest < ActiveSupport::TestCase
     end
     
     should_change "Location.count", :by => 1
+    should_change "LocationPlace.count", :by => 1
   
     should "have neighborhood locality" do
       assert_equal [@river_north], @location.localities

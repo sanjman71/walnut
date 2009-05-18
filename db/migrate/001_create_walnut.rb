@@ -81,6 +81,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :neighborhoods_count,   :default => 0 # counter cache
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
+      t.string      :digest,                :limit => 50, :default => ""
       t.references  :source,                :polymorphic => true, :default => nil
       t.integer     :popularity,            :default => 0 # used to order search results
       t.integer     :recommendations_count, :default => 0
@@ -92,9 +93,11 @@ class CreateWalnut < ActiveRecord::Migration
     end
             
     add_index :locations, [:source_id, :source_type], :name => "index_locations_on_source"
-    add_index :locations, [:popularity]
-    add_index :locations, [:recommendations_count]
-    add_index :locations, [:city_id], :name => "index_locations_on_city"
+    add_index :locations, :city_id, :name => "index_locations_on_city"
+    add_index :locations, :popularity
+    add_index :locations, :recommendations_count
+    add_index :locations, :events_count
+    add_index :locations, :digest
     
     create_table :phone_numbers do |t|
       t.string      :name,      :limit => 20
