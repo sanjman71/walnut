@@ -41,6 +41,10 @@ module ApplicationHelper
     end
   end
   
+  def current_search_query
+    @raw_query ? @raw_query : "" 
+  end
+  
   # build search route based on the klass parameter
   # note: searching can only be done by city, zip or neighborhood
   def build_search_route(klass, where, options={})

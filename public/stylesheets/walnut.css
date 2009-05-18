@@ -77,7 +77,7 @@ div.mat.shaded                                    { background: #E5ECF9 none rep
 /* form styles */
 
 input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
-input.title.hint                                  { color: #BBBBBB; }
+input.title.hint                                  { color: #BBBBBB; border: none; }
 
 label.big                                         { font-size: 16px; }
 

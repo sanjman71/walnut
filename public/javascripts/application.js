@@ -11,31 +11,60 @@ Function.prototype.sleep = function (millisecond_delay) {
 // displays hint text on any input element with the 'title' attribute set
 $.fn.init_input_hints = function() {
   var el = $('input[title]');
-
+  
   // show the display text
   el.each(function(i) {
     if ($(this).attr('value') == '') {
       // add hint if the value is initially empty
       $(this).attr('value', $(this).attr('title'));
       $(this).addClass('hint');
+
+      // hide clear button
+      $clear = $(this).parent().next(".clear");
+      $clear.hide();
     }
   });
 
   // hook up the blur & focus
   el.focus(function() {
-    // clear field on focus if the current value is the hint
     if ($(this).attr('value') == $(this).attr('title'))
     {
+      // clear field on focus if the current value is the hint
       $(this).attr('value', '');
       $(this).removeClass('hint');
-    } 
+    }
+    // hide clear button
+    $clear = $(this).parent().next(".clear");
+    $clear.hide();
   }).blur(function() {
-    // add hint on blur if the field is empty
+    // check field value on blur
+    $clear = $(this).parent().next(".clear");
     if ($(this).attr('value') == '')
     {
+      // add hint if the field is empty
       $(this).attr('value', $(this).attr('title'));
       $(this).addClass('hint');
+      // hide clear button
+      $clear.hide();
+    } else {
+      // show clear button
+      $clear.show();
     }
+  });
+  
+  // hook up the clear buttons
+  $("span.clear").click(function() {
+    console.log("clear field");
+
+    // clear the input field
+    $field = $(this).prev(".text").find("input.title");
+    $field.attr('value', '');
+
+    // set the focus
+    $field.focus();
+
+    // hide the button
+    $(this).hide();
   });
 }
 
