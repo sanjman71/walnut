@@ -17,7 +17,8 @@ config.action_controller.perform_caching             = true
 config.action_mailer.raise_delivery_errors = false
 
 # Configure the rails cache
-config.cache_store = :file_store, "#{RAILS_ROOT}/tmp/cache"
+# config.cache_store = :file_store, "#{RAILS_ROOT}/tmp/cache"
+config.cache_store = :mem_cache_store
 
 # Google maps api key - http://www.walnut.dev
 GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBRKHyjCFHczuSNpLv6PJ7BM1sjczBSR9dLPitiritgQPAQhDKJM7I0E9g"
