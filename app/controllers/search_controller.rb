@@ -104,7 +104,7 @@ class SearchController < ApplicationController
     
     @search_klass   = params[:klass]
     @tag            = params[:tag].to_s.from_url_param
-    @what           = params[:what] ? session[:what] : 'anything'
+    @what           = params[:what] ? session[:what] : ''
 
     # handle special case of 'something' to find a random what
     @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'something'
