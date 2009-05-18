@@ -7,7 +7,10 @@
         == #{venue.address},
         = venue.city
         = venue.zip
-      %h5.popularity.bottom
+      %h5.attributes.bottom
+        == Confidence:
+        = venue.confidence
+        == &nbsp;|&nbsp;
         == Popularity:
         = venue.popularity
       %h5.mapping.bottom{:style => 'color: #555;'}

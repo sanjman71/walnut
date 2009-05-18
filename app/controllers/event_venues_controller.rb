@@ -19,11 +19,14 @@ class EventVenuesController < ApplicationController
   def city
     # @country, @state, @city all initialized in before filter
 
-    @venues = EventVenue.city(@city).order_popularity.paginate(:page => params[:page], :per_page => 20)
+    @filter   = params[:filter] ? params[:filter] : 'all'
+    @filters  = ['all', 'mapped', 'unmapped'] - Array(@filter)
+    
+    @venues   = EventVenue.city(@city).order_popularity.send(@filter).paginate(:page => params[:page], :per_page => 20)
     
     logger.debug("*** found #{@venues.size} venues")
 
-    @title  = "#{@city.name} Event Venues Directory"
+    @title  = "#{@city.name} Event Venues Directory - #{@filter.titleize} Venues"
     @h1     = @title
   end
   

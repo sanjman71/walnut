@@ -51,10 +51,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources   :tags
   
   # event venue routes
-  map.city_venues       '/venues/:country/:state/:city', :controller => 'event_venues', :action => 'city', :city => /[a-z-]+/ # city must be lowercase
-  map.country_venues    '/venues/:country', :controller => 'event_venues', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
-  map.add_venue         '/venues/:id/add', :controller => 'event_venues', :action => 'add'
-  map.resources   :event_venues, :only => [:create]
+  map.filtered_city_venues  '/venues/:country/:state/:city/:filter', :controller => 'event_venues', :action => 'city', :city => /[a-z-]+/,
+                            :filter => /all|mapped|unmapped/
+  map.city_venues           '/venues/:country/:state/:city', :controller => 'event_venues', :action => 'city', :city => /[a-z-]+/ 
+  map.country_venues        '/venues/:country', :controller => 'event_venues', :action => 'country', :country => /[a-z]{2}/ 
+  map.add_venue             '/venues/:id/add', :controller => 'event_venues', :action => 'add'
+  map.resources             :event_venues, :only => [:create]
   
   # zip routes
   map.connect     '/zips/error/:locality', :controller => 'zips', :action => 'error'
