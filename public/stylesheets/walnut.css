@@ -75,6 +75,8 @@ div.mat.shaded                                    { background: #E5ECF9 none rep
 
 /* form styles */
 
+input:focus                                       { outline: 0 none; }  /* needed to remove border/outline in safari */
+
 input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
 input.title.hint                                  { color: #BBBBBB; border: none; }
 

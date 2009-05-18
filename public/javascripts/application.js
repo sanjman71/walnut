@@ -33,9 +33,6 @@ $.fn.init_input_hints = function() {
       $(this).attr('value', '');
       $(this).removeClass('hint');
     }
-    // hide clear button
-    $clear = $(this).parent().next(".clear");
-    $clear.hide();
   }).blur(function() {
     // check field value on blur
     $clear = $(this).parent().next(".clear");
