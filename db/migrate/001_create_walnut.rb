@@ -87,6 +87,8 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :events_count,          :default => 0
       t.integer     :status,                :default => 0
       t.boolean     :delta  # used by sphinx for real-time indexing
+
+      t.timestamps
     end
             
     add_index :locations, [:source_id, :source_type], :name => "index_locations_on_source"
