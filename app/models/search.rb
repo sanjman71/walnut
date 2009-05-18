@@ -26,19 +26,23 @@ class Search
     all_fields      = [:address, :name, :tags]
     all_attributes  = [:events, :popularity]
     
+    # valid patterns
+    match_token     = "([a-zA-Z]+):([0-9a-zA-Z]+)"
+    match_quotes    = "([a-zA-Z]+):'([0-9a-zA-Z ]+)'"
+
     while true
-      if matches = s.match(/([a-z]+):([0-9a-z]+)/)
+      if matches = s.match(/#{match_token}/)
         key   = matches[1].to_sym
         value = matches[2]
       
         # removed matched string
-        s = s.gsub(/([a-z]+):([0-9a-z]+)/, '').strip
-      elsif matches = s.match(/([a-z]+):'([0-9a-z ]+)'/)
+        s = s.gsub(/#{match_token}/, '').strip
+      elsif matches = s.match(/#{match_quotes}/)
         key   = matches[1].to_sym
         value = matches[2]
 
         # removed matched string
-        s = s.gsub(/([a-z]+):'([0-9a-z ]+)'/, '').strip
+        s = s.gsub(/#{match_quotes}/, '').strip
       else
         # no (more matches)
         break

@@ -45,6 +45,16 @@ class SearchTest < ActiveSupport::TestCase
       assert_equal Hash[:query_raw => "address:'200 grand'", :query_and => '', :query_or => '', :fields => {:address => '200 grand'}], @hash
     end
   end
+
+  context "search query with no query string and address field with caps" do
+    setup do
+      @hash = Search.query("address:'200 Grand Ave'")
+    end
+
+    should "have fields hash" do
+      assert_equal Hash[:query_raw => "address:'200 Grand Ave'", :query_and => '', :query_or => '', :fields => {:address => '200 Grand Ave'}], @hash
+    end
+  end
   
   context "search query with a query string and events attribute" do
     setup do
