@@ -106,13 +106,13 @@ class SearchController < ApplicationController
     @tag            = params[:tag].to_s.from_url_param
     @what           = params[:what] ? session[:what] : ''
 
-    # handle special case of 'something' to find a random what
-    @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'something'
-
     if @tag.blank? and @what.blank?
       # default to tag 'anything'
       redirect_to(url_for(:what => nil, :tag => 'anything')) and return
     end
+
+    # handle special case of 'something' to find a random tag
+    @tag            = Tag.all(:order => 'rand()', :limit => 1).first.name if @tag == 'something'
 
     @hash           = Search.query(!@tag.blank? ? @tag : @what)
     @raw_query      = @hash[:query_raw]
