@@ -109,6 +109,11 @@ class SearchController < ApplicationController
     # handle special case of 'something' to find a random what
     @what           = Tag.all(:order => 'rand()', :limit => 1).first.name if @what == 'something'
 
+    if @tag.blank? and @what.blank?
+      # default to tag 'anything'
+      redirect_to(url_for(:what => nil, :tag => 'anything')) and return
+    end
+
     @hash           = Search.query(!@tag.blank? ? @tag : @what)
     @raw_query      = @hash[:query_raw]
     @query          = @hash[:query_or]
