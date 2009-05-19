@@ -9,10 +9,11 @@ ActionController::Routing::Routes.draw do |map|
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
 
-  map.resources   :locations, :only => [:index, :show, :create]
-  
   # locations routes
   map.connect     '/locations/:id/recommend', :controller => 'locations', :action => 'recommend', :conditions => {:method => :post}
+  map.connect     '/locations/:city/random', :controller => 'locations', :action => 'random', :conditions => {:method => :get}
+
+  map.resources   :locations, :only => [:index, :show, :create]
 
   # chains routes
   map.connect     '/chains/:country/:id', :controller => 'chains', :action => 'country'
