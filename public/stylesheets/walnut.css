@@ -5,7 +5,8 @@ a:hover                                           { color: #FFFFFF; background-c
 a.current, a.current:hover                        { text-decoration: none; }
 
 a img                                             { border: 0 none; vertical-align: top; }
-a img:hover                                       { background-color: #FFFFFF; }
+
+a img.logo:hover                                  { background-color: #FF6600; }  /* don't change background on hover */
 
 /* error styles */
 

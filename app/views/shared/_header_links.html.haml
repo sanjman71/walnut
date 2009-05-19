@@ -1,6 +1,6 @@
 .span-24
   .span-4
-    = link_to(image_tag("/images/WalnutPlaces.png", :width => '120px', :height => '50px'), root_path)
+    = link_to(image_tag("/images/WalnutPlaces.png", :width => '120px', :height => '50px', :class => 'logo'), root_path)
   .span-20.last#search_objects{:style => "visibility: visible;"}
     = render(:partial => 'shared/search_bar')
   .span-24.last#header_links{:style => 'text-align: right;'}
