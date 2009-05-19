@@ -18,7 +18,7 @@ class StreetAddress
   def self.normalize(s)
     s = s.to_s.downcase
     normalizations = [[".", ""], [",", ""], ["street", "st"], ["avenue", "ave"], ["drive", "dr"], ["#", "ste"], ["boulevard", "blvd"], 
-                      ["court", "ct"], ["plaza", "plz"]
+                      ["court", "ct"], ["plaza", "plz"], ["road", "rd"]
                      ]
     normalizations.each do |tuple|
       # these can be anywhere in the street address
