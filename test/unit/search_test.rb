@@ -36,6 +36,16 @@ class SearchTest < ActiveSupport::TestCase
     end
   end
 
+  context "search query with no query string and no events attribute" do
+    setup do
+      @hash = Search.query("events:0")
+    end
+
+    should "have attributes hash" do
+      assert_equal Hash[:query_raw => "events:0", :query_and => '', :query_or => '', :attributes => {:events => 0}], @hash
+    end
+  end
+
   context "search query with no query string and address field" do
     setup do
       @hash = Search.query("address:'200 grand'")
