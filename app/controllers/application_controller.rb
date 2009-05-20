@@ -144,7 +144,7 @@ class ApplicationController < ActionController::Base
       end
 
       self.class.benchmark("Benchmarking #{@city.name} neighborhoods using database") do
-        @neighborhoods  = @city.neighborhoods.with_locations.order_by_density(:limit => 100)
+        @neighborhoods  = @city.neighborhoods.with_locations.order_by_density(:limit => 100).sort_by { |o| o.name }
       end
       
       # track events
