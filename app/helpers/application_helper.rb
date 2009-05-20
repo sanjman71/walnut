@@ -138,9 +138,9 @@ module ApplicationHelper
 
   def build_what_route_path(options)
     if options[:tag]
-      "/tag/#{options[:tag]}"
+      "/tag/#{options[:tag].parameterize}"
     elsif options[:what]
-      "/#{options[:what]}"
+      "/#{options[:what].parameterize}"
     else
       ""
     end

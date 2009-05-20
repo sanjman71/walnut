@@ -119,7 +119,7 @@ class SearchController < ApplicationController
     @query          = @hash[:query_or]
     @and_query      = @hash[:query_and]
     @fields         = @hash[:fields]
-    @attributes     = @hash[:with] || Hash.new
+    @attributes     = @hash[:attributes] || Hash.new
     @attributes     = Search.attributes(@country, @state, @city, @neighborhood, @zip).update(@attributes)
 
     case @search_klass
