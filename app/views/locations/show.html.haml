@@ -11,9 +11,8 @@
         == #{@location.source_type}:#{@location.source_id}
         == &nbsp;|&nbsp;
         == Digest:#{@location.digest}
-        - if @location.event_venue
-          == &nbsp;|&nbsp;
-          == Venue
+        == &nbsp;|&nbsp;
+        = pluralize(@location.events_count, "Event")
           
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :link_all => true})
