@@ -22,9 +22,11 @@ class LocationsController < ApplicationController
     @nearby_limit     = 7
     
     if @location.mappable?
+      @origin = [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f]
+      
       self.class.benchmark("Benchmarking nearby locations and event venues") do
         @nearby_locations = Rails.cache.fetch("#{@location.cache_key}:nearby:locations", :expires_in => CacheExpire.locations) do
-          Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
+          Location.search(:geo => @origin,
                           :with => @attributes,
                           :without_ids => @location.id,
                           :order => "@geodist ASC", 
@@ -33,7 +35,7 @@ class LocationsController < ApplicationController
         end
 
         @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby:event_venues", :expires_in => CacheExpire.locations) do
-          Location.search(:geo => [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f],
+          Location.search(:geo => @origin,
                           :with => @attributes.update(@hash[:attributes]),
                           :without_ids => @location.id,
                           :order => "@geodist ASC", 
