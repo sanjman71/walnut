@@ -4,9 +4,9 @@
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
   %h2= @h1
   %h5
-    = link_to("Search #{pluralize(@neighborhood.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :what => 'anything'), :class => 'locality search')
+    = link_to("Search #{pluralize(@neighborhood.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :tag => 'anything'), :class => 'locality search')
   %h4#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :neighborhood => @neighborhood})
 
 %hr.space
 

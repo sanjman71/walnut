@@ -1,5 +1,11 @@
 .city_neighborhoods= title
 
-- neighborhoods.each do |neighborhood|
-  - klasses = ["locality"].push(cycle('even', 'odd'))
-  %span.small[neighborhood]= link_to(neighborhood, build_neighborhood_search_route(params[:controller], country, state, city, neighborhood), :class => klasses.join(" "))
+- unless neighborhoods.blank?
+  - count_method  = :locations_count
+  - max_count     = neighborhoods.max{ |a,b| a.send(count_method) <=> b.send(count_method)}.send(count_method)
+  - cloud_classes = ['one', 'two', 'three']
+
+  - neighborhoods.each do |neighborhood|
+    - cloud_class = tag_cloud_class(neighborhood, count_method, max_count, cloud_classes)
+    - klasses = ["locality"].push(cycle('even', 'odd')).push(cloud_class)
+    %span.small[neighborhood]{:style => "white-space: nowrap; margin-right: 3px; font-weight: normal;"}= link_to(neighborhood, build_neighborhood_search_route(params[:controller], country, state, city, neighborhood), :class => klasses.join(" "))
