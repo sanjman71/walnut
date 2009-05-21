@@ -21,6 +21,7 @@ class EventVenue < ActiveRecord::Base
   
   named_scope :order_popularity,  { :order => "popularity DESC" }
   named_scope :order_city,        { :order => "city ASC" }
+  named_scope :order_city_name,   { :order => "city, name ASC" }
 
   @@search_method       = "venues/search"
   @@get_method          = "venues/get"
@@ -325,7 +326,7 @@ class EventVenue < ActiveRecord::Base
     object  = EventVenue.create(options)
 
     if object and log
-      puts "#{Time.now}: *** added venue #{object.name}:#{object.city}:#{object.state}:#{object.zip}:#{object.area_type}"
+      puts "#{Time.now}: *** imported venue #{object.name}:#{object.city}:#{object.state}:#{object.zip}:#{object.area_type}"
     end
     
     object
@@ -386,9 +387,17 @@ class EventVenue < ActiveRecord::Base
   # initialize location_source fields if the event venue has been mapped to a location
   def init_location_source
     return if location.blank?
-    return if !self.location_source_id.blank? or !self.location_source_type.blank?
-    self.location_source_id   = location.source_id
-    self.location_source_type = location.source_type
+    return if !self.location_source_id.blank? and !self.location_source_type.blank?
+    
+    if location.source_type.match(/Localeze/)
+      self.location_source_type = location.source_type
+      self.location_source_id   = location.source_id
+    else
+      # use location digest
+      self.location_source_type = "Digest:#{location.digest}"
+      self.location_source_id   = 0
+    end
+    
     self.save
   end
 end

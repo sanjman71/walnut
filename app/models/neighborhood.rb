@@ -14,6 +14,16 @@ class Neighborhood < ActiveRecord::Base
   named_scope :order_by_density,      {:order => "locations_count DESC"}
   
 
+  # max distance where locations are considered to be in the same neighborhood
+  
+  def self.within_neighborhood_distance_meters
+    500.0
+  end
+
+  def self.within_neighborhood_distance_miles
+    Math.meters_to_miles(self.within_neighborhood_distance_meters)
+  end
+  
   def to_param
     self.name.parameterize.to_s
   end

@@ -6,4 +6,8 @@ module Math
   def self.meters_to_miles(meter)
     meter.to_f * 0.000621371192
   end
+  
+  def self.miles_to_meters(miles)
+    miles.to_f * 1609.344
+  end
 end

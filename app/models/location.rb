@@ -11,6 +11,8 @@ class Location < ActiveRecord::Base
   has_one                 :event_venue
   has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
 
+  has_many                :location_neighbors
+  
   before_save             :before_save_callback
   after_save              :after_save_callback
 
@@ -25,9 +27,15 @@ class Location < ActiveRecord::Base
   named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
-  named_scope :recommended,         { :conditions => ["recommendations_count > 0"] }
-  named_scope :event_venues,        { :conditions => ["events_count > 0"] }
+  named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
+  named_scope :without_neighborhoods, { :conditions => ["neighborhoods_count = 0"] }
+  named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
+  named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
+  named_scope :with_events,           { :conditions => ["events_count > 0"] }
+  named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
 
+  named_scope :with_neighbors,        { :include => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
+  
   # find location by the specified source id
   named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
   named_scope :find_by_source_id,   lambda { |source_id| { :conditions => {:source_id => source_id} }}

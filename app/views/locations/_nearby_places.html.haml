@@ -6,5 +6,5 @@
     = location.street_address
     = location.city
     %br
-    = number_with_precision(Math.meters_to_miles(distance.to_f), :precision => 2, :delimiter => ',')
+    = number_with_precision(distance.to_f, :precision => 2, :delimiter => ',')
     == miles

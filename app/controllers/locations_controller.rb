@@ -17,32 +17,43 @@ class LocationsController < ApplicationController
     @neighborhoods    = @location.neighborhoods
     
     # find nearby locations, within the same city, exclude this location, and sort by distance
-    @hash             = Search.query("events:1")
     @attributes       = Search.attributes(@country, @state, @city)
-    @nearby_limit     = 7
+    @nearby_limit     = LocationNeighbor.default_limit
     
     if @location.mappable?
-      @origin = [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f]
-      
-      self.class.benchmark("Benchmarking nearby locations and event venues") do
-        @nearby_locations = Rails.cache.fetch("#{@location.cache_key}:nearby:locations", :expires_in => CacheExpire.locations) do
-          Location.search(:geo => @origin,
-                          :with => @attributes,
-                          :without_ids => @location.id,
-                          :order => "@geodist ASC", 
-                          :limit => @nearby_limit,
-                          :include => [:places])
-        end
+      # @origin = [Math.degrees_to_radians(@location.lat).to_f, Math.degrees_to_radians(@location.lng).to_f]
 
-        @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby:event_venues", :expires_in => CacheExpire.locations) do
-          Location.search(:geo => @origin,
-                          :with => @attributes.update(@hash[:attributes]),
-                          :without_ids => @location.id,
-                          :order => "@geodist ASC", 
-                          :limit => @nearby_limit,
-                          :include => [:places])
+      self.class.benchmark("Benchmarking nearby locations and event venues using database") do
+        # partition neighbors into regular and event venue locations
+        @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
+        
+        if @nearby_locations.blank? and @nearby_event_venues.blank?
+          # initialize neighbors and try again
+          LocationNeighbor.set_neighbors(@location, @city, :limit => @nearby_limit, :geodist => 0.0..LocationNeighbor.default_radius_meters)
+          @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
         end
       end
+        
+      # self.class.benchmark("Benchmarking nearby locations and event venues") do
+        # @nearby_locations = Rails.cache.fetch("#{@location.cache_key}:nearby:locations", :expires_in => 1.second) do
+        #   Location.search(:geo => @origin,
+        #                   :with => @attributes,
+        #                   :without_ids => @location.id,
+        #                   :order => "@geodist ASC", 
+        #                   :limit => @nearby_limit,
+        #                   :include => [:places])
+        # end
+
+        # @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby:event_venues", :expires_in => 1.second) do
+        #   @hash = Search.query("events:1")
+        #   Location.search(:geo => @origin,
+        #                   :with => @attributes.update(@hash[:attributes]),
+        #                   :without_ids => @location.id,
+        #                   :order => "@geodist ASC", 
+        #                   :limit => @nearby_limit,
+        #                   :include => [:places])
+        # end
+      # end
     end
     
     # initialize title, h1 tags

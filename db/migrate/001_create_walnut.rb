@@ -88,7 +88,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :events_count,          :default => 0
       t.integer     :status,                :default => 0
       t.boolean     :delta  # used by sphinx for real-time indexing
-
+      t.datetime    :urban_mapping_at,      :default => nil
       t.timestamps
     end
             
