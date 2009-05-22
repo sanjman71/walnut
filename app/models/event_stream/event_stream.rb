@@ -2,14 +2,14 @@ require 'eventful/api'
 
 module EventStream
 
-  class Search
-    
-    @@method = "events/search"
+  class Event
   
+    @@method = "events/search"
+
     def self.session
       @@session ||= Eventful::API.new(EVENTFUL_API_KEY)
     end
-  
+
     # search events using the eventful api, with options:
     #  - :keywords
     #  - :category => category id or name
@@ -18,11 +18,11 @@ module EventStream
     #          => months by name, e.g. 'October'
     #          => exact ranges take the form 'YYYYMMDDHH-YYYYMMDDHH', e.g. '2008042500-2008042723'
     #  - :sort_order => 'popularity', 'date', 'title', 'relevance', or 'venue_name', default is 'popularity'
-    def self.call(options={})
+    def self.search(options={})
       search_options = {:date => 'Future'}
       session.call(@@method, search_options.update(options))
     end
-  
-  end
-  
-end
+
+  end # class
+
+end # module

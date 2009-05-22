@@ -7,6 +7,8 @@ class Event < ActiveRecord::Base
   has_many                  :event_category_mappings, :dependent => :destroy
   has_many                  :event_categories, :through => :event_category_mappings, :after_add => :after_add_category, :after_remove => :after_remove_category
   
+  before_destroy            :before_destroy_callback
+
   acts_as_taggable_on       :event_tags
 
   delegate                  :country, :to => '(location or return nil)'
@@ -17,6 +19,10 @@ class Event < ActiveRecord::Base
   delegate                  :street_address, :to => '(location or return nil)'
   delegate                  :lat, :to => '(location or return nil)'
   delegate                  :lng, :to => '(location or return nil)'
+
+  # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
+  named_scope :future,      lambda { { :conditions => ["start_at >= ?", Time.now.beginning_of_day.utc] } }
+  named_scope :past,        lambda { { :conditions => ["start_at < ?", Time.now.beginning_of_day.utc - 1.day] } } # be conservative
 
   named_scope :popular,     { :conditions => ["popularity > 0"] }
 
@@ -66,6 +72,12 @@ class Event < ActiveRecord::Base
   def mappable?
     return true if self.lat and self.lng
     false
+  end
+
+  # remove event references
+  def before_destroy_callback
+    location.events.delete(self) if location
+    event_venue.events.delete(self) if event_venue
   end
 
   protected

@@ -101,7 +101,7 @@ namespace :events do
     while imported < limit
       # find future events in the specified city
       conditions = {:location => city.name, :date => 'Future', :page => page, :page_size => per_page, :sort_order => 'popularity'}
-      results    = EventStream::Search.call(conditions)
+      results    = EventStream::Event.search(conditions)
       events     = results['events'] ? results['events']['event'] : []
 
       events.each do |event_hash|
@@ -205,18 +205,15 @@ namespace :events do
     puts "#{Time.now}: completed"
   end
   
-  desc "Remove past events"
+  desc "Remove all past events"
   task :remove_past_events do
-    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
+    # find all past events
+    events = Event.past
 
-    if city.blank?
-      puts "usage: missing CITY"
-      exit
-    end
-
-    puts "#{Time.now}: removing old #{city.name} events"
+    puts "#{Time.now}: removing all #{events.size} past events"
     
-
+    events.each { |e| e.destroy }
+    
     puts "#{Time.now}: completed"
   end
   
@@ -224,11 +221,7 @@ namespace :events do
   task :remove_all do
     puts "#{Time.now}: removing all #{Event.count} events"
     
-    Event.all.each do |event|
-      event.event_venue.events.delete(event) unless event.event_venue.blank?
-      event.location.events.delete(event) unless event.location.blank?
-      event.destroy
-    end
+    Event.all.each { |e| e.destroy }
     
     puts "#{Time.now}: completed"
   end
