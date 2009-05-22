@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
   include RecommendationsHelper
   include GoogleAnalyticsEventsHelper
   
+  include ActionView::Helpers::NumberHelper
+
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => '7c342efc7bc88b372c5913ebad934c5e'
@@ -275,6 +277,11 @@ class ApplicationController < ActionController::Base
       tuple.push("#{city.name} #{state.code}")
     elsif city
       tuple.push("#{city.name}")
+    end
+
+    if place.phone_numbers_count > 0
+      # add phone number
+      tuple.push(number_to_phone(place.primary_phone_number.number, :delimiter => " "))
     end
 
     tuple.join(" - ")

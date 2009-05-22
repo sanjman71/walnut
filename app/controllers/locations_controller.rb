@@ -39,7 +39,7 @@ class LocationsController < ApplicationController
     
     # initialize title, h1 tags
     @title    = build_place_title(@place, @location, :city => @city, :state => @state, :zip => @zip)
-    @h1       = @title
+    @h1       = @place.name
   end
 
   # GET /locations/random

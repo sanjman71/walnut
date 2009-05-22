@@ -17,6 +17,11 @@ class Place < ActiveRecord::Base
   
   acts_as_taggable_on       :tags
   
+  def primary_phone_number
+    return nil if phone_numbers_count == 0
+    phone_numbers.first
+  end
+
   private
   
   def after_add_phone_number(phone_number)
