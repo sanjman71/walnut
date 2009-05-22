@@ -113,7 +113,7 @@ namespace :events do
         
         if venue.blank? and city_name == city.name
           # missing venue in the requested city, add it
-          puts "#{Time.now}: adding venue: #{event_hash['venue_name']}:#{event_hash['venue_id']}"
+          puts "#{Time.now}: *** importing venue: #{event_hash['venue_name']}:#{event_hash['venue_id']}"
           
           begin
             # get venue info
@@ -131,7 +131,7 @@ namespace :events do
         
         if venue.blank?
           # missing venue, but its not in th requested city
-          puts "#{Time.now}: xxx missing venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}"
+          puts "#{Time.now}: xxx missing venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
           missing += 1
           next
         end
@@ -149,7 +149,7 @@ namespace :events do
         
         if !venue.mapped?
           # the venue could not be mapped to location
-          puts "#{Time.now}: xxx unmapped venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}"
+          puts "#{Time.now}: xxx unmapped venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
           next
         end
       
@@ -202,6 +202,21 @@ namespace :events do
       end
     end
     
+    puts "#{Time.now}: completed"
+  end
+  
+  desc "Remove past events"
+  task :remove_past_events do
+    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
+
+    if city.blank?
+      puts "usage: missing CITY"
+      exit
+    end
+
+    puts "#{Time.now}: removing old #{city.name} events"
+    
+
     puts "#{Time.now}: completed"
   end
   
