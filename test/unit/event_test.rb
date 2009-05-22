@@ -22,9 +22,12 @@ class EventTest < ActiveSupport::TestCase
   end
   
   context "validate event venue" do
-    should "have location_source_id and location_source_type" do
-      assert_equal 100, @event_venue.location_source_id
-      assert_equal "Somebody", @event_venue.location_source_type
+    should "have location_source_id == 0" do
+      assert_equal 0, @event_venue.location_source_id
+    end
+
+    should "have location_source_type with digest value" do
+      assert_match /Digest:\w+/, @event_venue.location_source_type
     end
   end
   
@@ -92,8 +95,6 @@ class EventTest < ActiveSupport::TestCase
       
       context "then remove event that has an event category" do
         setup do
-          @event_venue.events.delete(@event)
-          @location.events.delete(@event)
           @event.destroy
           @event_venue.reload
           @location.reload
