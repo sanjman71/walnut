@@ -258,4 +258,25 @@ class ApplicationController < ActionController::Base
     return "#{subject.titleize} near #{where}"
   end  
     
+  def build_place_title(place, location, options={})
+    city  = options[:city]
+    state = options[:state]
+    zip   = options[:zip]
+
+    tuple = [place.name]
+
+    if city.blank? and state.blank? and zip.blank?
+      return tuple.join(" - ")
+    end
+
+    if city and state and zip
+      tuple.push("#{city.name} #{state.code}, #{zip.name}")
+    elsif city and state
+      tuple.push("#{city.name} #{state.code}")
+    elsif city
+      tuple.push("#{city.name}")
+    end
+
+    tuple.join(" - ")
+  end
 end
