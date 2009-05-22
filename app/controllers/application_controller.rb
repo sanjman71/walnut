@@ -213,10 +213,10 @@ class ApplicationController < ActionController::Base
   
   def build_search_title(options={})
     tag       = options[:tag] || ''
-    what      = options[:what] || ''
+    query     = options[:query] || ''
     filter    = options[:filter] || ''
 
-    raise ArgumentError if tag.blank? and what.blank? and filter.blank?
+    raise ArgumentError if tag.blank? and query.blank? and filter.blank?
     
     if options[:state] and options[:city] and options[:neighborhood]
       where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
@@ -228,11 +228,11 @@ class ApplicationController < ActionController::Base
       raise Exception, "invalid search"
     end
 
-    # use 'tag', then 'what', then 'filter'
+    # use 'tag', then 'query', then 'filter'
     if !tag.blank?
       subject = tag
-    elsif !what.blank?
-      subject = what
+    elsif !query.blank?
+      subject = query
     elsif !filter.blank?
       subject = filter
     end

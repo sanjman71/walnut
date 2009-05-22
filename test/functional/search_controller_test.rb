@@ -13,50 +13,50 @@ class SearchControllerTest < ActionController::TestCase
   should_route :get, '/search/us/il/chicago', :controller => 'search', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
   
   # city search tag/what routes
-  should_route :get, '/search/us/il/chicago/food',
-               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :what => 'food', :klass => 'search'
+  should_route :get, '/search/us/il/chicago/q/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :klass => 'search'
   should_route :get, '/search/us/il/chicago/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food', :klass => 'search'
-  should_route :get, '/locations/us/il/chicago/food',
-               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :what => 'food', :klass => 'locations'
+  should_route :get, '/locations/us/il/chicago/q/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :klass => 'locations'
   should_route :get, '/locations/us/il/chicago/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food', :klass => 'locations'
-  should_route :get, '/events/us/il/chicago/food',
-               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :what => 'food', :klass => 'events'
+  should_route :get, '/events/us/il/chicago/q/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :klass => 'events'
   should_route :get, '/events/us/il/chicago/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food', :klass => 'events'
 
   # neighborhood search tag/waht routes
-  should_route :get, '/search/us/il/chicago/n/river-north/soccer',
+  should_route :get, '/search/us/il/chicago/n/river-north/q/soccer',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
-               :what => 'soccer', :klass => 'search'
+               :query => 'soccer', :klass => 'search'
   should_route :get, '/search/us/il/chicago/n/river-north/tag/soccer', 
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
                :tag => 'soccer', :klass => 'search'
-  should_route :get, '/locations/us/il/chicago/n/river-north/soccer',
+  should_route :get, '/locations/us/il/chicago/n/river-north/q/soccer',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
-               :what => 'soccer', :klass => 'locations'
+               :query => 'soccer', :klass => 'locations'
   should_route :get, '/locations/us/il/chicago/n/river-north/tag/soccer',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
                :tag => 'soccer', :klass => 'locations'
-  should_route :get, '/events/us/il/chicago/n/river-north/soccer',
+  should_route :get, '/events/us/il/chicago/n/river-north/q/soccer',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
-               :what => 'soccer', :klass => 'events'
+               :query => 'soccer', :klass => 'events'
   should_route :get, '/events/us/il/chicago/n/river-north/tag/soccer',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
                :tag => 'soccer', :klass => 'events'
 
   # zip search tag/what routes
-  should_route :get, '/search/us/il/60610/food',
-               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :what => 'food', :klass => 'search'
+  should_route :get, '/search/us/il/60610/q/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :query => 'food', :klass => 'search'
   should_route :get, '/search/us/il/60610/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food', :klass => 'search'
-  should_route :get, '/locations/us/il/60610/food',
-               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :what => 'food', :klass => 'locations'
+  should_route :get, '/locations/us/il/60610/q/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :query => 'food', :klass => 'locations'
   should_route :get, '/locations/us/il/60610/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food', :klass => 'locations'
-  should_route :get, '/events/us/il/60610/food',
-               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :what => 'food', :klass => 'events'
+  should_route :get, '/events/us/il/60610/q/food',
+               :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :query => 'food', :klass => 'events'
   should_route :get, '/events/us/il/60610/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food', :klass => 'events'
 
@@ -85,9 +85,10 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:country) { @us }
       should_assign_to(:state) { @il }
       should_assign_to(:city) { @chicago }
-      should_assign_to :what, :tag
-      should_assign_to(:query) { "food" }
-      should_assign_to(:raw_query) { "food" }
+      should_assign_to :query, :tag
+      should_assign_to(:query_or) { "food" }
+      should_assign_to(:query_and) { "food" }
+      should_assign_to(:query_raw) { "food" }
       should_not_assign_to(:fields)
       should_assign_to(:attributes) { Hash[:city_id => @chicago.id, :state_id => @il.id, :country_id => @us.id] }
       should_assign_to(:title) { "Food near Chicago, Illinois" }

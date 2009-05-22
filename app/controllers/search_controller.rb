@@ -104,20 +104,20 @@ class SearchController < ApplicationController
     
     @search_klass   = params[:klass]
     @tag            = params[:tag].to_s.from_url_param
-    @what           = params[:what] ? session[:what] : ''
+    @query          = params[:query] ? session[:query] : ''
 
-    if @tag.blank? and @what.blank?
+    if @tag.blank? and @query.blank?
       # default to tag 'anything'
-      redirect_to(url_for(:what => nil, :tag => 'anything')) and return
+      redirect_to(url_for(:query => nil, :tag => 'anything')) and return
     end
 
     # handle special case of 'something' to find a random tag
     @tag            = Tag.all(:order => 'rand()', :limit => 1).first.name if @tag == 'something'
 
-    @hash           = Search.query(!@tag.blank? ? @tag : @what)
-    @raw_query      = @hash[:query_raw]
-    @query          = @hash[:query_or]
-    @and_query      = @hash[:query_and]
+    @hash           = Search.query(!@tag.blank? ? @tag : @query)
+    @query_raw      = @hash[:query_raw]
+    @query_or       = @hash[:query_or]
+    @query_and      = @hash[:query_and]
     @fields         = @hash[:fields]
     @attributes     = @hash[:attributes] || Hash.new
     @attributes     = Search.attributes(@country, @state, @city, @neighborhood, @zip).update(@attributes)
@@ -131,8 +131,8 @@ class SearchController < ApplicationController
       @klasses = [Event]
     end
 
-    self.class.benchmark("Benchmarking query '#{@query}'") do
-      @objects = ThinkingSphinx::Search.search(@query, :classes => @klasses, :with => @attributes, :conditions => @fields,
+    self.class.benchmark("Benchmarking query '#{@query_or}'") do
+      @objects = ThinkingSphinx::Search.search(@query_or, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                                :match_mode => :extended, :page => params[:page], :per_page => 5,
                                                :order => :popularity, :sort_mode => :desc)
     end
@@ -147,8 +147,8 @@ class SearchController < ApplicationController
       # find related tags by class
       related_size    = 11
       @related_tags   = @klasses.inject([]) do |array, klass|
-        facets  = klass.facets(@and_query, :with => @attributes, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
-        array  += Search.load_from_facets(facets, Tag).collect(&:name).sort - [@raw_query]
+        facets  = klass.facets(@query_and, :with => @attributes, :facets => ["tag_ids"], :limit => related_size, :max_matches => related_size)
+        array  += Search.load_from_facets(facets, Tag).collect(&:name).sort - [@query_raw]
       end
     end
     
@@ -158,12 +158,12 @@ class SearchController < ApplicationController
         @cities = Array(@neighborhood.city)
         # build zip facets
         limit   = 10
-        @facets = Location.facets(@and_query, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
+        @facets = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
         @zips   = Search.load_from_facets(@facets, Zip)
       elsif @city
         # build zip and neighborhood facets
         limit           = 10
-        @facets         = Location.facets(@and_query, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
+        @facets         = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
         @zips           = Search.load_from_facets(@facets, Zip)
         @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
 
@@ -174,15 +174,15 @@ class SearchController < ApplicationController
       elsif @zip
         # build city facets
         limit   = 5
-        @facets = Location.facets(@and_query, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
+        @facets = Location.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
         @cities = Search.load_from_facets(@facets, City)
       end
     end
     
     @locality_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
     
-    # build search title based on what, city, neighborhood, zip search
-    @title          = build_search_title(:tag => @tag, :what => @what, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    # build search title based on query, city, neighborhood, zip search
+    @title          = build_search_title(:tag => @tag, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1             = @title
 
     # enable/disable robots
@@ -193,7 +193,7 @@ class SearchController < ApplicationController
     end
 
     # track what event
-    track_what_ga_event(@search_klass, :tag => @tag, :what => @what)
+    track_what_ga_event(@search_klass, :tag => @tag, :query => @query)
   end
   
   def resolve
@@ -201,11 +201,12 @@ class SearchController < ApplicationController
     @klass    = params[:search_klass] ? params[:search_klass] : 'search'
     # resolve where parameter
     @locality = Locality.resolve(params[:where].to_s)
-    # normalize what parameter
-    @what     = 'what' #Search.normalize(params[:what].to_s).parameterize
-    
-    # cache what as part of session
-    session[:what] = params[:what].to_s
+    # normalize query parameter
+    @query    = Search.normalize(params[:query].to_s).parameterize
+    # @query    = 'query'
+
+    # store raw query as a session parameter
+    session[:query] = params[:query].to_s
     
     if @locality.blank?
       redirect_to(:action => 'error', :locality => 'unknown') and return
@@ -215,16 +216,16 @@ class SearchController < ApplicationController
     when 'City'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @locality, :query => @query) and return
     when 'Zip'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :zip => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :zip => @locality, :query => @query) and return
     when 'Neighborhood'
       @city     = @locality.city
       @state    = @city.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :what => @what) and return
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :query => @query) and return
     when 'State'
       raise Exception, "search by state not supported"
     else

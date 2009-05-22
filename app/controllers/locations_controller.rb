@@ -21,7 +21,7 @@ class LocationsController < ApplicationController
       @nearby_limit = LocationNeighbor.default_limit
 
       self.class.benchmark("Benchmarking nearby locations and event venues") do
-        @nearby_locations, @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby", :expires_in => 1.second) do
+        @nearby_locations, @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby", :expires_in => CacheExpire.locations) do
 
           # partition neighbors into regular and event venue locations
           @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)

@@ -42,7 +42,7 @@ module ApplicationHelper
   end
   
   def current_search_query
-    @raw_query ? @raw_query : "" 
+    @query_raw ? @query_raw : "" 
   end
   
   # build search route based on the klass parameter
@@ -62,16 +62,10 @@ module ApplicationHelper
     case where
     when 'city'
       build_city_search_route(klass, options[:country], options[:state], options[:city], options)
-      # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
-      #         :tag => options[:tag], :what => options[:what])
     when 'zip'
       build_zip_search_route(klass, options[:country], options[:state], options[:zip], options)
-      # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :zip => options[:zip], 
-      #         :tag => options[:tag], :what => options[:what])
     when 'neighborhood'
       build_neighborhood_search_route(klass, options[:country], options[:state], options[:city], options[:neighborhood], options)
-      # url_for(:controller => controller, :action => 'index', :country => options[:country], :state => options[:state], :city => options[:city], 
-      #         :neighborhood => options[:neighborhood], :tag => options[:tag], :what => options[:what])
     else
       raise ArgumentError, "no route for #{where}"
     end
@@ -139,8 +133,8 @@ module ApplicationHelper
   def build_what_route_path(options)
     if options[:tag]
       "/tag/#{options[:tag].parameterize}"
-    elsif options[:what]
-      "/#{options[:what].parameterize}"
+    elsif options[:query]
+      "/#{options[:query].parameterize}"
     else
       ""
     end

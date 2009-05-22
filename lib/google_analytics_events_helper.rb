@@ -26,13 +26,13 @@ module GoogleAnalyticsEventsHelper
   def track_what_ga_event(controller, options)
     @ga_events ||= []
 
-    # use controller as category, and tag or what as action
+    # use controller as category, and tag or query as action
     if !options[:tag].blank?
       action  = 'Tag'
       label   = options[:tag]
-    elsif !options[:what].blank?
-      action  = 'What'
-      label   = options[:what]
+    elsif !options[:query].blank?
+      action  = 'Query'
+      label   = options[:query]
     else
       # whoops, no action
       return
