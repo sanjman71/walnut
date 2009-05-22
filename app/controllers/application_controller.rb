@@ -154,6 +154,11 @@ class ApplicationController < ActionController::Base
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
       @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank?
 
+      if @city and @neighborhood.blank?
+        # neighborhoods can have non-letter characters; try resolving again
+        @neighborhood = @city.neighborhoods.find_like(params[:neighborhood].gsub('-','%')).first
+      end
+
       if @city.blank? or @neighborhood.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return if @city.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
@@ -185,6 +190,11 @@ class ApplicationController < ActionController::Base
       @city           = @state.cities.find_by_name(params[:city].to_s.titleize) unless params[:city].blank?
       @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
       @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
+
+      if @city and !params[:neighborhood].blank?
+        # neighborhoods can have non-letter characters; try resolving again
+        @neighborhood = @city.neighborhoods.find_like(params[:neighborhood].gsub('-','%')).first
+      end
       
       if @city.blank? and @zip.blank?
         # invalid search

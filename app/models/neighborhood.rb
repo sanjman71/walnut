@@ -7,6 +7,9 @@ class Neighborhood < ActiveRecord::Base
   
   include NameParam
 
+  # find neighborhoods named with characters such as [', -]
+  named_scope :find_like,             lambda { |s| {:conditions => ["name LIKE ?", s]} }
+
   # find neighborhoods with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
