@@ -10,8 +10,8 @@ class Location < ActiveRecord::Base
   has_many                :places, :through => :location_places
   has_one                 :event_venue
   has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
-
   has_many                :location_neighbors
+  has_many                :neighbors, :through => :location_neighbors
   
   before_save             :before_save_callback
   after_save              :after_save_callback

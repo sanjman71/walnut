@@ -48,24 +48,25 @@ class LocationNeighbor < ActiveRecord::Base
   end
   
   # set regular and event venue neighbors for the specified location
-  def self.set_neighbors(location, localities, options={})
+  def self.set_neighbors(location, options={})
     raise ArgumentError, "location is blank" if location.blank?
     raise ArgumentError, "location is not mappable" if !location.mappable?
     
     # parse options
     limit       = options[:limit] ? options[:limit].to_i : self.default_limit
+    args_attr   = options[:attributes] ? options[:attributes] : Hash.new
     
-    attributes  = ::Search.attributes(Array(localities))
     hash        = ::Search.query("events:0")
-    attributes  = attributes.update(hash[:attributes])
+    attributes  = args_attr.dup.update(hash[:attributes])
 
     if options[:geodist]
       attributes["@geodist"] = options[:geodist]
     end
 
     origin      = [Math.degrees_to_radians(location.lat).to_f, Math.degrees_to_radians(location.lng).to_f]
-    locations   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc",  :limit => limit)
-
+    locations   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc",  :limit => limit,
+                                  :retry_stale => true)
+    
     # set regular location neighbors
     locations.each_with_geodist do |neighbor, distance|
       # convert meters to miles
@@ -75,15 +76,17 @@ class LocationNeighbor < ActiveRecord::Base
     end
 
     hash        = ::Search.query("events:1")
-    attributes  = attributes.update(hash[:attributes])
+    attributes  = args_attr.dup.update(hash[:attributes])
 
     if options[:geodist]
       attributes["@geodist"] = options[:geodist]
     end
 
-    locations   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc",  :limit => limit)
+    origin      = [Math.degrees_to_radians(location.lat).to_f, Math.degrees_to_radians(location.lng).to_f]
+    locations   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc", :limit => limit,
+                                  :retry_stale => true)
 
-    # set event venue location neighbords
+    # set event venue location neighbors
     locations.each_with_geodist do |neighbor, distance|
       # convert meters to miles
       miles = Math.meters_to_miles(distance.to_f)
