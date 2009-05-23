@@ -95,9 +95,11 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :locations, [:source_id, :source_type], :name => "index_locations_on_source"
     add_index :locations, :city_id, :name => "index_locations_on_city"
     add_index :locations, :popularity
-    add_index :locations, :recommendations_count
     add_index :locations, :events_count
+    add_index :locations, :neighborhoods_count
     add_index :locations, :digest
+    add_index :locations, :status
+    add_index :locations, :recommendations_count
     
     create_table :phone_numbers do |t|
       t.string      :name,      :limit => 20
