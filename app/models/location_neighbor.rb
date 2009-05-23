@@ -6,7 +6,6 @@ class LocationNeighbor < ActiveRecord::Base
   named_scope :for_location,        lambda { |location| {:conditions => ["location_id = ?", location.is_a?(Integer) ? location : location.id], 
                                                          :include => [:neighbor, {:neighbor => [:city, :places]}] }}
                                                         
-  # named_scope :venue,               { :joins => :neighbor, :conditions => ['locations.events_counts > 0'] }
   named_scope :order_by_distance,   { :order => "distance asc"}
   
   def self.default_limit
@@ -21,7 +20,7 @@ class LocationNeighbor < ActiveRecord::Base
     Math.miles_to_meters(self.default_radius_miles)
   end
   
-  def self.find_neighbors(location, options={})
+  def self.get_neighbors(location, options={})
     return [] if location.blank?
     limit = options[:limit] ? options[:limit].to_i : self.default_limit
     LocationNeighborCollection.new(LocationNeighbor.for_location(location).order_by_distance.all(:limit => limit))
@@ -33,8 +32,8 @@ class LocationNeighbor < ActiveRecord::Base
     # parse options
     limit       = options[:limit] ? options[:limit].to_i : self.default_limit
     
-    # find all neighbors
-    collection  = find_neighbors(location, :limit => limit*2)
+    # get all neighbors
+    collection  = get_neighbors(location, :limit => limit*2)
     
     # partition by regular and event venue locations
     regulars    = LocationNeighborCollection.new
@@ -55,7 +54,12 @@ class LocationNeighbor < ActiveRecord::Base
     # parse options
     limit       = options[:limit] ? options[:limit].to_i : self.default_limit
     args_attr   = options[:attributes] ? options[:attributes] : Hash.new
-    
+    delete      = options[:delete] == true
+
+    # get old neighbors, track new neighbors
+    new_set     = []
+    old_set     = get_neighbors(location, :limit => 2**30).collect{ |o| o.neighbor } if delete
+
     hash        = ::Search.query("events:0")
     attributes  = args_attr.dup.update(hash[:attributes])
 
@@ -66,13 +70,15 @@ class LocationNeighbor < ActiveRecord::Base
     origin      = [Math.degrees_to_radians(location.lat).to_f, Math.degrees_to_radians(location.lng).to_f]
     locations   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc",  :limit => limit,
                                   :retry_stale => true)
-    
+
     # set regular location neighbors
     locations.each_with_geodist do |neighbor, distance|
       # convert meters to miles
       miles = Math.meters_to_miles(distance.to_f)
       # add (unique) neighbor
       LocationNeighbor.create(:location => location, :neighbor => neighbor, :distance => miles)
+      # track new set
+      new_set.push(neighbor)
     end
 
     hash        = ::Search.query("events:1")
@@ -92,6 +98,19 @@ class LocationNeighbor < ActiveRecord::Base
       miles = Math.meters_to_miles(distance.to_f)
       # add (unique) neighbor
       LocationNeighbor.create(:location => location, :neighbor => neighbor, :distance => miles)
+      # track new set
+      new_set.push(neighbor)
     end
+
+    if delete
+      # delete all old neighbors not in the new neighbor set
+      del_set = old_set - new_set
+      del_set.each do |neighbor|
+        loc_neighbor = LocationNeighbor.find_by_location_id_and_neighbor_id(location.id, neighbor.id)
+        loc_neighbor.destroy
+      end
+    end
+
+    new_set
   end
 end
