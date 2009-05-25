@@ -24,7 +24,7 @@ class Event < ActiveRecord::Base
   named_scope :future,      lambda { { :conditions => ["start_at >= ?", Time.now.beginning_of_day.utc] } }
   named_scope :past,        lambda { { :conditions => ["start_at < ?", Time.now.beginning_of_day.utc - 1.day] } } # be conservative
 
-  named_scope :popular,     { :conditions => ["popularity > 0"] }
+  named_scope :min_popularity,  lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
   define_index do
     indexes name, :as => :name

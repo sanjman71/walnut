@@ -124,17 +124,23 @@ class SearchController < ApplicationController
 
     case @search_klass
     when 'search'
-      @klasses = [Event, Location]
+      @klasses    = [Event, Location]
+      @sort_order = :popularity
+      @sort_mode  = :desc
     when 'locations'
-      @klasses = [Location]
+      @klasses    = [Location]
+      @sort_order = :popularity
+      @sort_mode  = :desc
     when 'events'
-      @klasses = [Event]
+      @klasses    = [Event]
+      @sort_order = :start_at
+      @sort_mode  = :asc
     end
 
     self.class.benchmark("Benchmarking query '#{@query_or}'") do
       @objects = ThinkingSphinx::Search.search(@query_or, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                                :match_mode => :extended, :page => params[:page], :per_page => 5,
-                                               :order => :popularity, :sort_mode => :desc)
+                                               :order => @sort_order, :sort_mode => @sort_mode)
     end
 
     # filter objects by class if this was a generic search

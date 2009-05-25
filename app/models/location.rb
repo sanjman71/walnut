@@ -32,13 +32,15 @@ class Location < ActiveRecord::Base
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
   named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }
+  named_scope :with_neighbors,        { :include => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
+  named_scope :min_popularity,        lambda { |x| {:conditions => ["popularity >= ?", x] }}
+
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
 
-  named_scope :with_neighbors,        { :include => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
-  
-  # find location by the specified source id
+  # find location with the specified source
   named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
   named_scope :find_by_source_id,   lambda { |source_id| { :conditions => {:source_id => source_id} }}
+  named_scope :find_by_source_type, lambda { |source_type| { :conditions => {:source_type => source_type} }}
   
   
   define_index do
@@ -176,12 +178,29 @@ class Location < ActiveRecord::Base
     return if event.blank?
     # increment events_count
     Location.increment_counter(:events_count, self.id)
+    # add tags
+    add_venue_tag
   end
   
   def after_remove_event(event)
     return if event.blank?
     # decrement events_count
     Location.decrement_counter(:events_count, self.id)
+    # remve tags
+    remove_venue_tag
+  end
+
+  def add_venue_tag
+    return unless @place = self.place
+    # add tag 'venue'
+    @place.tag_list.add("venue")
+    @place.save
   end
   
+  def remove_venue_tag
+    return unless @place = self.place
+    # remove tag 'venue'
+    @place.tag_list.remove("venue")
+    @place.save
+  end
 end

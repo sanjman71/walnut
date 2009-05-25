@@ -59,14 +59,23 @@
     
   %hr.space
   
-  -# nearby locations
-  .last#nearby_places{:class => @nearby_event_venues.blank? ? "span-18" : "span-7 colborder"}
-    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_locations, :heading => 'Nearby Places'}) unless @nearby_locations.blank?
+  - if @location_events.blank?
+    -# nearby locations
+    .last#nearby_places{:class => @nearby_event_venues.blank? ? "span-18" : "span-7 colborder"}
+      = render(:partial => 'nearby_places', :locals => {:locations => @nearby_locations, :title => 'Nearby Places'}) unless @nearby_locations.blank?
     
-  -# nearby event venues
-  .span-9.last#nearby_event_venues
-    = render(:partial => 'nearby_places', :locals => {:nearby_locations => @nearby_event_venues, :heading => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
-    
+    -# nearby event venues
+    .span-9.last#nearby_event_venues
+      = render(:partial => 'nearby_places', :locals => {:locations => @nearby_event_venues, :title => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
+  - else
+    -# location events
+    .last#location_events{:class => "span-7 colborder"}
+      = render(:partial => 'location_events', :locals => {:events => @location_events, :title => 'Upcoming Events'})
+
+    -# nearby event venues
+    .span-9.last#nearby_event_venues
+      = render(:partial => 'nearby_places', :locals => {:locations => @nearby_event_venues, :title => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
+  
 .span-5.last#sidebar{:style => 'text-align: right;'}
   -# google ad
   = google_ad(160, 600)

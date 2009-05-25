@@ -15,6 +15,11 @@ class EventTest < ActiveSupport::TestCase
     @chicago        = Factory(:city, :name => "Chicago", :state => @il)
     @location       = Location.create(:name => "Legion of Doom", :city => @chicago, :source_id => 100, :source_type => "Somebody")
     assert @location.valid?
+    @place          = Place.create(:name => "My Legion of Doom")
+    assert @place.valid?
+    @place.locations.push(@location)
+    @location.reload
+    assert_equal @place, @location.place
     @event_venue    = Factory(:event_venue, :name => "House of Pain", :location_id => @location.id)
     assert @event_venue.valid?
     @event_category = Factory(:event_category, :name => "Music", :tags => "music,concert")
@@ -31,6 +36,23 @@ class EventTest < ActiveSupport::TestCase
     end
   end
   
+  context "create event venue mapped to a location from a localeze base record" do
+    setup do
+      @hall_of_justice = Location.create(:name => "Hall of Justice", :city => @chicago, :source_id => 101, :source_type => "Localeze::BaseRecord")
+      assert @hall_of_justice.valid?
+      @hall_venue = Factory(:event_venue, :name => "Hall of Justice Venue", :location_id => @hall_of_justice.id)
+      assert @hall_venue.valid?
+    end
+
+    should "have location_source_type with localeze value" do
+      assert_match /Localeze::BaseRecord/, @hall_venue.location_source_type
+    end
+    
+    should "have location_source_id == 101" do
+      assert_equal 101, @hall_venue.location_source_id
+    end
+  end
+  
   context "create event" do
     setup do
       @event = Event.new(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1")
@@ -39,6 +61,7 @@ class EventTest < ActiveSupport::TestCase
       @event_venue.reload
       @location.events.push(@event)
       @location.reload
+      @place.reload
       @chicago.reload
     end
     
@@ -60,6 +83,10 @@ class EventTest < ActiveSupport::TestCase
       assert_equal 1, @event_venue.events_count
     end
 
+    should "add tag 'venue' to location place" do
+      assert_equal ["venue"], @place.tag_list
+    end
+    
     context "then add event category with tags" do
       setup do
         @event.event_categories.push(@event_category)
@@ -98,6 +125,7 @@ class EventTest < ActiveSupport::TestCase
           @event.destroy
           @event_venue.reload
           @location.reload
+          @place.reload
           @chicago.reload
         end
         
@@ -121,6 +149,10 @@ class EventTest < ActiveSupport::TestCase
 
         should "decrement venue event count" do
           assert_equal 0, @event_venue.events_count
+        end
+
+        should "remove tag 'venue' from location place" do
+          assert_equal [], @place.tag_list
         end
       end
     end

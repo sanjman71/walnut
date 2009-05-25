@@ -1,0 +1,9 @@
+%h2= title
+- events.each do |event|
+  .span-7.append-1[event]{:style => 'margin-bottom: 20px;'}
+    %span{:style => 'font-size: 1.3em;'}= event.name
+    %br
+    %span{:style => 'font-size: 1.1em; color: #FF6600; font-weight: bold;'}
+      = event.start_at.to_s(:month_short)
+      = event.start_at.to_s(:month_day)
+    %span{:style => 'font-size: 0.9em; padding-left: 3px;'}= link_to "Details", event.url
