@@ -154,27 +154,34 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking related cities, zips, neighborhoods") do
       if @neighborhood
         # build neighborhood cities
-        @cities = Array(@neighborhood.city)
-        # build zip facets
-        limit   = 10
-        @facets = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
-        @zips   = Search.load_from_facets(@facets, Zip)
+        @cities           = Array(@neighborhood.city)
+
+        # build zip facets using all locality constraints
+        limit             = 10
+        facets            = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
+        @zips             = Search.load_from_facets(facets, Zip)
+
+        # build neighborhood facets using only city constraint
+        limit             = 11
+        city_constraints  = Search.attributes(@city).update(@hash[:attributes] || Hash[])
+        facets            = Location.facets(@query_and, :with => city_constraints, :facets => ["neighborhood_ids"], :limit => limit, :max_matches => limit)
+        @neighborhoods    = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
       elsif @city
         # build zip and neighborhood facets
         limit           = 10
-        @facets         = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
-        @zips           = Search.load_from_facets(@facets, Zip)
-        @neighborhoods  = Search.load_from_facets(@facets, Neighborhood)
+        facets          = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
+        @zips           = Search.load_from_facets(facets, Zip)
+        @neighborhoods  = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
 
         # find nearby cities, where nearby is defined with a mile radius range
         nearby_miles    = 20
         nearby_limit    = 5
         @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
       elsif @zip
-        # build city facets
-        limit   = 5
-        @facets = Location.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
-        @cities = Search.load_from_facets(@facets, City)
+        # build neighborhood and city facets
+        limit           = 5
+        facets          = Location.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
+        @cities         = Search.load_from_facets(facets, City)
       end
     end
     
