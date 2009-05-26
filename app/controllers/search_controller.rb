@@ -40,19 +40,11 @@ class SearchController < ApplicationController
       end
     end
 
-    self.class.benchmark("Benchmarking #{@city.name} popular events") do
-      @events_count, @popular_events = Rails.cache.fetch("#{@city.name.parameterize}:popular_events", :expires_in => CacheExpire.events) do
-        # find city events count and popular events
-        event_limit     = 10
-        facets          = Event.facets(:with => Search.attributes(@city), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
-        events_count    = facets[:city_id][@city.id].to_i
-        popular_events  = []
-        
-        [events_count, popular_events]
-        # if events_count > 0
-        #   # find most popular city events
-        #   popular_events = Event.search(:with => Search.attributes(@city).update(:popularity => 1..100), :limit => 5)
-        # end
+    self.class.benchmark("Benchmarking #{@city.name} events") do
+      @events_count = Rails.cache.fetch("#{@city.name.parameterize}:events", :expires_in => CacheExpire.events) do
+        # find city events count
+        facets = Event.facets(:with => Search.attributes(@city), :facets => "city_id")
+        facets[:city_id][@city.id].to_i
       end
     end
     
@@ -72,11 +64,12 @@ class SearchController < ApplicationController
       end
     end
 
-    self.class.benchmark("Benchmarking #{@neighborhood.name} popular events") do
-      # find events count and popular events
-      event_limit   = 10
-      @facets       = Event.facets(:with => Search.attributes(@neighborhood), :facets => "city_id", :limit => event_limit, :max_matches => event_limit)
-      @events_count = @facets[:city_id][@city.id].to_i
+    self.class.benchmark("Benchmarking #{@neighborhood.name} events") do
+      # find neighborhood events count
+      @events_count = Rails.cache.fetch("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:events", :expires_in => CacheExpire.events) do
+        facets = Event.facets(:with => Search.attributes(@neighborhood), :facets => "neighborhood_ids")
+        facets[:neighborhood_ids][@neighborhood.id].to_i
+      end
     end
     
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"

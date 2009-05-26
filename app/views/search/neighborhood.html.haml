@@ -5,6 +5,9 @@
   %h2= @h1
   %h5
     = link_to("Search #{pluralize(@neighborhood.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :tag => 'anything'), :class => 'locality search')
+    - if @events_count > 0
+      == &nbsp;|&nbsp;
+      = link_to("Search #{pluralize(@neighborhood.name, 'Events')}", url_for(:action => 'index', :klass => 'events', :tag => 'anything'), :class => 'locality search')
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :neighborhood => @neighborhood})
 
