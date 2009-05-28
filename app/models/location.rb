@@ -178,6 +178,8 @@ class Location < ActiveRecord::Base
     return if event.blank?
     # increment events_count
     Location.increment_counter(:events_count, self.id)
+    # increment popularity
+    Location.increment_counter(:popularity, self.id)
     # add tags
     add_venue_tag
   end
@@ -186,6 +188,8 @@ class Location < ActiveRecord::Base
     return if event.blank?
     # decrement events_count
     Location.decrement_counter(:events_count, self.id)
+    # decrement popularity
+    Location.decrement_counter(:popularity, self.id)
     # remve tags
     remove_venue_tag
   end
