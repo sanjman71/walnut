@@ -200,6 +200,13 @@ class SearchController < ApplicationController
 
     # track what event
     track_what_ga_event(@search_klass, :tag => @tag, :query => @query)
+
+    if @objects.blank?
+      # no search results
+      render(:action => 'no_results')
+    else
+      render(:action => 'index')
+    end
   end
   
   def resolve
