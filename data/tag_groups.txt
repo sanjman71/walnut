@@ -20,7 +20,7 @@
 20|Schools - Colleges and Universities|college universities,education,schools
 21|Religious Services and Organizations|religion,religious organizations
 22|Bicycle Sales and Service|bicycle accessories,bicycle shops,bike shops
-23|Hair Salons and Barbers|beauty salons,hair cuts,hair salons,nail salons,salons
+23|Hair Salons and Barbers|beauty salon,hair cuts,hair salon,nail salon,salon
 24|Real Estate - Brokers and Agents|real estate,real estate agent,real estate broker
 25|Automobile - Repairs and Services|auto repair,automotive repair,car repair,car service
 26|Physicians - General|general physicians
@@ -58,7 +58,7 @@
 58|Restaurant Equipment and Supplies|kitchen equipment,kitchen supplies,restaurant equipment,restaurant supplies
 59|Trailers and Recreational Vehicles|campers,recreational vehicles,rvs,trailers
 60|Post Offices and Mail Services|mail service,post address,post office
-61|Legal Services|lawyers,legal,legal aid,legal services
+61|Legal Services|lawyer,legal,legal aid,legal services
 62|Real Estate - Property Management|commercial property,property management,real estate management,rental property
 63|Real Estate - Commercial and Industrial|commercial real estate,commerical properties,industrial space
 64|Real Estate - Apartments and Condominiums|apartments,condo,condominiums,real estate,townhomes
