@@ -5,7 +5,7 @@ To get the application up and running:
 1. Initialize the database:
   - rake init:all
 
-2. Import localeze data.
+2. Import localeze data:
   - Import records by city
     - rake data:import_records CITY='Chicago' STATE='IL'      # 8700
     - rake data:import_records CITY='Charlotte' STATE='NC'    # 3726
@@ -19,47 +19,39 @@ To get the application up and running:
     - rake data:import_records CITY='Boston' STATE='MA'       # 1366
     
   - Import records by cbsa
-    - rake data:import_records CBSA=16980
+    - rake data:import_records CBSA=16980       # Chicagoland, 437101 locations, 842 minutes
+    - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes
+    - rake data:import_records CBSA=37980       # Philadelphia area, 288721 locations, 10704 errors, 682 minutes
+    - rake data:import_records CBSA=38300       # Pittsburg, PA, 127,596 locations, ?? minutes
   
   * Note: check error logs in log/localeze.error.log
   
-3. Add tags by mapping localeze categories to local tag groups
+3. Add tags by mapping localeze categories to local tag groups:
   - rake data:import_tags
 
-4. Import neighborhoods
-  - rake init:urban_neighborhoods CITY='Chicago' STATE='IL'
-  - rake init:urban_neighborhoods CITY='Charlotte' STATE='NC'
-
-5. Import and map event categories, event venues and events.
+4. Import and map event categories, event venues and events:
   - rake events:init
-  - rake events:import_category_tags
-  - rake events:map_venues
-  - rake events:import_venue_events
   
-5. Build the sphinx index, without re-creating the configuration file:
+  - rake events:import_events CITY=Chicago LIMIT=10
+  - rake events:import_events CITY=Chicago REGION=Illinois LIMIT=10 # import chicago and all illinois region events
+
+  - rake events:import_events CITY=Charlotte REGION='North Carolina' LIMIT=10 # import charlotte and north carolina region events
+  - rake events:import_events CITY=Charlotte REGION='South Carolina' LIMIT=10 # import charlotte and south carolina region events
+
+5. Import neighborhoods:
+  * import neighborhoods from urban mapping by city's popular tags (300 request per day with the free api)
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY='Chicago' LIMIT=300
+  * import neighborhoods from urban mapping by city's event venues (300 request per day with the free api)
+    - rake neighborhoods:import_from_urban_by_city_event_venues CITY='Chicago' LIMIT=100
+  * import neighborhoods based on proximity to locations already marked with neighborhoods
+    - rake neighborhoods:import_by_city_proximity CITY='Chicago'
+
+6. Build location neighbors:
+  * Note: do this after importing events and event venues, as this affects location neighbors.
+
+
+7. Build the sphinx index, without re-creating the configuration file:
   - rake ts:index
   
-6. Start the sphinx dameon:
+8. Start the sphinx dameon:
   - rake ts:start
-
-
-== MySQL Cleanup
-
-The msyql data directory (/usr/local/mysql/data) was taking up a lot of space.  Here's how I cleaned it up:
-
-1. Stop mysqld
-  - sudo /Library/StartupItems/MySQLCOM/MySQLCOM stop
-
-2. Remove innodb data files
-  - rm /usr/local/mysql/data/ibdata1
-  - rm /usr/local/mysql/data/ib_logfile[0,1]
-
-3. Remove crash recovery binary update logs
-  - rm /usr/local/msyql/data/mysql-bin.00*
-
-4. Changed mysql configuration (/etc/my.cnf) to create a file per innodb table
-  - added innodb_file_per_table = 1 to [msyqld] section
-
-5. Start mysqld
-  - sudo /Library/StartupItems/MySQLCOM/MySQLCOM start
-
