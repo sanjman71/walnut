@@ -4,7 +4,7 @@ class TagsController < ApplicationController
   
   def index
     @search   = params[:search].to_s
-    order     = "taggings_count DESC"
+    order     = "taggings_count DESC, name ASC"
     per_page  = 30
     
     case @search
@@ -16,6 +16,16 @@ class TagsController < ApplicationController
     end
     
     @title  = "Tags"
+  end
+  
+  def destroy
+    @tag = Tag.find(params[:id])
+    
+    TagHelper.remove_tag(@tag)
+    
+    flash[:notice] = "removed tag #{@tag.name}"
+    
+    redirect_to(request.referer) and return
   end
   
 end

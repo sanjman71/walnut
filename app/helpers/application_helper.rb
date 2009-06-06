@@ -45,6 +45,27 @@ module ApplicationHelper
     @query_raw ? @query_raw : "" 
   end
   
+  def location_color(location)
+    color = "_purple"
+    
+    return color if location.blank?
+    
+    case location.events_count
+    when 0
+      color = "_purple"
+    else
+      color = "_green"
+    end
+    color
+  end
+  
+  def location_features(location)
+    return [] if location.blank?
+    features = ["location"]
+    features.push("event") if location.events_count > 0    
+    features.sort
+  end
+  
   # build search route based on the klass parameter
   # note: searching can only be done by city, zip or neighborhood
   def build_search_route(klass, where, options={})

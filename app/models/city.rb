@@ -13,13 +13,14 @@ class City < ActiveRecord::Base
   named_scope :within_state,  lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
   
   # find cities with locations
-  named_scope :with_locations,    { :conditions => ["locations_count > 0"] }
+  named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
   
   # order cities by location count
-  named_scope :order_by_density,  { :order => "locations_count DESC" }
+  named_scope :order_by_density,      { :order => "locations_count DESC" }
   
   # order cities by name
-  named_scope :order_by_name,     { :order => "name ASC" }
+  named_scope :order_by_name,         { :order => "name ASC" }
+  named_scope :order_by_state_name,   { :order => "state_id ASC, name ASC" }
   
   # the special anywhere object
   def self.anywhere(state=nil)
@@ -53,8 +54,31 @@ class City < ActiveRecord::Base
   end
   
   # convert city to a string of attributes separated by '|'
-  def to_pipe
-    [self.name, self.state_id. self.lat, self.lng].join("|")
+  def to_csv
+    [self.name, self.state.code, self.lat, self.lng].join("|")
+  end
+  
+  # import cities
+  def self.import(options={})
+    imported  = 0
+    file      = options[:file] ? options[:file] : "#{RAILS_ROOT}/data/cities.txt"
+    
+    FasterCSV.foreach(file, :col_sep => '|') do |row|
+      city_name, state_code, lat, lng = row
+
+      # validate state
+      state = State.find_by_code(state_code)
+      next if state.blank?
+
+      # skip if city exists
+      next if state.cities.find_by_name(city_name)
+
+      # create city
+      city = state.cities.create(:name => city_name, :lat => lat, :lng => lng)
+      imported += 1
+    end
+    
+    imported
   end
   
 end

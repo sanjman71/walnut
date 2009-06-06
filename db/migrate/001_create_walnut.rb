@@ -87,6 +87,7 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :recommendations_count, :default => 0
       t.integer     :events_count,          :default => 0
       t.integer     :status,                :default => 0
+      t.integer     :refer_to,              :default => 0
       t.boolean     :delta  # used by sphinx for real-time indexing
       t.datetime    :urban_mapping_at,      :default => nil
       t.timestamps
@@ -117,6 +118,8 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :tag_groups_count,      :default => 0   # counter cache
     end
 
+    add_index :places, :name
+    
     create_table :location_places do |t|
       t.references  :location
       t.references  :place

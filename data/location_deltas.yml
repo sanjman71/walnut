@@ -1,0 +1,53 @@
+# Chicago
+name: Revive @ El Ray
+street_address: 3504 S Western Ave
+city: Chicago
+state: Illinois
+zip: 60609
+---
+name: Stretch Bar and Grill
+street_address: 3485 N Clark St
+city: Chicago
+state: Illinois
+zip: 60657
+---
+name: Uncle Fatty's Rum Resort
+street_address: 2833 N Sheffield Ave
+city: Chicago
+state: Illinois
+zip: 60657
+---
+name: Wrigley Field
+street_address: 1060 W Addison St
+city: Chicago
+state: Illinois
+zip: 60613
+---
+name: First Midwest Bank Amphitheatre
+street_address: 19100 S Ridgeland Ave
+city: Tinley Park
+state: Illinois
+zip: 60477
+---
+source_type: Localeze::BaseRecord
+source_id: 115007341
+name: Tryst
+# Pittsburg
+---
+source_type: Localeze::BaseRecord
+source_id: 59967926
+name: Altar Bar
+---
+source_type: Localeze::BaseRecord
+source_id: 10522811
+name: Heinz Field
+---
+source_type: Localeze::BaseRecord
+source_id: 112384325
+name: PNC Park
+---
+name: Mr. Small’s Theater
+street_address: 400 Lincoln Ave
+city: Pittsburgh
+state: Pennsylvania
+zip: 15209

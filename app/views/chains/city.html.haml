@@ -28,7 +28,7 @@
     - @locations.each_with_index do |location, i|
       .span-10.letterbox-5.border_bottom[location]
         / Regular location
-        = render(:partial => 'search/location', :locals => {:location => location, :query => @chain.name, :tags => [], :index => i, :color => "_purple", :nameclass => 'place'})
+        = render(:partial => 'search/location', :locals => {:location => location, :query => @chain.name, :index => i})
 
   .span-9.last
     - unless @locations.blank?

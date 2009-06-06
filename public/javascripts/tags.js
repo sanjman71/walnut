@@ -105,7 +105,7 @@ $(document).ready(function() {
     // remove_tags should already be populated
     
     // disable submit button
-    $("#update_tag_group").attr("disabled", "disabled");
+    //$("#update_tag_group").attr("disabled", "disabled");
     
     // do the normal submit
     return true;

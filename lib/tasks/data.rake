@@ -222,7 +222,16 @@ namespace :data do
     
     @country    = Country.find_by_code("US")
     
-    until (records = Localeze::BaseRecord.find(:all, :conditions => conditions, :limit => per_page, :offset => offset)).blank?
+    # find all matching record ids
+    record_ids  = Localeze::BaseRecord.find(:all, :select => 'id', :conditions => conditions)
+    
+    puts "#{Time.now}: found #{record_ids.size} matching record ids"
+    
+    # load records in batches
+    until (records = Localeze::BaseRecord.find(record_ids.slice(offset, per_page))).blank?
+
+    puts "#{Time.now}: processing batch #{offset}"
+      
       records.each do |record|
         # check if record has already been imported
         if Location.find_by_source(record).first
@@ -232,7 +241,7 @@ namespace :data do
         end
       
         # find state
-        @state = @country.states.find_by_code(record.state)
+        @state  = @country.states.find_by_code(record.state)
       
         if @state.blank?
           # invalid state

@@ -88,6 +88,10 @@ class Location < ActiveRecord::Base
     false
   end
   
+  def refer_to?
+    self.refer_to > 0
+  end
+  
   def geocode_latlng(options={})
     force = options.has_key?(:force) ? options[:force] : false
     return true if self.lat and self.lng and !force

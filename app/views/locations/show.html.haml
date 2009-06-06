@@ -7,13 +7,15 @@
 .span-23.last.box
   %h1
     = @h1
-    - if has_privilege?('manage site')
-      %span{:style => 'font-size: 0.4em; color: #777777;'}
-        == #{@location.source_type}:#{@location.source_id}
-        == &nbsp;|&nbsp;
-        == Digest:#{@location.digest}
-        == &nbsp;|&nbsp;
-        = pluralize(@location.events_count, "Event")
+  - if has_privilege?('manage site')
+    %h4{:style => 'font-size: 1.0em; color: #777777;'}
+      == #{@location.source_type}:#{@location.source_id}
+      == &nbsp;|&nbsp;
+      == Digest:#{@location.digest}
+      == &nbsp;|&nbsp;
+      == Popularity:#{@location.popularity}
+      == &nbsp;|&nbsp;
+      == Events:#{@location.events_count}
           
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :link_all => true})

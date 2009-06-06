@@ -28,8 +28,8 @@ class CreateEvents < ActiveRecord::Migration
       t.integer     :events_count,    :default => 0
       t.integer     :confidence,      :default => 0
       t.references  :location
-      t.integer     :location_source_id
-      t.string      :location_source_type
+      t.string      :location_source_id,    :limit => 50
+      t.string      :location_source_type,  :limit => 100
     end
     
     add_index :event_venues, :source_id

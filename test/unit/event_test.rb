@@ -27,12 +27,12 @@ class EventTest < ActiveSupport::TestCase
   end
   
   context "validate event venue" do
-    should "have location_source_id == 0" do
-      assert_equal 0, @event_venue.location_source_id
+    should "have location_source_type with 'Digest'" do
+      assert_match /Digest/, @event_venue.location_source_type
     end
 
-    should "have location_source_type with digest value" do
-      assert_match /Digest:\w+/, @event_venue.location_source_type
+    should "have location_source_id with digest value" do
+      assert_equal "51d9af61aa010e52ae073036ca6b4de1", @event_venue.location_source_id
     end
   end
   
@@ -49,7 +49,7 @@ class EventTest < ActiveSupport::TestCase
     end
     
     should "have location_source_id == 101" do
-      assert_equal 101, @hall_venue.location_source_id
+      assert_equal '101', @hall_venue.location_source_id
     end
   end
   
@@ -83,6 +83,10 @@ class EventTest < ActiveSupport::TestCase
       assert_equal 1, @event_venue.events_count
     end
 
+    should "increment location's popularity value" do
+      assert_equal 1, @location.popularity
+    end
+    
     should "add tag 'venue' to location place" do
       assert_equal ["venue"], @place.tag_list
     end
@@ -141,6 +145,10 @@ class EventTest < ActiveSupport::TestCase
         
         should "decrement location event count" do
           assert_equal 0, @location.events_count
+        end
+
+        should "decrement location's popularity value" do
+          assert_equal 0, @location.popularity
         end
 
         should "remove event from venue event collection" do

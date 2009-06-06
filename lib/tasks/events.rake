@@ -21,7 +21,7 @@ namespace :events do
     options   = { :validate => false }
     imported  = 0
     
-    puts "#{Time.now}: adding category tags, parsing file #{file}" 
+    puts "#{Time.now}: adding category tags ... parsing file #{file}" 
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       name, tags = row
       
@@ -77,22 +77,26 @@ namespace :events do
   #   puts "#{Time.now}: completed, updated #{count} venues"
   # end
   
-  desc "Import popular CITY events from eventful"
-  task :import_popular_events do
+  desc "Import CITY events from eventful, allow all REGION events if specified"
+  task :import_events do
     # build events search conditions
-    city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
-    limit = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 1
+    city    = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
+    region  = ENV["REGION"] ? ENV["REGION"] : ""
+    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 1
 
     if city.blank?
       puts "usage: missing CITY"
       exit
     end
 
+    state   = city.state
+
     puts "#{Time.now}: importing #{city.name} events, limit #{limit}"
 
     page        = 1
     per_page    = 50
     imported    = 0
+    exists      = 0
     checked     = 0
     missing     = 0
     errors      = 0
@@ -110,8 +114,9 @@ namespace :events do
         # map eventful event to an event venue
         venue       = EventVenue.find_by_source_id(event_hash['venue_id'])
         city_name   = event_hash['city_name']
+        region_name = event_hash['region_name']
         
-        if venue.blank? and city_name == city.name
+        if venue.blank? and (city_name == city.name or region == region_name)
           # missing venue in the requested city, add it
           puts "#{Time.now}: *** importing venue: #{event_hash['venue_name']}:#{event_hash['venue_id']}"
           
@@ -120,8 +125,10 @@ namespace :events do
             venue_hash = EventVenue.get(event_hash['venue_id'])
             # add venue
             venue = EventVenue.import_venue(venue_hash, :log => true)
-            # apply metadata
+            # import metadata
             EventVenue.import_metadata(city.name)
+            # reload venue
+            venue.reload
           rescue Exception => e
             puts "#{Time.now}: xxx venue get exception, skipping: #{e.message}"
             errors += 1
@@ -130,31 +137,31 @@ namespace :events do
         end
         
         if venue.blank?
-          # missing venue, but its not in th requested city
-          puts "#{Time.now}: xxx missing venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
+          # missing venue, but its not in the requested city
+          puts "#{Time.now}: xxx skipping venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
           missing += 1
           next
         end
 
         if !venue.mapped?
-          # map the venue to a location if we need to
+          # map the venue to a location
           venue.map_to_location(:log => true)
 
-          # skip adding venues as locations for now
-          # if !venue.mapped?
-          #   # if its still not mapped, add the venue as a new place and location
-          #   venue.add_place(:log => true)
-          # end
+          # if its still not mapped, and the confidence value says the location probably doesn't exist, add the venue as a new place
+          if !venue.mapped? and venue.confidence == 0
+            venue.add_place(:log => true)
+          end
         end
         
         if !venue.mapped?
-          # the venue could not be mapped to location
+          # the venue could not be mapped to a location
           puts "#{Time.now}: xxx unmapped venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
           next
         end
       
         if Event.find_by_source_id(event_hash['id'])
           # event already exists
+          exists += 1
           next
         end
         
@@ -164,9 +171,6 @@ namespace :events do
         if event
           # tag the event
           EventVenue.tag_event(event, :log => true)
-        
-          # mark as popular
-          event.popular!
 
           # track imported event count
           imported += 1
@@ -180,7 +184,7 @@ namespace :events do
     
     iend = Event.count
 
-    puts "#{Time.now}: completed, checked #{checked} events, imported #{iend - istart} events, ended with #{iend} events"
+    puts "#{Time.now}: completed, checked #{checked} events, imported #{iend - istart} events, #{exists} already exist, missing #{missing} venues, ended with #{iend} events"
   end
   
   desc "Tag all events in a city"

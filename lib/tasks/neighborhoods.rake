@@ -35,7 +35,7 @@ namespace :neighborhoods do
         attributes  = ::Search.attributes(Array(location.city))
         attributes["@geodist"] = 0.0..Neighborhood.within_neighborhood_distance_meters
         origin      = [Math.degrees_to_radians(location.lat).to_f, Math.degrees_to_radians(location.lng).to_f]
-        limit       = 100
+        limit       = 200
         neighbors   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc",  
                                       :max_matches => limit, :limit => limit)
       
@@ -69,7 +69,8 @@ namespace :neighborhoods do
   desc "Import neighborhoods from urban mapping based on city popular tags"
   task :import_from_urban_by_city_popular_tags do
     city        = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
-    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 300 # 300 is max requests per day allowed with free api
+    tag_limit   = ENV["TAG_LIMIT"] ? ENV["TAG_LIMIT"].to_i : 200
     added       = 0
     over_limit  = false
     
@@ -78,10 +79,10 @@ namespace :neighborhoods do
       exit
     end
 
-    puts "#{Time.now}: importing #{city.name} neighborhoods, limit #{limit}"
+    puts "#{Time.now}: importing #{city.name} neighborhoods using popular tags, tag limit #{tag_limit}, limit #{limit}"
     
     # find popular tags
-    tags = popular_tags(city, :limit => 150)
+    tags = popular_tags(city, :limit => tag_limit)
 
     tags.each do |tag|
       # find locations tagged with 'tag'
@@ -100,7 +101,7 @@ namespace :neighborhoods do
         # skip if location has already been mapped or has neighborhoods (i.e. mapped w/o using urban mapping)
         next if !location.urban_mapping_at.blank? or location.neighborhoods_count > 0
 
-        puts "#{Time.now}: *** mapping location #{location.id}:#{location.name}"
+        puts "#{Time.now}: *** mapping location #{location.id}:#{location.place_name}"
         
         begin
           # add neighborhoods from urban mapping
@@ -123,6 +124,61 @@ namespace :neighborhoods do
 
       # check if we exceeded our rate limit
       break if over_limit
+    end
+
+    puts "#{Time.now}: completed, added #{added} neighborhoods"
+  end
+  
+  desc "Import neighborhoods from urban mapping based on city event venues"
+  task :import_from_urban_by_city_event_venues do
+    city        = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
+    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 300 # 300 is max requests per day allowed with free api
+    added       = 0
+    over_limit  = false
+    
+    if city.blank?
+      puts "*** invalid city"
+      exit
+    end
+
+    puts "#{Time.now}: importing #{city.name} neighborhoods for event venues, limit #{limit}"
+  
+    hash          = Search.query("events:1")
+    # @query_raw    = @hash[:query_raw]
+    # @query_or     = @hash[:query_or]
+    # @query_and    = @hash[:query_and]
+    # @fields       = @hash[:fields]
+    attributes    = hash[:attributes] || Hash.new
+    attributes    = Search.attributes(city).update(attributes)
+
+    per_page      = 200
+    locations     = Location.search(:with => attributes, :match_mode => :extended, :page => 1, :per_page => per_page, :max_matches => per_page,
+                                    :order => :popularity, :sort_mode => :desc)
+
+
+    locations.each do |location|
+      # skip if location has already been mapped or has neighborhoods (i.e. mapped w/o using urban mapping)
+      next if !location.urban_mapping_at.blank? or location.neighborhoods_count > 0
+
+      puts "#{Time.now}: *** mapping location #{location.id}:#{location.place_name}"
+
+      begin
+        # add neighborhoods from urban mapping
+        added += add_urban_neighborhoods(location)
+      rescue UrbanMapping::ExceededRateLimitError
+        # we're done for today
+        over_limit = true
+        break
+      end
+      
+      if added >= limit
+        # self imposed limit
+        over_limit = true
+        break
+      end
+      
+      # throttle calls to urban mapping
+      Kernel.sleep(1)
     end
 
     puts "#{Time.now}: completed, added #{added} neighborhoods"
@@ -152,7 +208,7 @@ namespace :neighborhoods do
       return 0
     end
     
-    puts "#{Time.now}: *** mapped location #{location.id}:#{location.name} to urban hoods #{neighborhoods.collect(&:name).join(',')}"
+    puts "#{Time.now}: *** mapped location #{location.id}:#{location.place_name} to urban hoods #{neighborhoods.collect(&:name).join(',')}"
 
     added = 0
     

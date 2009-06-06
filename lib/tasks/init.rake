@@ -4,7 +4,7 @@ require 'ar-extensions'
 namespace :init do
 
   desc "Initialize default values."
-  task :all => [:countries, :states, :cities, :communities, :state_zips, :tag_groups, :admin_users, "rp:init"]
+  task :all => [:countries, :states, :cities, :communities, :townships, :zips, :tag_groups, :admin_users, "rp:init", "events:init"]
 
   desc "Initialize admin users"
   task :admin_users do 
@@ -46,7 +46,7 @@ namespace :init do
     values  = []
     options = { :validate => false }
 
-    puts "#{Time.now}: parsing file #{file}" 
+    puts "#{Time.now}: importing states ... parsing file #{file}" 
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => ',') do |row|
       id, name, code, lat, lng = row
       value = [id, name, code, @us.id, lat, lng]
@@ -63,58 +63,22 @@ namespace :init do
   
   desc "Initialize basic set of cities"
   task :cities do
-
-    ["IL"].each do |code|
-      @state = State.find_by_code(code)
-      ['Chicago'].each do |city_name|
-        Locality.validate(@state, 'city', city_name)
-      end
-    end
-
-    ["NY"].each do |code|
-      @state = State.find_by_code(code)
-      ['New York'].each do |city_name|
-        Locality.validate(@state, 'city', city_name)
-      end
-    end
-
-    ["NC"].each do |code|
-      @state = State.find_by_code(code)
-      ['Charlotte'].each do |city_name|
-        Locality.validate(@state, 'city', city_name)
-      end
-    end
-
-    ["PA"].each do |code|
-      @state = State.find_by_code(code)
-      ['Philadelphia'].each do |city_name|
-        Locality.validate(@state, 'city', city_name)
-      end
-    end
-    
-    ["CO"].each do |code|
-      @state = State.find_by_code(code)
-      ['Denver'].each do |city_name|
-        Locality.validate(@state, 'city', city_name)
-      end
-    end
-
-    ["AZ"].each do |code|
-      @state = State.find_by_code(code)
-      ['Phoenix'].each do |city_name|
-        Locality.validate(@state, 'city', city_name)
-      end
-    end
-
-    puts "#{Time.now}: initialized cities"
+    count = City.import
+    puts "#{Time.now}: initialized #{count} cities"
   end
   
-  "Initialize communities, which are treated as cities"
+  desc "Initialize communities, which are imported as cities"
   task :communities do
     # import communities as cities
-    Community.import
+    count = Community.import
+    puts "#{Time.now}: initialized #{count} communities"
+  end
 
-    puts "#{Time.now}: initialized communities"
+  desc "Initialize townships, which are imported as cities"
+  task :townships do
+    # import townships as cities
+    count = Township.import
+    puts "#{Time.now}: initialized #{count} townships"
   end
 
   desc "Geocode all locations"
@@ -151,24 +115,32 @@ namespace :init do
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
   
-  desc "Initialize state zips"
-  task :state_zips do
+  desc "Initialize zips"
+  task :zips do
     klass   = Zip
-    columns = [:id, :name, :state_id, :lat, :lng]
-    file    = "#{RAILS_ROOT}/data/state_zips.txt"
+    columns = [:name, :state_id, :lat, :lng]
+    file    = "#{RAILS_ROOT}/data/zips.txt"
     values  = []
     options = { :validate => false }
     
     puts "#{Time.now}: importing state zips ... parsing file #{file}" 
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
-      id, name, state_id, lat, lng = row
-      value = [id, name, state_id, lat, lng]
+      name, state_code, lat, lng = row
+
+      # validate state
+      state = State.find_by_code(state_code)
+      next if state.blank?
+      
+      # check if zip already exists
+      next if state.zips.find_by_name(name)
+
+      value = [name, state.id, lat, lng]
       values << value
     end
 
     # import data
     puts "#{Time.now}: importing data, starting with #{klass.count} objects"
-    klass.import columns, values, options 
+    klass.import columns, values, options if !values.blank?
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
 

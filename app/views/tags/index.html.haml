@@ -8,6 +8,8 @@
     = text_field("tag", "name", :autocomplete => "off", :id => 'live_search_for_tags', :class => 'title big', :url => tags_path)
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
     
+%hr.space
+
 .prepend-1.span-14#flash
   = display_flash(:notice)
 

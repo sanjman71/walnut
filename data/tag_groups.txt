@@ -2,7 +2,7 @@
 2|Real Estate - Title Companies|real estate company,title companies,title insurance
 3|Furniture|bedroom,chair,furnishings,furniture,living room
 4|Automobile - Parts and Accessories|auto accessories,auto parts,car accessories,car parts
-5|Dentists|dds,dental,dentistry,dentists
+5|Dentists|dds,dental,dentistry,dentist
 6|Automobile - Rentals|car rental,rent a car,rentals,truck rentals
 7|Automobile - Towing|car towing,towing,towing services
 8|Automobile - Tires|automotive tires,tire dealers,truck tires
@@ -18,18 +18,18 @@
 18|Schools - Public and Academic|academic schools,elementary schools,public school
 19|Physicians - Psychiatry|anxiety,bipolar,depression,psychiatrists,psychiatry
 20|Schools - Colleges and Universities|college universities,education,schools
-21|Religious Services and Organizations|religion,religious organizations
+21|Religious Services and Organizations|religion
 22|Bicycle Sales and Service|bicycle accessories,bicycle shops,bike shops
 23|Hair Salons and Barbers|beauty salon,hair cuts,hair salon,nail salon,salon
 24|Real Estate - Brokers and Agents|real estate,real estate agent,real estate broker
 25|Automobile - Repairs and Services|auto repair,automotive repair,car repair,car service
-26|Physicians - General|general physicians
+26|Physicians - General|general physician
 27|Moving Services|moving companies,moving services,relocation services
-28|Hair and Beauty Supplies, Service and Equipment|beauty products,beauty supplies,hair care,hair salons,spa beauty
+28|Hair and Beauty Supplies, Service and Equipment|beauty products,beauty supplies,hair care,hair salon,spa beauty
 29|Dry Cleaners|cleaners,dry cleaners,laundry
 30|Employment Agencies|employment agencies,employment staffing,temp agencies
 31|Contractors - Painting|painting,painting contractors
-32|Groceries|food,groceries,grocery,supermarket
+32|Groceries|food,grocery,supermarket
 33|Contractors - Roofing|roofing contractors,roofing materials,shingles
 34|Law - Criminal|criminal attorney,criminal law,criminal lawyer
 35|Bakeries|bakery,cakes,pastry
@@ -37,8 +37,8 @@
 37|Advertising|ads,advertising,branding,marketing,promotion,sales
 38|Graphic Design|graphic design,graphic designer,web design
 39|Contractors - Computer|computer consultants,computer technician
-40|Loans and Mortgages|equity loans,home loans,loans,mortgage,mortgage loans
-41|Telecommunications Equipment and Services|telecommunications equipment,voip
+40|Loans and Mortgages|equity loans,home loans,loan,mortgage,mortgage loans
+41|Telecommunications Equipment and Services|broadband,mobile,telecommunications equipment,voip
 42|Security Systems and Services|alarm sytems,home security,security services,security systems
 43|Carpet and Flooring|carpet,flooring,hardwood,laminate,wood
 44|Bars, Taverns and Cocktail Lounges|bar,lounge,pub
@@ -57,7 +57,7 @@
 57|Boat Dealers and Equipment|boat dealers,boat equipment,boating
 58|Restaurant Equipment and Supplies|kitchen equipment,kitchen supplies,restaurant equipment,restaurant supplies
 59|Trailers and Recreational Vehicles|campers,recreational vehicles,rvs,trailers
-60|Post Offices and Mail Services|mail service,post address,post office
+60|Post Offices and Mail Services|mail service,packing,post address,post office,postage,shipping
 61|Legal Services|lawyer,legal,legal aid,legal services
 62|Real Estate - Property Management|commercial property,property management,real estate management,rental property
 63|Real Estate - Commercial and Industrial|commercial real estate,commerical properties,industrial space
@@ -71,7 +71,7 @@
 71|Metal|aluminum,copper,metal,steel
 72|Real Estate - Development|real estate developers,real estate development
 73|Business Brokers and Franchising|business brokers,business franchise,franchising
-74|Organizations and Associations|associations,organizations
+74|Organizations and Associations|
 75|Cleaning Services and Supplies|cleaning supplies,home cleaning,house cleaning,maid
 76|Interior Designers and Decorators|home design,interior design,interior designers
 77|Health and Fitness Clubs|fitness clubs,health clubs,health fitness,health gyms
@@ -95,15 +95,15 @@
 95|Veterinarians|dvm,pets,vet clinic,veterinarians,veterinary
 96|Shopping Malls and Centers|outlet stores,shopping centers,shopping malls
 97|Clothing and Accessories|apparel,clothes,clothing
-98|Law - Financial and Bankruptcy|
-99|Law - Labor and Employment|
-100|Physicians - Obstetrics and Gynecology|
-101|Law - Personal Injury and Property Damage|
-102|Physicians - Nephrology and Urology|
+98|Law - Financial and Bankruptcy|bankruptcy law,lawyer
+99|Law - Labor and Employment|employment law,labor law,lawyer
+100|Physicians - Obstetrics and Gynecology|gynecology,obgyn,obstetrics
+101|Law - Personal Injury and Property Damage|lawyer,personal injury,property damage
+102|Physicians - Nephrology and Urology|nephrology,urology
 103|Party Supplies|party favors,party invitations,party supplies
 104|Music Stores|guitar stores,music stores,sheet music
 105|Artists and Art Dealers|art dealers,art galleries,artists,paintings,posters
-106|Insurance|
+106|Insurance|insurance
 107|Health Services|health care,health centers,health clinics,healthcare,hospitals
 108|Pet Services|pet boarding,pet care,pet grooming,pet kennels,pet sitting
 109|Hardware Tools and Services|hardware tools,lumber,power tools,tools repair
@@ -128,165 +128,165 @@
 128|Engineers|
 129|Martial Arts Instruction|martial arts school,martial arts training
 130|Counseling Services|counseling center,counseling services,counselor,mental health
-131|Propane|
-132|Publishers|
+131|Propane|gas,propane
+132|Publishers|books,publisher,publishing
 133|Uniforms|
-134|Medical Laboratories|
-135|Photographers|
+134|Medical Laboratories|medical lab
+135|Photographers|photographer
 136|Shopping and Errand Services|
 137|Screen Printing and Embroidery|
-138|Musical Instruments|
-139|Trophies and Engraving|
-140|Pawn Shops and Discount Stores|
-141|Physicians - Cardiovascular and Pulmonary|
+138|Musical Instruments|music,musical instruments
+139|Trophies and Engraving|engraving,trophy
+140|Pawn Shops and Discount Stores|discount,pawn shop
+141|Physicians - Cardiovascular and Pulmonary|cardiovascular,pulmonary
 142|Security Guards and Patrols|
 143|Contractors - Excavation and Wrecking|construction equipment,excavating,excavation,heavy equipment
-144|Physicians - Orthopedics|
+144|Physicians - Orthopedics|orthopedic,orthopedist,sports medicine
 145|Commercial and Industrial Vehicles and Machinery|
-146|Laundromats|
-147|Variety Stores|
-148|Electronics - Printers|
-149|Manufacturing and Assembly|
-150|Landscaping Services and Supplies|
-151|Inspection Services|
+146|Laundromats|cleaner,laundromat,laundry
+147|Variety Stores|discount
+148|Electronics - Printers|printers,printing
+149|Manufacturing and Assembly|assembly,manufacturing
+150|Landscaping Services and Supplies|landscape design,landscaping
+151|Inspection Services|building,home,inspection
 152|Pet Services and Supplies|pet products,pet store,pet supplies
 153|Agricultural Production|agricultural,agriculture,farming
-154|Laundry Services|
-155|Fireplaces|
+154|Laundry Services|dry cleaners,laundry
+155|Fireplaces|fireplace,hearth,stove
 156|Chiropractors|chiropractic,chiropractors,physical therapy
-157|Contractors - Sewer|
-158|Investigation Services|
-159|Physicians - Oncology and Hematology|
-160|Waste Management|
-161|Wedding Supplies and Services|
-162|Photographic Equipment|
-163|Upholstery|
-164|Wireless Communications|
-165|Real Estate - Appraisers|
+157|Contractors - Sewer|plumbing,sewer
+158|Investigation Services|background check,detective,fraud,investigation,private investigator
+159|Physicians - Oncology and Hematology|hematology,oncology
+160|Waste Management|recycling,trash,waste
+161|Wedding Supplies and Services|marriage,wedding
+162|Photographic Equipment|photography,photos
+163|Upholstery|fabric,upholstery
+164|Wireless Communications|mobile,wireless
+165|Real Estate - Appraisers|appraisal,appraiser,realtor
 166|Collection Agencies and Repossessions|
 167|Florists|bouquets,delivery,floral,flowers
 168|Document and Records Services|document imaging,document management
-169|Retirement and Assisted Living Facilities|
+169|Retirement and Assisted Living Facilities|assisted living,retirement community,senior living
 170|Aircraft Dealers and Services|aircraft maintenance,aviation
 171|Alternative Medicine|alternative medicine,herbal medicine,holistic medicine,homeopathy,natural medicine
 172|Automobile - Wash and Detailing|auto detailing,car wash,car washes,carwash
-173|Contractors - Masonry|
+173|Contractors - Masonry|brick,concrete,masonry
 174|Camps and Training|
-175|Fences|
+175|Fences|fences
 176|Shoes and Shoe Repairs|boots,footwear,shoe repairs,shoes
-177|Psychics and Astrologers|
+177|Psychics and Astrologers|astrology,horoscope,psychic,tarot
 178|Disaster Preparation and Recovery|
 179|Broadcasting and Media Production|film production,television production,video production
-180|Golf Courses and Ranges|
+180|Golf Courses and Ranges|driving range,golf courses
 181|Adult Entertainment|
 182|Entertainers and Entertainment|
 183|Body Piercing and Tattoos|body jewelry,body piercing,tattoos
-184|Video Rentals and Sales|
-185|Formal Wear|
-186|International Trade|
-187|Sports and Recreation Facilities|
-188|Physicians - Podiatry|
-189|Contractors - Paving|
-190|Collectibles|
+184|Video Rentals and Sales|dvd,video rental,video sale
+185|Formal Wear|evening wear,formal wear
+186|International Trade|export,import,international trade
+187|Sports and Recreation Facilities|sports center,sports complex
+188|Physicians - Podiatry|foot,podiatrist,podiatry
+189|Contractors - Paving|asphalt,paving
+190|Collectibles|collectibles,memorabilia
 191|Hobby and Model Supplies|
 192|Cabinets and Countertops|cabinets,countertops,granite
-193|Taxidermy|
-194|Electronics - Equipment and Services|
+193|Taxidermy|taxidermy
+194|Electronics - Equipment and Services|electronic equipment,electronic supplies
 195|Sprinklers and Irrigation|
-196|Mental Health Services|
-197|Swimming Pool Construction|
-198|Garage Doors|
-199|Nurseries and Garden Centers|
+196|Mental Health Services|counseling,mental health,psychiatric
+197|Swimming Pool Construction|swimming pools
+198|Garage Doors|garage door
+199|Nurseries and Garden Centers|garden center,gardening,nursery
 200|Chemicals and Gases|
-201|Massage|
+201|Massage|massage,massage therapy
 202|Septic Tanks|
 203|Ambulance and Rescue Services|
 204|Mobile Home Dealers and Services|
-205|Swimming Pool Maintenance and Services|
+205|Swimming Pool Maintenance and Services|pool supplies,swimming pools
 206|Repair Services|
 207|Sewing Supplies and Services|fabric,sewing supplies
-208|Mattresses and Bedding|
-209|Motorcycles and Motor Sports|
+208|Mattresses and Bedding|bedding,mattress
+209|Motorcycles and Motor Sports|motorcycle
 210|Fire Protection Systems and Services|
-211|Swimming Pool Equipment and Supplies|
+211|Swimming Pool Equipment and Supplies|pool supplies,swimming pools
 212|Senior Citizen Centers and Services|
-213|Painting Supplies|
+213|Painting Supplies|paint
 214|Electronics - Audio Visual|
-215|Welding|
+215|Welding|welding
 216|Logging and Sawmills|
-217|Electronics - Batteries|
-218|Sporting Goods|
+217|Electronics - Batteries|battery
+218|Sporting Goods|sporting goods
 219|Surveyors Equipment and Services|
-220|Contractors - Concrete|
+220|Contractors - Concrete|brick,cement,concrete
 221|Heating, Ventilation and Air Conditioning|air conditioning,heating,hvac
 222|Diet, Nutrition and Weight Management|
-223|Contractors - Tile, Marble and Granite|
-224|Utilities - Gas, Water and Electric|
-225|Signs, Displays, Flags and Banners|
-226|Event Venues|events
+223|Contractors - Tile, Marble and Granite|granite,marble,slate,tile
+224|Utilities - Gas, Water and Electric|electric,gas,water
+225|Signs, Displays, Flags and Banners|display,flag,sign
+226|Event Venues|
 227|Contractors - Insulation|
-228|Contractors - Deck and Patio|
-229|Internet Services|
-230|Electronics - Home Entertainment|
-231|Contractors - Siding|
-232|Law - Wills and Estate Planning|
-233|Law - Governmental Issues|
-234|Water Heaters|
-235|Contractors - Drywall|
+228|Contractors - Deck and Patio|deck,patio
+229|Internet Services|broadband,high speed,internet
+230|Electronics - Home Entertainment|electronics,home theater
+231|Contractors - Siding|siding
+232|Law - Wills and Estate Planning|estate planning,lawyer,wills
+233|Law - Governmental Issues|government law,lawyer
+234|Water Heaters|water heater
+235|Contractors - Drywall|drywall
 236|Fire and Water - Damage and Restoration|
-237|Arts and Crafts Supplies|
+237|Arts and Crafts Supplies|arts,crafts
 238|Catering and Bartending Services|bartending,catering
-239|Yoga Instruction|
-240|Contractors - Carpentry|
-241|Law - Divorce and Family|
-242|Photo Finishing|
-243|Tanning Salons|
-244|Health and Diet Food Products|
+239|Yoga Instruction|pilates,yoga
+240|Contractors - Carpentry|carpenter,carpentry,woodworking
+241|Law - Divorce and Family|divorce,family,lawyer
+242|Photo Finishing|photo lab,photo printing,photo processing
+243|Tanning Salons|tanning salons
+244|Health and Diet Food Products|health food,nutrition,supplements,vitamins
 245|Plastics|
-246|Spas, Saunas and Hot Tubs|
-247|Petroleum Services and Equipment|
-248|Textiles|
+246|Spas, Saunas and Hot Tubs|hot tub,sauna,spa
+247|Petroleum Services and Equipment|oil,petroleum
+248|Textiles|apparel,fabric,garment,textile
 249|Consultants - Food|
 250|Contractors - Marine|
 251|Fraternities and Sororities|
 252|Educational Services|
-253|Law - Malpractice|
-254|Law - Real Estate|
-255|Law - Business and Corporate|
-256|Libraries|
-257|Physicians - Pediatrics|
-258|Dancing Instruction|
-259|Boat Services|
-260|Physicians - Endocrinology and Diabetes|
-261|Physicians - Radiology|
+253|Law - Malpractice|lawyer,malpractice
+254|Law - Real Estate|lawyer,real estate
+255|Law - Business and Corporate|business law,lawyer
+256|Libraries|books,library
+257|Physicians - Pediatrics|pediatric,pediatrician
+258|Dancing Instruction|dance classes,dance school,dance studio
+259|Boat Services|boat
+260|Physicians - Endocrinology and Diabetes|diabetes,diabetic,endocrinology
+261|Physicians - Radiology|radiology
 262|Ticket Sales|
 263|Movie Theaters|
 264|Museums and Zoological Gardens|
-265|Fashion Design|
-266|Dating Services|
-267|Vending Machines|
+265|Fashion Design|design,fashion
+266|Dating Services|dating service,online,personals
+267|Vending Machines|beverage,snack,soda,vending machine
 268|Writing Services|
 269|Lighting Fixtures|
 270|Secretarial Services|
-271|Bowling|
+271|Bowling|billiards,bowling
 272|Gymnastics Instruction|
 273|Arcades|
-274|Railroads|
+274|Railroads|railroad,train
 275|Tree Service|
-276|Physicians - Neurology and Neurosurgery|
+276|Physicians - Neurology and Neurosurgery|neurology,neurosurgery
 277|Beverage Sales and Distribution|beverage distributors,beverage industry
 278|Cable and Satellite Equipment and Services|
 279|Physicians - Pathology|
 280|Physicians - Proctology|
-281|Elevators|
-282|Pest and Animal Control|
+281|Elevators|elevator,lifts
+282|Pest and Animal Control|pest control,rodents
 283|Personal Coaching|
-284|Costume Shops|
-285|Laundry Supplies|
+284|Costume Shops|costume
+285|Laundry Supplies|cleaning,laundry
 286|Rubber|
 287|Birth Control and Abortion Services|
 288|Agricultural Services|agricultural,agriculture,farming
-289|Outdoor Recreation|
+289|Outdoor Recreation|outdoor sports
 290|Boat Charters and Rentals|
 291|Mobile Home Parks|
 292|Fund Raising and Financial Aid|
@@ -294,31 +294,31 @@
 294|Scuba Diving|
 295|Refrigeration Sales and Service|
 296|Water Filtration and Treatment|
-297|Physicians - Plastic and Cosmetic Surgery|
-298|Funeral, Burial, and Cremation|
+297|Physicians - Plastic and Cosmetic Surgery|cosmetic surgery,plastic surgery
+298|Funeral, Burial, and Cremation|burial,cremation,funeral
 299|Translating and Interpreting Services|
 300|Payment Handling Equipment and Supplies|
 301|Cemeteries|
 302|Prosthetics and Orthopedic Supplies|
-303|Credit Counseling and Bankruptcy Services|
+303|Credit Counseling and Bankruptcy Services|bankruptcy,credit
 304|Scientific Equipment and Supplies|
 305|Disabled Persons Services|
 306|Inventory Control and Equipment|
 307|Portable Buildings|
-308|Physicians - Dermatology|
+308|Physicians - Dermatology|dermatologist,dermatology
 309|Junk and Scrap Dealers|recycling
 310|Educational Supplies|
 311|Campgrounds and Rv Parks|
 312|Generators|
-313|Animal Shelters and Humane Societies|
+313|Animal Shelters and Humane Societies|animal shelter,humane society,pets
 314|Vacuum Cleaners|
-315|Convention and Meeting Facilities|
+315|Convention and Meeting Facilities|conference,convention,meeting
 316|Consultants - Entertainment|
 317|Machine Shops|
-318|Pool Tables and Billiards|
+318|Pool Tables and Billiards|billiards,pool table
 319|Dental Equipment and Supplies|
 320|Video Production and Duplication|
-321|Fuel, Oil and Coal|
+321|Fuel, Oil and Coal|coal,gas,diesel,fuel,oil
 322|Graveside Monuments|
 323|Truck Parts and Accessories|
 324|Housing Assistance and Shelters|
@@ -328,7 +328,7 @@
 328|Horse Services and Equipment|
 329|Music Production Services|
 330|Aircraft Charters and Rentals|
-331|Ice and Ice Machines|
+331|Ice and Ice Machines|ice,ice maker
 332|Service Station Equipment and Supplies|
 333|Hunting and Fishing Sites|
 334|Awnings, Canopies and Tarps|
@@ -338,7 +338,7 @@
 338|Theatrical Equipment and Supplies|
 339|Allergy and Immunology|
 340|Physicians - Ear, Nose and Throat|
-341|Nursing Homes|
+341|Nursing Homes|assisted living,nursing home
 342|Automation and Control Systems|
 343|Physicians - Anesthesiology|
 344|Water Well, Pipe Line and Drilling Services|
@@ -347,18 +347,18 @@
 347|Appliance Repair and Supplies|
 348|Geologic Services|
 349|Pump Sales and Service|
-350|Forestry|
-351|Law - Patent, Trademark and Copyright|
+350|Forestry|forestry,tree
+351|Law - Patent, Trademark and Copyright|copyright,lawyer,patent,trademark
 352|Religious Goods|
-353|Butchers and Meat Processing|
-354|Music Instruction|
-355|Beer and Wine Making Equipment and Supplies|
-356|Guns and Gunsmiths|
+353|Butchers and Meat Processing|butcher,meat
+354|Music Instruction|music
+355|Beer and Wine Making Equipment and Supplies|beer,wine
+356|Guns and Gunsmiths|firearms,gun
 357|Aids Resources|aids,herpes,hiv,std
 358|Electronics - Telephone|
-359|Gambling and Gaming|
+359|Gambling and Gaming|gambling,gaming,casino
 360|Portable Toilet Rental|
-361|Physicians - Fertility and Sterility|
+361|Physicians - Fertility and Sterility|fertility,infertility
 362|Escort Services|
 363|Hearing Aids and Testing|
 364|Marine Equipment and Supplies|
@@ -367,14 +367,18 @@
 367|Archery|
 368|Singing Telegrams|
 369|Automobile - License and Title Services|
-370|Law - Juvenile|
+370|Law - Juvenile|juvenile law,lawyer
 371|First Aid and Safety|
 372|Fiberglass|
-373|Real Estate - Investments|
-374|Bakery Equipment and Supplies|
+373|Real Estate - Investments|real estate
+374|Bakery Equipment and Supplies|bakery,cakes,pastry
 375|Table and Tent Rental|
 376|Ethnic Foods|
-377|Lawn Maintenance|
-378|Fireworks|
-379|Law - Driving and Traffic|
+377|Lawn Maintenance|lawn care,lawn mowers
+378|Fireworks|fireworks
+379|Law - Driving and Traffic|driving,dui,lawyer,speeding,traffic
 380|Dancing Supplies and Apparel|
+381|Contractors - Foundation|
+382|Veterinarian Equipment and Supplies|pets,veterinarians,veterinary
+383|Residential Contractors|
+384|Biotechnology|

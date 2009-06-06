@@ -13,11 +13,12 @@ class Zip < ActiveRecord::Base
   # order zips by location count
   named_scope :order_by_density,      {:order => "zips.locations_count DESC"}
 
+  # order zips by name
+  named_scope :order_by_name,         { :order => "name ASC" }
+  named_scope :order_by_state_name,   { :order => "state_id ASC, name ASC" }
 
-  def self.to_csv
-    csv = Zip.all.collect do |zip|
-      "#{zip.id}|#{zip.name}|#{zip.state_id}|#{zip.lat}|#{zip.lng}"
-    end
+  def to_csv
+    [self.name, self.state.code, self.lat, self.lng].join("|")
   end
 
   def to_param

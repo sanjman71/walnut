@@ -40,6 +40,67 @@ namespace :tags do
     puts "#{Time.now}: completed"
   end
   
+  desc "Merge tag TAG_FROM to TAG_TO"
+  task :merge do
+    tag_from  = Tag.find_by_name(ENV["TAG_FROM"])
+    tag_to    = Tag.find_by_name(ENV["TAG_TO"])
+    
+    if tag_from.blank? or tag_to.blank?
+      puts "missing TAG_FROM or TAG_TO"
+      exit
+    end
+    
+    merge_tags(tag_from, tag_to)
+    
+    puts "#{Time.now}: completed"
+  end
+  
+  desc "Merge the default set of tags"
+  task :merge_default do
+    merge_hash = Hash["beauty salons" => "beauty salon",
+                      "groceries" => "grocery",
+                      "hair salons" => "hair salon",
+                      "nail salons" => "nail salon",
+                      "salons" => "salon"]
+                      
+    merge_hash.each_pair do |key, value|
+      tag_from = Tag.find_by_name(key)
+      tag_to   = Tag.find_by_name(value)
+      
+      next if tag_from.blank? or tag_to.blank?
+      
+      merge_tags(tag_from, tag_to)
+    end
+    
+    puts "#{Time.now}: completed"
+  end
+  
+  def merge_tags(tag_from, tag_to)
+    puts "#{Time.now}: merging #{tag_from.name}:#{tag_from.taggings.count} to #{tag_to.name}:#{tag_to.taggings.count}"
+
+    # merge tags and reload
+    TagHelper.merge_tags(tag_from, tag_to)
+    tag_to.reload
+    
+    puts "#{Time.now}: completed, merged tag #{tag_to.name}:#{tag_to.taggings.count}"
+  end
+  
+  desc "Remove tag TAG"
+  task :remove do
+    tag = Tag.find_by_name(ENV["TAG"])
+    
+    if tag.blank?
+      puts "missing TAG"
+      exit
+    end
+    
+    puts "#{Time.now}: removing #{tag.name}:#{tag.taggings.count}"
+    
+    TagHelper.remove_tag(tag)
+    
+    puts "#{Time.now}: completed, removed tag #{tag.name}"
+  end
+  
   desc "Cleanup tags"
   task :cleanup do
     unused  = 0

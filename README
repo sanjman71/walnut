@@ -22,23 +22,30 @@ To get the application up and running:
     - rake data:import_records CBSA=16980       # Chicagoland, 437101 locations, 842 minutes
     - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes
     - rake data:import_records CBSA=37980       # Philadelphia area, 288721 locations, 10704 errors, 682 minutes
-    - rake data:import_records CBSA=38300       # Pittsburg, PA, 127,596 locations, ?? minutes
+    - rake data:import_records CBSA=38300       # Pittsburg, PA, 127488 locations, 101 errors, 230 minutes
   
   * Note: check error logs in log/localeze.error.log
   
-3. Add tags by mapping localeze categories to local tag groups:
+3. Add/Update locations.
+  - rake locations:init_deltas
+  
+  * (Re-)build index: rake ts:index
+  
+4. Add tags by mapping localeze categories to local tag groups:
   - rake data:import_tags
 
-4. Import and map event categories, event venues and events:
-  - rake events:init
-  
+  * (Re-)build index: rake ts:index
+
+5. Import and map event categories, event venues and events:
   - rake events:import_events CITY=Chicago LIMIT=10
   - rake events:import_events CITY=Chicago REGION=Illinois LIMIT=10 # import chicago and all illinois region events
 
   - rake events:import_events CITY=Charlotte REGION='North Carolina' LIMIT=10 # import charlotte and north carolina region events
   - rake events:import_events CITY=Charlotte REGION='South Carolina' LIMIT=10 # import charlotte and south carolina region events
 
-5. Import neighborhoods:
+  - rake events:import_events CITY=Pittsburgh LIMIT=10
+  
+6. Import neighborhoods:
   * import neighborhoods from urban mapping by city's popular tags (300 request per day with the free api)
     - rake neighborhoods:import_from_urban_by_city_popular_tags CITY='Chicago' LIMIT=300
   * import neighborhoods from urban mapping by city's event venues (300 request per day with the free api)
@@ -46,12 +53,12 @@ To get the application up and running:
   * import neighborhoods based on proximity to locations already marked with neighborhoods
     - rake neighborhoods:import_by_city_proximity CITY='Chicago'
 
-6. Build location neighbors:
-  * Note: do this after importing events and event venues, as this affects location neighbors.
+7. Build location neighbors:
+  * Note: do this after importing events and event venues and indexing, as this affects location neighbors.
 
 
-7. Build the sphinx index, without re-creating the configuration file:
+8. Build the sphinx index, without re-creating the configuration file:
   - rake ts:index
   
-8. Start the sphinx dameon:
+9. Start the sphinx dameon:
   - rake ts:start

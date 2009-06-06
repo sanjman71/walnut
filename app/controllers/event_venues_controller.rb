@@ -8,9 +8,17 @@ class EventVenuesController < ApplicationController
     # find cities with event venues
     @cities     = EventVenue.count(:group => "city").sort_by { |k, v| -v }.map do |city, count|
       # map city name to object, remove empty cities
-      city = City.find_by_name(city)
-      city ? [city, count] : nil
+      city = City.find_by_name(city, :include => :state)
+      city ? [city, city.state, count] : nil
     end.compact
+    
+    # group by state
+    @states     = @cities.group_by do |city, state, count|
+      state
+    end
+
+    @unmapped_count = EventVenue.unmapped.count
+    @mapped_count   = EventVenue.mapped.count
     
     @title      = "#{@country.name} Event Venues Directory"
     @h1         = @title
@@ -22,7 +30,7 @@ class EventVenuesController < ApplicationController
     @filter   = params[:filter] ? params[:filter] : 'all'
     @filters  = ['all', 'mapped', 'unmapped'] - Array(@filter)
     
-    @venues   = EventVenue.city(@city).order_popularity.send(@filter).paginate(:page => params[:page], :per_page => 20)
+    @venues   = EventVenue.city(@city).order_city_name.send(@filter).paginate(:page => params[:page], :per_page => 20)
     
     logger.debug("*** found #{@venues.size} venues")
 

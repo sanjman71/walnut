@@ -11,6 +11,8 @@
     .span-6.prepend-1.border
       %h3{:style => 'margin-bottom: 3px;'}
         = tag1.name
+        == &nbsp;
+        = link_to 'X', tag_path(tag1), :method => :delete, :style => 'font-size: 0.7em; color: #FF6600; font-weight: bold;'
       .span-2{:style => 'color: #777777;'}
         == Count: #{tag1.taggings_count}
     
@@ -18,6 +20,8 @@
       .span-6.prepend-1.border
         %h3{:style => 'margin-bottom: 3px;'}
           = tag2.name
+          == &nbsp;
+          = link_to 'X', tag_path(tag2), :method => :delete, :style => 'font-size: 0.7em; color: #FF6600; font-weight: bold;'
         .span-2{:style => 'color: #777777;'}
           == Count: #{tag2.taggings_count}
           
@@ -25,5 +29,7 @@
       .span-6.prepend-1.last
         %h3{:style => 'margin-bottom: 3px;'}
           = tag3.name
+          == &nbsp;
+          = link_to 'X', tag_path(tag3), :method => :delete, :style => 'font-size: 0.7em; color: #FF6600; font-weight: bold;'
         .span-2{:style => 'color: #777777;'}
           == Count: #{tag3.taggings_count}

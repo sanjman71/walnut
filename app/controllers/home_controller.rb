@@ -24,7 +24,7 @@ class HomeController < ApplicationController
     
     self.class.benchmark("Benchmarking popular cities using database") do
       city_limit      = 10
-      city_density    = 10000
+      city_density    = 25000
       @cities         = City.with_locations.order_by_density.all(:limit => city_limit, :include => :state, :conditions => ['locations_count > ?', city_density])
     end
 

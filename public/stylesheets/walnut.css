@@ -119,13 +119,18 @@ a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
 a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
                                                   { font-size: 2.0em; }
 
-/* place link styles */
+/* generic location link styles */
 
-a.place.name                                      { color: #5500BB; font-size: 1.1em; font-weight: bold; }
-a.place.name:hover                                { color: #FFFFFF; background-color: #5500BB; }
+a.location.name                                   { color: #5500BB; font-size: 1.1em; font-weight: bold; }
+a.location.name:hover                             { color: #FFFFFF; background-color: #5500BB; }
 
 .place.indicator                                  { text-align: center; width: 40px; height: 13px; border: 1px solid #DDDDDD; padding-bottom: 0; 
                                                     background: #5500BB none repeat scroll 0 0; display: block; }
+
+/* event location link styles */
+
+a.event.location.name                             { color: #006600; font-size: 1.1em; font-weight: bold; }
+a.event.location.name:hover                       { color: #FFFFFF; background-color: #006600; }
 
 /* event link styles */
 
@@ -137,12 +142,6 @@ a.event.category.even:hover                       { color: #FFFFFF; background-c
 
 a.event.category.odd                              { color: #663333; font-size: 1.2em; }
 a.event.category.odd:hover                        { color: #FFFFFF; background-color: #663333; }
-
-/* event location styles */
-
-a.event-location.name                             { color: green; font-size: 1.1em; font-weight: bold; }
-a.event-location.name:hover                       { color: #FFFFFF; background-color: green; }
-
 
 /* calendar styles */
 

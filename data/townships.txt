@@ -1,0 +1,17 @@
+Berlin Township|NJ|39.8008256|-74.9150313
+Burlington Township|NJ|40.046906|-74.8390162
+Deptford Township|NJ|39.8285035|-75.1253492
+Eastampton Township|NJ|39.995556|-74.757778
+Evesham Township|NJ|39.8724094|-74.8857989
+Haddon Township|NJ|39.906111|-75.062778
+Harrison Township|NJ|39.744967|-75.222084
+Logan Township|NJ|39.7924923|-75.3528779
+Mannington Township|NJ|39.5330699|-75.4577775
+Medford Township|NJ|39.8661826|-74.8390162
+Pilesgrove Township|NJ|39.650833|-75.316111
+Pittsgrove Township|NJ|39.5314846|-75.1311874
+Shamong Township|NJ|39.7583945|-74.7102958
+Voorhees Township|NJ|39.8383777|-74.9325683
+Westampton Township|NJ|40.014444|-74.826111
+Woolwich Township|NJ|39.8203014|-75.3048617
+Neville Island|PA|40.504|-80.102

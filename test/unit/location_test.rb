@@ -34,12 +34,12 @@ class LocationTest < ActiveSupport::TestCase
       assert_not_equal "", @digest
     end
     
-    # should "have united states locality tag" do
-    #   assert_equal ["United States"], @location.locality_tag_list
-    # end
-
     should "increment us locations_count" do
       assert_equal 1, @us.locations_count
+    end
+
+    should "have refer_to? == false" do
+      assert_equal false, @location.refer_to?
     end
     
     context "remove country" do
@@ -110,10 +110,6 @@ class LocationTest < ActiveSupport::TestCase
       assert_not_equal "", @digest
     end
 
-    # should "have illinois locality tag" do
-    #   assert_equal ["Illinois"], @location.locality_tag_list
-    # end
-
     should "increment illinois locations_count" do
       assert_equal 1, @il.locations_count
     end
@@ -130,10 +126,6 @@ class LocationTest < ActiveSupport::TestCase
       should "have a changed digest" do
         assert_not_equal @digest, @digest2
       end
-
-      # should "have no illinois locality tag" do
-      #   assert_equal [], @location.locality_tag_list
-      # end
 
       should "decrement illinois locations_count" do
         assert_equal 0, @il.locations_count
@@ -157,10 +149,6 @@ class LocationTest < ActiveSupport::TestCase
     
     should_change "Location.count", :by => 1
     should_change "LocationPlace.count", :by => 1
-
-    # should "have chicago locality tag" do
-    #   assert_equal ["Chicago"], @location.locality_tag_list
-    # end
 
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
@@ -201,10 +189,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.reload
         @digest2 = @location.digest
       end
-
-      # should "have springfield locality tag" do
-      #   assert_equal ["Springfield"], @location.locality_tag_list
-      # end
 
       should "remove chicago locations" do
         assert_equal [], @chicago.locations
@@ -276,10 +260,6 @@ class LocationTest < ActiveSupport::TestCase
         @digest2 = @location.digest
       end
 
-      # should "have no locality tags" do
-      #   assert_equal [], @location.locality_tag_list
-      # end
-
       should "decrement zip locations_count" do
         assert_equal 0, @zip.locations_count
       end
@@ -302,10 +282,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.reload
         @digest2 = @location.digest
       end
-
-      # should "have 60610 locality tag" do
-      #   assert_equal ["60610"], @location.locality_tag_list
-      # end
 
       should "set 60654 locations to []" do
         assert_equal [], @zip.locations
@@ -336,11 +312,7 @@ class LocationTest < ActiveSupport::TestCase
     should "have neighborhood locality" do
       assert_equal [@river_north], @location.localities
     end
-    
-    # should "have neighborhood locality tag" do
-    #   assert_equal ["River North"], @location.locality_tag_list
-    # end
-    
+
     should "increment neighborhood and locations counter caches" do
       assert_equal 1, @river_north.locations_count
       assert_equal 1, @location.neighborhoods_count
@@ -357,10 +329,6 @@ class LocationTest < ActiveSupport::TestCase
         @river_north.reload
       end
 
-      # should "have no locality tag" do
-      #   assert_equal [], @location.locality_tag_list
-      # end
-
       should "set neighborhood locations to []" do
         assert_equal [], @river_north.locations
       end
@@ -370,6 +338,27 @@ class LocationTest < ActiveSupport::TestCase
         assert_equal 0, @location.neighborhoods_count
       end
       
+    end
+  end
+  
+  context "location without refer_to" do
+    setup do
+      @location = Location.create(:name => "Home")
+    end
+    
+    should "have refer_to? == false" do
+      assert_equal false, @location.refer_to?
+    end
+    
+    context "and add refer_to" do
+      setup do
+        @location.refer_to = 1001
+        @location.save
+      end
+
+      should "have refer_to? == true" do
+        assert_equal true, @location.refer_to?
+      end
     end
   end
 end

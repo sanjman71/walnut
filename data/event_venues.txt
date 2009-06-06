@@ -1,3 +1,112 @@
+Chicago|Abbey Pub|Localeze::BaseRecord|19381018
+Chicago|Aragon Ballroom||
+Chicago|Beat Kitchen|Localeze::BaseRecord|1541638
+Chicago|Black Ensemble Theater|Localeze::BaseRecord|1789935
+Chicago|Bottom Lounge|Localeze::BaseRecord|688951915
+Chicago|Briar Street Theatre|Localeze::BaseRecord|2040952
+Chicago|Buca Di Beppo|Localeze::BaseRecord|2144849
+Chicago|Cadillac Palace Theatre|Localeze::BaseRecord|140897717
+Chicago|Charter One Pavilion||
+Chicago|Columbus and Jackson / Multiple entry points along Lake Shore Drive||
+Chicago|Congress Theater|Localeze::BaseRecord|46098297
+Chicago|Debonair Social Club|Localeze::BaseRecord|687931078
+Chicago|Double Door|Localeze::BaseRecord|46071367
+Chicago|Durty Nellie's|Localeze::BaseRecord|45597440
+Chicago|FitzGerald's||
+Chicago|Ford Center for the Performing Arts|Localeze::BaseRecord|142540859
+Chicago|Goose Island Wrigleyville|Localeze::BaseRecord|5817111
+Chicago|House of Blues - Chicago|Localeze::BaseRecord|139838576
+Chicago|Humboldt Park Art Fair||
+Chicago|Hydrate|Localeze::BaseRecord|88310787
+Chicago|International Museum of Surgical Science||
+Chicago|Joe&#39;s Bar||
+Chicago|Joe's Sports Bar||
+Chicago|LaSalle Power Company||
+Chicago|MacSpecaialist|Localeze::BaseRecord|685954408
+Chicago|Martyrs'|Localeze::BaseRecord|46056593
+Chicago|Mutiny|Localeze::BaseRecord|13473930
+Chicago|Premier Entertainment Center||
+Chicago|redtwist theatre|Localeze::BaseRecord|91802425
+Chicago|Riviera Theatre|Localeze::BaseRecord|46090833
+Chicago|Silvie's Lounge|Localeze::BaseRecord|153369020
+Chicago|Soldier Field (1410 S. Museum Campus Drive) Chicago||
+Chicago|Spybar|Localeze::BaseRecord|12555755
+Chicago|Subterranean|Localeze::BaseRecord|46098583
+Chicago|Taste Of Chicago||
+Chicago|The Chicago Theatre||
+Chicago|The Elbo Room|Localeze::BaseRecord|13374006
+Chicago|U.S. Cellular Field|Localeze::BaseRecord|46062588
+Chicago|Underground Lounge|Localeze::BaseRecord|14072995
+Chicago|United Center|Localeze::BaseRecord|81941012
+Chicago|University of Illinois Chicago||
+Chicago|US Beer Co.|Localeze::BaseRecord|46057897
+Chicago|Wachovia Securities|Localeze::BaseRecord|687934634
+Chicago|Wrigley Done Right||
+Des Plaines|Allstate Arena||
+Des Plaines|Comfort Inn O'Hare||
+Des Plaines|Crown Plaza Chicago O'Hare||
+Des Plaines|Des Plaines Public Library|Localeze::BaseRecord|37946258
+Des Plaines|Des Plaines, Illinois, United States||
+Des Plaines|Donald E. Stephens Convention Center||
+Des Plaines|Intercontinental Chicago O'hare||
+Des Plaines|Maine West High School||
+Des Plaines|Postal code 60016, United States||
+Des Plaines|Postal code 60018, United States||
+Des Plaines|Stadium Sports Club & Pizza|Localeze::BaseRecord|693088217
+Evanston|Bill's Blues Bar|Localeze::BaseRecord|684377892
+
+Charlotte|Actor's Theatre of Charlotte, The|Localeze::BaseRecord|349540
+Charlotte|Amos' Southend|Localeze::BaseRecord|861359
+Charlotte|Cans Bar &amp; Canteen|Localeze::BaseRecord|144419806
+Charlotte|Charlotte, NC (Charlotte, NC)|Digest|cf5777f73a69eb6a52f94d7d9be5c72f
+Charlotte|Charlotte Convention Center|Localeze::BaseRecord|15930104
+Charlotte|Charlotte's Underground|Localeze::BaseRecord|686677893
+Charlotte|Coyote Joe's|Localeze::BaseRecord|3569420
+Charlotte|Double Door Inn|Localeze::BaseRecord|691620790
+Charlotte|Epicenter|Digest|cf5777f73a69eb6a52f94d7d9be5c72f
+Charlotte|Evening Muse|Localeze::BaseRecord|13377755
+Charlotte|Gaston County Museum of Art & History|Digest|5670244aec0f417bdc5521fafd888a4c
+Charlotte|Hilton Charlotte Center City|Localeze::BaseRecord|56715544
+Charlotte|Hilton Charlotte University Place|Digest|d090d3ad568a010b4ec48eeec89ef7a4
+Charlotte|KISS Lounge|Localeze::BaseRecord|692516195
+Charlotte|Metrolina Expo Center|Localeze::BaseRecord|67534172
+Charlotte|NC Blumenthal Performing Arts Center|Localeze::BaseRecord|136312368
+Charlotte|Ovens Auditorium|Localeze::BaseRecord|134402693
+Charlotte|Paramount's Carowinds Themepark|Localeze::BaseRecord|73664139
+Charlotte|Pavilion at EpiCentre|Localeze::BaseRecord|690964298
+Charlotte|Postal code 28216, United States|Digest|a630eb85cf874c5c41dd1a999e4a3c25
+Charlotte|Salvador Deli|Localeze::BaseRecord|151683130
+Charlotte|The Charlotte Art League|Localeze::BaseRecord|2760446
+Charlotte|The Evening Muse|Localeze::BaseRecord|13377755
+Charlotte|The Fillmore Charlotte|Localeze::BaseRecord|686170526
+Charlotte|The Neighborhood Theatre|Localeze::BaseRecord|56721808
+Charlotte|Time Warner Cable Arena|Localeze::BaseRecord|144419829
+Charlotte|Tremont Music Hall - Casbah|Localeze::BaseRecord|13863429
+Charlotte|TOTAL BEAUTY SALON AND SPA|Digest|e2e6ac2fd05a7ac9a6db312650e34a19
+Charlotte|Uptown Charlotte|Digest|cc543df7413eb3cc077f87ccc933edd1
+Charlotte|Verizon Wireless Amphitheatre Charlotte|Localeze::BaseRecord|14367393
+Charlotte|Visulite Theatre with Old 97's|Localeze::BaseRecord|14472408
+Concord|Cabarrus Arena &amp; Events Center|Digest|c3592f1976b713924047eff8bb43516b
+Concord|Embassy Suites Charlotte - Concord Golf Resort & Spa|Localeze::BaseRecord|685083298
+Cornelius|Lake Norman Chamber of Commerce|Localeze::BaseRecord|90465835
+Cornelius|The Rusty Rudder|Localeze::BaseRecord|56703997
+Fort Mill|newsboys - Knights Stadium|Digest|c1b1809cfa8a4feb580f3d389f84c855
+Gastonia|Big Man's BBQ & Seafood||
+Harrisburg|Kelly O'Shea's Performing Arts|Digest|d7e14ad72c99bc659b233abda7826d78
+Pineville|The Well|Localeze::BaseRecord|15940108
+
+Pittsburgh|Altar Bar|Localeze::BaseRecord|59967926
+Pittsburgh|Amphitheatre at Station Square|Localeze::BaseRecord|148206284
+Pittsburgh|Benedum Center for the Performing Arts|Localeze::BaseRecord|131104994
+Pittsburgh|Club Zoo|Localeze::BaseRecord|111117256
+Pittsburgh|Diesel Club Lounge|Localeze::BaseRecord|153170555
+Pittsburgh|Heinz Field|Localeze::BaseRecord|10522811
+Pittsburgh|Heinz Hall for the Performing Arts|Localeze::BaseRecord|689090341
+Pittsburgh|Holiday Inn Greentree|Localeze::BaseRecord|142472502
+Pittsburgh|PNC Park|Localeze::BaseRecord|112384325
+Pittsburgh|The Rex Theater|Localeze::BaseRecord|59954835
+Pittsburgh|Thunderbird Cafe&nbsp;|Localeze::BaseRecord|59953544
+
 Brooklyn|Solomon's Porch Cafe|Localeze::BaseRecord|92177079
 Brooklyn|BAM Café|Localeze::BaseRecord|148050112
 Brooklyn|Union Pool|Localeze::BaseRecord|14088759
@@ -8,28 +117,6 @@ Brooklyn|The Trash Bar (www.thetrashbar.com)|Localeze::BaseRecord|55273849
 Brooklyn|Studio B|Localeze::BaseRecord|148052528
 Brooklyn|Southpaw|Localeze::BaseRecord|86319079
 Brooklyn|Music Hall of Williamsburg|Localeze::BaseRecord|683990562
-Charlotte|Cans Bar &amp; Canteen|Localeze::BaseRecord|144419806
-Charlotte|Salvador Deli|Localeze::BaseRecord|151683130
-Charlotte|Actor's Theatre of Charlotte, The|Localeze::BaseRecord|349540
-Charlotte|The Charlotte Art League|Localeze::BaseRecord|2760446
-Charlotte|Metrolina Expo Center|Localeze::BaseRecord|67534172
-Charlotte|Time Warner Cable Arena (formerly Charlotte Bobcats Arena)|Localeze::BaseRecord|137655263
-Charlotte|Double Door Inn|Localeze::BaseRecord|691620790
-Charlotte|The Evening Muse|Localeze::BaseRecord|13377755
-Charlotte|Coyote Joe's|Localeze::BaseRecord|3569420
-Charlotte|Paramount's Carowinds Themepark|Localeze::BaseRecord|73664139
-Charlotte|KISS Lounge|Localeze::BaseRecord|692516195
-Charlotte|Evening Muse|Localeze::BaseRecord|13377755
-Charlotte|Charlotte's Underground|Localeze::BaseRecord|686677893
-Charlotte|The Neighborhood Theatre|Localeze::BaseRecord|56721808
-Charlotte|Visulite Theatre with Old 97's|Localeze::BaseRecord|14472408
-Charlotte|Charlotte Convention Center|Localeze::BaseRecord|15930104
-Charlotte|NC Blumenthal Performing Arts Center|Localeze::BaseRecord|136312368
-Charlotte|Ovens Auditorium|Localeze::BaseRecord|134402693
-Charlotte|Tremont Music Hall - Casbah|Localeze::BaseRecord|13863429
-Charlotte|Amos' Southend|Localeze::BaseRecord|861359
-Charlotte|Time Warner Cable Arena|Localeze::BaseRecord|144419829
-Charlotte|Verizon Wireless Amphitheatre Charlotte|Localeze::BaseRecord|14367393
 New York|Kenny's Castaways|Localeze::BaseRecord|55669121
 New York|Havana Central|Localeze::BaseRecord|147991327
 New York|Canal Room|Localeze::BaseRecord|110304981
@@ -81,4 +168,7 @@ Philadelphia|McFadden's at the Ballpark|Localeze::BaseRecord|59866108
 Philadelphia|Comcast SportsNet|Localeze::BaseRecord|684871088
 Philadelphia|Theater of Living Arts|Localeze::BaseRecord|13585387
 Philadelphia|World Cafe Live|Localeze::BaseRecord|142712335
-
+Philadelphia|Projects Gallery|Localeze::BaseRecord|143642229
+Philadelphia|Club Risque Philadelphia|Localeze::BaseRecord|3159969
+Philadelphia|Mt Airy Learning Tree|Localeze::BaseRecord|59892821
+Philadelphia|Kildare's Manayunk|Localeze::BaseRecord|88765971
