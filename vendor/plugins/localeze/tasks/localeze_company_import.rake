@@ -251,7 +251,7 @@ namespace :localeze do
     # Performance: ?
     desc "Import company phones"
     task :import_company_phones do
-      klass   = CompanyPhone
+      klass   = Localeze::CompanyPhone
       columns = [:id, :base_record_id, :areacode, :exchange, :phonenumber, :phonetype, :valflag, :valdate, :dnc]
       file    = "#{LOCALEZE_COMPANY_DATA_DIR}/CompanyPhones.txt"
       options = { :validate => false } 
@@ -268,7 +268,7 @@ namespace :localeze do
         klass.import columns, [value], options
         id += 1
       
-        puts "#{Time.now}: *** added #{id} records" if (id % 50) == 0
+        puts "#{Time.now}: *** added #{id} records" if (id % 1000) == 0
       end
     
       puts "#{Time.now}: completed, ended with #{klass.count} objects" 

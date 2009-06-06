@@ -3,3 +3,5 @@ IL|Hoffman Est|Hoffman Estates
 IL|Glendale Hts|Glendale Heights
 IL|La Grange Pk|La Grange Park
 IN|Valpo|Valparaiso
+PA|Phila|Philadelphia
+PA|Squirrel Hill|Pittsburgh
