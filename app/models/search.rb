@@ -4,8 +4,8 @@ class Search
   
   # normalize the string
   def self.normalize(s)
-    # remove quotes, dashes
-    s.gsub(/['-]/, '').strip
+    # remove quotes, dashes, @
+    s.gsub(/['-@]/, '').strip
   end
   
   # build sphinx attributes

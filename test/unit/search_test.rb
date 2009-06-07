@@ -165,6 +165,22 @@ class SearchTest < ActiveSupport::TestCase
       end
     end
 
+    context "with query 'revive @ el ray'" do
+      setup do
+        @us     = Factory.create(:us)
+        @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @hash   = Search.query("revive @ el ray")
+      end
+
+      should "have raw query with @" do
+        assert_equal "revive @ el ray", @hash[:query_raw]
+      end
+      
+      should "have query with @ removed" do
+        assert_equal "revive | el | ray", @hash[:query_or]
+      end
+    end
+
     context "with query 'anything'" do
       setup do
         @us     = Factory.create(:us)
