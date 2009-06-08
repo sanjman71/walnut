@@ -3,8 +3,7 @@ require 'test/factories'
 
 class LocationTest < ActiveSupport::TestCase
   
-  should_validate_presence_of   :name
-  should_belong_to              :country
+  should_belong_to    :country
   
   def setup
     @us           = Factory(:us)
@@ -18,7 +17,7 @@ class LocationTest < ActiveSupport::TestCase
 
   context "location with country" do
     setup do
-      @location = Location.create(:name => "Home", :country => @us)
+      @location = Location.create(:country => @us)
       @location.reload
       @us.reload
       @digest = @location.digest

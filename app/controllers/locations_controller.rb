@@ -96,9 +96,8 @@ class LocationsController < ApplicationController
     end
     
     Location.transaction do
-      # create place, use default location name
+      # create place
       @place = Place.create(:name => @location.name)
-      @location.name = "Work"
       @location.save
 
       raise ActiveRecord::Rollback if !@place.valid? or !@location.valid?

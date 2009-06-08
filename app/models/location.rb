@@ -1,5 +1,4 @@
 class Location < ActiveRecord::Base
-  validates_presence_of   :name
   belongs_to              :country
   belongs_to              :state
   belongs_to              :city

@@ -49,7 +49,7 @@ class PlaceTest < ActiveSupport::TestCase
     
     context "then add a location" do
       setup do
-        @location2  = Location.create(:name => "Work")
+        @location2  = Location.create
         @place.locations.push(@location2)
         @place.reload
       end

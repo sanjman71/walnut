@@ -11,7 +11,7 @@ class PlaceHelper
 
     street_address  = StreetAddress.normalize(hash['street_address'])
     zip             = state.zips.find_by_name(hash['zip'])
-    options         = {:name => "Work", :street_address => street_address, :city => city, :state => state, :zip => zip, :country => Country.default}
+    options         = {:street_address => street_address, :city => city, :state => state, :zip => zip, :country => Country.default}
 
     if hash['lat'] and hash['lng']
       options.merge!(:lat => hash['lat'], :lng => hash['lng'])
