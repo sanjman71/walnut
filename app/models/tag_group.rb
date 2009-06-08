@@ -88,7 +88,7 @@ class TagGroup < ActiveRecord::Base
   end
   
   # convert tag group to a string of attributes separated by '|'
-  def to_pipe
+  def to_csv
     [self.id, self.name, self.tags].join("|")
   end
   

@@ -30,7 +30,7 @@ class EventVenuesController < ApplicationController
     @filter   = params[:filter] ? params[:filter] : 'all'
     @filters  = ['all', 'mapped', 'unmapped'] - Array(@filter)
     
-    @venues   = EventVenue.city(@city).order_city_name.send(@filter).paginate(:page => params[:page], :per_page => 20)
+    @venues   = EventVenue.city(@city).order_by_city_name.send(@filter).paginate(:page => params[:page], :per_page => 20)
     
     logger.debug("*** found #{@venues.size} venues")
 

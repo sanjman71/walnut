@@ -13,7 +13,7 @@ class EventCategory < ActiveRecord::Base
   end
   
   # convert object to a string of attributes separated by '|'
-  def to_pipe
+  def to_csv
     [self.name, self.tags].join("|")
   end
   

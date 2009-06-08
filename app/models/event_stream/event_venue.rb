@@ -19,9 +19,9 @@ class EventVenue < ActiveRecord::Base
   # find event venues mapped to a localeze record location
   named_scope :localeze,          { :conditions => {:location_source_type => "Localeze::BaseRecord"}}
   
-  named_scope :order_popularity,  { :order => "popularity DESC" }
-  named_scope :order_city,        { :order => "city ASC" }
-  named_scope :order_city_name,   { :order => "city, name ASC" }
+  named_scope :order_by_popularity,  { :order => "popularity DESC" }
+  named_scope :order_by_city,        { :order => "city ASC" }
+  named_scope :order_by_city_name,   { :order => "city, name ASC" }
 
   @@venue_search_method     = "venues/search"
   @@venue_get_method        = "venues/get"
@@ -36,8 +36,8 @@ class EventVenue < ActiveRecord::Base
     EventVenue.get(self.source_id, options)
   end
 
-  # convert object to a pipe separated list of attributes
-  def to_pipe
+  # convert object to a string of attributes separated by '|'
+  def to_csv
     [self.city, self.name, self.location_source_type, self.location_source_id].join("|")
   end
 
