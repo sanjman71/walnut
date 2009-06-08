@@ -21,7 +21,7 @@ namespace :db do
     puts "#{Time.now}: created backup"
     
     dir         = Dir.new(backup_dir)
-    max_backups = ENV["MAX"] ? ENV["MAX"].to_i : 5
+    max_backups = ENV["MAX"] ? ENV["MAX"].to_i : 10
     all_backups = dir.entries[2..-1].sort.reverse
 
     unwanted_backups = all_backups[max_backups..-1] || []
