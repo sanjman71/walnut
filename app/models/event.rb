@@ -56,6 +56,22 @@ class Event < ActiveRecord::Base
     self.update_attribute(:popularity, 0)
   end
 
+  # return the event venue's name
+  def venue_name
+    # use the association location and place
+    if self.location
+      self.location.place_name
+    else
+      ""
+    end
+  end
+  
+  # returns true iff the location has a latitude and longitude 
+  def mappable?
+    return true if self.lat and self.lng
+    false
+  end
+
   def apply_category_tags!(category)
     return false if category.blank? or category.tags.blank?
     self.event_tag_list.add(category.tags.split(",")) 
@@ -68,12 +84,6 @@ class Event < ActiveRecord::Base
     self.save
   end
   
-  # returns true iff the location has a latitude and longitude 
-  def mappable?
-    return true if self.lat and self.lng
-    false
-  end
-
   # remove event references
   def before_destroy_callback
     location.events.delete(self) if location

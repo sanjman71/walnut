@@ -183,16 +183,16 @@ class EventVenue < ActiveRecord::Base
     log = options.delete(:log) ? true : false
     
     # create location parameters
-    # state   = State.find_by_name(self.state)
-    # city    = state.cities.find_by_name(self.city) if state
-    # 
-    # if state.blank? or city.blank?
-    #   if log
-    #     puts "#{Time.now}: venue has an invalid city or state"
-    #   end
-    #   
-    #   return 0
-    # end
+    state   = State.find_by_name(self.state)
+    city    = state.cities.find_by_name(self.city) if state
+    
+    if state.blank? or city.blank?
+      if log
+        puts "#{Time.now}: xxx venue #{self.name} has an invalid city or state"
+      end
+      
+      return 0
+    end
 
     hash     = Hash['name' => name, 'street_address' =>  StreetAddress.normalize(address), 'city' => city, 'state' => state, 'zip' => zip]
     new_loc  = PlaceHelper.add_place(hash)

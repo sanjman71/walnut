@@ -4,7 +4,7 @@
 
 - cache("#{event.cache_key}:index:#{index}") do
 
-  .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => event.location.lat, :lng => event.location.lng, :index => index, :color => color, :html => "<strong>#{event.name}</strong><br/>At #{event.event_venue.name}<br/>#{link_to "Details", event.url}"}
+  .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => event.location.lat, :lng => event.location.lng, :index => index, :color => color, :html => "<strong>#{event.name}</strong><br/>At #{event.venue_name}<br/>#{link_to "Details", event.url}"}
 
     .span-1
       %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
@@ -13,7 +13,7 @@
       %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
         = event.name
       %h4.venue.margin-bottom-5{:style => 'color: #555;'}
-        = event.event_venue.name
+        = event.venue_name
         %span{:style => 'font-size: 0.8em; padding-left: 3px;'}= link_to "Details", event.url
 
     .span-2.date.last

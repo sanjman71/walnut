@@ -13,9 +13,9 @@ class EventTest < ActiveSupport::TestCase
     @us             = Factory(:us)
     @il             = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
     @chicago        = Factory(:city, :name => "Chicago", :state => @il)
-    @location       = Location.create(:name => "Legion of Doom", :city => @chicago, :source_id => 100, :source_type => "Somebody")
+    @location       = Location.create(:city => @chicago, :source_id => 100, :source_type => "Somebody")
     assert @location.valid?
-    @place          = Place.create(:name => "My Legion of Doom")
+    @place          = Place.create(:name => "Kickass Ampthitheater")
     assert @place.valid?
     @place.locations.push(@location)
     @location.reload
@@ -26,19 +26,19 @@ class EventTest < ActiveSupport::TestCase
     assert @event_category.valid?
   end
   
-  context "validate event venue" do
+  context "validate event venue source is 'Digest'" do
     should "have location_source_type with 'Digest'" do
       assert_match /Digest/, @event_venue.location_source_type
     end
 
     should "have location_source_id with digest value" do
-      assert_equal "51d9af61aa010e52ae073036ca6b4de1", @event_venue.location_source_id
+      assert_equal "3fca59290310e24f5447bb23f6022248", @event_venue.location_source_id
     end
   end
   
   context "create event venue mapped to a location from a localeze base record" do
     setup do
-      @hall_of_justice = Location.create(:name => "Hall of Justice", :city => @chicago, :source_id => 101, :source_type => "Localeze::BaseRecord")
+      @hall_of_justice = Location.create(:city => @chicago, :source_id => 101, :source_type => "Localeze::BaseRecord")
       assert @hall_of_justice.valid?
       @hall_venue = Factory(:event_venue, :name => "Hall of Justice Venue", :location_id => @hall_of_justice.id)
       assert @hall_venue.valid?
@@ -73,6 +73,10 @@ class EventTest < ActiveSupport::TestCase
 
     should "increment location's event count" do
       assert_equal 1, @location.events_count
+    end
+    
+    should "have venue name Kickass Ampthitheater" do
+      assert_equal "Kickass Ampthitheater", @event.venue_name
     end
     
     should "add event to event venue events collection" do
