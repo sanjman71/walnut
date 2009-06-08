@@ -25,15 +25,17 @@ namespace :locations do
   def edit_location(location, object)
     place = location.place
     
-    if object["name"] and place.name == object['name']
-      # already changed
-      return
+    if object["name"] and place.name != object['name']
+      puts "#{Time.now}: *** changing name on location #{location.id} from #{place.name} to #{object["name"]}"
+      place.name = object["name"]
+      place.save
     end
     
-    puts "#{Time.now}: *** changing name on location #{location.id} from #{place.name} to #{object["name"]}"
-    
-    place.name = object["name"]
-    place.save
+    if object["street_address"] and location.street_address != object["street_address"]
+      puts "#{Time.now}: *** changing address on location #{location.id} from #{location.street_address} to #{object["street_address"]}"
+      location.street_address = object["street_address"]
+      location.save
+    end
   end
   
   def add_location(object)

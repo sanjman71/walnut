@@ -1,4 +1,22 @@
 # Chicago
+name: Columbia College Chicago
+street_address: 600 S Michigan Ave
+city: Chicago
+state: Illinois
+zip: 60605
+---
+name: Delilah's
+street_address: 2771 N Lincoln Ave
+city: Chicago
+state: Illinois
+zip: 60647
+---
+name: Grant Park
+street_address: 331 E Randolph St
+city: Chicago
+state: Illinois
+zip: 60601
+---
 name: Revive @ El Ray
 street_address: 3504 S Western Ave
 city: Chicago
@@ -10,6 +28,12 @@ street_address: 3485 N Clark St
 city: Chicago
 state: Illinois
 zip: 60657
+---
+name: The Whistler
+street_address: 2421 N Milwaukee Ave
+city: Chicago
+state: Illinois
+zip: 60647
 ---
 name: Uncle Fatty's Rum Resort
 street_address: 2833 N Sheffield Ave
@@ -23,11 +47,46 @@ city: Chicago
 state: Illinois
 zip: 60613
 ---
+name: Marriott Theatre in Lincolnshire
+street_address: 10 Marriott Dr
+city: Lincolnshire
+state: Illinois
+zip: 60069
+---
+name: The Pearl Room
+street_address: 19081 Old LaGrange Rd
+city: Mokena
+state: Illinois
+zip: 60448
+---
 name: First Midwest Bank Amphitheatre
 street_address: 19100 S Ridgeland Ave
 city: Tinley Park
 state: Illinois
 zip: 60477
+---
+name: Mojoe's Rock House
+street_address: 7537 W 159th St
+city: Tinley Park
+state: Illinois
+zip: 60477
+---
+source_type: Localeze::BaseRecord
+source_id: 19511203
+name: Auditorium Theatre
+street_address: 50 E Congress Pkwy
+---
+source_type: Localeze::BaseRecord
+source_id: 3656024
+name: Crobar Chicago
+---
+source_type: Localeze::BaseRecord
+source_id: 88310585
+name: iO Theater
+---
+source_type: Localeze::BaseRecord
+source_id: 91277183
+name: Toyota Park
 ---
 source_type: Localeze::BaseRecord
 source_id: 115007341

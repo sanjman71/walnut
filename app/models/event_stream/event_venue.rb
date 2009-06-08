@@ -308,15 +308,25 @@ class EventVenue < ActiveRecord::Base
     results       = EventVenue.search(:sort_order => sort_order, :location => city.name, :page_number => page_number, :page_size => page_size)
     venues        = results['venues'] ? results['venues']['venue'] : []
     
-    @total        = @results['total_items']
-    @count        = @results['page_items']   # the number of events on this page
-    @first_item   = @results['first_item']   # the first item number on this page, e.g. 11
-    @last_item    = @results['last_item']    # the last item number on this page, e.g. 20
+    total         = results['total_items']
+    count         = results['page_items']   # the number of events on this page
+    first_item    = results['first_item']   # the first item number on this page, e.g. 11
+    last_item     = results['last_item']    # the last item number on this page, e.g. 20
     
     start_count   = EventVenue.count
     
-    venues.each_with_index do |venue, index|
-      import_venue(venue, :log => log)
+    venues.each_with_index do |venue_hash, index|
+      # skip if venue already exists
+      next if EventVenue.find_by_name(venue_hash["name"])
+      
+      # fix/set city name
+      venue_hash["city"] = venue_hash["city_name"] if venue_hash["city"].blank?
+      venue              = import_venue(venue_hash, :log => log)
+      
+      if venue and !venue.mapped?
+        # map the venue to a location
+        venue.map_to_location(:log => true)
+      end
     end
     
     imported = EventVenue.count - start_count
@@ -334,8 +344,8 @@ class EventVenue < ActiveRecord::Base
     state   = State.find_by_name(venue_hash['region'])
     options[:state] = state.name if state
     
-    # create event venue
-    object  = EventVenue.create(options)
+    # find or create event venue
+    object  = EventVenue.find_by_name(options[:name]) || EventVenue.create(options)
 
     if object and log
       puts "#{Time.now}: *** imported venue #{object.name}:#{object.city}:#{object.state}:#{object.zip}:#{object.area_type}"

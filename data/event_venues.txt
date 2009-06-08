@@ -1,59 +1,91 @@
+Bridgeview|Toyota Park|Localeze::BaseRecord|91277183
 Chicago|Abbey Pub|Localeze::BaseRecord|19381018
-Chicago|Aragon Ballroom||
+Chicago|Ann Sather Restaurant|Localeze::BaseRecord|46106935
+Chicago|Apollo Theater (Chicago)|Localeze::BaseRecord|973060
+Chicago|Aragon Ballroom|Localeze::BaseRecord|1008123
+Chicago|Arie Crown Theater|Localeze::BaseRecord|141569305
+Chicago|Art Institute of Chicago|Localeze::BaseRecord|137912168
+Chicago|Athenaeum Theatre|Localeze::BaseRecord|139394117
+Chicago|Auditorium Theatre|Localeze::BaseRecord|19511203
 Chicago|Beat Kitchen|Localeze::BaseRecord|1541638
 Chicago|Black Ensemble Theater|Localeze::BaseRecord|1789935
 Chicago|Bottom Lounge|Localeze::BaseRecord|688951915
 Chicago|Briar Street Theatre|Localeze::BaseRecord|2040952
+Chicago|Buddy Guy's Legends|Localeze::BaseRecord|36355249
 Chicago|Buca Di Beppo|Localeze::BaseRecord|2144849
 Chicago|Cadillac Palace Theatre|Localeze::BaseRecord|140897717
-Chicago|Charter One Pavilion||
-Chicago|Columbus and Jackson / Multiple entry points along Lake Shore Drive||
 Chicago|Congress Theater|Localeze::BaseRecord|46098297
+Chicago|Crobar Chicago|Localeze::BaseRecord|3656024
+Chicago|Cubby Bear Lounge|Localeze::BaseRecord|13359373
+Chicago|DarkRoom|Localeze::BaseRecord|19506026
 Chicago|Debonair Social Club|Localeze::BaseRecord|687931078
 Chicago|Double Door|Localeze::BaseRecord|46071367
 Chicago|Durty Nellie's|Localeze::BaseRecord|45597440
-Chicago|FitzGerald's||
+Chicago|Empty Bottle|Localeze::BaseRecord|68553768
+Chicago|Field Museum|Localeze::BaseRecord|144343875
 Chicago|Ford Center for the Performing Arts|Localeze::BaseRecord|142540859
 Chicago|Goose Island Wrigleyville|Localeze::BaseRecord|5817111
+Chicago|Green Mill|Localeze::BaseRecord|13407489
+Chicago|Hard Rock Cafe Chicago|Localeze::BaseRecord|6185905
+Chicago|Heartland Cafe|Localeze::BaseRecord|6307603
+Chicago|Hideout|Localeze::BaseRecord|13421033
 Chicago|House of Blues - Chicago|Localeze::BaseRecord|139838576
-Chicago|Humboldt Park Art Fair||
 Chicago|Hydrate|Localeze::BaseRecord|88310787
-Chicago|International Museum of Surgical Science||
-Chicago|Joe&#39;s Bar||
-Chicago|Joe's Sports Bar||
-Chicago|LaSalle Power Company||
+Chicago|Instituto Cervantes of Chicago|Localeze::BaseRecord|157015412
+Chicago|iO Theater|Localeze::BaseRecord|88310585
+Chicago|Kingston Mines&nbsp;|Localeze::BaseRecord|11151785
+Chicago|LaSalle Bank Theatre (formerly Shubert)|Localeze::BaseRecord|693072840
+Chicago|League of Chicago Theatres|Localeze::BaseRecord|13585525
+Chicago|Logan Square Auditorium|Localeze::BaseRecord|46098105
 Chicago|MacSpecaialist|Localeze::BaseRecord|685954408
 Chicago|Martyrs'|Localeze::BaseRecord|46056593
+Chicago|Metro|Localeze::BaseRecord|12275888
+Chicago|Museum of Science & Industry|Localeze::BaseRecord|9356376
+Chicago|Music Box|Localeze::BaseRecord|46056358
 Chicago|Mutiny|Localeze::BaseRecord|13473930
-Chicago|Premier Entertainment Center||
+Chicago|Navy Pier|Localeze::BaseRecord|19471551
+Chicago|Neo Nightclub|Localeze::BaseRecord|46058980
+Chicago|Old Town School of Folk Music|Localeze::BaseRecord|9894799
 Chicago|redtwist theatre|Localeze::BaseRecord|91802425
+Chicago|Reggies Music Joint|Localeze::BaseRecord|152669454
+Chicago|Reggies Rock Club|Localeze::BaseRecord|152669455
+Chicago|Risque|Localeze::BaseRecord|685951999
 Chicago|Riviera Theatre|Localeze::BaseRecord|46090833
+Chicago|Schuba's|Localeze::BaseRecord|46105134
 Chicago|Silvie's Lounge|Localeze::BaseRecord|153369020
-Chicago|Soldier Field (1410 S. Museum Campus Drive) Chicago||
+Chicago|Smart Bar|Localeze::BaseRecord|12275888
+Chicago|Spin Night-Club|Localeze::BaseRecord|46105808
 Chicago|Spybar|Localeze::BaseRecord|12555755
 Chicago|Subterranean|Localeze::BaseRecord|46098583
-Chicago|Taste Of Chicago||
-Chicago|The Chicago Theatre||
+Chicago|The Chicago Theatre|Localeze::BaseRecord|2826689
 Chicago|The Elbo Room|Localeze::BaseRecord|13374006
+Chicago|The Kinetic Playground|Localeze::BaseRecord|113969330
+Chicago|The Mercury Theater|Localeze::BaseRecord|46056363
+Chicago|The Note|Localeze::BaseRecord|13312811
+Chicago|Theatre Building Chicago|Localeze::BaseRecord|13585525
 Chicago|U.S. Cellular Field|Localeze::BaseRecord|46062588
 Chicago|Underground Lounge|Localeze::BaseRecord|14072995
 Chicago|United Center|Localeze::BaseRecord|81941012
-Chicago|University of Illinois Chicago||
+Chicago|University of Chicago|Localeze::BaseRecord|16560058
 Chicago|US Beer Co.|Localeze::BaseRecord|46057897
+Chicago|Vic Theatre|Localeze::BaseRecord|114912558
+Chicago|Vision|Localeze::BaseRecord|149868851
 Chicago|Wachovia Securities|Localeze::BaseRecord|687934634
-Chicago|Wrigley Done Right||
-Des Plaines|Allstate Arena||
-Des Plaines|Comfort Inn O'Hare||
-Des Plaines|Crown Plaza Chicago O'Hare||
+Chicago|Zanies Comedy Club|Localeze::BaseRecord|15160010
+Cicero|Hawthorne Race Course|Localeze::BaseRecord|6260617
 Des Plaines|Des Plaines Public Library|Localeze::BaseRecord|37946258
-Des Plaines|Des Plaines, Illinois, United States||
-Des Plaines|Donald E. Stephens Convention Center||
-Des Plaines|Intercontinental Chicago O'hare||
-Des Plaines|Maine West High School||
-Des Plaines|Postal code 60016, United States||
-Des Plaines|Postal code 60018, United States||
 Des Plaines|Stadium Sports Club & Pizza|Localeze::BaseRecord|693088217
+Des Plaines|The Tiki Terrace|Localeze::BaseRecord|687952749
 Evanston|Bill's Blues Bar|Localeze::BaseRecord|684377892
+Evanston|Evanston Public Library|Localeze::BaseRecord|112698314
+Evanston|The Space (Evanston, IL)|Localeze::BaseRecord|687284018
+Highland Park|Ravinia Festival|Localeze::BaseRecord|685190339
+Hoffman Estates|Sears Centre|Localeze::BaseRecord|153356426
+Joliet|Rialto Square Theatre|Localeze::BaseRecord|48022259
+Joliet|Route 66 Raceway|Localeze::BaseRecord|11003214
+Palatine|Palatine Park District|Localeze::BaseRecord|693087177
+Schaumburg|Chicago City Limits|Localeze::BaseRecord|48014520
+Schaumburg|Chicago Improv|Localeze::BaseRecord|142839306
 
 Charlotte|Actor's Theatre of Charlotte, The|Localeze::BaseRecord|349540
 Charlotte|Amos' Southend|Localeze::BaseRecord|861359
