@@ -23,7 +23,8 @@ To get the application up and running:
     - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes
     - rake data:import_records CBSA=37980       # Philadelphia area, 288721 locations, 10704 errors, 682 minutes
     - rake data:import_records CBSA=38300       # Pittsburg, PA, 127488 locations, 101 errors, 230 minutes
-  
+    - rake data:import_records CBSA=12060       # Atlanta area, 257217 location, 289 errors, 359 minutes
+    
   * Note: check error logs in log/localeze.error.log
   
 3. Add/Update locations.
