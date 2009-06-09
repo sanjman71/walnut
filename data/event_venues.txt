@@ -87,44 +87,34 @@ Palatine|Palatine Park District|Localeze::BaseRecord|693087177
 Schaumburg|Chicago City Limits|Localeze::BaseRecord|48014520
 Schaumburg|Chicago Improv|Localeze::BaseRecord|142839306
 
+Belmont|Bentley's|Localeze::BaseRecord|689480308
 Charlotte|Actor's Theatre of Charlotte, The|Localeze::BaseRecord|349540
 Charlotte|Amos' Southend|Localeze::BaseRecord|861359
 Charlotte|Cans Bar &amp; Canteen|Localeze::BaseRecord|144419806
-Charlotte|Charlotte, NC (Charlotte, NC)|Digest|cf5777f73a69eb6a52f94d7d9be5c72f
 Charlotte|Charlotte Convention Center|Localeze::BaseRecord|15930104
 Charlotte|Charlotte's Underground|Localeze::BaseRecord|686677893
 Charlotte|Coyote Joe's|Localeze::BaseRecord|3569420
 Charlotte|Double Door Inn|Localeze::BaseRecord|691620790
-Charlotte|Epicenter|Digest|cf5777f73a69eb6a52f94d7d9be5c72f
 Charlotte|Evening Muse|Localeze::BaseRecord|13377755
-Charlotte|Gaston County Museum of Art & History|Digest|5670244aec0f417bdc5521fafd888a4c
-Charlotte|Hilton Charlotte Center City|Localeze::BaseRecord|56715544
-Charlotte|Hilton Charlotte University Place|Digest|d090d3ad568a010b4ec48eeec89ef7a4
 Charlotte|KISS Lounge|Localeze::BaseRecord|692516195
 Charlotte|Metrolina Expo Center|Localeze::BaseRecord|67534172
 Charlotte|NC Blumenthal Performing Arts Center|Localeze::BaseRecord|136312368
 Charlotte|Ovens Auditorium|Localeze::BaseRecord|134402693
 Charlotte|Paramount's Carowinds Themepark|Localeze::BaseRecord|73664139
 Charlotte|Pavilion at EpiCentre|Localeze::BaseRecord|690964298
-Charlotte|Postal code 28216, United States|Digest|a630eb85cf874c5c41dd1a999e4a3c25
 Charlotte|Salvador Deli|Localeze::BaseRecord|151683130
 Charlotte|The Charlotte Art League|Localeze::BaseRecord|2760446
 Charlotte|The Evening Muse|Localeze::BaseRecord|13377755
-Charlotte|The Fillmore Charlotte|Localeze::BaseRecord|686170526
 Charlotte|The Neighborhood Theatre|Localeze::BaseRecord|56721808
-Charlotte|Time Warner Cable Arena|Localeze::BaseRecord|144419829
+Charlotte|Time Warner Cable Arena|Localeze::BaseRecord|134157518
 Charlotte|Tremont Music Hall - Casbah|Localeze::BaseRecord|13863429
-Charlotte|TOTAL BEAUTY SALON AND SPA|Digest|e2e6ac2fd05a7ac9a6db312650e34a19
-Charlotte|Uptown Charlotte|Digest|cc543df7413eb3cc077f87ccc933edd1
+Charlotte|U.S. National Whitewater Center|Localeze::BaseRecord|151684796
 Charlotte|Verizon Wireless Amphitheatre Charlotte|Localeze::BaseRecord|14367393
 Charlotte|Visulite Theatre with Old 97's|Localeze::BaseRecord|14472408
-Concord|Cabarrus Arena &amp; Events Center|Digest|c3592f1976b713924047eff8bb43516b
 Concord|Embassy Suites Charlotte - Concord Golf Resort & Spa|Localeze::BaseRecord|685083298
 Cornelius|Lake Norman Chamber of Commerce|Localeze::BaseRecord|90465835
 Cornelius|The Rusty Rudder|Localeze::BaseRecord|56703997
-Fort Mill|newsboys - Knights Stadium|Digest|c1b1809cfa8a4feb580f3d389f84c855
-Gastonia|Big Man's BBQ & Seafood||
-Harrisburg|Kelly O'Shea's Performing Arts|Digest|d7e14ad72c99bc659b233abda7826d78
+Huntersville|Huntersville Presbyterian Church|Localeze::BaseRecord|133298708
 Pineville|The Well|Localeze::BaseRecord|15940108
 
 Pittsburgh|Altar Bar|Localeze::BaseRecord|59967926

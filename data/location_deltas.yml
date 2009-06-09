@@ -91,8 +91,45 @@ name: Toyota Park
 source_type: Localeze::BaseRecord
 source_id: 115007341
 name: Tryst
-# Pittsburg
 ---
+# Charlotte area
+name: Club Faces
+street_address: 2815 Crisman St
+city: Charlotte
+state: North Carolina
+zip: 28208
+---
+name: Illusions
+street_address: 1000 Seaboard St
+city: Charlotte
+state: North Carolina
+zip: 28206
+---
+name: Memorial Stadium
+street_address: 310 N Kings Dr
+city: Charlotte
+state: North Carolina
+zip: 28204
+---
+name: The Fillmore Charlotte
+street_address: 820 Hamilton St
+city: Charlotte
+state: North Carolina
+zip: 28202
+---
+source_type: Localeze::BaseRecord
+source_id: 689480308
+name: Bentley's Bar and Grill
+---
+source_type: Localeze::BaseRecord
+source_id: 134157518
+name: Time Warner Cable Arena
+---
+source_type: Localeze::BaseRecord
+source_id: 14367393
+name: Verizon Wireless Amphitheatre Charlotte
+---
+# Pittsburg
 source_type: Localeze::BaseRecord
 source_id: 59967926
 name: Altar Bar
