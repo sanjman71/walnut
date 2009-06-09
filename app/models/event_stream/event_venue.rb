@@ -201,7 +201,7 @@ class EventVenue < ActiveRecord::Base
       return 0
     end
 
-    hash     = Hash['name' => name, 'street_address' =>  StreetAddress.normalize(address), 'city' => city, 'state' => state, 'zip' => zip]
+    hash     = Hash['name' => name, 'street_address' =>  StreetAddress.normalize(address), 'city' => city.name, 'state' => state.name, 'zip' => zip]
     new_loc  = PlaceHelper.add_place(hash)
     
     if self.lat and self.lng
