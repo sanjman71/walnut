@@ -5,7 +5,6 @@ class EventVenue < ActiveRecord::Base
   validates_uniqueness_of   :name
   
   belongs_to                :location
-  has_many                  :events
   
   after_save                :init_location_source
   
@@ -44,6 +43,14 @@ class EventVenue < ActiveRecord::Base
   # returns true if the event venue is mapped to a location
   def mapped?
     !self.location_id.blank?
+  end
+  
+  def events
+    self.location.blank? ? [] : self.location.events
+  end
+  
+  def events_count
+    self.location.blank? ? 0 : self.location.events_count
   end
   
   # try to map the venue to location
@@ -254,6 +261,14 @@ class EventVenue < ActiveRecord::Base
   def import_event(event_hash, options={})
     log   = options[:log] ? true : false
     
+    if !self.mapped?
+      if log
+        puts "#{Time.now}: xxx event venue import event exception, event venue is not mapped to a location"
+      end
+      
+      raise ArgumentError, "event venue is not mapped to a location"
+    end
+    
     # check if event exits
     event = Event.find_by_source_id(event_hash['id'])
     
@@ -270,8 +285,7 @@ class EventVenue < ActiveRecord::Base
       puts "#{Time.now}: *** created event: #{event.name} @ #{self.name}"
     end
     
-    # add event to event venue and location
-    self.events.push(event)
+    # add event to location
     self.location.events.push(event)
 
     event

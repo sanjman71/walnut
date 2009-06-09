@@ -25,7 +25,6 @@ class CreateEvents < ActiveRecord::Migration
       t.integer     :popularity,      :default => 0
       t.string      :source_type,     :limit => 20, :null => false
       t.string      :source_id,       :limit => 50, :null => false
-      t.integer     :events_count,    :default => 0
       t.integer     :confidence,      :default => 0
       t.references  :location
       t.string      :location_source_id,    :limit => 50
@@ -40,7 +39,6 @@ class CreateEvents < ActiveRecord::Migration
     create_table :events, :force => :true do |t|
       t.string      :name,          :limit => 100, :null => false
       t.references  :location
-      t.references  :event_venue
       t.integer     :popularity,    :default => 0
       t.string      :url,           :limit => 200
       t.datetime    :start_at
@@ -49,7 +47,10 @@ class CreateEvents < ActiveRecord::Migration
       t.string      :source_id,     :limit => 50, :null => false
       t.timestamps
     end
-    
+
+    add_index :events, :location_id
+    add_index :events, :popularity
+
     create_table :event_category_mappings, :force => :true do |t|
       t.references  :event
       t.references  :event_category

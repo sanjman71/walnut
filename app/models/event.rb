@@ -2,7 +2,6 @@ class Event < ActiveRecord::Base
   validates_presence_of     :name
 
   belongs_to                :location # counter cache implemented manually with a callback; the counter_cache didn't work for event adds
-  belongs_to                :event_venue, :counter_cache => :events_count
   
   has_many                  :event_category_mappings, :dependent => :destroy
   has_many                  :event_categories, :through => :event_category_mappings, :after_add => :after_add_category, :after_remove => :after_remove_category
@@ -87,7 +86,6 @@ class Event < ActiveRecord::Base
   # remove event references
   def before_destroy_callback
     location.events.delete(self) if location
-    event_venue.events.delete(self) if event_venue
   end
 
   protected

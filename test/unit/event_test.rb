@@ -4,7 +4,6 @@ require 'test/factories'
 class EventTest < ActiveSupport::TestCase
   
   should_validate_presence_of :name
-  should_belong_to            :event_venue
   should_belong_to            :location
   should_have_many            :event_categories
   should_have_many            :event_tags
@@ -22,6 +21,7 @@ class EventTest < ActiveSupport::TestCase
     assert_equal @place, @location.place
     @event_venue    = Factory(:event_venue, :name => "House of Pain", :location_id => @location.id)
     assert @event_venue.valid?
+    @event_venue.reload
     @event_category = Factory(:event_category, :name => "Music", :tags => "music,concert")
     assert @event_category.valid?
   end
@@ -57,8 +57,6 @@ class EventTest < ActiveSupport::TestCase
     setup do
       @event = Event.new(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1")
       assert @event.valid?
-      @event_venue.events.push(@event)
-      @event_venue.reload
       @location.events.push(@event)
       @location.reload
       @place.reload
