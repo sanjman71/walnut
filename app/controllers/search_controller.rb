@@ -35,8 +35,8 @@ class SearchController < ApplicationController
         facets    = Event.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         tags      += Search.load_from_facets(facets, Tag)
 
-        # return sorted tags collection
-        tags.sort_by { |o| o.name }
+        # return sorted, unique tags collection
+        tags.sort_by { |o| o.name }.uniq
       end
     end
 
@@ -57,10 +57,17 @@ class SearchController < ApplicationController
 
     self.class.benchmark("Benchmarking #{@neighborhood.name} tag cloud") do
       @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
-        # build tag cloud
+        # build tag cloud from location and event objects
         tag_limit = 150
         facets    = Location.facets(:with => Search.attributes(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-        Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+        tags      = Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+
+        tag_limit = 30
+        facets    = Event.facets(:with => Search.attributes(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        tags      += Search.load_from_facets(facets, Tag)
+
+        # return sorted, unique tags collection
+        tags.sort_by { |o| o.name }.uniq
       end
     end
 
@@ -81,10 +88,17 @@ class SearchController < ApplicationController
 
     self.class.benchmark("Benchmarking #{@zip.name} tag cloud") do
       @popular_tags = Rails.cache.fetch("#{@zip.name}:tag_cloud", :expires_in => CacheExpire.tags) do
-        # build tag cloud
+        # build tag cloud from location and event objects
         tag_limit = 150
         facets    = Location.facets(:with => Search.attributes(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-        Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+        tags      = Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
+
+        tag_limit = 30
+        facets    = Event.facets(:with => Search.attributes(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        tags      += Search.load_from_facets(facets, Tag)
+
+        # return sorted, unique tags collection
+        tags.sort_by { |o| o.name }.uniq
       end
     end
 
