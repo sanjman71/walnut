@@ -167,6 +167,8 @@ class SearchController < ApplicationController
     
     self.class.benchmark("Benchmarking related cities, zips, neighborhoods") do
       if @neighborhood
+        @locality_type    = 'neighborhood'
+
         # build neighborhood cities
         @cities           = Array(@neighborhood.city)
 
@@ -181,6 +183,8 @@ class SearchController < ApplicationController
         facets            = Location.facets(@query_and, :with => city_constraints, :facets => ["neighborhood_ids"], :limit => limit, :max_matches => limit)
         @neighborhoods    = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
       elsif @city
+        @locality_type  = 'city'
+
         # build zip and neighborhood facets
         limit           = 10
         facets          = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
@@ -192,6 +196,8 @@ class SearchController < ApplicationController
         nearby_limit    = 5
         @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
       elsif @zip
+        @locality_type  = 'zip'
+
         # build neighborhood and city facets
         limit           = 5
         facets          = Location.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
