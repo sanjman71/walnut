@@ -124,8 +124,10 @@ a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
 a.location.name                                   { color: #5500BB; font-size: 1.1em; font-weight: bold; }
 a.location.name:hover                             { color: #FFFFFF; background-color: #5500BB; }
 
+/*
 .place.indicator                                  { text-align: center; width: 40px; height: 13px; border: 1px solid #DDDDDD; padding-bottom: 0; 
                                                     background: #5500BB none repeat scroll 0 0; display: block; }
+*/
 
 /* event location link styles */
 
