@@ -33,7 +33,7 @@ Rails::Initializer.run do |config|
   config.gem "geokit" # required by geokit-rails plugin
   config.gem "curb" # curl api
   config.gem "json"
-  config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
+  # config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   # config.gem "eventfulapi", :source => "remote"  # this doesn't work
   
   # Only load the plugins named here, in the order given. By default, all plugins 
