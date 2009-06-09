@@ -1,3 +1,4 @@
+GA|Atl|Atlanta
 IL|Elk Grove Vlg|Elk Grove Village
 IL|Hoffman Est|Hoffman Estates
 IL|Glendale Hts|Glendale Heights

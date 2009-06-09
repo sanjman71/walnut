@@ -1,3 +1,4 @@
+Big Canoe|GA||
 La Grange Highlands|IL|41.7906113|-87.8647961
 Belmont Hills|PA|40.0131418|-75.2304038
 Chalk Hill|PA|39.844|-79.617
@@ -6,7 +7,7 @@ Fredericktown|PA|40.002|-79.998
 Grindstone|PA|40.016|-79.83
 Jeffersonville|PA|40.1270723|-75.3353875
 North Hills|PA|40.0958615|-75.1720488
-South Hills|PA|
+South Hills|PA||
 Rydal|PA|40.1067516|-75.1019942
 St Davids|PA|40.0600713|-75.3995089
 Zieglerville|PA|40.2817806|-75.497096
