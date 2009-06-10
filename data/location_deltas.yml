@@ -1,3 +1,26 @@
+# Atlanta
+name: Foreign Exchange Cafe
+street_address: 658 West Whitehall St
+city: Atlanta
+state: Georgia
+zip: 30310
+---
+name: Rialto Center for the Arts
+street_address: 80 Forsyth Street
+city: Atlanta
+state: Georgia
+zip: 30303
+---
+name: Variety Playhouse
+street_address: 1099 Euclid Ave
+city: Atlanta
+state: Georgia
+zip: 30307
+---
+source_type: Localeze::BaseRecord
+source_id: 690156497
+name: Verizon Wireless Amphitheatre at Encore Park
+---
 # Chicago
 name: Columbia College Chicago
 street_address: 600 S Michigan Ave

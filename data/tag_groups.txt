@@ -259,8 +259,8 @@
 259|Boat Services|boat
 260|Physicians - Endocrinology and Diabetes|diabetes,diabetic,endocrinology
 261|Physicians - Radiology|radiology
-262|Ticket Sales|
-263|Movie Theaters|
+262|Ticket Sales|tickets
+263|Movie Theaters|cinema,movie theater
 264|Museums and Zoological Gardens|
 265|Fashion Design|design,fashion
 266|Dating Services|dating service,online,personals

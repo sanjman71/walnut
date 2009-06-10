@@ -1,3 +1,20 @@
+Atlanta|Chastain Park Amphitheater|Localeze::BaseRecord|160805419
+Atlanta|The Masquerade|Localeze::BaseRecord|44761980
+Atlanta|Philips Arena|Localeze::BaseRecord|693936556
+Atlanta|Fabulous Fox Theatre|Localeze::BaseRecord|44762652
+Atlanta|Turner Field|Localeze::BaseRecord|153634280
+Atlanta|The Earl Restaurant and Bar|Localeze::BaseRecord|13372750
+Atlanta|Tabernacle|Localeze::BaseRecord|44758130
+Atlanta|Opera Nightclub & Events Center|Localeze::BaseRecord|684576314
+Duluth|Gwinnett Arena|Localeze::BaseRecord|148749952
+Norcross|Northern Star Coffeehouse|Localeze::BaseRecord|111363425
+Decatur|Eddie's Attic|Localeze::BaseRecord|44722515
+Alpharetta|Verizon Wireless Amphitheatre at Encore Park|Localeze::BaseRecord|690156497
+Atlanta|The Shakespeare Tavern|Localeze::BaseRecord|18828685
+Atlanta|Alon's Bakery &amp; Market in Dunwoody|Localeze::BaseRecord|686660831
+Marietta|Marietta Wine Market|Localeze::BaseRecord|133511960
+Atlanta|W Atlanta Midtown Hotel|Localeze::BaseRecord|75737283
+
 Bridgeview|Toyota Park|Localeze::BaseRecord|91277183
 Chicago|Abbey Pub|Localeze::BaseRecord|19381018
 Chicago|Ann Sather Restaurant|Localeze::BaseRecord|46106935
