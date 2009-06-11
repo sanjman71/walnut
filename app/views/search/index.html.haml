@@ -14,68 +14,69 @@
   
 %hr.space
 
-.span-22.prepend-2
-  -# show a google ad
-  = google_ad(728, 90, 'image')
+.span-24.last
+  .span-5#sidebar
+    #related_tags
+      = render(:partial => 'search/related_tags', :locals => {:title => "Related Searches", :tags => @related_tags}) unless @related_tags.blank?
+    #neighborhoods
+      = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag, :query => @query}) unless @neighborhoods.blank?
+    #zips
+      = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag, :query => @query}) unless @zips.blank?
+    #cities
+      = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag, :query => @query}) unless @cities.blank?
+    #nearby_cities
+      = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :query => @query}) unless @nearby_cities.blank?
 
-%hr.space
-
-.span-5#sidebar
-  #related_tags
-    = render(:partial => 'search/related_tags', :locals => {:title => "Related Searches", :tags => @related_tags}) unless @related_tags.blank?
-  #neighborhoods
-    = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag, :query => @query}) unless @neighborhoods.blank?
-  #zips
-    = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag, :query => @query}) unless @zips.blank?
-  #cities
-    = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag, :query => @query}) unless @cities.blank?
-  #nearby_cities
-    = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :query => @query}) unless @nearby_cities.blank?
-
-  -# show another google ad
-  = google_ad(160, 600)
-
-.span-19.last#search
-  .span-10
-    %h4
-      - if @objects.blank?
-        %span{:style => 'font-size: 0.9em; font-weight: bold;'}
-          == No search results.
-          == Please check your search criteria and try again
-      - else
-        = page_entries_info @objects
-  .span-9.last
-    = will_paginate(@objects, :page_links => true)
+    -# google ad
+    = google_ad(160, 600)
 
   .span-19.last
-    - if @search_filters.keys.size > 0
-      -# filter search results by type
-      - @search_filters.keys.each do |klass|
-        %span{:style => 'font-weight: bold; font-size: 1.1em;'}
-          = link_to("Search #{klass.pluralize} only", build_search_route(klass, @locality_type, @locality_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
-          = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
-    
-  .span-10
-    - @objects.each_with_index do |object, i|
-      .span-10.letterbox-5.border_bottom[object]
-        - case object.class.to_s
-        - when 'Location'
-          = render(:partial => 'search/location', :locals => {:location => object, :query => @query, :tags => @tags, :index => i})
-        - when 'Event'
-          = render(:partial => 'search/event', :locals => {:event => object, :query => @query, :tags => @tags, :index => i})
-
-  .span-9.last
-    - unless @objects.blank?
-      .jmap#map{:style => "width: 350px; height: 430px;"}
-
-  %hr.space
+    -# google ad
+    = google_ad(728, 90, 'image')
   
-  .span-10
-    %h4= page_entries_info @objects unless @objects.blank?
-  .span-9.last
-    = will_paginate(@objects, :page_links => true)
-
   .span-19.last
-    - unless @objects.blank?
-      -# show a google ad
+    %hr.space
+  
+  .span-19.last#search
+    .span-10
+      %h4
+        - if @objects.blank?
+          %span{:style => 'font-size: 0.9em; font-weight: bold;'}
+            == No search results.
+            == Please check your search criteria and try again
+        - else
+          = page_entries_info @objects
+    .span-9.last
+      = will_paginate(@objects, :page_links => true)
+
+    .span-19.last
+      - if @search_filters.keys.size > 0
+        -# filter search results by type
+        - @search_filters.keys.each do |klass|
+          %span{:style => 'font-weight: bold; font-size: 1.1em;'}
+            = link_to("Search #{klass.pluralize} only", build_search_route(klass, @locality_type, @locality_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
+            = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
+    
+    .span-10
+      - @objects.each_with_index do |object, i|
+        .span-10.letterbox-5.border_bottom[object]
+          - case object.class.to_s
+          - when 'Location'
+            = render(:partial => 'search/location', :locals => {:location => object, :query => @query, :tags => @tags, :index => i})
+          - when 'Event'
+            = render(:partial => 'search/event', :locals => {:event => object, :query => @query, :tags => @tags, :index => i})
+
+    .span-9.last
+      - unless @objects.blank?
+        .jmap#map{:style => "width: 350px; height: 430px;"}
+
+    %hr.space
+  
+    .span-10
+      %h4= page_entries_info @objects unless @objects.blank?
+    .span-9.last
+      = will_paginate(@objects, :page_links => true)
+
+    .span-19.last
+      -# google ad
       = google_ad(728, 90, 'image')
