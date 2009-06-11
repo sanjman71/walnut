@@ -1,3 +1,3 @@
-- if place.phone_numbers_count > 0
-  - number = place.primary_phone_number.number
-  = number_to_phone(number, :area_code => true)
+- if location.phone_numbers_count > 0
+  - location.phone_numbers.slice(0,max_phones).each do |phone_number|
+    %div[phone_number]{:style => 'padding-bottom: 5px;'}= number_to_phone(phone_number.number, :area_code => true)

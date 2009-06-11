@@ -4,5 +4,16 @@ IL|Hoffman Est|Hoffman Estates
 IL|Glendale Hts|Glendale Heights
 IL|La Grange Pk|La Grange Park
 IN|Valpo|Valparaiso
+NJ|Berlin Twp|Berlin Township
+NJ|Eastamptn Twp|Eastampton Township
+NJ|Evesham Twp|Evesham Township
+NJ|Haddon Twp|Haddon Township
+NJ|Logan Twp|Logan Township
+NJ|Pittsgrov Twp|Pittsgrove Township
+NJ|Southampton Twp|Southampton Township
+NJ|Woolwich Twp|Woolwich Township
+PA|Kennet Sq|Kennett Square
+PA|Kennett Sq|Kennett Square
 PA|Phila|Philadelphia
+PA|Saint Davids|St Davids
 PA|Squirrel Hill|Pittsburgh

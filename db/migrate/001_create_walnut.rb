@@ -79,22 +79,21 @@ class CreateWalnut < ActiveRecord::Migration
       t.references  :zip
       t.references  :country
       t.integer     :neighborhoods_count,   :default => 0 # counter cache
+      t.integer     :phone_numbers_count,   :default => 0   # counter cache
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
-      t.string      :digest,                :limit => 50, :default => ""
-      t.references  :source,                :polymorphic => true, :default => nil
       t.integer     :popularity,            :default => 0 # used to order search results
       t.integer     :recommendations_count, :default => 0
       t.integer     :events_count,          :default => 0
       t.integer     :status,                :default => 0
       t.integer     :refer_to,              :default => 0
-      t.boolean     :delta  # used by sphinx for real-time indexing
+      t.boolean     :delta                  # used by sphinx for real-time indexing
       t.datetime    :urban_mapping_at,      :default => nil
       t.timestamps
     end
             
-    add_index :locations, [:source_id, :source_type], :name => "index_locations_on_source"
     add_index :locations, :city_id, :name => "index_locations_on_city"
+    add_index :locations, [:city_id, :street_address]
     add_index :locations, :popularity
     add_index :locations, :events_count
     add_index :locations, :neighborhoods_count
@@ -134,6 +133,14 @@ class CreateWalnut < ActiveRecord::Migration
     end
 
     add_index :chains, :places_count
+
+    create_table :location_sources do |t|
+      t.references  :location
+      t.references  :source,        :polymorphic => true
+    end
+    
+    add_index :location_sources, :location_id
+    add_index :location_sources, [:source_id, :source_type]
   end
 
   def self.down

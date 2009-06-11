@@ -27,13 +27,12 @@ namespace :data do
       places.collect(&:locations).flatten.each do |location|
         # track number of locations checked
         checked     += 1
-        
+
+        # make sure location is from localeze, or has a source
+        next unless !location.location_sources.blank?
+
         place       = location.place
-        
-        # make sure location is from localeze
-        next unless Localeze::BaseRecord.to_s == location.source_type
-        
-        record      = Localeze::BaseRecord.find(location.source_id)
+        record      = Localeze::BaseRecord.find(location.location_sources.first.source_id)
         categories  = record.categories
         attributes  = record.attributes
         groups      = []
@@ -146,7 +145,8 @@ namespace :data do
         records.each do |record_hash|
           # map localeze id to a location and place
           localeze_id = record_hash['id']
-          location    = Location.find_by_source_id(localeze_id).first
+          source      = LocationSource.find_by_source_id(localeze_id).first
+          location    = source.location if source
           place       = location.place if location
           
           # check for valid location and place
@@ -181,6 +181,7 @@ namespace :data do
     page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
     per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 1000
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    filter        = ENV["FILTER"] if ENV["FILTER"]
     offset        = (page - 1) * per_page
      
     # initialize conditions hash
@@ -228,18 +229,24 @@ namespace :data do
     puts "#{Time.now}: found #{record_ids.size} matching record ids"
     
     # load records in batches
-    until (records = Localeze::BaseRecord.find(record_ids.slice(offset, per_page))).blank?
-
-    puts "#{Time.now}: processing batch #{offset}"
+    until (batch_ids = record_ids.slice(offset, per_page)).blank?
+      records = Localeze::BaseRecord.find(batch_ids)
+      
+      puts "#{Time.now}: processing batch #{offset}"
       
       records.each do |record|
         # check if record has already been imported
-        if Location.find_by_source(record).first
+        if LocationSource.find_by_source(record).first
           # record has already been imported
           exists += 1
           next
         end
       
+        if filter
+          # apply filter
+          next unless record.stdname.match(/#{filter}/)
+        end
+        
         # find state
         @state  = @country.states.find_by_code(record.state)
       
@@ -288,32 +295,48 @@ namespace :data do
           errors += 1
           next
         end
-       
-        # create location
-        options   = {:name => "Work", :street_address => record.street_address, :city => @city, :state => @state, :zip => @zip, :country => @country}
-        options.merge!(:source_id => record.id, :source_type => record.class.to_s)
-        options.merge!(:lat => record.latitude, :lng => record.longitude) if record.mappable?
-        location  = Location.create(options)
-      
-        # create place
-        place     = Place.create(:name => record.stdname)
-        place.locations.push(location)
-        place.reload
-      
+
+        # look for an existing location with the same street address and name
+        locations = Location.find(:all, :conditions => {:city_id => @city.id, :street_address => record.street_address}, :include => :places)
+        location  = locations.select { |l| l.place_name == record.stdname }.first
+        
+        if location
+          # found a matching location, so use it
+          place = location.place
+        else
+          # create location
+          options   = {:street_address => record.street_address, :city => @city, :state => @state, :zip => @zip, :country => @country}
+          options.merge!(:lat => record.latitude, :lng => record.longitude) if record.mappable?
+          location  = Location.create(options)
+
+          # create place
+          place     = Place.create(:name => record.stdname)
+          place.locations.push(location)
+          
+          # reload
+          place.reload
+          location.reload
+        end
+        
+        # add location source
+        location.location_sources.push(LocationSource.new(:source_id => record.id, :source_type => record.class.to_s))
+        
         # check for a phonenumber
         if record.phone_number
-          # add phone number
-          phone_number = PhoneNumber.create(:name => "Work", :number => record.phone_number)
-          place.phone_numbers.push(phone_number)
+          # add phone number to location
+          location.phone_numbers.push(PhoneNumber.new(:name => "Work", :number => record.phone_number))
         end
         
         # check for chain
         if !record.chain_id.blank? and localeze_chain = Localeze::Chain.find_by_id(record.chain_id)
           # find or create local chain object
           chain = Chain.find_by_name(localeze_chain.name) || Chain.create(:name => localeze_chain.name)
-          # add chain
-          place.chain = chain
-          place.save
+          
+          if !place.chain?
+            # add chain
+            place.chain = chain
+            place.save
+          end
         end
         
         added += 1

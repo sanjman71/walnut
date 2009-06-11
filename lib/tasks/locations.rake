@@ -1,25 +1,50 @@
 namespace :locations do
 
-  desc "Add location sources"
-  task :init_sources do
-    puts "#{Time.now}: adding location sources"
-    
-    added = 0
-    
-    Location.find_in_batches do |locations|
-      locations.each do |location|
-        next if location.source_id.blank?
-        next if location.location_sources.size > 0
-      
-        source = LocationSource.new(:location => location, :source_id => location.source_id, :source_type => location.source_type)
-        location.location_sources.push(source)
-        
-        added += 1
-      end
-    end
-    
-    puts "#{Time.now}: completed, added #{added} location sources"
-  end
+  # desc "Add location sources"
+  # task :init_sources do
+  #   puts "#{Time.now}: adding location sources"
+  #   
+  #   added = 0
+  #   
+  #   Location.find_in_batches do |locations|
+  #     locations.each do |location|
+  #       next if location.source_id.blank?
+  #       next if location.location_sources.size > 0
+  #     
+  #       source = LocationSource.new(:location => location, :source_id => location.source_id, :source_type => location.source_type)
+  #       location.location_sources.push(source)
+  #       
+  #       added += 1
+  #     end
+  #   end
+  #   
+  #   puts "#{Time.now}: completed, added #{added} location sources"
+  # end
+  
+  # desc "Move phone numbers from places to locations"
+  # task :move_phones do
+  #   puts "#{Time.now}: moving phone numbers from places to locations"
+  #   
+  #   moved = 0
+  #   
+  #   PhoneNumber.find_in_batches(:conditions => {:callable_type => "Place"}) do |phone_numbers|
+  #     phone_numbers.each do |phone_number|
+  #       callable  = phone_number.callable
+  #       next if !callable.is_a?(Place)
+  #       
+  #       # find associated location
+  #       location  = callable.locations.first
+  #       
+  #       # move number from place to location
+  #       location.phone_numbers.push(PhoneNumber.new(:name => phone_number.name, :number => phone_number.number))
+  #       callable.phone_numbers.destroy(phone_number)
+  #       
+  #       moved += 1
+  #     end
+  #   end
+  #   
+  #   puts "#{Time.now}: completed, moved #{moved} phone numbers"
+  # end
   
   desc "Merge locations with same address in the specified CITY"
   task :merge_using_address do
@@ -36,8 +61,6 @@ namespace :locations do
     groups  = Location.count(:group => :street_address, :conditions => {:city_id => city.id}).delete_if { |name, count| count == 1 or name.blank? }
     
     groups.each do |street_address, count|
-      # puts "found #{street_address} #{count} times"
-      
       # find all locations with the street address
       locations = Location.find(:all, :conditions => {:city_id => city.id, :street_address => street_address}, :include => :places)
       
@@ -50,15 +73,13 @@ namespace :locations do
       # merge each name that mapped to more than 1 location at this address
       names.each_pair do |name, collection|
         next if collection.size <= 1
-        puts "*** merging #{name}:#{street_address}:#{collection.size}"
+        puts "#{Time.now}: *** merging #{name}:#{street_address}, #{collection.size} locations"
         LocationHelper.merge_locations(collection)
         merged += 1
       end
-      
-      break if merged > 5
     end
     
-    puts "#{Time.now}: completed, merged #{merged}"
+    puts "#{Time.now}: completed, merged #{merged} locations"
   end
   
   desc "Initialize location deltas"
@@ -68,8 +89,9 @@ namespace :locations do
     s.documents.each do |object|
       if object["source_id"] and object["source_type"]
         # find location
-        location = Location.find_by_source_id_and_source_type(object["source_id"], object["source_type"])
-
+        source    = LocationSource.find_by_source_id_and_source_type(object["source_id"], object["source_type"])
+        location  = soruce.location if source
+        
         if location.blank?
           puts "#{Time.now}: xxx could not find location #{object["source_type"]}:#{object["source_id"]}"
           next
@@ -104,7 +126,7 @@ namespace :locations do
     places    = Place.find(:all, :conditions => {:name => object['name']})
     
     if places.size > 0
-      puts "#{Time.now}: xxx place #{object['name']} already exists"
+      puts "#{Time.now}: ok place #{object['name']} already exists"
       return
     end
     
@@ -113,6 +135,12 @@ namespace :locations do
     
     if city.blank?
       puts "#{Time.now}: xxx city #{object["city"]} is invalid"
+      return
+    end
+    
+    # check that city has a sufficient locations count
+    if city.locations_count < 1000
+      puts "#{Time.now}: xxx city #{city.name} has #{city.locations_count} locations"
       return
     end
     

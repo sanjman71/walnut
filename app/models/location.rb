@@ -7,12 +7,15 @@ class Location < ActiveRecord::Base
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   has_many                :location_places
   has_many                :places, :through => :location_places
+  has_many                :phone_numbers, :as => :callable
   has_one                 :event_venue
   has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
   has_many                :location_neighbors
   has_many                :neighbors, :through => :location_neighbors
   
-  before_save             :before_save_callback
+  has_many                :location_sources
+  has_many                :sources, :through => :location_sources
+  
   after_save              :after_save_callback
 
   # make sure only accessible attributes are written to from forms etc.
@@ -21,10 +24,8 @@ class Location < ActiveRecord::Base
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :place_name
   
-  # acts_as_taggable_on     :locality_tags
-  
-  named_scope :for_state, lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
-  named_scope :for_city,  lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
+  named_scope :for_state,             lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
+  named_scope :for_city,              lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
   named_scope :without_neighborhoods, { :conditions => ["neighborhoods_count = 0"] }
@@ -32,16 +33,13 @@ class Location < ActiveRecord::Base
   named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }
   named_scope :with_neighbors,        { :include => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
+  named_scope :with_phone_numbers,    { :conditions => ["phone_numbers_count > 0"] }
+  named_scope :no_phone_numbers,      { :conditions => ["phone_numbers_count = 0"] }
+  named_scope :min_phone_numbers,     lambda { |x| {:conditions => ["phone_numbers_count >= ?", x] }}
   named_scope :min_popularity,        lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
 
-  # find location with the specified source
-  named_scope :find_by_source,      lambda { |source| { :conditions => {:source_id => source.id, :source_type => source.class.to_s} }}
-  named_scope :find_by_source_id,   lambda { |source_id| { :conditions => {:source_id => source_id} }}
-  named_scope :find_by_source_type, lambda { |source_type| { :conditions => {:source_type => source_type} }}
-  
-  
   define_index do
     indexes places.name, :as => :name
     indexes street_address, :as => :address
@@ -81,6 +79,11 @@ class Location < ActiveRecord::Base
     [country, state, city, zip].compact + neighborhoods.compact
   end
   
+  def primary_phone_number
+    return nil if phone_numbers_count == 0
+    phone_numbers.first
+  end
+  
   # returns true iff the location has a latitude and longitude 
   def mappable?
     return true if self.lat and self.lng
@@ -109,19 +112,6 @@ class Location < ActiveRecord::Base
 
   protected
   
-  # before_save callback to:
-  #  - update digest
-  def before_save_callback
-    changed_set = ["country_id", "state_id", "city_id", "zip_id", "name"]
-
-    self.changes.keys.each do |change|
-      # filter out unless its a locality or name
-      next unless changed_set.include?(change.to_s)
-      # update digest
-      self.digest = self.to_digest
-    end
-  end
-
   # after_save callback to:
   #  - increment/decrement locality counter caches
   #  x (deprecated) update locality tags (e.g. country, state, city, zip) based on changes to the location object
@@ -144,16 +134,12 @@ class Location < ActiveRecord::Base
       
       if old_id
         locality = klass.find_by_id(old_id.to_i)
-        # remove locality tag
-        # locality_tag_list.remove(locality.name)
         # decrement counter cache
         klass.decrement_counter(:locations_count, locality.id)
       end
       
       if new_id
         locality = klass.find_by_id(new_id.to_i)
-        # add locality tag
-        # locality_tag_list.add(locality.name)
         # increment counter cache
         klass.increment_counter(:locations_count, locality.id)
       end
@@ -162,9 +148,6 @@ class Location < ActiveRecord::Base
   
   def after_add_neighborhood(hood)
     return if hood.blank?
-    # add locality tag
-    # locality_tag_list.add(hood.name)
-    # save
   end
   
   def before_remove_neighborhood(hood)
@@ -172,11 +155,8 @@ class Location < ActiveRecord::Base
     # decrement counter caches
     Neighborhood.decrement_counter(:locations_count, hood.id)
     Location.decrement_counter(:neighborhoods_count, self.id)
-    # remove locality tag
-    # locality_tag_list.remove(hood.name)
-    # save
   end
-  
+
   def after_add_event(event)
     return if event.blank?
     # increment events_count

@@ -4,6 +4,14 @@ require 'test/factories'
 class LocationTest < ActiveSupport::TestCase
   
   should_belong_to    :country
+  should_belong_to    :state
+  should_belong_to    :city
+  should_belong_to    :zip
+  should_have_many    :neighborhoods
+  should_have_many    :places
+  should_have_many    :phone_numbers
+  should_have_many    :neighbors
+  should_have_many    :sources
   
   def setup
     @us           = Factory(:us)
@@ -20,7 +28,6 @@ class LocationTest < ActiveSupport::TestCase
       @location = Location.create(:country => @us)
       @location.reload
       @us.reload
-      @digest = @location.digest
     end
     
     should_change "Location.count", :by => 1
@@ -28,11 +35,7 @@ class LocationTest < ActiveSupport::TestCase
     should "have us as locality" do
       assert_equal [@us], @location.localities
     end
-    
-    should "have a valid digest" do
-      assert_not_equal "", @digest
-    end
-    
+
     should "increment us locations_count" do
       assert_equal 1, @us.locations_count
     end
@@ -47,20 +50,11 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @location.reload
         @us.reload
-        @digest2 = @location.digest
       end
 
       should "have us no localities" do
         assert_equal [], @location.localities
       end
-
-      should "have a changed digest" do
-        assert_not_equal @digest, @digest2
-      end
-      
-      # should "have no locality tags" do
-      #   assert_equal [], @location.locality_tag_list
-      # end
 
       should "decrement us locations_count" do
         assert_equal 0, @us.locations_count
@@ -74,15 +68,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.reload
         @us.reload
         @ca.reload
-        @digest2 = @location.digest
-      end
-
-      # should "have ca country area tag" do
-      #   assert_equal ["Canada"], @location.locality_tag_list
-      # end
-
-      should "have a changed digest" do
-        assert_not_equal @digest, @digest2
       end
 
       should "decrement us locations_count" do
@@ -100,14 +85,9 @@ class LocationTest < ActiveSupport::TestCase
       @location = Location.create(:name => "Home", :state => @il)
       @il.reload
       @location.reload
-      @digest = @location.digest
     end
     
     should_change "Location.count", :by => 1
-
-    should "have a valid digest" do
-      assert_not_equal "", @digest
-    end
 
     should "increment illinois locations_count" do
       assert_equal 1, @il.locations_count
@@ -119,11 +99,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @il.reload
         @location.reload
-        @digest2 = @location.digest
-      end
-
-      should "have a changed digest" do
-        assert_not_equal @digest, @digest2
       end
 
       should "decrement illinois locations_count" do
@@ -136,14 +111,10 @@ class LocationTest < ActiveSupport::TestCase
     setup do
       @location = Location.create(:name => "Home", :city => @chicago)
       @location.reload
-      @digest = @location.digest
-      assert_not_equal "", @digest
       @place.locations.push(@location)
       @place.reload
       @location.reload
       @chicago.reload
-      @digest1 = @location.digest
-      assert_not_equal @digest, @digest1
     end
     
     should_change "Location.count", :by => 1
@@ -163,7 +134,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @chicago.reload
         @location.reload
-        @digest2 = @location.digest
       end
 
       should "decrement chicago locations_count" do
@@ -172,10 +142,6 @@ class LocationTest < ActiveSupport::TestCase
 
       should "set chicago locations to []" do
         assert_equal [], @chicago.locations
-      end
-
-      should "have a changed digest" do
-        assert_not_equal @digest1, @digest2
       end
     end
     
@@ -186,7 +152,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @chicago.reload
         @location.reload
-        @digest2 = @location.digest
       end
 
       should "remove chicago locations" do
@@ -196,17 +161,12 @@ class LocationTest < ActiveSupport::TestCase
       should "set springfield locations to [@location]" do
         assert_equal [@location], @springfield.locations
       end
-
-      should "have a changed digest" do
-        assert_not_equal @digest1, @digest2
-      end
     end
     
     context "remove place" do
       setup do
         @place.locations.delete(@location)
         @location.reload
-        @digest2 = @location.digest
       end
 
       should_change "LocationPlace.count", :by => -1
@@ -218,11 +178,6 @@ class LocationTest < ActiveSupport::TestCase
       should "have no places associated with location" do
         assert_equal [], @location.places
       end
-      
-      should "have digest changed back to original digest" do
-        assert_not_equal @digest1, @digest2
-        assert_equal @digest, @digest2
-      end
     end
   end
     
@@ -232,7 +187,6 @@ class LocationTest < ActiveSupport::TestCase
       @place.locations.push(@location)
       @location.reload
       @zip.reload
-      @digest = @location.digest
     end
     
     should_change "Location.count", :by => 1
@@ -246,17 +200,12 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal [@location], @zip.locations
     end
     
-    should "have a valid digest" do
-      assert_not_equal "", @digest
-    end
-    
     context "remove zip" do
       setup do
         @location.zip = nil
         @location.save
         @zip.reload
         @location.reload
-        @digest2 = @location.digest
       end
 
       should "decrement zip locations_count" do
@@ -265,10 +214,6 @@ class LocationTest < ActiveSupport::TestCase
 
       should "remove zip locations" do
         assert_equal [], @zip.locations
-      end
-
-      should "have a changed digest" do
-        assert_not_equal @digest, @digest2
       end
     end
     
@@ -279,7 +224,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.save
         @zip2.reload
         @location.reload
-        @digest2 = @location.digest
       end
 
       should "set 60654 locations to []" do
@@ -288,10 +232,6 @@ class LocationTest < ActiveSupport::TestCase
       
       should "set 60610 locations to [@location]" do
         assert_equal [@location], @zip2.locations
-      end
-
-      should "have a changed digest" do
-        assert_not_equal @digest, @digest2
       end
     end
   end
@@ -340,6 +280,47 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
+  context "location with a phone number" do
+    setup do
+      @location = Location.create(:country => @us, :name => "My Location")
+      @location.phone_numbers.push(PhoneNumber.new(:name => "Home", :number => "9991234567"))
+      @location.reload
+    end
+  
+    should_change "Location.count", :by => 1
+    should_change "PhoneNumber.count", :by => 1
+    
+    should "have 1 phone number" do
+      assert_equal ["9991234567"], @location.phone_numbers.collect(&:number)
+    end
+    
+    should "have phone_numbers_count == 1" do
+      assert_equal 1, @location.phone_numbers_count
+    end
+    
+    should "have a primary phone number" do
+      assert_equal "9991234567", @location.primary_phone_number.number
+    end
+    
+    context "then destroy phone number" do
+      setup do
+        @phone_number = @location.phone_numbers.first
+        @location.phone_numbers.destroy(@phone_number)
+        @location.reload
+      end
+      
+      should_change "PhoneNumber.count", :by => -1
+
+      should "have no phone number" do
+        assert_equal [], @location.phone_numbers
+      end
+
+      should "have phone_numbers_count == 0" do
+        assert_equal 0, @location.phone_numbers_count
+      end
+    end
+  end
+  
   context "location without refer_to" do
     setup do
       @location = Location.create(:name => "Home")
@@ -360,4 +341,68 @@ class LocationTest < ActiveSupport::TestCase
       end
     end
   end
+  
+  context "create 2 locations" do
+    setup do
+      @location1  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
+      @location1.phone_numbers.push(PhoneNumber.new(:name => "Work", :number => "1111111111"))
+      @location1.location_sources.push(LocationSource.new(:location => @location1, :source_id => 1, :source_type => "Test"))
+      @place1     = Place.create(:name => "Fun Place")
+      @place1.locations.push(@location1)
+      @location1.reload
+      @place1.tag_list.add("tag1")
+      @place1.save
+      
+      @location2  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
+      @location2.phone_numbers.push(PhoneNumber.new(:name => "Work", :number => "2222222222"))
+      @location2.location_sources.push(LocationSource.new(:location => @location2, :source_id => 2, :source_type => "Test"))
+      @place2     = Place.create(:name => "Fun Place")
+      @place2.locations.push(@location2)
+      @location2.reload
+      @place2.tag_list.add("tag2")
+      @place2.save
+    end
+    
+    should_change "Location.count", :by => 2
+    should_change "Place.count", :by => 2
+    should_change "PhoneNumber.count", :by => 2
+    should_change "LocationSource.count", :by => 2
+    
+    context "and then merge locations" do
+      setup do
+        LocationHelper.merge_locations([@location1, @location2])
+        @location1.reload
+      end
+      
+      should_change "Location.count", :by => -1
+      should_change "Place.count", :by => -1
+      should_not_change "PhoneNumber.count"
+      should_not_change "LocationSource.count"
+      
+      should "add tags to location1" do
+        assert_equal ["tag1", "tag2"], @location1.place.tag_list
+      end
+      
+      should "add phone number to location1" do
+        assert_equal ["1111111111", "2222222222"], @location1.phone_numbers.collect(&:number)
+      end
+      
+      should "have phone_numbers_count == 2" do
+        assert_equal 2, @location1.phone_numbers_count
+      end
+      
+      should "add location source to location1" do
+        assert_equal [1, 2], @location1.location_sources.collect(&:source_id)
+      end
+      
+      should "remove place2" do
+        assert_equal nil, Place.find_by_id(@place2.id)
+      end
+      
+      should "remove location1" do
+        assert_equal nil, Location.find_by_id(@location2.id)
+      end
+    end
+  end
+  
 end

@@ -57,7 +57,7 @@ class Event < ActiveRecord::Base
 
   # return the event venue's name
   def venue_name
-    # use the association location and place
+    # use the associated location's name
     if self.location
       self.location.place_name
     else

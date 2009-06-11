@@ -78,12 +78,10 @@ class EventVenue < ActiveRecord::Base
     # check if there a source id and type
     if !self.location_source_id.blank? and !self.location_source_type.blank?
       # check the source type
-      if match = self.location_source_type.match(/Digest/)
-        # find the location using the digest
-        matches = Location.find_all_by_digest(self.location_source_id)
-      elsif match = self.location_source_type.match(/Localeze/)
+      if match = self.location_source_type.match(/Localeze/)
         # find the location using the source id and type
-        matches = Location.find(:all, :conditions => {:source_id => self.location_source_id, :source_type => self.location_source_type})
+        sources = LocationSource.find(:all, :conditions => {:source_id => self.location_source_id, :source_type => self.location_source_type})
+        matches = sources.collect(&:location)
       else
         # invalid type
         if log
@@ -426,15 +424,12 @@ class EventVenue < ActiveRecord::Base
     return if location.blank?
     return if !self.location_source_id.blank? and !self.location_source_type.blank?
     
-    if location.source_type and location.source_type.match(/Localeze/)
-      self.location_source_type = location.source_type
-      self.location_source_id   = location.source_id.to_s
-    else
-      # use location digest
-      self.location_source_type = "Digest"
-      self.location_source_id   = location.digest
+    if !location.location_sources.blank?
+      # use first source
+      source = location.location_sources.first
+      self.location_source_type = source.source_type
+      self.location_source_id   = source.source_id.to_s
+      self.save
     end
-    
-    self.save
   end
 end

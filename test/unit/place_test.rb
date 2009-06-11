@@ -29,6 +29,10 @@ class PlaceTest < ActiveSupport::TestCase
       assert_equal 1, @place.locations_count
     end
     
+    should "not belong to chain" do
+      assert_equal false, @place.chain?
+    end
+    
     context "then remove location" do
       setup do
         @place.locations.delete(@location)
@@ -67,11 +71,10 @@ class PlaceTest < ActiveSupport::TestCase
     end
   end
   
-  context "create place with a phone number" do
+  context "place with a phone number" do
     setup do
       @place  = Place.create(:name => "Place 1")
-      @phone  = PhoneNumber.create(:name => "Home", :number => "9991234567")
-      @place.phone_numbers.push(@phone)
+      @place.phone_numbers.push(PhoneNumber.new(:name => "Home", :number => "9991234567"))
       @place.reload
     end
   
@@ -79,11 +82,15 @@ class PlaceTest < ActiveSupport::TestCase
     should_change "PhoneNumber.count", :by => 1
     
     should "have 1 phone number" do
-      assert_equal [@phone], @place.phone_numbers
+      assert_equal ["9991234567"], @place.phone_numbers.collect(&:number)
     end
     
-    should "have phone_numbers_count of 1" do
+    should "have phone_numbers_count == 1" do
       assert_equal 1, @place.phone_numbers_count
+    end
+
+    should "have a primary phone number" do
+      assert_equal "9991234567", @place.primary_phone_number.number
     end
   end
   

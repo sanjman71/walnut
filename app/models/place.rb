@@ -5,8 +5,7 @@ class Place < ActiveRecord::Base
   has_many                  :location_places
   has_many                  :locations, :through => :location_places, :after_add => :after_add_location, :after_remove => :after_remove_location
 
-  # TODO: find out why the counter cache field doesn't work without the before and after filters
-  has_many                  :phone_numbers, :as => :callable, :after_add => :after_add_phone_number, :before_remove => :before_remove_phone_number
+  has_many                  :phone_numbers, :as => :callable
 
   has_many                  :place_tag_groups
   has_many                  :tag_groups, :through => :place_tag_groups
@@ -17,41 +16,31 @@ class Place < ActiveRecord::Base
   
   acts_as_taggable_on       :tags
   
+  named_scope :with_locations,      { :conditions => ["locations_count > 0"] }
+  named_scope :with_chain,          { :conditions => ["chain_id is NOT NULL"] }
+  named_scope :no_chain,            { :conditions => ["chain_id is NULL"] }
+  named_scope :with_tag_groups,     { :conditions => ["tag_groups_count > 0"] }
+  named_scope :no_tag_groups,       { :conditions => ["tag_groups_count = 0"] }
+  
   def primary_phone_number
     return nil if phone_numbers_count == 0
     phone_numbers.first
   end
 
-  private
+  def chain?
+    !self.chain_id.blank?
+  end
   
-  def after_add_phone_number(phone_number)
-    unless phone_number.blank?
-      Place.increment_counter(:phone_numbers_count, self.id)
-    end
-  end
-
-  def before_remove_phone_number(phone_number)
-    unless phone_number.blank?
-      Place.decrement_counter(:phone_numbers_count, self.id)
-    end
-  end
+  private
   
   def after_add_location(location)
     return if location.blank?
-
-    # update location digest
-    location.digest = location.to_digest
-    location.save
 
     # Note: incrementing the counter cache is done using built-in activerecord callback
   end
   
   def after_remove_location(location)
     return if location.blank?
-
-    # update location digest
-    location.digest = location.to_digest
-    location.save
 
     # decrement locations_count counter cache
     # TODO: find out why the built-in counter cache doesn't work here

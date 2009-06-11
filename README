@@ -21,7 +21,7 @@ To get the application up and running:
   - Import records by cbsa
     - rake data:import_records CBSA=16980       # Chicagoland, 437101 locations, 842 minutes
     - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes
-    - rake data:import_records CBSA=37980       # Philadelphia area, 288721 locations, 10704 errors, 682 minutes
+    - rake data:import_records CBSA=37980       # Philadelphia area, 299343 locations, 82 errors, 425 minutes, (605 minutes w/ merging)
     - rake data:import_records CBSA=38300       # Pittsburg, PA, 127488 locations, 101 errors, 230 minutes
     - rake data:import_records CBSA=12060       # Atlanta area, 257217 location, 289 errors, 359 minutes
     
@@ -45,6 +45,11 @@ To get the application up and running:
   - rake events:import_events CITY=Charlotte REGION='South Carolina' LIMIT=10 # import charlotte and south carolina region events
 
   - rake events:import_events CITY=Pittsburgh LIMIT=10
+
+  - rake events:import_events CITY=Philadelphia LIMIT=10
+  
+  - rake events:import_events CITY=Atlanta LIMIT=5
+  - rake events:import_events CITY=Atlanta REGION=Georgia LIMIT=5
   
 6. Import neighborhoods:
   * import neighborhoods from urban mapping by city's popular tags (300 request per day with the free api)

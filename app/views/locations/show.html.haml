@@ -9,10 +9,8 @@
     = @h1
   - if has_privilege?('manage site')
     %h4{:style => 'font-size: 1.0em; color: #777777;'}
-      == #{@location.source_type}:#{@location.source_id}
-      == &nbsp;|&nbsp;
-      == Digest:#{@location.digest}
-      == &nbsp;|&nbsp;
+      = @location.location_sources.collect{ |s| "#{s.source_type}:#{s.source_id}"}.join(" | ")
+    %h4{:style => 'font-size: 1.0em; color: #777777;'}
       == Popularity:#{@location.popularity}
       == &nbsp;|&nbsp;
       == Events:#{@location.events_count}
@@ -33,8 +31,8 @@
         
       -# location phone 
       %h3#phone
-        - unless @place.phone_numbers_count == 0
-          = render(:partial => 'phone', :locals => {:location => @location, :place => @place})
+        - unless @location.phone_numbers_count == 0
+          = render(:partial => 'phone', :locals => {:location => @location, :max_phones => 3})
         
       -# location recommendations
       / %h4.recommendations#recommend

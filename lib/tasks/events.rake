@@ -80,18 +80,17 @@ namespace :events do
   desc "Import CITY events from eventful, allow all REGION events if specified"
   task :import_events do
     # build events search conditions
-    city    = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
-    region  = ENV["REGION"] ? ENV["REGION"] : ""
-    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 1
-
+    city      = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
+    region    = ENV["REGION"] ? ENV["REGION"] : ""
+    limit     = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 1
+    max_page  = ENV["MAX_PAGE"] ? ENV["MAX_PAGE"].to_i : 3
+    
     if city.blank?
       puts "usage: missing CITY"
       exit
     end
 
-    state   = city.state
-
-    puts "#{Time.now}: importing #{city.name} events, limit #{limit}"
+    state       = city.state
 
     page        = 1
     per_page    = 50
@@ -101,16 +100,26 @@ namespace :events do
     missing     = 0
     errors      = 0
     istart      = Event.count
-    
-    while imported < limit
+
+    puts "#{Time.now}: importing #{city.name} events, limit #{limit}, checking at most #{max_page * per_page} events"
+
+    while imported < limit and page <= max_page
       # find future events in the specified city
       conditions = {:location => city.name, :date => 'Future', :page => page, :page_size => per_page, :sort_order => 'popularity'}
       results    = EventStream::Event.search(conditions)
       events     = results['events'] ? results['events']['event'] : []
 
+      puts "#{Time.now}: *** processing #{events.size} events"
+      
       events.each do |event_hash|
         checked += 1
-        
+
+        if Event.find_by_source_id(event_hash['id'])
+          # event already exists
+          exists += 1
+          next
+        end
+
         # map eventful event to an event venue
         venue       = EventVenue.find_by_source_id(event_hash['venue_id'])
         city_name   = event_hash['city_name']
@@ -159,12 +168,6 @@ namespace :events do
           next
         end
       
-        if Event.find_by_source_id(event_hash['id'])
-          # event already exists
-          exists += 1
-          next
-        end
-        
         # import the event
         event = venue.import_event(event_hash, :log => true)
       

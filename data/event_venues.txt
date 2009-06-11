@@ -197,17 +197,27 @@ New York|Knitting Factory|Localeze::BaseRecord|688477871
 New York|The Bowery Ballroom|Localeze::BaseRecord|28306112
 New York|Radio City Music Hall|Localeze::BaseRecord|55633490
 New York|Madison Square Garden|Localeze::BaseRecord|133846415
-Philadelphia|Clark Park|Localeze::BaseRecord|10176882
-Philadelphia|Triumph Brewing Company|Localeze::BaseRecord|160883355
-Philadelphia|Dr. Watson's Pub|Localeze::BaseRecord|59888266
-Philadelphia|Fluid Nightclub|Localeze::BaseRecord|92297881
-Philadelphia|Shampoo|Localeze::BaseRecord|683962600
+
+Glenside|Keswick Theatre|Localeze::BaseRecord|7519331
+Kennett Square|Longwood Gardens|Localeze::BaseRecord|139907017
 Philadelphia|Chris' Jazz Cafe|Localeze::BaseRecord|32180110
-Philadelphia|McFadden's at the Ballpark|Localeze::BaseRecord|59866108
-Philadelphia|Comcast SportsNet|Localeze::BaseRecord|684871088
-Philadelphia|Theater of Living Arts|Localeze::BaseRecord|13585387
-Philadelphia|World Cafe Live|Localeze::BaseRecord|142712335
-Philadelphia|Projects Gallery|Localeze::BaseRecord|143642229
+Philadelphia|Clark Park|Localeze::BaseRecord|10176882
 Philadelphia|Club Risque Philadelphia|Localeze::BaseRecord|3159969
-Philadelphia|Mt Airy Learning Tree|Localeze::BaseRecord|59892821
+Philadelphia|Comcast SportsNet|Localeze::BaseRecord|684871088
+Philadelphia|Dr. Watson's Pub|Localeze::BaseRecord|59888266
+Philadelphia|First Unitarian Church of Philadelphia|Localeze::BaseRecord|67704407
+Philadelphia|Fluid Nightclub|Localeze::BaseRecord|92297881
 Philadelphia|Kildare's Manayunk|Localeze::BaseRecord|88765971
+Philadelphia|McFadden's at the Ballpark|Localeze::BaseRecord|59866108
+Philadelphia|Mt Airy Learning Tree|Localeze::BaseRecord|59892821
+Philadelphia|North Star Bar|Localeze::BaseRecord|59898626
+Philadelphia|Pearl|Localeze::BaseRecord|685595289
+Philadelphia|Penn's Landing Great Plaza|Localeze::BaseRecord|153574247
+Philadelphia|Projects Gallery|Localeze::BaseRecord|143642229
+Philadelphia|Shampoo|Localeze::BaseRecord|683962600
+Philadelphia|Starlight Ballroom|Localeze::BaseRecord|12667814
+Philadelphia|Theater of Living Arts|Localeze::BaseRecord|13585387
+Philadelphia|Triumph Brewing Company|Localeze::BaseRecord|160883355
+Philadelphia|World Cafe Live|Localeze::BaseRecord|142712335
+Woodlyn|Bootleggers|Localeze::BaseRecord|1932828
+

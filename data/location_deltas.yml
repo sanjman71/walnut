@@ -152,6 +152,13 @@ source_type: Localeze::BaseRecord
 source_id: 14367393
 name: Verizon Wireless Amphitheatre Charlotte
 ---
+# Philadelphia
+name: Alexander's
+street_address: 2080 Castor Ave 2nd Fl
+city: Philadelphia
+state: Pennsylvania
+zip: 19134
+---
 # Pittsburg
 source_type: Localeze::BaseRecord
 source_id: 59967926

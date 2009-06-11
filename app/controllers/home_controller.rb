@@ -5,14 +5,8 @@ class HomeController < ApplicationController
     # find a city to highlight
     @featured_city = find_featured_city
     
-    # find featured city events
+    # find featured city objects
     featured_limit = 5
-
-    # self.class.benchmark("Benchmarking #{@featured_city.name} popular events") do
-    #   @featured_events = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured_events", :expires_in => CacheExpire.events) do
-    #     Event.search(:with => Search.attributes(@featured_city), :include => :event_venue, :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
-    #   end
-    # end
 
     self.class.benchmark("Benchmarking #{@featured_city.name} featured set") do
       @featured_set = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured_set", :expires_in => CacheExpire.locations) do
@@ -52,7 +46,10 @@ class HomeController < ApplicationController
 
   # find a randomly selected featured city
   def find_featured_city
-    City.order_by_density.all(:limit => 1, :include => :state, :order => 'rand()', :conditions => ["locations_count > 25000"]).first
+    city = City.order_by_density.all(:limit => 1, :include => :state, :order => 'rand()', :conditions => ["locations_count > 25000"]).first
+    # default to city with most locations
+    city = City.find(:first, :order => "locations_count DESC") if city.blank?
+    city
   end
 
 end

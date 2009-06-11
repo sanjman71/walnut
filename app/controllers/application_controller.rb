@@ -279,9 +279,9 @@ class ApplicationController < ActionController::Base
       tuple.push("#{city.name}")
     end
 
-    if place.phone_numbers_count > 0
+    if location.phone_numbers_count > 0
       # add phone number
-      tuple.push(number_to_phone(place.primary_phone_number.number, :delimiter => " "))
+      tuple.push(number_to_phone(location.primary_phone_number.number, :delimiter => " "))
     end
 
     tuple.join(" - ")

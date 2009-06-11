@@ -11,7 +11,10 @@ Medford Township|NJ|39.8661826|-74.8390162
 Pilesgrove Township|NJ|39.650833|-75.316111
 Pittsgrove Township|NJ|39.5314846|-75.1311874
 Shamong Township|NJ|39.7583945|-74.7102958
+South Harrison Township|NJ|39.698333|-75.260556
+Southampton Township|NJ|39.909722|-74.712778
 Voorhees Township|NJ|39.8383777|-74.9325683
 Westampton Township|NJ|40.014444|-74.826111
 Woolwich Township|NJ|39.8203014|-75.3048617
+Kennett Square|PA|39.844167|-75.710556
 Neville Island|PA|40.504|-80.102

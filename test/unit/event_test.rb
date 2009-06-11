@@ -12,7 +12,7 @@ class EventTest < ActiveSupport::TestCase
     @us             = Factory(:us)
     @il             = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
     @chicago        = Factory(:city, :name => "Chicago", :state => @il)
-    @location       = Location.create(:city => @chicago, :source_id => 100, :source_type => "Somebody")
+    @location       = Location.create(:city => @chicago)
     assert @location.valid?
     @place          = Place.create(:name => "Kickass Ampthitheater")
     assert @place.valid?
@@ -26,30 +26,31 @@ class EventTest < ActiveSupport::TestCase
     assert @event_category.valid?
   end
   
-  context "validate event venue source is 'Digest'" do
-    should "have location_source_type with 'Digest'" do
-      assert_match /Digest/, @event_venue.location_source_type
+  context "validate event venue source is nil" do
+    should "have location_source_type is nil" do
+      assert_equal nil, @event_venue.location_source_type
     end
 
-    should "have location_source_id with digest value" do
-      assert_equal "3fca59290310e24f5447bb23f6022248", @event_venue.location_source_id
+    should "have location_source_id is nil" do
+      assert_equal nil, @event_venue.location_source_id
     end
   end
   
-  context "create event venue mapped to a location from a localeze base record" do
+  context "create event venue mapped to a location sourced from localeze" do
     setup do
-      @hall_of_justice = Location.create(:city => @chicago, :source_id => 101, :source_type => "Localeze::BaseRecord")
-      assert @hall_of_justice.valid?
-      @hall_venue = Factory(:event_venue, :name => "Hall of Justice Venue", :location_id => @hall_of_justice.id)
-      assert @hall_venue.valid?
+      @location.location_sources.push(LocationSource.new(:source_id => 101, :source_type => "Localeze::BaseRecord"))
+      @new_venue = Factory(:event_venue, :name => "New Venue", :location_id => @location.id)
+      assert @new_venue.valid?
     end
 
+    should_change "LocationSource.count", :by => 1
+    
     should "have location_source_type with localeze value" do
-      assert_match /Localeze::BaseRecord/, @hall_venue.location_source_type
+      assert_match /Localeze::BaseRecord/, @new_venue.location_source_type
     end
     
     should "have location_source_id == 101" do
-      assert_equal '101', @hall_venue.location_source_id
+      assert_equal '101', @new_venue.location_source_id
     end
   end
   
