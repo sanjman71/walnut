@@ -97,7 +97,6 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :locations, :popularity
     add_index :locations, :events_count
     add_index :locations, :neighborhoods_count
-    add_index :locations, :digest
     add_index :locations, :status
     add_index :locations, :recommendations_count
     
