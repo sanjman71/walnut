@@ -21,6 +21,13 @@ class Place < ActiveRecord::Base
   named_scope :no_chain,            { :conditions => ["chain_id is NULL"] }
   named_scope :with_tag_groups,     { :conditions => ["tag_groups_count > 0"] }
   named_scope :no_tag_groups,       { :conditions => ["tag_groups_count = 0"] }
+  named_scope :with_taggings,       { :conditions => ["taggings_count > 0"] }
+  named_scope :no_taggings,         { :conditions => ["taggings_count = 0"] }
+
+  def primary_location
+    return nil if locations_count == 0
+    locations.first
+  end
   
   def primary_phone_number
     return nil if phone_numbers_count == 0
@@ -47,4 +54,7 @@ class Place < ActiveRecord::Base
     Place.decrement_counter(:locations_count, id)
   end
   
+  def after_remove_tagging(tagging)
+    Place.decrement_counter(:taggings_count, id)
+  end
 end

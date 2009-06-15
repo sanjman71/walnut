@@ -90,6 +90,10 @@ class Event < ActiveRecord::Base
 
   protected
 
+  def after_remove_tagging(tagging)
+    Event.decrement_counter(:taggings_count, id)
+  end
+
   def after_add_category(category)
     return if category.tags.blank?
     # add category tags and save object

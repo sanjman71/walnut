@@ -19,10 +19,9 @@ namespace :data do
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     offset        = (page - 1) * per_page
      
-    # initialize conditions hash
-    conditions    = {:tag_groups_count => 0}
+    # find places with no tags
+    conditions    = {:taggings_count => 0}
     
-    # find places with no tag groups
     until (places = Place.find(:all, :conditions => conditions, :include => :locations, :offset => offset, :limit => per_page)).blank?
       places.collect(&:locations).flatten.each do |location|
         # track number of locations checked

@@ -1,5 +1,28 @@
 namespace :tags do
   
+  desc "Find places without any tags"
+  task :find_untagged_places do
+    filter = ENV["FILTER"] ? ENV["FILTER"] : nil
+    tags   = ENV["TAGS"] ? ENV["TAGS"].split(",").map(&:strip) : []
+
+    puts "#{Time.now}: finding untagged places, filter: #{filter}, tags: #{tags.join(",")}"
+    Place.find_in_batches(:batch_size => 100, :conditions => {:taggings_count => 0}) do |places|
+      places.each do |place|
+        next if filter and place.name.match(/#{filter}/i).blank?
+        
+        puts "#{Time.now}: #{place.name}:#{place.primary_location.street_address}:#{place.primary_location.city.name}"
+        
+        if tags.any? and !filter.blank?
+          # add tags
+          place.tag_list.add(tags)
+          # place.save
+        end
+      end
+    end
+
+    puts "#{Time.now}: completed"
+  end
+  
   desc "Find tags >= WORDS words in length"
   task :find_min_words do
     words = ENV["WORDS"].to_i

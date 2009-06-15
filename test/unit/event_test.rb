@@ -98,6 +98,7 @@ class EventTest < ActiveSupport::TestCase
       setup do
         @event.event_categories.push(@event_category)
         @event_category.reload
+        @event.reload
       end
       
       should_change "EventCategoryMapping.count", :by => 1
@@ -110,10 +111,15 @@ class EventTest < ActiveSupport::TestCase
         assert_equal 1, @event_category.events_count
       end
       
+      should "increment event.taggings_count to 2" do
+        assert_equal 2, @event.taggings_count
+      end
+      
       context "then remove event category" do
         setup do
           @event.event_categories.delete(@event_category)
           @event_category.reload
+          @event.reload
         end
 
         should_change "EventCategoryMapping.count", :by => -1
@@ -124,6 +130,10 @@ class EventTest < ActiveSupport::TestCase
 
         should "decrement event_category.events_count" do
           assert_equal 0, @event_category.events_count
+        end
+
+        should "decrement event.taggings_count to 0" do
+          assert_equal 0, @event.taggings_count
         end
       end
       
@@ -180,6 +190,10 @@ class EventTest < ActiveSupport::TestCase
       
       should "have no event tags" do
         assert_equal [], @event.event_tags
+      end
+      
+      should "not change event.taggings.count" do
+        assert_equal 0, @event.taggings_count
       end
     end
   end

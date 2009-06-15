@@ -37,19 +37,21 @@ class CreateEvents < ActiveRecord::Migration
     add_index :event_venues, [:city, :popularity]
 
     create_table :events, :force => :true do |t|
-      t.string      :name,          :limit => 100, :null => false
+      t.string      :name,                :limit => 100, :null => false
       t.references  :location
-      t.integer     :popularity,    :default => 0
-      t.string      :url,           :limit => 200
+      t.integer     :popularity,          :default => 0
+      t.string      :url,                 :limit => 200
       t.datetime    :start_at
       t.datetime    :end_at
-      t.string      :source_type,   :limit => 20, :null => false
-      t.string      :source_id,     :limit => 50, :null => false
+      t.integer     :taggings_count,      :default => 0   # counter cache
+      t.string      :source_type,         :limit => 20, :null => false
+      t.string      :source_id,           :limit => 50, :null => false
       t.timestamps
     end
 
     add_index :events, :location_id
     add_index :events, :popularity
+    add_index :events, :taggings_count
 
     create_table :event_category_mappings, :force => :true do |t|
       t.references  :event

@@ -73,7 +73,8 @@ module ActiveRecord
               class_inheritable_reader :tag_types
             
               has_many :taggings, :as => :taggable, :dependent => :destroy, :include => :tag
-              has_many :base_tags, :class_name => "Tag", :through => :taggings, :source => :tag
+              # SK - added after_remove callback
+              has_many :base_tags, :class_name => "Tag", :through => :taggings, :source => :tag, :after_remove => :after_remove_tagging
             
               attr_writer :custom_contexts
             

@@ -94,39 +94,48 @@ class PlaceTest < ActiveSupport::TestCase
     end
   end
   
-  context "place with a tag" do
+  context "place with tags" do
     setup do
-      @place  = Place.create(:name => "Place 1")
-      @tag1   = @place.tag_list.add("tag1")
+      @place = Place.create(:name => "Place 1")
+      @place.tag_list.add(["pizza","soccer"])
       @place.save
-      @place.reload 
+      @place.reload
     end
     
     should_change "Place.count", :by => 1
-    should_change "Tag.count", :by => 1
-    should_change "Tagging.count", :by => 1
+    should_change "Tag.count", :by => 2
+    should_change "Tagging.count", :by => 2
     
     should "set tag.taggings_count to 1" do
-      assert_equal 1, Tag.find_by_name("tag1").taggings.count
+      assert_equal 1, Tag.find_by_name("pizza").taggings.count
+      assert_equal 1, Tag.find_by_name("soccer").taggings.count
     end
     
-    context "remove tag" do
+    should "increment place.taggings_count to 2" do
+      assert_equal 2, @place.taggings_count
+    end
+
+    context "then remove a tag" do
       setup do
-        @place.tag_list.remove(@tag1)
+        @place.tag_list.remove("pizza")
         @place.save
         @place.reload
       end
 
       should_change "Tagging.count", :by => -1
       
-      should "set tag.taggings_count to 0" do
-        assert_equal 0, Tag.find_by_name("tag1").taggings.count
+      should "descrement tag.taggings_count to 0" do
+        assert_equal 0, Tag.find_by_name("pizza").taggings.count
+      end
+
+      should "decrement place.taggings_count to 1" do
+        assert_equal 1, @place.taggings_count
       end
     end
     
-    context "add another tag" do
+    context "then add another tag" do
       setup do
-        @tag2 = @place.tag_list.add("tag2")
+        @place.tag_list.add("beer")
         @place.save
         @place.reload 
       end
@@ -135,7 +144,11 @@ class PlaceTest < ActiveSupport::TestCase
       should_change "Tagging.count", :by => 1
 
       should "set tag.taggings_count to 1" do
-        assert_equal 1, Tag.find_by_name("tag2").taggings.count
+        assert_equal 1, Tag.find_by_name("beer").taggings.count
+      end
+
+      should "increment place.taggings_count to 3" do
+        assert_equal 3, @place.taggings_count
       end
     end
   end

@@ -113,10 +113,13 @@ class CreateWalnut < ActiveRecord::Migration
       t.integer     :locations_count,       :default => 0   # counter cache
       t.integer     :phone_numbers_count,   :default => 0   # counter cache
       t.references  :chain
+      t.integer     :taggings_count,        :default => 0   # counter cache
       t.integer     :tag_groups_count,      :default => 0   # counter cache
     end
 
     add_index :places, :name
+    add_index :places, :taggings_count
+    add_index :places, :tag_groups_count
     
     create_table :location_places do |t|
       t.references  :location
