@@ -1,0 +1,79 @@
+# bakery, cafe, coffee, tea
+regex: bakery.*cafe|cafe.*bakery
+tag_groups: 
+  - Bakeries
+  - Coffee Houses
+---
+regex: bakery
+tag_groups: Bakeries
+---
+regex: coffee
+tag_groups: Coffee Houses
+---
+regex: cafe
+tag_groups: Coffee Houses
+---
+regex: espresso
+tag_groups: Coffee Houses
+---
+regex: tea
+tag_groups: Coffee Houses
+---
+# pizza, food, restaurants
+regex: pizza
+tag_groups: 
+  - Pizza
+  - Restaurants
+---
+regex: restaurant
+tag_groups: Restaurants
+---
+regex: restaurants
+tag_groups: Restaurants
+---
+# bars, lounges
+regex: sports bar
+tag_groups: Bars, Taverns and Cocktail Lounges
+---
+regex: lounge
+tag_groups: Bars, Taverns and Cocktail Lounges
+---
+regex: bar.*grill|grill.*bar
+tag_groups: 
+  - Bars, Taverns and Cocktail Lounges
+  - Restaurants
+# regex: bar
+# tag_groups: Bars, Taverns and Cocktail Lounges
+# ---
+# nail salon, beauty salon
+regex: nail salon
+tag_groups: Beauty Salons and Day Spas
+---
+regex: nail spa
+tag_groups: Beauty Salons and Day Spas
+---
+regex: beauty salon
+tag_groups: Beauty Salons and Day Spas
+---
+regex: nail
+tag_groups: Beauty Salons and Day Spas
+---
+regex: nail bar
+tag_groups: Beauty Salons and Day Spas
+---
+# auto
+regex: auto service
+tag_groups: Automobile - Repairs and Services
+---
+regex: auto sales
+tag_groups: Automobile - Dealers
+# chains
+regex: blockbuster video
+tag_groups: Video Rentals and Sales
+---
+regex: cvs pharmacy
+tag_groups: Pharmacies
+# video|
+# wine| 
+# food|
+# 

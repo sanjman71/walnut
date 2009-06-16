@@ -97,7 +97,7 @@ namespace :init do
   desc "Initialize default tag groups"
   task :tag_groups do
     klass   = TagGroup
-    columns = [:id, :name, :tags, :applied_at]
+    columns = [:name, :tags, :applied_at]
     file    = "#{RAILS_ROOT}/data/tag_groups.txt"
     values  = []
     options = { :validate => false }
@@ -105,13 +105,17 @@ namespace :init do
     puts "#{Time.now}: importing tag groups ... parsing file #{file}" 
     FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       id, name, tags = row
-      value = [id, name, tags, Time.now]
+      
+      # skip if tag group already exists
+      next if TagGroup.find_by_name(name)
+      
+      value = [name, tags, Time.now]
       values << value
     end
 
     # import data
     puts "#{Time.now}: importing data, starting with #{klass.count} objects"
-    klass.import columns, values, options 
+    klass.import columns, values, options if values.any?
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
   

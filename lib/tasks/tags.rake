@@ -1,26 +1,77 @@
 namespace :tags do
   
+  desc "Mark untagged places based on rules in yaml file"
+  task :mark_untagged_places do
+    s = YAML::load_stream( File.open("data/untagged_places.yml"))
+
+    checked = 0
+    tagged  = 0
+    
+    s.documents.each do |object|
+      regex       = object["regex"]
+      tag_groups  = Array(object["tag_groups"])
+
+      tag_groups  = tag_groups.collect do |s|
+        tag_group = TagGroup.find_by_name(s)
+      end.compact
+      
+      puts "#{Time.now}: *** using regex: #{regex}, tag groups: #{tag_groups.collect(&:name).join(",")}"
+
+      conditions  = {:taggings_count => 0}
+
+      if tag_groups.any?
+        c, t    = add_place_tag_groups(conditions, regex, tag_groups, [])
+        checked += c
+        tagged  += t
+      end
+    end
+    
+    puts "#{Time.now}: completed, checked #{checked} places, tagged #{tagged} places"
+  end
+  
   desc "Find places without any tags"
   task :find_untagged_places do
-    filter = ENV["FILTER"] ? ENV["FILTER"] : nil
-    tags   = ENV["TAGS"] ? ENV["TAGS"].split(",").map(&:strip) : []
+    filter  = ENV["FILTER"] ? ENV["FILTER"] : nil
+    
+    puts "#{Time.now}: finding untagged places, filter: #{filter}"
+    
+    conditions = {:taggings_count => 0}
+    checked, tagged = add_place_tag_groups(conditions, filter, [], [])
 
-    puts "#{Time.now}: finding untagged places, filter: #{filter}, tags: #{tags.join(",")}"
-    Place.find_in_batches(:batch_size => 100, :conditions => {:taggings_count => 0}) do |places|
+    puts "#{Time.now}: completed, checked #{checked} places, tagged #{tagged} places"
+  end
+  
+  def add_place_tag_groups(conditions, filter, tag_groups, tags)
+    checked = 0
+    tagged  = 0
+    
+    Place.find_in_batches(:batch_size => 100, :conditions => conditions) do |places|
       places.each do |place|
-        next if filter and place.name.match(/#{filter}/i).blank?
+        # apply filter if we have one
+        next if filter and place.name.match(/\b#{filter}\b/i).blank?
+
+        checked += 1
+
+        puts "#{Time.now}: #{place.name}:#{place.primary_location.city.name}:#{place.primary_location.street_address}"
         
-        puts "#{Time.now}: #{place.name}:#{place.primary_location.street_address}:#{place.primary_location.city.name}"
+        if tag_groups.any? and !filter.blank?
+          # add place to each tag group
+          tag_groups.each do |tag_group|
+            tag_group.places.push(place)
+            tagged += 1
+          end
+        end
         
         if tags.any? and !filter.blank?
-          # add tags
+          # add place tags
           place.tag_list.add(tags)
-          # place.save
+          place.save
+          tagged += 1
         end
       end
     end
-
-    puts "#{Time.now}: completed"
+    
+    [checked, tagged]
   end
   
   desc "Find tags >= WORDS words in length"

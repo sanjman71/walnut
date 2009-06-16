@@ -10,7 +10,7 @@
 10|Hotels, Motels, and Lodging|hotels,lodging,motels
 11|Physical Therapy and Rehabilitation|physical therapist,physical therapy,rehabilitation,sports therapy
 12|Child Care Centers and Services|child care,child care center,day care center
-13|Restaurants|dining,restaurants
+13|Restaurants|dining,restaurant
 14|Office Services, Supplies and Equipment|office equipment,office furniture,office products,office supplies
 15|Banks and Credit Unions|bank,banking,credit,credit card,credit union,loan,mortgage
 16|Locksmiths, Safes and Vaults|locks,locksmith,safes,vaults
@@ -382,3 +382,4 @@
 382|Veterinarian Equipment and Supplies|pets,veterinarians,veterinary
 383|Residential Contractors|
 384|Biotechnology|
+385|Pizza|pizza

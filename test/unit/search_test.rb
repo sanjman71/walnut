@@ -181,6 +181,22 @@ class SearchTest < ActiveSupport::TestCase
       end
     end
 
+    context "with query with quotes" do
+      setup do
+        @us     = Factory.create(:us)
+        @il     = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @hash   = Search.query("'dominos pizza'")
+      end
+
+      should "have raw query 'dominos pizza'" do
+        assert_equal "'dominos pizza'", @hash[:query_raw]
+      end
+
+      should "have query with @ removed" do
+        assert_equal Hash[:* => 'dominos pizza'], @hash[:fields]
+      end
+    end
+    
     context "with query 'anything'" do
       setup do
         @us     = Factory.create(:us)

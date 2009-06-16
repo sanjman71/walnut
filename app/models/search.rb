@@ -23,26 +23,33 @@ class Search
     attributes  = Hash.new
     
     # valid fields and attributes
-    all_fields      = [:address, :name, :tags]
-    all_attributes  = [:events, :popularity]
+    all_fields          = [:address, :name, :tags, :*]
+    all_attributes      = [:events, :popularity]
     
     # valid patterns
-    match_token     = "([a-zA-Z]+):([0-9a-zA-Z]+)"
-    match_quotes    = "([a-zA-Z]+):'([0-9a-zA-Z ]+)'"
+    match_field_token   = "([a-zA-Z]+):([0-9a-zA-Z]+)"
+    match_field_quotes  = "([a-zA-Z]+):'([0-9a-zA-Z ]+)'"
+    match_all_quotes    = "[ ]*'([0-9a-zA-Z ]+)'"
 
     while true
-      if matches = s.match(/#{match_token}/)
+      if matches = s.match(/#{match_field_token}/)
         key   = matches[1].to_sym
         value = matches[2]
       
         # removed matched string
-        s = s.gsub(/#{match_token}/, '').strip
-      elsif matches = s.match(/#{match_quotes}/)
+        s = s.gsub(/#{match_field_token}/, '').strip
+      elsif matches = s.match(/#{match_field_quotes}/)
         key   = matches[1].to_sym
         value = matches[2]
 
         # removed matched string
-        s = s.gsub(/#{match_quotes}/, '').strip
+        s = s.gsub(/#{match_field_quotes}/, '').strip
+      elsif matches = s.match(/#{match_all_quotes}/)
+        key   = '*'.to_sym
+        value = matches[1]
+
+        # removed matched string
+        s = s.gsub(/#{match_all_quotes}/, '').strip
       else
         # no (more matches)
         break

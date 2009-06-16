@@ -83,7 +83,7 @@ namespace :locations do
   end
   
   desc "Initialize location deltas"
-  task :init_deltas do 
+  task :init_deltas do
     s = YAML::load_stream( File.open("data/location_deltas.yml"))
     
     s.documents.each do |object|

@@ -1,6 +1,5 @@
 namespace :db do
   
-  
   desc "Backup the database to the /backups directory"
   task :backup do
     mysqldump           = 'mysqldump'
