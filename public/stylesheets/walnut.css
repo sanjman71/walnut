@@ -145,6 +145,10 @@ a.event.category.even:hover                       { color: #FFFFFF; background-c
 a.event.category.odd                              { color: #663333; font-size: 1.2em; }
 a.event.category.odd:hover                        { color: #FFFFFF; background-color: #663333; }
 
+/* company name */
+a.company_name                                    { color: #FFFFFF; font-size: 2.5em; text-decoration:none; line-height: 100%; }
+a.company_name:hover                              {}
+
 /* calendar styles */
 
 .calendar.date                                    { text-align: center; width: 40px; border: 1px solid #DDDDDD; padding-bottom: 0; }
