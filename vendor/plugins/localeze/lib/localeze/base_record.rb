@@ -44,6 +44,10 @@ module Localeze
       false
     end
 
+    def dnc?
+      self.dnc == 'N'
+    end
+
     # find all unique categories
     def categories
       (categories1 + categories2).uniq 
