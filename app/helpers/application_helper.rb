@@ -155,7 +155,7 @@ module ApplicationHelper
     if options[:tag]
       "/tag/#{options[:tag].parameterize}"
     elsif options[:query]
-      "/#{options[:query].parameterize}"
+      "/q/#{options[:query].parameterize}"
     else
       ""
     end
