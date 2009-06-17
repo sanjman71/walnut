@@ -320,8 +320,8 @@ namespace :data do
         # add location source
         location.location_sources.push(LocationSource.new(:source_id => record.id, :source_type => record.class.to_s))
         
-        # check for a phonenumber
-        if record.phone_number
+        # check for a phonenumber, and if its on the dnc list
+        if record.phone_number and !record.dnc?
           # add phone number to location
           location.phone_numbers.push(PhoneNumber.new(:name => "Work", :number => record.phone_number))
         end
