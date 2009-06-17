@@ -71,6 +71,7 @@ ActionController::Routing::Routes.draw do |map|
   map.root        :controller => 'home', :action => 'index'
   
   map.about       '/about', :controller => 'home', :action => 'about'
+  map.contactus   '/contactus', :controller => 'home', :action => 'contactus'
   
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
