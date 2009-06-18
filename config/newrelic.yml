@@ -141,4 +141,4 @@ production:
 staging:
   <<: *default_settings
   enabled: true
-  app_name: My Application (Staging)
+  app_name: Walnut Places (Staging)
