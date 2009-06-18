@@ -90,7 +90,7 @@ namespace :locations do
       if object["source_id"] and object["source_type"]
         # find location
         source    = LocationSource.find_by_source_id_and_source_type(object["source_id"], object["source_type"])
-        location  = soruce.location if source
+        location  = source.location if source
         
         if location.blank?
           puts "#{Time.now}: xxx could not find location #{object["source_type"]}:#{object["source_id"]}"

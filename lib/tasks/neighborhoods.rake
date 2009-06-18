@@ -15,7 +15,13 @@ namespace :neighborhoods do
       exit
     end
 
-    while !(locations = Location.for_city(city).urban_mapped.with_neighborhoods.all(:offset => (page - 1) * per_page, :limit => per_page)).blank?
+    # find locations in the specified city that have been urban mapped
+    location_ids  = Location.for_city(city).urban_mapped.with_neighborhoods.all(:select => "id").collect(&:id)
+    
+    puts "#{Time.now}: found #{location_ids.size} urban mapped locations in #{city.name}"
+    
+    while !(batch_ids = location_ids.slice((page - 1) * per_page, per_page)).blank?
+      locations = Location.find(batch_ids)
       locations.each do |location|
         # skip locations with no street address; these map to the 'center' of the city
         # skip locations with no lat/lng coordinates
@@ -29,7 +35,7 @@ namespace :neighborhoods do
           next unless "#{location.id}:#{location.name}".match(/#{filter}/)
         end
         
-        puts "#{Time.now}: *** finding neighbors for #{location.id}:#{location.name}"
+        puts "#{Time.now}: *** finding neighbors for #{location.id}:#{location.place_name}"
       
         # find neighbors, constrained by city and distance
         attributes  = ::Search.attributes(Array(location.city))
@@ -226,7 +232,7 @@ namespace :neighborhoods do
   end
   
   def add_neighborhoods_to_neighbor(location, neighbor)
-    puts "#{Time.now}: *** adding neighborhoods #{location.neighborhoods.collect(&:name).join(',')} to location #{neighbor.id}:#{neighbor.name}"
+    puts "#{Time.now}: *** adding neighborhoods #{location.neighborhoods.collect(&:name).join(',')} to location #{neighbor.id}:#{neighbor.place_name}"
 
     added = 0
     location.neighborhoods.each do |neighborhood|

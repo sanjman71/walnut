@@ -17,10 +17,10 @@ namespace :tags do
       
       puts "#{Time.now}: *** using regex: #{regex}, tag groups: #{tag_groups.collect(&:name).join(",")}"
 
-      conditions  = {:taggings_count => 0}
+      conditions = ["taggings_count = 0 AND name REGEXP '[[:<:]]%s[[:>:]]'", regex]
 
       if tag_groups.any?
-        c, t    = add_place_tag_groups(conditions, regex, tag_groups, [])
+        c, t    = add_place_tag_groups(conditions, tag_groups, [])
         checked += c
         tagged  += t
       end
@@ -35,26 +35,24 @@ namespace :tags do
     
     puts "#{Time.now}: finding untagged places, filter: #{filter}"
     
-    conditions = {:taggings_count => 0}
-    checked, tagged = add_place_tag_groups(conditions, filter, [], [])
+    # find places with no taggings and filter enclosed within a word boundary 
+    conditions = ["taggings_count = 0 AND name REGEXP '[[:<:]]%s[[:>:]]'", filter]
+    checked, tagged = add_place_tag_groups(conditions, [], [])
 
     puts "#{Time.now}: completed, checked #{checked} places, tagged #{tagged} places"
   end
   
-  def add_place_tag_groups(conditions, filter, tag_groups, tags)
+  def add_place_tag_groups(conditions, tag_groups, tags)
     checked = 0
     tagged  = 0
     
     Place.find_in_batches(:batch_size => 100, :conditions => conditions) do |places|
       places.each do |place|
-        # apply filter if we have one
-        next if filter and place.name.match(/\b#{filter}\b/i).blank?
-
-        checked += 1
-
         puts "#{Time.now}: #{place.name}:#{place.primary_location.city.name}:#{place.primary_location.street_address}"
         
-        if tag_groups.any? and !filter.blank?
+        checked += 1
+
+        if tag_groups.any?
           # add place to each tag group
           tag_groups.each do |tag_group|
             tag_group.places.push(place)
@@ -62,7 +60,7 @@ namespace :tags do
           end
         end
         
-        if tags.any? and !filter.blank?
+        if tags.any?
           # add place tags
           place.tag_list.add(tags)
           place.save

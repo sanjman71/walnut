@@ -2,21 +2,20 @@ namespace :neighbors do
   
   desc "Initialize neighbors for all locations"
   task :init_all do
+    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    filter  = ENV["FILTER"] if ENV["FILTER"]
+    
     puts "#{Time.now}: initializing neighbors for all locations"
     
     page        = 1
     page_size   = 1000
+    ids         = Location.find(:all, :select => 'id').collect(&:id)
     
-    # Note: the 'find_in_batches' method messes up the sql conditions for all nested sql calls
-    while (locations = Location.find(:all, :offset => (page-1) * page_size, :limit => page_size)).size > 0
-      locations.each do |location|
-        set_location_neighbors(location)
-      end
-      puts "#{Time.now}: #{page * page_size} locations processed"
-      page += 1
-    end
-    
-    puts "#{Time.now}: completed" 
+    puts "#{Time.now}: found #{ids.size} matching location ids"
+
+    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
+
+    puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
   end
 
   desc "Initialize neighbors for all city locations"
@@ -34,21 +33,61 @@ namespace :neighbors do
 
     page        = 1
     page_size   = 1000
+    ids         = Location.find(:all, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
+    
+    puts "#{Time.now}: found #{ids.size} matching location ids"
 
+    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
+
+    puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
+  end
+  
+  desc "Initialzie neighborhods for all city locations with tags"
+  task :init_by_city_locations_with_tags do
+    city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
+    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    filter  = ENV["FILTER"] if ENV["FILTER"]
+    
+    if city.blank?
+      puts "*** invalid city"
+      exit
+    end
+
+    puts "#{Time.now}: initializing neighbors for all #{city.name} locations with tags"
+
+    page        = 1
+    page_size   = 1000
+    ids         = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    
+    puts "#{Time.now}: found #{ids.size} matching location ids"
+
+    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
+
+    puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
+  end
+  
+  def init_neighbors(ids, page, page_size, options={})
+    filter    = options[:filter]
+    limit     = options[:limit] ? options[:limit].to_i : 2**30
+    neighbors = 0
+     
     # Note: the 'find_in_batches' method messes up the sql conditions for all nested sql calls
-    while (locations = Location.find(:all, :conditions => {:city_id => city.id}, :offset => (page-1) * page_size, :limit => page_size)).size > 0
+    until (batch_ids = ids.slice((page - 1) * page_size, page_size)).blank?
+      locations = Location.find(batch_ids)
       locations.each do |location|
         if filter
           # apply filter
           next unless "#{location.id}:#{location.name}".match(/#{filter}/)
         end
-        set_location_neighbors(location)
+        neighbors += set_location_neighbors(location)
+        # check limit
+        return neighbors if neighbors >= limit
       end
-      puts "#{Time.now}: #{page * page_size} locations processed"
-      page += 1
+      puts "#{Time.now}: #{page * page_size} locations processed, added neighbors to #{neighbors} locations"
+      page  += 1
     end
     
-    puts "#{Time.now}: completed" 
+    neighbors
   end
   
   desc "Initialize neighbors based on city popular tags"
