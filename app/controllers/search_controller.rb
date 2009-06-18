@@ -131,17 +131,20 @@ class SearchController < ApplicationController
 
     case @search_klass
     when 'search'
-      @klasses    = [Event, Location]
-      @sort_order = :popularity
-      @sort_mode  = :desc
+      @klasses        = [Event, Location]
+      @facet_klass    = Location
+      @sort_order     = :popularity
+      @sort_mode      = :desc
     when 'locations'
-      @klasses    = [Location]
-      @sort_order = :popularity
-      @sort_mode  = :desc
+      @klasses        = [Location]
+      @facet_klass    = Location
+      @sort_order     = :popularity
+      @sort_mode      = :desc
     when 'events'
-      @klasses    = [Event]
-      @sort_order = :start_at
-      @sort_mode  = :asc
+      @klasses        = [Event]
+      @facet_klass    = Event
+      @sort_order     = :start_at
+      @sort_mode      = :asc
     end
 
     self.class.benchmark("Benchmarking query '#{@query_or}'") do
@@ -174,20 +177,20 @@ class SearchController < ApplicationController
 
         # build zip facets using all locality constraints
         limit             = 10
-        facets            = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
+        facets            = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["zip_id"], :limit => limit, :max_matches => limit)
         @zips             = Search.load_from_facets(facets, Zip)
 
         # build neighborhood facets using only city constraint
         limit             = 11
         city_constraints  = Search.attributes(@city).update(@hash[:attributes] || Hash[])
-        facets            = Location.facets(@query_and, :with => city_constraints, :facets => ["neighborhood_ids"], :limit => limit, :max_matches => limit)
+        facets            = @facet_klass.facets(@query_and, :with => city_constraints, :facets => ["neighborhood_ids"], :limit => limit, :max_matches => limit)
         @neighborhoods    = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
       elsif @city
         @locality_type  = 'city'
 
-        # build zip and neighborhood facets
+        # build zip and neighborhood facets, based on search klass
         limit           = 10
-        facets          = Location.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
+        facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
         @zips           = Search.load_from_facets(facets, Zip)
         @neighborhoods  = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
 
@@ -200,7 +203,7 @@ class SearchController < ApplicationController
 
         # build neighborhood and city facets
         limit           = 5
-        facets          = Location.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
+        facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
         @cities         = Search.load_from_facets(facets, City)
       end
     end
