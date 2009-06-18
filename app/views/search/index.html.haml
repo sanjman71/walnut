@@ -26,8 +26,8 @@
     #nearby_cities
       = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :query => @query}) unless @nearby_cities.blank?
 
-    -# google ad
-    = google_ad(160, 600)
+    -# google ad - search index left side vertical banner
+    = render :partial => 'adsense/search_index_left_verticalbanner'
 
   .span-19.last
     -# google ad - search index top leaderboard
@@ -77,5 +77,6 @@
       = will_paginate(@objects, :page_links => true)
 
     .span-19.last
-      -# google ad
-      = google_ad(728, 90, 'image')
+      -# google ad - search index bottom leaderboard
+      = render :partial => 'adsense/search_index_bottom_leaderboard'
+
