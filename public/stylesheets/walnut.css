@@ -146,8 +146,8 @@ a.event.category.odd                              { color: #663333; font-size: 1
 a.event.category.odd:hover                        { color: #FFFFFF; background-color: #663333; }
 
 /* company name */
-a.company_name                                    { color: #FFFFFF; font-size: 2.5em; text-decoration:none; line-height: 100%; }
-a.company_name:hover                              {}
+a.company_name                                    { color: #FFDD00; font-size: 2.5em; font-weight: bold; text-decoration:none; line-height: 100%; }
+a.company_name:hover                              { color: #FFFFFF; background-color: #FF6600; }
 
 /* calendar styles */
 
