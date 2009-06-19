@@ -85,7 +85,7 @@
 85|Tax Preparation|income tax,tax filing,tax preparation,tax return
 86|Newspapers|classifieds,daily newspaper,local newspaper,newspaper
 87|Transportation Services|freight,logistics,transportation,trucking
-88|Pharmacies|drugstore,meds,pharmacies,prescription drugs,prescriptions
+88|Pharmacies|drugstore,meds,pharmacy,prescription drugs,prescriptions
 89|Jewelry|bracelets,earrings,jewelry,necklaces,pendants,rings
 90|Liquor Stores|alcohol,liquore store,wine
 91|Airlines and Airports|airlines,airport,airport parking,flights

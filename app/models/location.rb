@@ -28,7 +28,9 @@ class Location < ActiveRecord::Base
   named_scope :for_city,              lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
-  named_scope :without_neighborhoods, { :conditions => ["neighborhoods_count = 0"] }
+  named_scope :no_neighborhoods,      { :conditions => ["neighborhoods_count = 0"] }
+  named_scope :with_taggings,         { :include => :places, :conditions => ["places.taggings_count > 0"] }
+  named_scope :no_taggings,           { :include => :places, :conditions => ["places.taggings_count = 0"] }
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
   named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }

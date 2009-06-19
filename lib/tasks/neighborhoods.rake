@@ -69,7 +69,37 @@ namespace :neighborhoods do
       page += 1
     end
 
-    puts "#{Time.now}: completed, added neighborhoods to #{added} location, #{skipped} skipped"
+    puts "#{Time.now}: completed, added neighborhoods to #{added} locations, #{skipped} skipped"
+  end
+  
+  desc "Import neighborhoods from urban mapping based on city locations with tags"
+  task :import_from_urban_by_city_locations_with_tags do
+    city        = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
+    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 300 # 300 is max requests per day allowed with free api
+    added       = 0
+    
+    if city.blank?
+      puts "*** invalid city"
+      exit
+    end
+
+    puts "#{Time.now}: importing #{city.name} neighborhoods using city locations with tags, limit #{limit}"
+  
+    ids       = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    
+    puts "#{Time.now}: found #{ids.size} matching location ids"
+    
+    page      = 1
+    page_size = 1000
+    
+    while !(batch_ids = ids.slice((page - 1) * page_size, page_size)).blank?
+      locations = Location.find(batch_ids)
+      added    += add_neighborhoods_to_locations(locations, :limit => limit)
+      break if added >= limit
+      page     += 1
+    end
+
+    puts "#{Time.now}: completed, added #{added} neighborhoods"
   end
   
   desc "Import neighborhoods from urban mapping based on city popular tags"
@@ -78,7 +108,6 @@ namespace :neighborhoods do
     limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 300 # 300 is max requests per day allowed with free api
     tag_limit   = ENV["TAG_LIMIT"] ? ENV["TAG_LIMIT"].to_i : 200
     added       = 0
-    over_limit  = false
     
     if city.blank?
       puts "*** invalid city"
@@ -103,33 +132,7 @@ namespace :neighborhoods do
                                                   :match_mode => :extended, :page => 1, :per_page => 5,
                                                   :order => :popularity, :sort_mode => :desc)
 
-      locations.each do |location|
-        # skip if location has already been mapped or has neighborhoods (i.e. mapped w/o using urban mapping)
-        next if !location.urban_mapping_at.blank? or location.neighborhoods_count > 0
-
-        puts "#{Time.now}: *** mapping location #{location.id}:#{location.place_name}"
-        
-        begin
-          # add neighborhoods from urban mapping
-          added += add_urban_neighborhoods(location)
-        rescue UrbanMapping::ExceededRateLimitError
-          # we're done for today
-          over_limit = true
-          break
-        end
-        
-        if added >= limit
-          # self imposed limit
-          over_limit = true
-          break
-        end
-        
-        # throttle calls to urban mapping
-        Kernel.sleep(1)
-      end
-
-      # check if we exceeded our rate limit
-      break if over_limit
+      added       += add_neighborhoods_to_locations(locations, :limit => limit)
     end
 
     puts "#{Time.now}: completed, added #{added} neighborhoods"
@@ -140,7 +143,6 @@ namespace :neighborhoods do
     city        = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 300 # 300 is max requests per day allowed with free api
     added       = 0
-    over_limit  = false
     
     if city.blank?
       puts "*** invalid city"
@@ -161,7 +163,15 @@ namespace :neighborhoods do
     locations     = Location.search(:with => attributes, :match_mode => :extended, :page => 1, :per_page => per_page, :max_matches => per_page,
                                     :order => :popularity, :sort_mode => :desc)
 
-
+    added         = add_neighborhoods_to_locations(locations, :limit => limit)
+    
+    puts "#{Time.now}: completed, added #{added} neighborhoods"
+  end
+  
+  def add_neighborhoods_to_locations(locations, options={})
+    limit = options[:limit] ? options[:limit].to_i : 2**30
+    added = 0
+    
     locations.each do |location|
       # skip if location has already been mapped or has neighborhoods (i.e. mapped w/o using urban mapping)
       next if !location.urban_mapping_at.blank? or location.neighborhoods_count > 0
@@ -173,21 +183,19 @@ namespace :neighborhoods do
         added += add_urban_neighborhoods(location)
       rescue UrbanMapping::ExceededRateLimitError
         # we're done for today
-        over_limit = true
-        break
+        return added
       end
       
       if added >= limit
         # self imposed limit
-        over_limit = true
-        break
+        return added
       end
       
       # throttle calls to urban mapping
       Kernel.sleep(1)
     end
-
-    puts "#{Time.now}: completed, added #{added} neighborhoods"
+    
+    added
   end
   
   def popular_tags(city, options={})

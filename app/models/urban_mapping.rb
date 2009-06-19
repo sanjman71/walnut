@@ -10,7 +10,6 @@ module UrbanMapping
   # http://api0.urbanmapping.com/neighborhoods/rest/getNeighborhoodsByLatLng?lat=40.756945&lng=-73.978243&format=json&apikey=xxyyzz
   class Neighborhood
     @@site        = "http://api0.urbanmapping.com/neighborhoods/rest"
-    # @@apikey      = "zgejhasrqxsfjt8pcfrebvzu" # old key
     @@apikey      = "mhe5u25k856cgwy75wkxeyjr" # new key
     
     def self.find_all(location, options={})

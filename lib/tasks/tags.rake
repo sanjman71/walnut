@@ -36,7 +36,7 @@ namespace :tags do
     puts "#{Time.now}: finding untagged places, filter: #{filter}"
     
     # find places with no taggings and filter enclosed within a word boundary 
-    conditions = ["taggings_count = 0 AND name REGEXP '[[:<:]]%s[[:>:]]'", filter]
+    conditions = filter ? ["taggings_count = 0 AND name REGEXP '[[:<:]]%s[[:>:]]'", filter] : ["taggings_count = 0"]
     checked, tagged = add_place_tag_groups(conditions, [], [])
 
     puts "#{Time.now}: completed, checked #{checked} places, tagged #{tagged} places"
@@ -133,6 +133,7 @@ namespace :tags do
                       "groceries" => "grocery",
                       "hair salons" => "hair salon",
                       "nail salons" => "nail salon",
+                      "pharmacies" => "pharmacy",
                       "salons" => "salon"]
                       
     merge_hash.each_pair do |key, value|
