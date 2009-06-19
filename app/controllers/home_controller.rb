@@ -23,7 +23,7 @@ class HomeController < ApplicationController
     end
 
     self.class.benchmark("Benchmarking popular neighborhoods using database") do
-      hood_limit      = 10
+      hood_limit      = 25
       @neighborhoods  = Neighborhood.with_locations.order_by_density.all(:limit => hood_limit, :include => :city)
     end
     
