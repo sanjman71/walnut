@@ -9,7 +9,7 @@
         == Places: #{group.places_count}
       %br
       == Tags:
-      = group.tag_list.join(", ")
+      = group.tag_list.sort.join(", ")
     .span-2.last
       = link_to 'Show', tagg_path(group)
       == &nbsp;|&nbsp;

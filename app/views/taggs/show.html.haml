@@ -26,7 +26,7 @@
       == Locations: #{place.locations_count}
     %br
     == Tags:
-    = place.tag_list.join(", ")
+    = place.tag_list.sort.join(", ")
 
 
 %hr.space
