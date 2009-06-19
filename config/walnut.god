@@ -121,12 +121,12 @@ God.watch do |w|
 
   w.transition(:up, :restart) do |on|
     on.condition(:http_response_code) do |c|
-      c.host = 'localhost'
-      c.port = 5000
-      c.path = '/monitor.html'
+      c.host        = 'localhost'
+      c.port        = 5000
+      c.path        = '/monitor.html'
       c.code_is_not = 200
-      c.timeout = 10.seconds
-      c.times = [3, 5]
+      c.timeout     = 10.seconds
+      c.times       = [3, 5]
     end
   end
 
@@ -156,12 +156,12 @@ God.watch do |w|
   # lifecycle
   w.lifecycle do |on|
     on.condition(:flapping) do |c|
-      c.to_state = [:start, :restart]
-      c.times = 5
-      c.within = 5.minute
-      c.transition = :unmonitored
-      c.retry_in = 10.minutes
-      c.retry_times = 5
+      c.to_state     = [:start, :restart]
+      c.times        = 5
+      c.within       = 5.minute
+      c.transition   = :unmonitored
+      c.retry_in     = 10.minutes
+      c.retry_times  = 5
       c.retry_within = 2.hours
     end
   end
