@@ -17,12 +17,24 @@ namespace :data do
     page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
     per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 1000
     limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
-    offset        = (page - 1) * per_page
-     
+
+    city          = ENV["CITY"] ? City.find_by_name(ENV["CITY"]) : nil
+    state         = ENV["STATE"] ? State.find_by_name(ENV["STATE"]) : nil
+
     # find places with no tags
     conditions    = {:taggings_count => 0}
-    
-    until (places = Place.find(:all, :conditions => conditions, :include => :locations, :offset => offset, :limit => per_page)).blank?
+
+    # add city, state conditions as specified
+    conditions["locations.city_id"]  = city.id if city
+    conditions["locations.state_id"] = state.id if state
+
+    # find matching place ids
+    place_ids     = Place.find(:all, :conditions => conditions, :include => :locations, :select => "id").collect(&:id)
+
+    puts "#{Time.now}: found #{place_ids.size} matching places"
+
+    until (batch_ids = place_ids.slice((page - 1) * per_page, per_page)).blank?
+      places = Place.find(batch_ids, :include => :locations)
       places.collect(&:locations).flatten.each do |location|
         # track number of locations checked
         checked     += 1
@@ -101,8 +113,7 @@ namespace :data do
         end
       end
       
-      page   += 1
-      offset  = (page - 1) * per_page
+      page += 1
     end
     
     puts "#{Time.now}: completed, checked #{checked} locations, mapped #{mapped} locations, found #{unmapped} locations with no matching categories"

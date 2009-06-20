@@ -138,6 +138,12 @@ city: Charlotte
 state: North Carolina
 zip: 28204
 ---
+name: NoDa (Historic North Davidson Arts District)
+street_address: 3306 N Davidson St
+city: Charlotte
+state: North Carolina
+zip: 28205
+---
 name: The Fillmore Charlotte
 street_address: 820 Hamilton St
 city: Charlotte

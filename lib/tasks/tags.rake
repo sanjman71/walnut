@@ -15,7 +15,7 @@ namespace :tags do
         tag_group = TagGroup.find_by_name(s)
       end.compact
       
-      puts "#{Time.now}: *** using regex: #{regex}, tag groups: #{tag_groups.collect(&:name).join(",")}"
+      puts "#{Time.now}: *** regex: #{regex}, tag groups: #{tag_groups.collect(&:name).join(" | ")}"
 
       conditions = ["taggings_count = 0 AND name REGEXP '[[:<:]]%s[[:>:]]'", regex]
 
@@ -55,8 +55,10 @@ namespace :tags do
         if tag_groups.any?
           # add place to each tag group
           tag_groups.each do |tag_group|
-            tag_group.places.push(place)
-            tagged += 1
+            if !tag_group.places.include?(place)
+              tag_group.places.push(place)
+              tagged += 1
+            end
           end
         end
         

@@ -147,7 +147,7 @@ namespace :neighbors do
   #   puts "#{Time.now}: initializing neighbors for #{city.name} locations with neighborhoods"
   # 
   #   # find locations by city, with neighborhoods mapped by urban mapping
-  #   while !(locations = Location.for_city(city).urban_mapped.with_neighborhoods.all(:offset => (page - 1) * per_page, :limit => per_page)).blank?
+  #   while !(locations = Location.with_city(city).urban_mapped.with_neighborhoods.all(:offset => (page - 1) * per_page, :limit => per_page)).blank?
   #     locations.each do |location|
   #       added += set_location_neighbors(location)
   #     end

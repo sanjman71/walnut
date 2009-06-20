@@ -19,7 +19,7 @@
     
   - Import records by cbsa
     - rake data:import_records CBSA=16980       # Chicagoland, 437101 locations, 842 minutes (391087 locations, 25 errors, 800 minutes)
-    - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes
+    - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes (79731 locations, 0 errors, 204 minutes)
     - rake data:import_records CBSA=37980       # Philadelphia area, 299343 locations, 82 errors, 425 minutes, (605 minutes w/ merging)
     - rake data:import_records CBSA=38300       # Pittsburg, PA, 127488 locations, 101 errors, 230 minutes
     - rake data:import_records CBSA=12060       # Atlanta area, 257217 location, 289 errors, 359 minutes
@@ -41,6 +41,7 @@
   - rake events:import_events CITY=Chicago LIMIT=10
   - rake events:import_events CITY=Chicago REGION=Illinois LIMIT=10 # import chicago and all illinois region events
 
+  - rake events:import_events CITY=Charlotte LIMIT=10
   - rake events:import_events CITY=Charlotte REGION='North Carolina' LIMIT=10 # import charlotte and north carolina region events
   - rake events:import_events CITY=Charlotte REGION='South Carolina' LIMIT=10 # import charlotte and south carolina region events
 
@@ -55,7 +56,7 @@
   * import neighborhoods from urban mapping by city's popular tags (300 request per day with the free api)
     - rake neighborhoods:import_from_urban_by_city_popular_tags CITY='Chicago' LIMIT=300
 
-  * import neighborhoods from urban mapping by city's locations with tags
+  * import neighborhoods from urban mapping by city's locations with tags (300 request per day with the free api)
     - rake neighborhoods:import_from_urban_by_city_locations_with_tags CITY=Chicago LIMIT=100
 
   * import neighborhoods from urban mapping by city's event venues (300 request per day with the free api)
@@ -65,7 +66,7 @@
     - rake neighborhoods:import_by_city_proximity CITY='Chicago'
 
 7. Build location neighbors:
-  * Note: do this after importing events and event venues and indexing, as this affects location neighbors.
+  * Note: do this after importing events and event venues and indexing, as both affect location neighbors.
 
   - rake neighbors:init_by_city_locations_with_tags CITY=Chicago
   - rake neighbors:init_by_city_popular_tags CITY=Chicago

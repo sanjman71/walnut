@@ -14,17 +14,24 @@ class HomeController < ApplicationController
       end
     end
 
-    # find popular cities and neighborhoods
-    
+    # find popular cities based on city density
     self.class.benchmark("Benchmarking popular cities using database") do
       city_limit      = 10
       city_density    = 25000
-      @cities         = City.with_locations.order_by_density.all(:limit => city_limit, :include => :state, :conditions => ['locations_count > ?', city_density])
+      @cities         = Rails.cache.fetch("popular_cities:#{city_limit}:#{city_density}", :expires_in => CacheExpire.localities) do
+        City.with_locations.order_by_density.all(:limit => city_limit, :include => :state, :conditions => ['locations_count > ?', city_density])
+      end
     end
 
-    self.class.benchmark("Benchmarking popular neighborhoods using database") do
+    self.class.benchmark("Benchmarking popular city neighborhoods using database") do
       hood_limit      = 25
-      @neighborhoods  = Neighborhood.with_locations.order_by_density.all(:limit => hood_limit, :include => :city)
+      # build hash mapping cities to their neighborhoods ranked by density
+      @neighborhoods  = Rails.cache.fetch("popular_neighborhoods:#{hood_limit}", :expires_in => CacheExpire.localities) do
+        @cities.inject(ActiveSupport::OrderedHash.new) do |hash, city|
+          hash[city] = city.neighborhoods.with_locations.order_by_density.all(:limit => hood_limit, :include => :city)
+          hash
+        end
+      end
     end
     
     # track event
@@ -44,9 +51,9 @@ class HomeController < ApplicationController
 
   protected
 
-  # find a randomly selected featured city
   def find_featured_city
-    city = City.order_by_density.all(:limit => 1, :include => :state, :order => 'rand()', :conditions => ["locations_count > 25000"]).first
+    # find a randomly selected featured city
+    # city = City.order_by_density.all(:limit => 1, :include => :state, :order => 'rand()', :conditions => ["locations_count > 25000"]).first
     # default to city with most locations
     city = City.find(:first, :order => "locations_count DESC") if city.blank?
     city

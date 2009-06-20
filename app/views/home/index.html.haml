@@ -36,11 +36,12 @@
 
   %hr.space
 
-  .popular.neighborhoods
-    == Browse Popular Neighborhoods
-
-  - @neighborhoods.each do |hood|
-    - klasses = ["locality"].push(cycle('even', 'odd'))
-    - city    = hood.city
-    %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to hood.name, url_for(:controller => 'search', :action => 'neighborhood', :country => @country, :state => city.state, :city => city, :neighborhood => hood), :class => klasses.join(" ")
-        
+  - @neighborhoods.keys.each do |city|
+    -# show popular neighborhoods for each popular city
+    .popular.neighborhoods
+      == Browse Popular #{city.name} Neighborhoods
+    - @neighborhoods[city].each do |hood|
+      - klasses = ["locality"].push(cycle('even', 'odd'))
+      %span.small{:style => "white-space: nowrap; font-weight: bold; font-size: 1.7em; margin-right: 3px;"}= link_to hood.name, url_for(:controller => 'search', :action => 'neighborhood', :country => @country, :state => city.state, :city => city, :neighborhood => hood), :class => klasses.join(" ")
+    %hr.space
+    

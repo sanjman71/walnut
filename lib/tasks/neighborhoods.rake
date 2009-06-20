@@ -16,7 +16,7 @@ namespace :neighborhoods do
     end
 
     # find locations in the specified city that have been urban mapped
-    location_ids  = Location.for_city(city).urban_mapped.with_neighborhoods.all(:select => "id").collect(&:id)
+    location_ids  = Location.with_city(city).urban_mapped.with_neighborhoods.all(:select => "id").collect(&:id)
     
     puts "#{Time.now}: found #{location_ids.size} urban mapped locations in #{city.name}"
     
@@ -132,6 +132,7 @@ namespace :neighborhoods do
                                                   :match_mode => :extended, :page => 1, :per_page => 5,
                                                   :order => :popularity, :sort_mode => :desc)
 
+      limit       -= added
       added       += add_neighborhoods_to_locations(locations, :limit => limit)
     end
 

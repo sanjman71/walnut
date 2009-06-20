@@ -24,9 +24,8 @@ class Location < ActiveRecord::Base
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :place_name
   
-  named_scope :for_state,             lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
-  named_scope :for_city,              lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
-  
+  named_scope :with_state,            lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
+  named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
   named_scope :no_neighborhoods,      { :conditions => ["neighborhoods_count = 0"] }
   named_scope :with_taggings,         { :include => :places, :conditions => ["places.taggings_count > 0"] }

@@ -61,12 +61,109 @@ tag_groups: Beauty Salons and Day Spas
 regex: nail bar
 tag_groups: Beauty Salons and Day Spas
 ---
+regex: hair nails
+tag_groups: 
+  - Beauty Salons and Day Spas
+  - Hair Salons and Barbers
+---
+# hair salon, design, studio ...
+regex: hair care
+tag_groups: Hair Salons and Barbers
+---
+regex: hair cuttery
+tag_groups: Hair Salons and Barbers
+---
+regex: hair design
+tag_groups: Hair Salons and Barbers
+---
+regex: hair designs
+tag_groups: Hair Salons and Barbers
+---
+regex: hair express
+tag_groups: Hair Salons and Barbers
+---
+regex: hair salon
+tag_groups: Hair Salons and Barbers
+---
+regex: hair salons
+tag_groups: Hair Salons and Barbers
+---
+regex: hair studio
+tag_groups: Hair Salons and Barbers
+---
+regex: hair studios
+tag_groups: Hair Salons and Barbers
+---
+regex: hair styling
+tag_groups: Hair Salons and Barbers
+---
+# appliance
+regex: appliance repair
+tag_groups: Appliance Repair and Supplies
+---
 # auto
 regex: auto service
 tag_groups: Automobile - Repairs and Services
 ---
+regex: auto repair
+tag_groups: Automobile - Repairs and Services
+---
+regex: auto body
+tag_groups: Automobile - Body Repairs and Painting
+---
+regex: auto collision
+tag_groups: Automobile - Body Repairs and Painting
+---
+regex: auto part
+tag_groups: Automobile - Parts and Accessories
+---
+regex: auto parts
+tag_groups: Automobile - Parts and Accessories
+---
+regex: auto accessories
+tag_groups: Automobile - Parts and Accessories
+---
+regex: auto center
+tag_groups: Automobile - Dealers
+---
+regex: auto dealer
+tag_groups: Automobile - Dealers
+---
+regex: auto group
+tag_groups: Automobile - Dealers
+---
+regex: auto sale
+tag_groups: Automobile - Dealers
+---
 regex: auto sales
 tag_groups: Automobile - Dealers
+---
+# bank
+regex: bank
+tag_groups: Banks and Credit Unions
+---
+#
+# barber??
+#
+# freight
+regex: freight
+tag_groups: Cargo and Freight Services
+---
+# grocery, health food
+regex: grocery
+tag_groups: Groceries
+---
+regex: health food
+tag_groups: Health and Diet Food Products
+---
+# pharmacy
+regex: pharmacy
+tag_groups: Pharmacies
+---
+# taxi
+regex: taxi
+tag_groups: Taxi
+---
 # chains
 regex: blockbuster video
 tag_groups: Video Rentals and Sales
