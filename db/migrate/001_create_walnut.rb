@@ -152,7 +152,6 @@ class CreateWalnut < ActiveRecord::Migration
     drop_table  :cities
     drop_table  :zips
     drop_table  :neighborhoods
-    drop_table  :city_zips
     drop_table  :locations
     drop_table  :places
     drop_table  :chains
