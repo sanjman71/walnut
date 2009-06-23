@@ -19,7 +19,7 @@ class EventTest < ActiveSupport::TestCase
     @place.locations.push(@location)
     @location.reload
     assert_equal @place, @location.place
-    @event_venue    = Factory(:event_venue, :name => "House of Pain", :location_id => @location.id)
+    @event_venue    = Factory(:event_venue, :name => "House of Pain", :location_id => @location.id, :city => @chicago.name)
     assert @event_venue.valid?
     @event_venue.reload
     @event_category = Factory(:event_category, :name => "Music", :tags => "music,concert")
@@ -39,7 +39,7 @@ class EventTest < ActiveSupport::TestCase
   context "create event venue mapped to a location sourced from localeze" do
     setup do
       @location.location_sources.push(LocationSource.new(:source_id => 101, :source_type => "Localeze::BaseRecord"))
-      @new_venue = Factory(:event_venue, :name => "New Venue", :location_id => @location.id)
+      @new_venue = Factory(:event_venue, :name => "New Venue", :location_id => @location.id, :city => @chicago.name)
       assert @new_venue.valid?
     end
 
