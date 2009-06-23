@@ -52,7 +52,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :zips, [:state_id, :locations_count]
 
     create_table :neighborhoods do |t|
-      t.string      :name,                  :limit => 30, :default => nil
+      t.string      :name,                  :limit => 50, :default => nil
       t.references  :city
       t.decimal     :lat,                   :precision => 15, :scale => 10
       t.decimal     :lng,                   :precision => 15, :scale => 10
@@ -135,7 +135,8 @@ class CreateWalnut < ActiveRecord::Migration
     end
 
     add_index :chains, :places_count
-
+    add_index :chains, :name
+    
     create_table :location_sources do |t|
       t.references  :location
       t.references  :source,        :polymorphic => true

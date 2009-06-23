@@ -49,7 +49,7 @@ class LocationsController < ApplicationController
     @h1       = @place.name
   end
 
-  # GET /locations/random
+  # GET /locations/:city/random
   def random
     # build collection of location ids from the specified city
     @city = City.find_by_name(params[:city].titleize)

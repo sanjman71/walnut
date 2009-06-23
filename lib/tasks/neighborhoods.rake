@@ -1,5 +1,23 @@
 namespace :neighborhoods do
   
+  desc "Print neighborhood stats"
+  task :stats do
+    
+    # find cities by density
+    density = 25000
+    cities  = City.order_by_density.all(:include => :state, :conditions => ['locations_count > ?', density])
+    
+    puts "#{Time.now}: found #{cities.size} cities with more than #{density} locations"
+    
+    cities.each do |city|
+      city_locations_with_hoods   = Location.with_city(city).with_neighborhoods.count
+      city_locations_hoods_ratio  = city_locations_with_hoods.to_f / city.locations_count.to_f
+      puts "#{Time.now}: city: #{city.name}, hoods/locations: #{city_locations_with_hoods}/#{city.locations_count}, ratio: #{city_locations_hoods_ratio}"
+    end
+    
+    puts "#{Time.now}: completed"
+  end
+  
   desc "Import neighborhoods based on proximity to locations with neighborhoods"
   task :import_by_city_proximity do
     city          = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
@@ -132,8 +150,8 @@ namespace :neighborhoods do
                                                   :match_mode => :extended, :page => 1, :per_page => 5,
                                                   :order => :popularity, :sort_mode => :desc)
 
-      limit       -= added
-      added       += add_neighborhoods_to_locations(locations, :limit => limit)
+      add_limit   = limit - added
+      added       += add_neighborhoods_to_locations(locations, :limit => add_limit)
     end
 
     puts "#{Time.now}: completed, added #{added} neighborhoods"

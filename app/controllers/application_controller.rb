@@ -231,11 +231,11 @@ class ApplicationController < ActionController::Base
     raise ArgumentError if tag.blank? and query.blank? and filter.blank?
     
     if options[:state] and options[:city] and options[:neighborhood]
-      where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].name}"
+      where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].code}"
     elsif options[:state] and options[:city]
-      where = "#{options[:city].name}, #{options[:state].name}"
+      where = "#{options[:city].name}, #{options[:state].code}"
     elsif options[:state] and options[:zip]
-      where = "#{options[:state].name}, #{options[:zip].name}"
+      where = "#{options[:state].code}, #{options[:zip].name}"
     else
       raise Exception, "invalid search"
     end

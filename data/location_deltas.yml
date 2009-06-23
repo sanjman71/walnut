@@ -126,6 +126,12 @@ city: Charlotte
 state: North Carolina
 zip: 28208
 ---
+name: Historic Downtown
+street_address: 134 N Main St
+city: Belmont
+state: North Carolina
+zip: 28012
+---
 name: Illusions
 street_address: 1000 Seaboard St
 city: Charlotte
@@ -144,15 +150,31 @@ city: Charlotte
 state: North Carolina
 zip: 28205
 ---
+name: Prevue
+street_address: 2909 N Davidson St
+city: Charlotte
+state: North Carolina
+zip: 28205
+---
 name: The Fillmore Charlotte
 street_address: 820 Hamilton St
 city: Charlotte
 state: North Carolina
 zip: 28202
 ---
+name: Utopia Restaurant
+street_address: 10210 Berkeley Place Dr
+city: Charlotte
+state: North Carolina
+zip: 28262
+---
 source_type: Localeze::BaseRecord
 source_id: 689480308
 name: Bentley's Bar and Grill
+---
+source_type: Localeze::BaseRecord
+source_id: 137655263
+name: Bojangles' Coliseum
 ---
 source_type: Localeze::BaseRecord
 source_id: 134157518

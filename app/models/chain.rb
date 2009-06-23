@@ -10,5 +10,10 @@ class Chain < ActiveRecord::Base
   
   named_scope :no_places,   { :conditions => {:places_count => 0} }
   named_scope :places,      { :conditions => ["places_count > 0"] }
-  
+
+
+  def display_name
+    @display_name = read_attribute(:display_name)
+    @display_name.blank? ? self.name : @display_name
+  end
 end

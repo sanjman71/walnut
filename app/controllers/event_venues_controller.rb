@@ -17,8 +17,17 @@ class EventVenuesController < ApplicationController
       state
     end
 
-    @unmapped_count = EventVenue.unmapped.count
-    @mapped_count   = EventVenue.mapped.count
+    @unmapped_count   = EventVenue.unmapped.count
+    @mapped_count     = EventVenue.mapped.count
+    
+    # map unmapped venues to city, state values
+    @unmapped_hash    = EventVenue.unmapped.inject(Hash.new(0)) do |hash, venue|
+      city_state        = "#{venue.city}:#{venue.state}"
+      hash[city_state]  = hash[city_state] + 1
+      hash
+    end
+    
+    logger.debug("*** #{@unmapped_hash}")
     
     @title      = "#{@country.name} Event Venues Directory"
     @h1         = @title

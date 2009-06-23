@@ -46,6 +46,14 @@ module UrbanMapping
         else
           # find/create neighborhood
           neighborhood  = city.neighborhoods.find_by_name(hood["name"]) || ::Neighborhood.create(:name => hood["name"], :city_id => city.id)
+          
+          # check neighborhood
+          if !neighborhood.valid?
+            puts "#{Time.now}: xxx #{neighborhood.name} could not be created"
+            nil
+          else
+            neighborhood
+          end
         end
       end
       

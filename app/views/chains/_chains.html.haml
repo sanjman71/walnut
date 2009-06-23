@@ -4,4 +4,4 @@
 - chains.each do |chain|
   - klass     = nil #tag_cloud_class(chain, :places_count, max_count, tag_classes)
   - klasses   = ["chain"].push(cycle('even', 'odd')).push(klass)
-  %span.small{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to chain.name, url_for(:action => 'country', :country => @country, :id => chain), :class => klasses.join(" ")
+  %span.small{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to chain.display_name, url_for(:action => 'country', :country => @country, :id => chain), :class => klasses.join(" ")

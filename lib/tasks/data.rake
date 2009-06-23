@@ -4,8 +4,6 @@ namespace :data do
   desc "Import localeze categories and attributes as tags and tag groups"
   task :import_tags do
     
-    puts "#{Time.now}: importing localeze categories and attributes"
-    
     checked   = 0
     mapped    = 0
     unmapped  = 0 
@@ -21,6 +19,9 @@ namespace :data do
     city          = ENV["CITY"] ? City.find_by_name(ENV["CITY"]) : nil
     state         = ENV["STATE"] ? State.find_by_name(ENV["STATE"]) : nil
 
+    puts "#{Time.now}: importing localeze categories and attributes, limit: #{limit}, city: #{city.name if city}, state: #{state.name if state}"
+
+
     # find places with no tags
     conditions    = {:taggings_count => 0}
 
@@ -29,7 +30,7 @@ namespace :data do
     conditions["locations.state_id"] = state.id if state
 
     # find matching place ids
-    place_ids     = Place.find(:all, :conditions => conditions, :include => :locations, :select => "id").collect(&:id)
+    place_ids     = Place.find(:all, :limit => limit, :conditions => conditions, :select => "id").collect(&:id)
 
     puts "#{Time.now}: found #{place_ids.size} matching places"
 

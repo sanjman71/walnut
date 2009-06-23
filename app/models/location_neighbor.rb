@@ -3,9 +3,12 @@ class LocationNeighbor < ActiveRecord::Base
   belongs_to              :neighbor, :class_name => "Location", :foreign_key => "neighbor_id"
   validates_uniqueness_of :neighbor_id, :scope => :location_id
   
-  named_scope :for_location,        lambda { |location| {:conditions => ["location_id = ?", location.is_a?(Integer) ? location : location.id], 
+  named_scope :with_location,       lambda { |location| {:conditions => ["location_id = ?", location.is_a?(Integer) ? location : location.id], 
                                                          :include => [:neighbor, {:neighbor => [:city, :places]}] }}
-                                                        
+     
+  named_scope :with_city,           lambda { |city| { :conditions => ["locations.city_id = ?", city.id], :include => :location }}
+  named_scope :with_state,          lambda { |state| { :conditions => ["locations.state_id = ?", state.id], :include => :location }}
+                                                     
   named_scope :order_by_distance,   { :order => "distance asc"}
   
   def self.default_limit
@@ -23,7 +26,7 @@ class LocationNeighbor < ActiveRecord::Base
   def self.get_neighbors(location, options={})
     return [] if location.blank?
     limit = options[:limit] ? options[:limit].to_i : self.default_limit
-    LocationNeighborCollection.new(LocationNeighbor.for_location(location).order_by_distance.all(:limit => limit))
+    LocationNeighborCollection.new(LocationNeighbor.with_location(location).order_by_distance.all(:limit => limit))
   end
   
   def self.partition_neighbors(location, options={})

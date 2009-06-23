@@ -29,7 +29,7 @@ class SearchController < ApplicationController
         # build tag cloud from location and event objects
         tag_limit = 150
         facets    = Location.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
-        tags      = Search.load_from_facets(facets, Tag)#.sort_by { |o| o.name }
+        tags      = Search.load_from_facets(facets, Tag)
 
         tag_limit = 30
         facets    = Event.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
@@ -48,7 +48,7 @@ class SearchController < ApplicationController
       end
     end
     
-    @title        = "#{@city.name}, #{@state.name} Yellow Pages"
+    @title        = "#{@city.name}, #{@state.code} Yellow Pages"
     @h1           = "Search Places and Events in #{@city.name}, #{@state.name}"
   end
 
@@ -79,7 +79,7 @@ class SearchController < ApplicationController
       end
     end
     
-    @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.name} Yellow Pages"
+    @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.code} Yellow Pages"
     @h1     = "Search Places and Events in #{@neighborhood.name}, #{@city.name}, #{@state.name}"
   end
 
@@ -102,7 +102,7 @@ class SearchController < ApplicationController
       end
     end
 
-    @title        = "#{@state.name} #{@zip.name} Yellow Pages"
+    @title        = "#{@state.code} #{@zip.name} Yellow Pages"
     @h1           = "Search Places and Events in #{@state.name} #{@zip.name}"
   end
   
