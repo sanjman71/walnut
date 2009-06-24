@@ -1,7 +1,7 @@
 require 'eventful/api'
 
 class EventVenue < ActiveRecord::Base
-  validates_presence_of     :name, :source_id, :source_type
+  validates_presence_of     :name, :source_id, :source_type, :city
   validates_uniqueness_of   :name
   
   belongs_to                :location
