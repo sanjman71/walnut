@@ -30,6 +30,14 @@ Instructions for importing localeze data into the database localeze_#{RAILS_ENV}
       - no id field
       - field1 is base_record_id
       
+  - load condensed heading detail
+    - navicat settings
+      - import as .txt file with '|' separator
+
+  - load normalized heading detail
+    - navicat settings
+      - import as .txt file with '|' separator
+      
   ? load company phones
     *** find out the difference between the phone number in the base record, and the 1 or more company phones
     - rake localeze:company:import_company_phones
