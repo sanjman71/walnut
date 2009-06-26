@@ -19,7 +19,7 @@ class HomeController < ApplicationController
       city_limit      = 10
       city_density    = 25000
       @cities         = Rails.cache.fetch("popular_cities:#{city_limit}:#{city_density}", :expires_in => CacheExpire.localities) do
-        City.with_locations.order_by_density.all(:limit => city_limit, :include => :state, :conditions => ['locations_count > ?', city_density])
+        City.min_density(city_density).order_by_density.all(:limit => city_limit, :include => :state)
       end
     end
 
@@ -53,7 +53,7 @@ class HomeController < ApplicationController
 
   def find_featured_city
     # find a randomly selected featured city
-    # city = City.order_by_density.all(:limit => 1, :include => :state, :order => 'rand()', :conditions => ["locations_count > 25000"]).first
+    # city = City.min_density(25000).order_by_density.all(:limit => 1, :include => :state, :order => 'rand()').first
     # default to city with most locations
     city = City.find(:first, :order => "locations_count DESC") if city.blank?
     city
