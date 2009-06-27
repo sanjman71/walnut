@@ -43,16 +43,21 @@ namespace :data do
         # make sure location is from localeze, or has a source
         next unless !location.location_sources.blank?
 
-        place       = location.place
-        record      = Localeze::BaseRecord.find(location.location_sources.first.source_id)
-        categories  = record.categories
-        attributes  = record.attributes
-        groups      = []
-         
+        place             = location.place
+        record            = Localeze::BaseRecord.find(location.location_sources.first.source_id)
+        
+        categories        = record.categories
+        attributes        = record.attributes
+
+        condensed_names   = record.condensed_details.collect(&:name)
+        normalized_names  = record.normalized_details.collect(&:name)
+
+        groups            = []
+
         attributes.each do |attribute|
           group_name  = attribute['group_name']
           attr_name   = attribute['name']
-          
+
           tags_list   = Localeze::TagFilter.to_tags(group_name, attr_name)
 
           if tags_list.blank?
@@ -93,10 +98,39 @@ namespace :data do
           groups += tag_groups
         end
 
+        condensed_names.each do |name|
+          tag_group = TagHelper.to_tag_group(name)
+          
+          if tag_group.blank?
+            # condensed name could not be mapped to a tag group
+            DATA_TAGS_LOGGER.debug("xxx condensed name: #{name}")
+            next
+          end
+          
+          # add tag group
+          groups.push(tag_group)
+        end
+
+        normalized_names.each do |name|
+          tag_group = TagHelper.to_tag_group(name)
+          
+          if tag_group.blank?
+            # normalized name could not be mapped to a tag group
+            DATA_TAGS_LOGGER.debug("xxx normalized name: #{name}")
+            next
+          end
+          
+          # add tag group
+          groups.push(tag_group)
+        end
+
         if groups.blank?
           unmapped += 1
           next
         end
+
+        # make sure group list is unique
+        groups = groups.uniq
         
         # add place/group mappings
         place = location.place

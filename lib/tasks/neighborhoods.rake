@@ -5,7 +5,7 @@ namespace :neighborhoods do
     
     # find cities by density
     density = 25000
-    cities  = City.order_by_density.all(:include => :state, :conditions => ['locations_count > ?', density])
+    cities  = City.min_density(density).order_by_density
     
     puts "#{Time.now}: found #{cities.size} cities with more than #{density} locations"
     
@@ -103,7 +103,8 @@ namespace :neighborhoods do
 
     puts "#{Time.now}: importing #{city.name} neighborhoods using city locations with tags, limit #{limit}"
   
-    ids       = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    # find city locations with tags but no neighborhoods
+    ids       = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND neighborhoods_count = 0 AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
     
     puts "#{Time.now}: found #{ids.size} matching location ids"
     

@@ -1,4 +1,23 @@
 namespace :neighbors do
+
+  desc "Print neighbor stats"
+  task :stats do
+    
+    # find cities by density
+    density = 25000
+    cities  = City.min_density(density).order_by_density
+    
+    puts "#{Time.now}: found #{cities.size} cities with more than #{density} locations"
+    
+    cities.each do |city|
+      # use the :group option to get around a rails activerecord bug where the group by clause is lost when using count
+      city_locations_with_neighbors   = LocationNeighbor.with_city(city).count(:group => "location_id").length
+      city_locations_neighbors_ratio  = city_locations_with_neighbors.to_f / city.locations_count.to_f
+      puts "#{Time.now}: city: #{city.name}, neighbors/locations: #{city_locations_with_neighbors}/#{city.locations_count}, ratio: #{city_locations_neighbors_ratio}"
+    end
+    
+    puts "#{Time.now}: completed"
+  end
   
   desc "Initialize neighbors for all locations"
   task :init_all do
