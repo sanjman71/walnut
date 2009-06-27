@@ -212,7 +212,7 @@ class SearchController < ApplicationController
     if @city
       self.class.benchmark("Benchmarking city weather") do
         # initialize city weather
-        @weather = Rails.cache.fetch("weather:#{@city.name}", :expires_in => 2.hours) do
+        @weather = Rails.cache.fetch("weather:#{@city.name.parameterize}", :expires_in => 2.hours) do
           Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
         end
       end
