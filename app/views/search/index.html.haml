@@ -10,8 +10,9 @@
   %h1{:style => 'font-size: 2.0em;'}= @h1
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood, :link_all => true})
+
 .span-8.padding-top-5.bottom.last
-  = render(:partial => 'weather', :locals => {:weather => @weather}) unless @weather.blank?
+  = render(:partial => 'shared/weather', :locals => {:weather => @weather}) unless @weather.blank?
   
 %hr.space
 

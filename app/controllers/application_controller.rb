@@ -216,6 +216,31 @@ class ApplicationController < ActionController::Base
     return true
   end
   
+  def init_weather
+    if RAILS_ENV == 'development'
+    case
+    when @city
+      self.class.benchmark("Benchmarking city weather") do
+        # initialize city weather
+        @weather = Rails.cache.fetch("weather:#{@city.name.parameterize}", :expires_in => 2.hours) do
+          Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
+        end
+      end
+    when @zip
+      self.class.benchmark("Benchmarking zip weather") do
+        # initialize zip weather
+        @weather = Rails.cache.fetch("weather:#{@zip.name}", :expires_in => 2.hours) do
+          Weather.get("#{@zip.name}", "#{@zip.name} Weather")
+        end
+      end
+    else
+      @weather = nil
+    end
+    end # RAILS_ENV
+
+    @weather
+  end
+
   def normalize_page_number
     if params[:page] == '1'
       # redirect to url without page number

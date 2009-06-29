@@ -1,6 +1,6 @@
 class LocationsController < ApplicationController
 
-  # GET /locations/1
+  # GET /locations/1-hall-of-justice
   def show
     @location = Location.find(params[:id], :include => [:places, :country, :state, :city, :zip, :neighborhoods])
     @place    = @location.place unless @location.blank?
@@ -16,6 +16,9 @@ class LocationsController < ApplicationController
     @zip              = @location.zip
     @neighborhoods    = @location.neighborhoods
 
+    # initialize the weather
+    @weather          = init_weather
+
     if @location.events_count > 0
       # find upcoming events at this event venue
       # self.class.benchmark("Benchmarking upcoming events at event venue") do
@@ -24,7 +27,7 @@ class LocationsController < ApplicationController
         logger.debug("*** location events: #{@location_events.size}")
       # end
     end
-    
+
     if @location.mappable?
       self.class.benchmark("Benchmarking nearby locations and event venues") do
         @nearby_locations, @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby", :expires_in => CacheExpire.locations) do

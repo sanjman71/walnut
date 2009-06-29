@@ -4,9 +4,8 @@
   %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
 - javascript("jquery.jmap", "maps", "places")
 
-.span-23.last.box
-  %h1
-    = @h1
+.span-15.prepend-1.mat.padding-top-10.padding-bottom-10
+  %h1{:style => 'font-size: 2.0em;'}= @h1
   - if has_privilege?('manage site')
     %h4{:style => 'font-size: 1.0em; color: #777777;'}
       = @location.location_sources.collect{ |s| "#{s.source_type}:#{s.source_id}"}.join(" | ")
@@ -17,6 +16,11 @@
           
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :link_all => true})
+
+.span-8.padding-top-5.bottom.last
+  = render(:partial => 'shared/weather', :locals => {:weather => @weather}) unless @weather.blank?
+
+%hr.space
 
 .span-18.prepend-1
   .span-18#address_phone

@@ -1,6 +1,7 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
   before_filter   :init_localities, :only => [:country, :state, :city, :neighborhood, :zip, :index]
+  before_filter   :init_weather, :only => [:index]
 
   def country
     # @country, @states initialized in before filter
@@ -208,24 +209,6 @@ class SearchController < ApplicationController
       end
     end
     
-    if RAILS_ENV == 'development'
-    if @city
-      self.class.benchmark("Benchmarking city weather") do
-        # initialize city weather
-        @weather = Rails.cache.fetch("weather:#{@city.name.parameterize}", :expires_in => 2.hours) do
-          Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
-        end
-      end
-    elsif @zip
-      self.class.benchmark("Benchmarking zip weather") do
-        # initialize zip weather
-        @weather = Rails.cache.fetch("weather:#{@zip.name}", :expires_in => 2.hours) do
-          Weather.get("#{@zip.name}", "#{@zip.name} Weather")
-        end
-      end
-    end
-    end # RAILS_ENV
-
     @locality_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
     
     # build search title based on query, city, neighborhood, zip search

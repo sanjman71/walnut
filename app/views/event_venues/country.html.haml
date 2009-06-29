@@ -16,7 +16,7 @@
 %h3.span-23.prepend-1
   - @states.keys.sort_by(&:name).each do |state|
     -# state
-    = state.name
+    %span{:style => 'font-size: 0.8em; font-weight: bold;'}= state.name
     %hr.space
     
     -# all venues in state, grouped by city
