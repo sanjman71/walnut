@@ -78,7 +78,7 @@ namespace :events do
   # end
   
   desc "Import CITY events from eventful, allow all REGION events if specified"
-  task :import_events do
+  task :import do
     # build events search conditions
     city      = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
     region    = ENV["REGION"] ? ENV["REGION"] : ""
@@ -190,8 +190,8 @@ namespace :events do
     puts "#{Time.now}: completed, checked #{checked} events, imported #{iend - istart} events, #{exists} already exist, missing #{missing} venues, ended with #{iend} events"
   end
   
-  desc "Tag all events in a city"
-  task :tag_events do
+  desc "Tag all events in a CITY"
+  task :tag do
     city  = ENV["CITY"] ? City.find_by_name(ENV["CITY"].to_s.titleize) : nil
 
     if city.blank?
@@ -213,7 +213,7 @@ namespace :events do
   end
   
   desc "Remove all past events"
-  task :remove_past_events do
+  task :remove_past do
     # find all past events
     events = Event.past
 
