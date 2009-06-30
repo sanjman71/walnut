@@ -1,4 +1,10 @@
-# Atlanta
+# Atlanta and vicinity
+name: The Local
+street_address: 1440 Roswell Rd
+city:  Marietta
+state: Georgia
+zip:  30062
+---
 name: Foreign Exchange Cafe
 street_address: 658 West Whitehall St
 city: Atlanta
