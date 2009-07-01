@@ -2,8 +2,8 @@ class Location < ActiveRecord::Base
   has_many                :locatables_locations
   has_many                :locatables, :through => :locatables_locations
 
-  # All addresses must have a country, state, city and zip
-  validates_presence_of   :country_id, :state_id, :city_id, :zip_id
+  # All addresses must have a country, state and city
+  validates_presence_of   :country_id, :state_id, :city_id
 
   belongs_to              :country
   belongs_to              :state
