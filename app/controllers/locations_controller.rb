@@ -21,11 +21,11 @@ class LocationsController < ApplicationController
 
     if @location.events_count > 0
       # find upcoming events at this event venue
-      # self.class.benchmark("Benchmarking upcoming events at event venue") do
+      self.class.benchmark("Benchmarking upcoming events at event venue") do
         @event_limit      = LocationNeighbor.default_limit
         @location_events  = @location.events.future.all(:order => 'start_at asc')
-        logger.debug("*** location events: #{@location_events.size}")
-      # end
+        # logger.debug("*** location events: #{@location_events.size}")
+      end
     end
 
     if @location.mappable?
