@@ -29,7 +29,7 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem "haml", :version => '~> 2.0.6'
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
+  config.gem 'rubyist-aasm', :version => '~> 2.0.5', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem "geokit" # required by geokit-rails plugin
   config.gem "curb" # curl api
   config.gem "json"
