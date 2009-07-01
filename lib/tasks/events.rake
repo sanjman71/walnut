@@ -224,12 +224,12 @@ namespace :events do
     puts "#{Time.now}: completed"
   end
   
-  desc "Remove all events"
-  task :remove_all do
-    puts "#{Time.now}: removing all #{Event.count} events"
-    
-    Event.all.each { |e| e.destroy }
-    
-    puts "#{Time.now}: completed"
-  end
+  # desc "Remove all events"
+  # task :remove_all do
+  #   puts "#{Time.now}: removing all #{Event.count} events"
+  #   
+  #   Event.all.each { |e| e.destroy }
+  #   
+  #   puts "#{Time.now}: completed"
+  # end
 end
