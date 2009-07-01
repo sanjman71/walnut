@@ -95,11 +95,19 @@ class Location < ActiveRecord::Base
     self.refer_to > 0
   end
   
+  def geocode_latlng!(options={})
+    b = geocode_latlng(options)
+    raise Exception, "geocode failed" if b == false
+    b
+  end
+  
   def geocode_latlng(options={})
     force = options.has_key?(:force) ? options[:force] : false
     return true if self.lat and self.lng and !force
+    # use street_address, city, state, zip unless any are empty
+    geocode_address = [street_address, city ? city.name : nil, state ? state.name : nil, zip ? zip.name : nil].compact.reject(&:blank?).join(" ")
     # multi-geocoder geocode does not throw an exception on failure
-    geo = Geokit::Geocoders::MultiGeocoder.geocode("#{street_address}, #{city.name }#{state.name}")
+    geo = Geokit::Geocoders::MultiGeocoder.geocode(geocode_address)
     return false unless geo.success
     self.lat, self.lng = geo.lat, geo.lng
     self.save
