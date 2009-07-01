@@ -99,6 +99,7 @@ class CreateWalnut < ActiveRecord::Migration
     add_index :locations, :neighborhoods_count
     add_index :locations, :status
     add_index :locations, :recommendations_count
+    add_index :locations, :updated_at
     
     create_table :phone_numbers do |t|
       t.string      :name,      :limit => 20
