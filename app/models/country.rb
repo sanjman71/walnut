@@ -6,7 +6,9 @@ class Country < ActiveRecord::Base
   has_many                    :locations
   
   include NameParam
-  
+
+  attr_accessible             :name, :code
+
   def self.default
     @@country ||= Country.find_by_code("US")
   end

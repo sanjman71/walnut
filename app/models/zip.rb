@@ -7,6 +7,8 @@ class Zip < ActiveRecord::Base
   
   include NameParam
 
+  attr_accessible             :name, :state, :state_id, :lat, :lng
+
   # find zips with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
   

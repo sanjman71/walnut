@@ -9,6 +9,8 @@ class City < ActiveRecord::Base
   
   include NameParam
   
+  attr_accessible             :name, :state, :state_id, :lat, :lng
+  
   named_scope :exclude,       lambda { |city| {:conditions => ["id <> ?", city.is_a?(Integer) ? city : city.id] } }
   named_scope :within_state,  lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
   

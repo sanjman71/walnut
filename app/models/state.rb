@@ -8,12 +8,23 @@ class State < ActiveRecord::Base
 
   include NameParam
   
+  attr_accessible             :name, :code, :country, :country_id, :lat, :lng
+
   # find states with locations
   named_scope :with_locations,    { :conditions => ["locations_count > 0"] }
 
   # find states with events, 1 means there are events, 0 means no events
   named_scope :with_events,       { :conditions => ["events > 0"] }
+
+  # find all states in a particular country, defaults to country #1 (presumably the US)
+  named_scope :in_country,        lambda {|*args| {:conditions => ["country_id = ?", args.first || 1] } }
   
+  # order alphabetically by code
+  named_scope :order_by_code,     { :order => "code" }
+  
+  # order alphabetically by name
+  named_scope :order_by_name,     { :order => "name" }
+
   # order states by location count
   named_scope :order_by_density,  { :order => "locations_count DESC" }
   
