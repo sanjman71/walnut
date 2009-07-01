@@ -38,8 +38,8 @@ class LocationsController < ApplicationController
 
           if @nearby_locations.blank? and @nearby_event_venues.blank?
             # initialize neighbors and try again
-            LocationNeighbor.set_neighbors(@location, :limit => @nearby_limit, :geodist => 0.0..LocationNeighbor.default_radius_meters)
-            @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
+            # LocationNeighbor.set_neighbors(@location, :limit => @nearby_limit, :geodist => 0.0..LocationNeighbor.default_radius_meters)
+            # @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
           end
 
           [@nearby_locations, @nearby_event_venues]
