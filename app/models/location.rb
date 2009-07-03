@@ -28,6 +28,8 @@ class Location < ActiveRecord::Base
   named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
   named_scope :no_neighborhoods,      { :conditions => ["neighborhoods_count = 0"] }
+  named_scope :with_street_address,   { :conditions => ["street_address <> '' AND street_address IS NOT NULL"] }
+  named_scope :no_street_address,     { :conditions => ["street_address = '' OR street_address IS NULL"] }
   named_scope :with_taggings,         { :include => :places, :conditions => ["places.taggings_count > 0"] }
   named_scope :no_taggings,           { :include => :places, :conditions => ["places.taggings_count = 0"] }
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
@@ -91,6 +93,13 @@ class Location < ActiveRecord::Base
     false
   end
   
+  def neighborhoodable?
+    # can't map to a neighborhood if there is no street address
+    return false if street_address.blank?
+    # can't map if there's no lat/lng
+    mappable?
+  end
+
   def refer_to?
     self.refer_to > 0
   end
