@@ -7,7 +7,8 @@ class Locality
     begin
       geoloc = geocode(s)
       
-      if geoloc.provider == 'google'
+      case geoloc.provider
+      when 'google', 'yahoo'
         case geoloc.precision
         when 'country'
           # find database object
@@ -28,9 +29,21 @@ class Locality
           # map state codes
           map_state_codes(geoloc)
           # find state database object
-          state   = State.find_by_code(geoloc.state)
-          # find zip from state
-          object  = state.zips.find_by_name(geoloc.zip)
+          state = State.find_by_code(geoloc.state)
+
+          if geoloc.provider == 'yahoo'
+            # yahoo returns a zip precision for cities and zips
+            if geoloc.zip.blank?
+              # its a city - find city from state
+              object = state.cities.find_by_name(geoloc.city)
+            else
+              # its a zip - find zip from state
+              object = state.zips.find_by_name(geoloc.zip)
+            end
+          else
+            # google zip really means a zip - find zip from state
+            object = state.zips.find_by_name(geoloc.zip)
+          end
         end
         
         return object
@@ -54,18 +67,40 @@ class Locality
       s       = "#{state.name} #{name}"
       geoloc  = geocode(s)
     else
-      raise ArgumentError, "invalid type #{type}"
+      raise ArgumentError, "invalid type #{type}, #{name}"
     end
+
+    # find class object we are trying to find or create
+    klass  = Kernel.const_get(type.to_s.titleize)
     
     if geoloc.provider == 'google'
+      # the google geocoder
       if geoloc.precision == type.to_s.downcase
         # find or create city or zip
         # use the geoloc name as the 'official' name, unless its blank, which allows mis-spellings to be normalized by the geocoder
         name   = geoloc.send(type.to_s.downcase).blank? ? name : geoloc.send(type.to_s.downcase)
-        klass  = Kernel.const_get(type.to_s.titleize)
         object = klass.find_by_name_and_state_id(name, state.id) || klass.create(:name => name, :state => state, :lat => geoloc.lat, :lng => geoloc.lng)
       else
-        raise LocalityError, "invalid #{type}"
+        raise LocalityError, "invalid #{type}, #{name}"
+      end
+    elsif geoloc.provider == 'yahoo'
+      # the yahoo geocoder
+      case type.to_s.downcase
+      when 'city'
+        # yahoo precision field is 'city' or 'zip', city must be valid, state code must match
+        if (geoloc.precision == type.to_s.downcase or geoloc.precision == 'zip') and !geoloc.send(type.to_s.downcase).blank? and geoloc.state == state.code
+          # use the geoloc name as the 'official' name
+          name   = geoloc.send(type.to_s.downcase)
+          object = klass.find_by_name_and_state_id(name, state.id) || klass.create(:name => name, :state => state, :lat => geoloc.lat, :lng => geoloc.lng)
+        end
+      when 'zip'
+        # yahoo precision field is 'zip', zip must be valid, state code must match
+        if geoloc.precision == type.to_s.downcase and !geoloc.send(type.to_s.downcase).blank? and geoloc.state == state.code
+          name   = geoloc.send(type.to_s.downcase)
+          object = klass.find_by_name_and_state_id(name, state.id) || klass.create(:name => name, :state => state, :lat => geoloc.lat, :lng => geoloc.lng)
+        end
+      else
+        raise LocalityError, "invalid #{type}, #{name}"
       end
     end
     
