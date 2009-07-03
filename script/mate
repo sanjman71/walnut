@@ -2,4 +2,4 @@
 # This script will startup TextMate pointing at just the interesting directories
 # To install the mate shortcut, do something like: ln -s /Applications/TextMate.app/Contents/Resources/mate ~/bin/mate
 # 
-exec("mate app config db lib public script spec stories test vendor/plugins data README*") if fork.nil?
+exec("mate app config db lib public script spec stories test walnut_shared_models vendor/plugins data README*") if fork.nil?
