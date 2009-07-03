@@ -12,8 +12,16 @@ class PlaceTest < ActiveSupport::TestCase
   
   context "create place with a location" do
     setup do
+      @us       = Factory(:us)
+      @il       = Factory(:il, :country_id => @us.id)
+      @chicago  = Factory(:chicago, :state_id => @il.id)
+      
+      @canada   = Factory(:canada)
+      @ontario  = Factory(:ontario, :country_id => @canada.id)
+      @toronto  = Factory(:toronto, :state_id => @ontario.id)
+      
       @place    = Place.create(:name => "Place 1")
-      @location = Location.create(:name => "Home")
+      @location = Location.create(:name => "Home", :city => @chicago)
       @place.locations.push(@location)
       @place.reload
     end
@@ -53,7 +61,7 @@ class PlaceTest < ActiveSupport::TestCase
     
     context "then add a location" do
       setup do
-        @location2  = Location.create
+        @location2  = Location.create(:city => @toronto)
         @place.locations.push(@location2)
         @place.reload
       end

@@ -15,9 +15,11 @@ class LocationTest < ActiveSupport::TestCase
   
   def setup
     @us           = Factory(:us)
-    @ca           = Factory(:country, :name => "Canada", :code => "CA")
-    @il           = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
-    @chicago      = Factory(:city, :name => "Chicago", :state => @il)
+    @canada       = Factory(:canada)
+    @il           = Factory(:il, :country => @us)
+    @on           = Factory(:ontario, :country => @canada)
+    @chicago      = Factory(:chicago, :state => @il)
+    @toronto      = Factory(:toronto, :state => @on)
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
     @place        = Place.create(:name => "My Place")
@@ -26,7 +28,6 @@ class LocationTest < ActiveSupport::TestCase
   context "location with country" do
     setup do
       @location = Location.create(:country => @us)
-      @location.reload
       @us.reload
     end
     
@@ -44,38 +45,20 @@ class LocationTest < ActiveSupport::TestCase
       assert_equal false, @location.refer_to?
     end
     
-    context "remove country" do
-      setup do
-        @location.country = nil
-        @location.save
-        @location.reload
-        @us.reload
-      end
-
-      should "have us no localities" do
-        assert_equal [], @location.localities
-      end
-
-      should "decrement us locations_count" do
-        assert_equal 0, @us.locations_count
-      end
-    end
-    
     context "change country" do
       setup do
-        @location.country = @ca
+        @location.country = @canada
         @location.save
-        @location.reload
         @us.reload
-        @ca.reload
+        @canada.reload
       end
-
+    
       should "decrement us locations_count" do
         assert_equal 0, @us.locations_count
       end
 
-      should "increment ca locations_count" do
-        assert_equal 1, @ca.locations_count
+      should "increment canada locations_count" do
+        assert_equal 1, @canada.locations_count
       end
     end
   end
@@ -84,13 +67,37 @@ class LocationTest < ActiveSupport::TestCase
     setup do
       @location = Location.create(:name => "Home", :state => @il)
       @il.reload
-      @location.reload
     end
     
     should_change "Location.count", :by => 1
 
+    should "have state's country" do
+      assert_equal @location.country, @il.country
+    end
+
     should "increment illinois locations_count" do
       assert_equal 1, @il.locations_count
+    end
+    
+    context "change state" do
+      setup do
+        @location.state = @on
+        @location.save
+        @on.reload
+        @il.reload
+      end
+      
+      should "change country to new state's country" do
+        assert_equal @on.country, @location.country
+      end
+      
+      should "decrement old state's locations_count" do
+        assert_equal 0, @il.locations_count
+      end
+      
+      should "increment new state's locations_count" do
+        assert_equal 1, @on.locations_count
+      end
     end
     
     context "remove state" do
@@ -98,7 +105,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.state = nil
         @location.save
         @il.reload
-        @location.reload
       end
 
       should "decrement illinois locations_count" do
@@ -110,7 +116,6 @@ class LocationTest < ActiveSupport::TestCase
   context "location with a place and city" do
     setup do
       @location = Location.create(:name => "Home", :city => @chicago)
-      @location.reload
       @place.locations.push(@location)
       @place.reload
       @location.reload
@@ -119,6 +124,11 @@ class LocationTest < ActiveSupport::TestCase
     
     should_change "Location.count", :by => 1
     should_change "LocationPlace.count", :by => 1
+
+    should "have city's state & country" do
+      assert_equal @location.state, @chicago.state
+      assert_equal @location.country, @chicago.state.country
+    end
 
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
@@ -133,7 +143,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.city = nil
         @location.save
         @chicago.reload
-        @location.reload
       end
 
       should "decrement chicago locations_count" do
@@ -147,26 +156,35 @@ class LocationTest < ActiveSupport::TestCase
     
     context "change city" do
       setup do
-        @springfield = Factory(:city, :name => "Springfield", :state => @il)
-        @location.city = @springfield
+        @location.city = @toronto
         @location.save
         @chicago.reload
-        @location.reload
+        @toronto.reload
       end
 
       should "remove chicago locations" do
         assert_equal [], @chicago.locations
       end
 
-      should "set springfield locations to [@location]" do
-        assert_equal [@location], @springfield.locations
+      should "set toronto locations to [@location]" do
+        assert_equal [@location], @toronto.locations
       end
+
+      should "set location's state and country to new city's state and country" do
+        assert_equal @toronto.state, @location.state
+        assert_equal @toronto.state.country, @location.country
+      end
+      
+      # TODO: We should check the neighborhoods on a location when we change the location's city etc.
+      # should "clear all existing neighborhoods not in the new city" do
+      #   assert_equal @location.neighborhoods, []
+      # end
+      
     end
     
     context "remove place" do
       setup do
         @place.locations.delete(@location)
-        @location.reload
       end
 
       should_change "LocationPlace.count", :by => -1
@@ -180,17 +198,21 @@ class LocationTest < ActiveSupport::TestCase
       end
     end
   end
-    
+
   context "location with a place and zip" do
     setup do
       @location = Location.create(:name => "Home", :zip => @zip)
       @place.locations.push(@location)
-      @location.reload
       @zip.reload
     end
     
     should_change "Location.count", :by => 1
     should_change "LocationPlace.count", :by => 1
+
+    should "have zip's state & country" do
+      assert_equal @location.state, @zip.state
+      assert_equal @location.country, @zip.state.country
+    end
 
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
@@ -205,7 +227,6 @@ class LocationTest < ActiveSupport::TestCase
         @location.zip = nil
         @location.save
         @zip.reload
-        @location.reload
       end
 
       should "decrement zip locations_count" do
@@ -223,7 +244,7 @@ class LocationTest < ActiveSupport::TestCase
         @location.zip = @zip2
         @location.save
         @zip2.reload
-        @location.reload
+        @zip.reload
       end
 
       should "set 60654 locations to []" do
@@ -238,8 +259,9 @@ class LocationTest < ActiveSupport::TestCase
   
   context "location with a place and neighborhood" do
     setup do
-      @location = Location.create(:name => "Home")
+      @location = Location.new(:name => "Home")
       @location.neighborhoods.push(@river_north)
+      @location.save
       @place.locations.push(@location)
       @location.reload
       @river_north.reload
@@ -248,10 +270,16 @@ class LocationTest < ActiveSupport::TestCase
     should_change "Location.count", :by => 1
     should_change "LocationPlace.count", :by => 1
   
-    should "have neighborhood locality" do
-      assert_equal [@river_north], @location.localities
+    should "have neighborhood's city, state and country" do
+      assert_equal @location.city, @river_north.city
+      assert_equal @location.state, @river_north.city.state
+      assert_equal @location.country, @river_north.city.state.country
     end
 
+    should "have neighborhood locality" do
+      assert_contains @location.localities, @river_north
+    end
+    
     should "increment neighborhood and locations counter caches" do
       assert_equal 1, @river_north.locations_count
       assert_equal 1, @location.neighborhoods_count
@@ -282,7 +310,7 @@ class LocationTest < ActiveSupport::TestCase
   
   context "location with a phone number" do
     setup do
-      @location = Location.create(:country => @us, :name => "My Location")
+      @location = Location.create(:name => "My Location", :country => @us)
       @location.phone_numbers.push(PhoneNumber.new(:name => "Home", :number => "9991234567"))
       @location.reload
     end
@@ -323,7 +351,7 @@ class LocationTest < ActiveSupport::TestCase
   
   context "location without refer_to" do
     setup do
-      @location = Location.create(:name => "Home")
+      @location = Location.create(:name => "Home", :country => @us)
     end
     
     should "have refer_to? == false" do

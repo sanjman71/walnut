@@ -5,9 +5,24 @@ Factory.define :us, :class => :Country do |o|
   o.code        "US"
 end
 
+Factory.define :canada, :class => :Country do |o|
+  o.name        "Canada"
+  o.code        "CA"
+end
+
 Factory.define :country do |o|
   o.name        "United States"
   o.code        "US"
+end
+
+Factory.define :il, :class => :State do |o|
+  o.name        "Illinois"
+  o.code        "IL"
+end
+
+Factory.define :ontario, :class => :State do |o|
+  o.name        "Ontario"
+  o.code        "ON"
 end
 
 Factory.define :state do |o|
@@ -15,9 +30,16 @@ Factory.define :state do |o|
   o.code        "IL"
 end
 
+Factory.define :chicago, :class => :City do |o|
+  o.name        "Chicago"
+end
+
+Factory.define :toronto, :class => :City do |o|
+  o.name        "Toronto"
+end
+
 Factory.define :city do |o|
   o.name        "Chicago"
-  o.state       { |o| Factory(:state) }
 end
 
 Factory.define :zip do |o|

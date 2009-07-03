@@ -10,9 +10,9 @@ class EventTest < ActiveSupport::TestCase
   
   def setup
     @us             = Factory(:us)
-    @il             = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
-    @chicago        = Factory(:city, :name => "Chicago", :state => @il)
-    @location       = Location.create(:city => @chicago)
+    @il             = Factory(:il, :country => @us)
+    @chicago        = Factory(:chicago, :state => @il)
+    @location       = Location.create(:city => @chicago, :state => @il, :country => @us)
     assert @location.valid?
     @place          = Place.create(:name => "Kickass Ampthitheater")
     assert @place.valid?
