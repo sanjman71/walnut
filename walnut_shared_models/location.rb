@@ -36,6 +36,8 @@ class Location < ActiveRecord::Base
   named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
   named_scope :no_neighborhoods,      { :conditions => ["neighborhoods_count = 0"] }
+  named_scope :with_street_address,   { :conditions => ["street_address <> '' AND street_address IS NOT NULL"] }
+  named_scope :no_street_address,     { :conditions => ["street_address = '' OR street_address IS NULL"] }
   named_scope :with_taggings,         { :include => :places, :conditions => ["places.taggings_count > 0"] }
   named_scope :no_taggings,           { :include => :places, :conditions => ["places.taggings_count = 0"] }
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
@@ -165,15 +167,30 @@ class Location < ActiveRecord::Base
     false
   end
   
+  def neighborhoodable?
+    # can't map to a neighborhood if there is no street address
+    return false if street_address.blank?
+    # can't map if there's no lat/lng
+    mappable?
+  end
+
   def refer_to?
     self.refer_to > 0
+  end
+  
+  def geocode_latlng!(options={})
+    b = geocode_latlng(options)
+    raise Exception, "geocode failed" if b == false
+    b
   end
   
   def geocode_latlng(options={})
     force = options.has_key?(:force) ? options[:force] : false
     return true if self.lat and self.lng and !force
+    # use street_address, city, state, zip unless any are empty
+    geocode_address = [street_address, city ? city.name : nil, state ? state.name : nil, zip ? zip.name : nil].compact.reject(&:blank?).join(" ")
     # multi-geocoder geocode does not throw an exception on failure
-    geo = Geokit::Geocoders::MultiGeocoder.geocode("#{street_address}, #{city.name} #{state.name} #{country}")
+    geo = Geokit::Geocoders::MultiGeocoder.geocode(geocode_address)
     return false unless geo.success
     self.lat, self.lng = geo.lat, geo.lng
     self.save
@@ -184,61 +201,7 @@ class Location < ActiveRecord::Base
     s = "#{self.place_name}:#{self.street_address}:#{self.city ? self.city.name : ''}:#{self.state ? self.state.name : ''}:#{self.zip ? self.zip.name : ''}:#{self.country ? self.country.name : ''}"
     Digest::MD5.hexdigest(s)
   end
-  
-  # This function accepts an address in the temporary string fields which we'll convert to a geocoded set of references and will normalize the
-  # city, state, country and zip to those that come back from the Google geocoder.
-  # If the address isn't in these strings, then the database references should be assigned
-  def normalize_and_geocode
-    
-    if (self.street_address.blank?)
-      errors.add(:street_address, "You must enter a street address.")
-    elsif (self.city_str.blank?)
-      if (self.city.blank?)
-        errors.add(:city, "You must enter a city.")
-      else
-        self.city_str = self.city.name
-      end
-    elsif (self.state_str.blank? && self.state.blank?)
-      if (self.city.blank?)
-        errors.add(:state, "You must enter a state.")
-      else
-        self.state_str = self.state.name
-      end
-    elsif (self.country_str.blank? && self.country.blank?)
-      if (self.city.blank?)
-        # Assume the country is the US if none entered
-        self.country_str = "US"
-      else
-        self.country_str = self.country.name
-      end
-    end
 
-    if errors.empty?
-      # Geocode the address. We pull out unit #'s etc from the street address
-      sa_components = StreetAddress.components(self.street_address)
-      tmp_sa = StreetAddress.normalize("#{sa_components[:housenumber]} #{sa_components[:streetname]}")
-      
-      geo=GeoKit::Geocoders::MultiGeocoder.geocode("#{tmp_sa} #{self.city_str} #{self.state_str} #{self.country_str}")
-
-      if !geo.success
-        errors.add_to_base("Sorry, this address could not be located. Please re-enter it.")
-      else
-        if (!self.country = Country.find_by_code(geo.country_code))
-          errors.add(:country_str, "Sorry, we do not support that country yet.")
-        end
-        if (!self.state = State.find_or_create_by_code(:code => geo.state, :name => geo.state, :country => country))
-          errors.add(:state_str, "Sorry, we had a problem adding the state #{geo.state}.")
-        end
-        if (!self.zip = Zip.find_or_create_by_name(:name => geo.zip, :state => state))
-          errors.add(:zip_str, "Sorry, we had a problem adding the zip #{geo.zip}.")
-        end
-        if (!self.city = City.find_or_create_by_name(:name => geo.city, :state => state))
-          errors.add(:city_str, "Sorry, we had a problem adding the city #{geo.city}.")
-        end
-      end
-    end
-  end
-  
   protected
   
   # after_save callback to:

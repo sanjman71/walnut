@@ -46,6 +46,39 @@ namespace :locations do
   #   puts "#{Time.now}: completed, moved #{moved} phone numbers"
   # end
   
+  desc "Add missing location lat/lng coordinates"
+  task :geocode do
+    limit     = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 5000  # 15000 is our daily limit
+    
+    location_ids = Location.find(:all, :conditions => ["lat is NULL AND lng is NULL"], :select => 'id')
+    
+    puts "#{Time.now}: found #{location_ids.size} matching locations, limit #{limit}"
+    
+    per_page  = 100
+    page      = 1
+    added     = 0
+    
+    while !(batch_ids = location_ids.slice((page - 1) * per_page, per_page)).blank?
+      locations = Location.find(batch_ids)
+      locations.each do |location|
+      
+        puts "*** location: #{location.id}:#{location.place_name}:#{location.street_address}:#{location.city.name}:#{location.state.name}:#{location.zip ? location.zip.name : ''}"
+        location.geocode_latlng!
+        
+        added += 1
+        
+        if added >= limit
+          puts "#{Time.now}: reached limit, geocoded #{added} locations"
+          exit
+        end
+        
+        Kernel.sleep(1)
+      end
+    end
+    
+    puts "#{Time.now}: completed, geocoded #{added} locations"
+  end
+  
   desc "Merge locations with same address in the specified CITY"
   task :merge_using_address do
     city = City.find_by_name(ENV["CITY"])

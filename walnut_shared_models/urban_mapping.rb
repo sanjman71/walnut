@@ -15,6 +15,7 @@ module UrbanMapping
     def self.find_all(location, options={})
       raise ArgumentError, "location is blank" if location.blank?
       raise ArgumentError, "location is not mappable" if !location.mappable?
+      raise ArgumentError, "location is not neighborhoodable" if !location.neighborhoodable?
       self.find_by_latlng(location.lat, location.lng, options)
     end
     
