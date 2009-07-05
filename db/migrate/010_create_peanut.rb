@@ -1,6 +1,6 @@
 class CreatePeanut < ActiveRecord::Migration
   def self.up
-    create_table :peanut_companies do |t|
+    create_table :companies do |t|
       t.string  :name
       t.string  :time_zone
       t.string  :subdomain
@@ -13,9 +13,9 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :peanut_companies, [:subdomain]
+    add_index :companies, [:subdomain]
     
-    create_table :peanut_services do |t|
+    create_table :services do |t|
       t.string  :name
       t.integer :duration
       t.string  :mark_as
@@ -26,18 +26,18 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :peanut_services, [:mark_as]
+    add_index :services, [:mark_as]
 
     # map services to companies
-    create_table :peanut_company_services do |t|
+    create_table :company_services do |t|
       t.integer :company_id
       t.integer :service_id
     end
 
-    add_index :peanut_company_services, [:company_id]
-    add_index :peanut_company_services, [:service_id]
+    add_index :company_services, [:company_id]
+    add_index :company_services, [:service_id]
     
-    create_table :peanut_products do |t|
+    create_table :products do |t|
       t.integer   :company_id
       t.string    :name
       t.integer   :inventory
@@ -45,36 +45,36 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
   
-    add_index :peanut_products, [:company_id]
-    add_index :peanut_products, [:company_id, :name]
+    add_index :products, [:company_id]
+    add_index :products, [:company_id, :name]
 
     # Map polymorphic providers (e.g. users) to companies
-    create_table :peanut_company_providers do |t|
+    create_table :company_providers do |t|
       t.references  :company
       t.references  :provider, :polymorphic => true
       t.timestamps
     end
     
-    add_index :peanut_company_providers, [:provider_id, :provider_type], :name => 'index_on_providers'
-    add_index :peanut_company_providers, [:company_id, :provider_id, :provider_type], :name => 'index_on_companies_and_providers'
+    add_index :company_providers, [:provider_id, :provider_type], :name => 'index_on_providers'
+    add_index :company_providers, [:company_id, :provider_id, :provider_type], :name => 'index_on_companies_and_providers'
 
     # Polymorphic relationship mapping services to provider (e.g. users, things)
-    create_table :peanut_service_providers do |t|
+    create_table :service_providers do |t|
       t.references  :service
       t.references  :provider, :polymorphic => true
       t.timestamps
     end
 
-    add_index :peanut_service_providers, [:service_id, :provider_id, :provider_type], :name => 'index_on_services_and_providers'
+    add_index :service_providers, [:service_id, :provider_id, :provider_type], :name => 'index_on_services_and_providers'
     
-    create_table :peanut_resources do |t|
+    create_table :resources do |t|
       t.string  :name
       t.string  :description
     end
     
-    add_index :peanut_resources, [:name]
+    add_index :resources, [:name]
     
-    create_table :peanut_appointments do |t|
+    create_table :appointments do |t|
       t.integer     :company_id
       t.integer     :service_id
       t.references  :provider, :polymorphic => true    # e.g. users
@@ -94,9 +94,9 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :peanut_appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
+    add_index :appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
     
-    create_table :peanut_invoice_line_items do |t|
+    create_table :invoice_line_items do |t|
       t.integer     :invoice_id
       t.references  :chargeable, :polymorphic => true
       t.integer     :price_in_cents
@@ -104,24 +104,24 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
-    create_table :peanut_invoices do |t|
+    create_table :invoices do |t|
       t.references  :invoiceable, :polymorphic => true
       t.integer     :gratuity_in_cents
       t.timestamps
     end
     
-    create_table :peanut_notes do |t|
+    create_table :notes do |t|
       t.text  :comment
       t.timestamps
     end
     
     # Polymorphic relationship mapping notes to different subjects (e.g. people, appointments)
-    create_table :peanut_notes_subjects do |t|
+    create_table :notes_subjects do |t|
       t.references  :note
       t.references  :subject, :polymorphic => true
     end
     
-    create_table :peanut_invitations do |t|
+    create_table :invitations do |t|
       t.integer   :sender_id
       t.integer   :recipient_id
       t.string    :recipient_email
@@ -133,21 +133,25 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
-    add_index :peanut_invitations, :token
+    add_index :invitations, :token
   end
 
   def self.down
-    drop_table :peanut_companies
-    drop_table :peanut_appointments
-    drop_table :peanut_services
-    drop_table :peanut_company_services
-    drop_table :peanut_products
-    drop_table :peanut_company_providers
-    drop_table :peanut_service_providers
-    drop_table :peanut_resources
-    drop_table :peanut_mobile_carriers
-    drop_table :peanut_notes
-    drop_table :peanut_notes_subjects
-    drop_table :peanut_invitations
+    drop_table :invitations
+    drop_table :notes_subjects
+    drop_table :notes
+    drop_table :invoices
+    drop_table :invoice_line_items
+    drop_table :appointments
+    drop_table :resources
+    drop_table :service_providers
+    drop_table :company_providers
+    drop_table :products
+    drop_table :company_services
+    drop_table :services
+    drop_table :companies
   end
 end
+
+
+

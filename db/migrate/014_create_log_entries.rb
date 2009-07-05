@@ -1,6 +1,6 @@
 class CreateLogEntries < ActiveRecord::Migration
   def self.up
-    create_table :peanut_log_entries do |t|
+    create_table :log_entries do |t|
       t.references  :loggable, :polymorphic => true  # e.g. appointment
       t.references  :company, :null => false            # company this is relevant to
       t.references  :location                           # company location this is relevant to, if any
@@ -15,6 +15,6 @@ class CreateLogEntries < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :peanut_log_entries
+    drop_table :log_entries
   end
 end

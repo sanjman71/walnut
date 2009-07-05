@@ -1,7 +1,7 @@
 class CreatePlans < ActiveRecord::Migration
   def self.up
     
-    create_table :peanut_plans do |t|
+    create_table :plans do |t|
       t.string      :name
       t.boolean     :enabled
       t.string      :icon
@@ -20,6 +20,6 @@ class CreatePlans < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :peanut_plans
+    drop_table :plans
   end
 end

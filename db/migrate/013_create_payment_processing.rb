@@ -1,6 +1,6 @@
 class CreatePaymentProcessing < ActiveRecord::Migration
   def self.up
-    create_table :peanut_payments do |t|
+    create_table :payments do |t|
       t.references  :subscription
       t.string      :description 
       t.integer     :amount
@@ -14,7 +14,7 @@ class CreatePaymentProcessing < ActiveRecord::Migration
       t.timestamps
     end  
     
-    create_table :peanut_subscriptions do |t|
+    create_table :subscriptions do |t|
       t.references  :user
       t.references  :company
       t.references  :plan
@@ -30,7 +30,7 @@ class CreatePaymentProcessing < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table  :peanut_payments
-    drop_table  :peanut_subscriptions
+    drop_table  :payments
+    drop_table  :subscriptions
   end
 end
