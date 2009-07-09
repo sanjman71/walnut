@@ -18,11 +18,12 @@
     - rake data:import_records CITY='Boston' STATE='MA'       # 1366
     
   - Import records by cbsa
-    - rake data:import_records CBSA=16980       # Chicagoland, 437101 locations, 842 minutes (391087 locations, 25 errors, 800 minutes)
+    - rake data:import_records CBSA=16980       # Chicagoland, 437101 locations, 842 minutes (391107 locations, 5 errors, 800 minutes)
     - rake data:import_records CBSA=16740       # Charlotte area, 87347 locations, 81 minutes (79731 locations, 0 errors, 204 minutes)
-    - rake data:import_records CBSA=37980       # Philadelphia area, 299343 locations, 82 errors, 425 minutes, (272644 locations, 148 errors, 530 minutes)
-    - rake data:import_records CBSA=38300       # Pittsburg, PA, 127488 locations, 101 errors, 230 minutes (116882 locations, 60 errors, 205 minutes)
-    - rake data:import_records CBSA=12060       # Atlanta area, 257217 location, 289 errors, 359 minutes
+    - rake data:import_records CBSA=12060       # Atlanta area, 257217 location, 359 minutes (230852 locations, 11 errors, 566 minutes)
+    - rake data:import_records CBSA=37980       # Philadelphia area, 299343 locations, 425 minutes, (272771 locations, 21 errors, 530 minutes)
+    - rake data:import_records CBSA=38300       # Pittsburg, PA, 127488 locations, 230 minutes (116932 locations, 10 errors, 205 minutes)
+    - rake data:import_records CBSA=35620       # New York area, **not sure** (959995 locations, 29 errors, 1900 minutes)
     
   * Note: check error logs in log/localeze.error.log
   
@@ -38,23 +39,30 @@
   * (Re-)build index: rake ts:index
 
 5. Import and map event categories, event venues and events:
-  - rake events:import_events CITY=Chicago LIMIT=10
-  - rake events:import_events CITY=Chicago REGION=Illinois LIMIT=10 # import chicago and all illinois region events
+  - rake events:import CITY=Chicago LIMIT=10
+  - rake events:import CITY=Chicago REGION=Illinois LIMIT=10 # import chicago and all illinois region events
 
-  - rake events:import_events CITY=Charlotte LIMIT=10
-  - rake events:import_events CITY=Charlotte REGION='North Carolina' LIMIT=10 # import charlotte and north carolina region events
-  - rake events:import_events CITY=Charlotte REGION='South Carolina' LIMIT=10 # import charlotte and south carolina region events
+  - rake events:import CITY=Charlotte LIMIT=10
+  - rake events:import CITY=Charlotte REGION='North Carolina' LIMIT=10 # import charlotte and north carolina region events
+  - rake events:import CITY=Charlotte REGION='South Carolina' LIMIT=10 # import charlotte and south carolina region events
 
-  - rake events:import_events CITY=Pittsburgh LIMIT=10
+  - rake events:import CITY=Pittsburgh LIMIT=10
+  - rake events:import CITY=Pittsburgh REGION=Pennsylvania LIMIT=10
 
-  - rake events:import_events CITY=Philadelphia LIMIT=10
+  - rake events:import CITY=Philadelphia LIMIT=10
+  - rake events:import CITY=Philadelphia REGION=Pennsylvania LIMIT=10
   
-  - rake events:import_events CITY=Atlanta LIMIT=5
-  - rake events:import_events CITY=Atlanta REGION=Georgia LIMIT=5
+  - rake events:import CITY=Atlanta LIMIT=5
+  - rake events:import CITY=Atlanta REGION=Georgia LIMIT=5
   
 6. Import neighborhoods:
   * import neighborhoods from urban mapping by city's popular tags (300 request per day with the free api)
-    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY='Chicago' LIMIT=300
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY=Chicago LIMIT=300
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY='New York'
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY=Brooklyn
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY=Bronx
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY=Flushing
+    - rake neighborhoods:import_from_urban_by_city_popular_tags CITY=Jamaica
 
   * import neighborhoods from urban mapping by city's locations with tags (300 request per day with the free api)
     - rake neighborhoods:import_from_urban_by_city_locations_with_tags CITY=Chicago LIMIT=100
@@ -65,12 +73,17 @@
   * import neighborhoods based on proximity to locations already marked with neighborhoods
     - rake neighborhoods:import_by_city_proximity CITY='Chicago'
 
+  * show neighborhood statistics
+    - rake neighborhoods:stats
+    
 7. Build location neighbors:
   * Note: do this after importing events and event venues and indexing, as both affect location neighbors.
 
   - rake neighbors:init_by_city_locations_with_tags CITY=Chicago
   - rake neighbors:init_by_city_popular_tags CITY=Chicago
  
+  - rake neighbors:stats
+  
 8. Build the sphinx index, without re-creating the configuration file:
   - rake ts:index
   
