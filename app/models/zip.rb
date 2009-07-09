@@ -9,7 +9,9 @@ class Zip < ActiveRecord::Base
 
   # find zips with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
-  
+
+  named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+
   # order zips by location count
   named_scope :order_by_density,      {:order => "zips.locations_count DESC"}
 

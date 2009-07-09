@@ -2,6 +2,10 @@ module UrbanMapping
   require 'curl'
   require 'json'
   
+  def self.max_requests_per_day
+    300
+  end
+  
   class ExceededRateLimitError < StandardError
   end
   
