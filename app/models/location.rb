@@ -30,12 +30,14 @@ class Location < ActiveRecord::Base
   named_scope :no_neighborhoods,      { :conditions => ["neighborhoods_count = 0"] }
   named_scope :with_street_address,   { :conditions => ["street_address <> '' AND street_address IS NOT NULL"] }
   named_scope :no_street_address,     { :conditions => ["street_address = '' OR street_address IS NULL"] }
-  named_scope :with_taggings,         { :include => :places, :conditions => ["places.taggings_count > 0"] }
-  named_scope :no_taggings,           { :include => :places, :conditions => ["places.taggings_count = 0"] }
+  named_scope :with_taggings,         { :joins => :places, :conditions => ["places.taggings_count > 0"] }
+  named_scope :no_taggings,           { :joins => :places, :conditions => ["places.taggings_count = 0"] }
+  named_scope :with_lat_lng,          { :conditions => ["lat IS NOT NULL and lng IS NOT NULL"] }
+  named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
   named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }
-  named_scope :with_neighbors,        { :include => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
+  named_scope :with_neighbors,        { :joins => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
   named_scope :with_phone_numbers,    { :conditions => ["phone_numbers_count > 0"] }
   named_scope :no_phone_numbers,      { :conditions => ["phone_numbers_count = 0"] }
   named_scope :min_phone_numbers,     lambda { |x| {:conditions => ["phone_numbers_count >= ?", x] }}

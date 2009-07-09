@@ -14,7 +14,9 @@ class City < ActiveRecord::Base
   
   # find cities with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
-  
+
+  named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+
   named_scope :min_density,           lambda { |density| { :conditions => ["locations_count >= ?", density] }}
 
   # order cities by location count
