@@ -18,9 +18,8 @@ class Neighborhood < ActiveRecord::Base
   
 
   # max distance where locations are considered to be in the same neighborhood
-  
   def self.within_neighborhood_distance_meters
-    500.0
+    100.0
   end
 
   def self.within_neighborhood_distance_miles
