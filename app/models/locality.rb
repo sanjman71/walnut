@@ -107,8 +107,37 @@ class Locality
     return object
   end
   
+  def self.find(s, options={})
+    # parse options
+    log   = options[:log] ? options[:log] : false
+
+    match = s.match(/([A-Za-z ]+),{0,1} ([A-Z][A-Z])/)
+
+    if match
+      city_name   = match[1]
+      state_code  = match[2]
+
+      # search database for city and state
+      state = State.find_by_code(state_code)
+      return nil if state.blank?
+      city  = state.cities.find_by_name(city_name)
+
+      if log
+        if city
+          RAILS_DEFAULT_LOGGER.debug("*** mapped #{s} to #{city.name}")
+        else
+          RAILS_DEFAULT_LOGGER.debug("xxx could not map #{s} to a city")
+        end
+      end
+
+      city
+    else
+      nil
+    end
+  end
+
   protected
-  
+
   # map special state codes
   def self.map_state_codes(geoloc)
     return geoloc if geoloc.blank? or geoloc.state.blank?

@@ -45,6 +45,9 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/search/:country/:state', :controller => 'search', :action => 'state', :state => /[a-z]{2}/ # state must be 2 letters
   map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
+  # autocomplete route
+  map.connect     '/autocomplete/search/where', :controller => 'autocomplete', :action => 'where'
+  
   # tag group routes
   map.resources   :taggs
 

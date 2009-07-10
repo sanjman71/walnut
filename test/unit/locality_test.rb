@@ -130,4 +130,59 @@ class LocalityTest < ActiveSupport::TestCase
     end
   end
   
+  context "find city, state code" do
+    setup do
+      @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+      @chicago  = Factory(:city, :name => "Chicago", :state => @il)
+      @heights  = Factory(:city, :name => "Chicago Heights", :state => @il)
+    end
+    
+    context "when its well-formed" do
+      should "find 'Chicago, IL'" do
+        @where  = "Chicago, IL"
+        @object = Locality.find(@where)
+        assert_equal @chicago, @object
+      end
+      
+      should "find 'chicago, IL'" do
+        @where  = "chicago, IL"
+        @object = Locality.find(@where)
+        assert_equal @chicago, @object
+      end
+
+      should "find 'chicago IL'" do
+        @where = "chicago IL"
+        @object = Locality.find(@where)
+        assert_equal @chicago, @object
+      end
+
+      should "find 'Chicago Heights, IL'" do
+        @where  = "Chicago Heights, IL"
+        @object = Locality.find(@where)
+        assert_equal @heights, @object
+      end
+
+      should "find 'Chicago , IL" do
+        @where  = "Chicago , IL"
+        @object = Locality.find(@where)
+        assert_equal @chicago, @object
+      end
+    end
+
+    context "when its not well formed" do
+      should "not find 'River North, Chicago, IL" do
+        @where  = "River North, Chicago, IL"
+        @object = Locality.find(@where)
+        assert_nil @object
+      end
+    end
+
+    context "when the city isn't in the database" do
+      should "not find 'Hippyville, IL'" do
+        @where = "Hippyville, IL"
+        @object = Locality.find(@where)
+        assert_nil @object
+      end
+    end
+  end
 end

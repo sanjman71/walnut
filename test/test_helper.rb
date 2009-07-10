@@ -35,4 +35,20 @@ class ActiveSupport::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+  
+  def assert_true(x)
+    assert(x)
+  end
+  
+  def assert_false(x)
+    assert(!x)
+  end
+  
+  def assert_not_valid(x)
+    assert !x.valid?
+  end  
+
+  def assert_nil(x)
+    assert_equal nil, x
+  end
 end

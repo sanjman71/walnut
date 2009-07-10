@@ -123,7 +123,13 @@ $.fn.init_search_objects_form = function() {
   })
 }
 
+$.fn.init_autocomplete_search_where = function() {
+  // init autocomplete field with where data
+  $("#search_where").autocomplete('/autocomplete/search/where', {matchContains:false, minChars:1, max:50});
+}
+
 $(document).ready(function() {
   $(document).init_input_hints();
   $(document).init_search_objects_form();
+  $(document).init_autocomplete_search_where();
 })
