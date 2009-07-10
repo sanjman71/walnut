@@ -195,20 +195,30 @@ class SearchController < ApplicationController
         @zips           = Search.load_from_facets(facets, Zip)
         @neighborhoods  = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
 
-        # find nearby cities, where nearby is defined with a mile radius range
+        # SK: this is an optimization to cache zip and neighborhood facets for a specific search, but requires more testing
+        # @zips, @neighborhoods = Rails.cache.fetch("#{@city.name.parameterize}:#{@facet_klass.to_s.parameterize}:#{@query_raw.parameterize}:facets:zips:neighborhoods", :expires_in => CacheExpire.facets) do
+        #   facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit, :max_matches => limit)
+        #   zips            = Search.load_from_facets(facets, Zip)
+        #   neighborhoods   = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
+        #   [zips, neighborhoods]
+        # end
+
+        # find (and cache) nearby cities, where nearby is defined with a mile radius range
         nearby_miles    = 20
         nearby_limit    = 5
-        @nearby_cities  = City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
+        @nearby_cities  = Rails.cache.fetch("#{@city.name.parameterize}:nearby:cities", :expires_in => CacheExpire.localities) do
+          City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
+        end
       elsif @zip
         @locality_type  = 'zip'
 
-        # build neighborhood and city facets
+        # build city facets
         limit           = 5
         facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["city_id"], :limit => limit, :max_matches => limit)
         @cities         = Search.load_from_facets(facets, City)
       end
     end
-    
+
     @locality_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
     
     # build search title based on query, city, neighborhood, zip search
