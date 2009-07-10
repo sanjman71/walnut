@@ -1,4 +1,6 @@
 class LocationsController < ApplicationController
+  # use the acts_as_friendly_param plugin filter to handle showing a unique friendly url for the location
+  around_filter ActionController::FriendlyFilter.new
 
   # GET /locations/1-hall-of-justice
   def show
