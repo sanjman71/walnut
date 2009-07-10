@@ -248,7 +248,7 @@ class SearchController < ApplicationController
     @klass    = params[:search_klass] ? params[:search_klass] : 'search'
     # resolve where parameter
     @where    = params[:where].to_s
-    @locality = Locality.find(@where, :log => true) || Locality.resolve(@where)
+    @locality = Locality.search(@where, :log => true) || Locality.resolve(@where)
     # normalize query parameter
     @query    = Search.normalize(params[:query].to_s).parameterize
     # @query    = 'query'

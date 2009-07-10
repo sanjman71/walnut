@@ -132,47 +132,61 @@ class LocalityTest < ActiveSupport::TestCase
   
   context "find city, state code" do
     setup do
-      @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
-      @chicago  = Factory(:city, :name => "Chicago", :state => @il)
-      @heights  = Factory(:city, :name => "Chicago Heights", :state => @il)
+      @il           = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+      @chicago      = Factory(:city, :name => "Chicago", :state => @il)
+      @heights      = Factory(:city, :name => "Chicago Heights", :state => @il)
+      @z60610       = Factory(:zip, :name => "60610", :state => @il)
+      @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
     end
     
     context "when its well-formed" do
       should "find 'Chicago, IL'" do
         @where  = "Chicago, IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
         assert_equal @chicago, @object
       end
       
       should "find 'chicago, IL'" do
         @where  = "chicago, IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
         assert_equal @chicago, @object
       end
 
       should "find 'chicago IL'" do
         @where = "chicago IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
         assert_equal @chicago, @object
       end
 
       should "find 'Chicago Heights, IL'" do
         @where  = "Chicago Heights, IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
         assert_equal @heights, @object
       end
 
       should "find 'Chicago , IL" do
         @where  = "Chicago , IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
         assert_equal @chicago, @object
       end
     end
 
-    context "when its not well formed" do
+    context "when its not a city" do
       should "not find 'River North, Chicago, IL" do
         @where  = "River North, Chicago, IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
+        assert_nil @object
+      end
+
+      should "not find '60610, IL'" do
+        @where = "60610, IL"
+        @object = Locality.search(@where)
+        assert_nil @object
+      end
+
+      should "not find 'IL 60610'" do
+        @where = "IL 60610"
+        @object = Locality.search(@where)
         assert_nil @object
       end
     end
@@ -180,7 +194,7 @@ class LocalityTest < ActiveSupport::TestCase
     context "when the city isn't in the database" do
       should "not find 'Hippyville, IL'" do
         @where = "Hippyville, IL"
-        @object = Locality.find(@where)
+        @object = Locality.search(@where)
         assert_nil @object
       end
     end

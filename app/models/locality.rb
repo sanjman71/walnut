@@ -107,7 +107,9 @@ class Locality
     return object
   end
   
-  def self.find(s, options={})
+  # find the specified locality in the database, and return nil if its not there
+  # - "Chicago, IL" should map to the city object 'Chicago'
+  def self.search(s, options={})
     # parse options
     log   = options[:log] ? options[:log] : false
 
