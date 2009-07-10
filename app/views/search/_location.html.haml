@@ -7,7 +7,7 @@
 
 - cache("#{location.cache_key}:index:#{index}") do
 
-  .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.place.name, {:controller => 'places', :action => 'show', :id => location}}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+  .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.place.name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
     .span-1.icon-div
       - if location.mappable?
         %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
