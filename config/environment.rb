@@ -96,6 +96,11 @@ require "#{RAILS_ROOT}/lib/math.rb"
 require "#{RAILS_ROOT}/lib/array.rb"
 require "#{RAILS_ROOT}/lib/secure_random.rb"
 
+# Initialize exception notifier
+ExceptionNotifier.exception_recipients  = %w(walnut-places-exception@jarna.com)
+ExceptionNotifier.sender_address        = %("walnut places error" <app.error@jarna.com>)
+ExceptionNotifier.email_prefix          = "[app] "
+
 # create special localeze loggers
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
 DATA_ERROR_LOGGER         = Logger.new("log/data.error.log")

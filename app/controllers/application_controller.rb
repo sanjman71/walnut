@@ -10,6 +10,9 @@ class ApplicationController < ActionController::Base
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
   
+  # Exception notifier to send emails when we have exceptions
+  include ExceptionNotifiable
+
   include RecommendationsHelper
   include GoogleAnalyticsEventsHelper
   
