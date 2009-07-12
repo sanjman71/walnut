@@ -61,22 +61,34 @@ module Localeze
 
     # fix localeze city errors
     # note: these errors have been collected after running many imports
-    def normalize_city_and_state
-      hash    = self.class.load_city_corrections
+    def apply_city_corrections
+      new_city  = self.class.apply_city_corrections(self.city, self.state)
+      
+      if new_city != self.city
+        # apply change, but don't save record
+        self.city = new_city
+        # self.save
+        1
+      else 
+        0
+      end
+    end
+    
+    def self.apply_city_corrections(city, state_code)
+      hash    = self.load_city_corrections
       errors  = 0
       
-      return errors if !hash.has_key?(state)
+      return errors if !hash.has_key?(state_code)
       
-      hash[state].each_pair do |wrong_city, right_city|
-        if self.city == wrong_city
+      hash[state_code].each_pair do |wrong_city, right_city|
+        if city == wrong_city
           # fix city
-          self.city = right_city
-          self.save
-          errors += 1
+          return right_city
         end
       end
-      
-      return errors
+
+      # no change applied
+      city
     end
     
     # def tags
@@ -97,6 +109,7 @@ module Localeze
         file = "#{RAILS_ROOT}/vendor/plugins/localeze/data/city_corrections.txt"
 
         FasterCSV.foreach(file, :col_sep => '|') do |row|
+          next if row.blank?
           state_code, wrong_city, right_city = row
           hash[state_code] = hash[state_code].merge(wrong_city.strip => right_city.strip)
         end
