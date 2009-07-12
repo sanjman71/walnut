@@ -98,8 +98,8 @@ require "#{RAILS_ROOT}/lib/secure_random.rb"
 
 # Initialize exception notifier
 ExceptionNotifier.exception_recipients  = %w(exceptions@walnutindustries.com)
-ExceptionNotifier.sender_address        = %("walnut places error" <app@walnutindustries.com>)
-ExceptionNotifier.email_prefix          = "[app] "
+ExceptionNotifier.sender_address        = %("Walnut Places Exception" <app@walnutindustries.com>)
+ExceptionNotifier.email_prefix          = "Walnut Places "
 
 # create special localeze loggers
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
