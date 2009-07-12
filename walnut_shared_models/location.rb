@@ -1,4 +1,10 @@
 class Location < ActiveRecord::Base
+  has_many                :locatables_locations
+  has_many                :locatables, :through => :locatables_locations
+
+  # All addresses must have a country
+  validates_presence_of   :country_id
+
   belongs_to              :country
   belongs_to              :state
   belongs_to              :city
@@ -18,8 +24,10 @@ class Location < ActiveRecord::Base
   
   after_save              :after_save_callback
 
+  attr_accessor           :city_str, :zip_str, :state_str, :country_str
+
   # make sure only accessible attributes are written to from forms etc.
-	attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type
+  attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type, :city_str, :zip_str, :state_str, :country_str
   
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :place_name
@@ -45,6 +53,65 @@ class Location < ActiveRecord::Base
 
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
 
+  def before_validation
+    if self.city_id.blank? && self.neighborhoods.first
+      city_id_will_change!
+      self.city_id = self.neighborhoods.first.city.id
+    end
+    if self.city_id && self.state.blank?
+      state_id_will_change!
+      self.state_id = self.city.state.id
+    end
+    if self.zip_id && self.state.blank?
+      state_id_will_change!
+      self.state_id = self.zip.state.id
+    end
+    if self.state_id && self.country.blank?
+      country_id_will_change!
+      self.country_id = self.state.country.id
+    end
+  end
+  
+  def city=(new_city)
+    if (new_city)
+      city_id_will_change!
+      state_id_will_change!
+      country_id_will_change!
+      self.city_id = new_city.id
+      self.state = new_city.state
+      self.country = new_city.state.country
+    else
+      city_id_will_change!
+      self.city_id = nil
+    end
+  end
+  
+  def zip=(new_zip)
+    if (new_zip)
+      zip_id_will_change!
+      state_id_will_change!
+      country_id_will_change!
+      self.zip_id = new_zip.id
+      self.state = new_zip.state
+      self.country = new_zip.state.country
+    else
+      zip_id_will_change!
+      self.zip_id = nil
+    end
+  end
+  
+  def state=(new_state)
+    if (new_state)
+      state_id_will_change!
+      country_id_will_change!
+      self.state_id = new_state.id
+      self.country = new_state.country
+    else
+      state_id_will_change!
+      self.state_id = nil
+    end
+  end
+
   define_index do
     indexes places.name, :as => :name
     indexes street_address, :as => :address
@@ -68,6 +135,13 @@ class Location < ActiveRecord::Base
     set_property :delta => :delayed
     # only index valid locations
     where "status = 0"
+  end
+
+  def self.anywhere
+    Location.new do |l|
+      l.name = "Anywhere"
+      l.send(:id=, 0)
+    end
   end
   
   # return location's first place
