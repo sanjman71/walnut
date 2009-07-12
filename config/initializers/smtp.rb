@@ -3,6 +3,6 @@ ActionMailer::Base.smtp_settings = {
   :address => "smtp.gmail.com",
   :port => "587",
   :authentication => :plain,
-  :user_name => "walnut@jarna.com",
-  :password => "walnut!" 
+  :user_name => "app@walnutindustries.com",
+  :password => "1ndus7ry!"
 }
