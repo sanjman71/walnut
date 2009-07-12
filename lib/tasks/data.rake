@@ -99,29 +99,29 @@ namespace :data do
         end
 
         condensed_names.each do |name|
-          tag_group = TagHelper.to_tag_group(name)
+          tag_groups = TagGroupImport.to_tag_group(name)
           
-          if tag_group.blank?
+          if tag_groups.empty?
             # condensed name could not be mapped to a tag group
             DATA_TAGS_LOGGER.debug("xxx condensed name: #{name}")
             next
           end
           
-          # add tag group
-          groups.push(tag_group)
+          # add tag groups
+          groups += tag_groups
         end
 
         normalized_names.each do |name|
-          tag_group = TagHelper.to_tag_group(name)
+          tag_groups = TagGroupImport.to_tag_group(name)
           
-          if tag_group.blank?
+          if tag_groups.empty?
             # normalized name could not be mapped to a tag group
             DATA_TAGS_LOGGER.debug("xxx normalized name: #{name}")
             next
           end
           
-          # add tag group
-          groups.push(tag_group)
+          # add tag groups
+          groups += tag_groups
         end
 
         if groups.blank?
@@ -304,24 +304,25 @@ namespace :data do
         
         if record.city.blank? or record.zip.blank?
           errors += 1
-          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} missing city or zip")
+          # log error
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} missing city or zip, city:#{record.city}, zip:#{record.zip}")
           next
         end
         
-        # fix localeze errors, and there are lots of them
-        record.normalize_city_and_state
+        # fix localeze errors
+        record.apply_city_corrections
         
         begin
           # get city if it exists, or validate and create if it doesn't
-          @city = @state.cities.find_by_name(record.city) || Locality.validate(@state, "city", record.city)
+          @city = @state.cities.find_by_name(record.city) #|| Locality.validate(@state, "city", record.city)
         rescue Exception
-          # log exception
           @city = nil
-          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate city:#{record.city} in state:#{@state.name}")
         end
       
         if @city.blank?
           errors += 1
+          # log error
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate city:#{record.city} in state:#{@state.name}")
           next
         end
 
@@ -329,15 +330,15 @@ namespace :data do
 
         begin
           # get zip if it exists, or validate and create if it doesn't
-          @zip = @state.zips.find_by_name(record.zip) || Locality.validate(@state, "zip", record.zip)
+          @zip = @state.zips.find_by_name(record.zip) #|| Locality.validate(@state, "zip", record.zip)
         rescue Exception
-          # log exception
           @zip = nil
-          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate zip:#{record.zip} in state:#{@state.name}")
         end
         
         if @zip.blank?
           errors += 1
+          # log error
+          DATA_ERROR_LOGGER.debug("#{Time.now}: xxx record:#{record.id} could not validate zip:#{record.zip} in state:#{@state.name}")
           next
         end
 
@@ -406,27 +407,176 @@ namespace :data do
     puts "#{Time.now}: completed, #{added} added, #{exists} already imported, #{errors} errors"
   end
     
-  desc "Import tag groups from the localeze log"
-  task :import_tag_groups_from_localeze_log do |t|
-  
-    file    = "#{RAILS_ROOT}/log/localeze.log"
-    groups  = []
+  desc "Compare cities in localeze database with cities table"
+  task :compare_state_cities do
+    state = State.find_by_code(ENV["CODE"]) || State.find_by_name(ENV["STATE"])
     
-    IO.readlines(file).each do |line|
-      if line.match(/xxx category ([\w\s-]+) mapped/)
-        puts "tag group: " + $1
-        groups.push($1)
+    if state.blank?
+      puts "missing state"
+      exit
+    end
+    
+    missing_cities  = 0
+    missing_records = 0
+    
+    # find cities cities
+    hash = Localeze::BaseRecord.count(:conditions => {:state => state.code}, :group => :city)
+    
+    hash.each do |city_name,count|
+      # puts "*** checking #{k}:#{state.code}"
+      
+      # apply any city corrections
+      city_name = Localeze::BaseRecord.apply_city_corrections(city_name, state.code)
+      
+      next if state.cities.find_by_name(city_name)
+      
+      missing_cities += 1
+      missing_records += count
+      puts "xxx missing city #{city_name},#{state.code}, count: #{count}"
+    end
+    
+    puts "#{Time.now}: completed, missing #{missing_cities} cities and #{missing_records} records"
+  end
+  
+  desc "Change a group of locations' city to the localeze base record city"
+  task :move_location_city_to_localeze_city do
+    # this city doesn't have to exist in cities table
+    city = City.new(:name => ENV["CITY"])
+    
+    state = State.find_by_name(ENV["STATE"])
+    
+    # check what city we should map it to
+    if state
+      city_to = state.cities.find_by_name(ENV["TO"])
+    else
+      city_to = City.find_by_name(ENV["TO"])
+    end
+    
+    if city_to.blank?
+      puts "missing TO used to map city to"
+      exit
+    end
+    
+    if state.blank? and City.count(:conditions => {:name => city_to.name}) > 1
+      cities = City.find(:all, :conditions => {:name => city_to.name})
+      puts "found #{cities.size} with name #{city_to.name}"
+      cities.each do |city|
+        puts "#{city.name}:#{city.state.name}"
+      end
+      exit
+    end
+
+    # initialize state if its empty
+    state = city_to.state if state.blank?
+    
+    puts "#{Time.now}: mapping locations sourced from localeze city #{city.name}, #{state.code} to #{city_to.name}, #{state.code}"
+
+    # find all localeze base records with the city
+    records = Localeze::BaseRecord.find(:all, :conditions => {:city => city.name, :state => state.code})
+    
+    puts "#{Time.now}: found #{records.size} localeze records with city #{city.name}"
+
+    # find all associated locations
+    locations = records.collect do |record|
+      LocationSource.find_by_source_id(record.id).collect(&:location)
+    end.flatten
+    
+    puts "#{Time.now}: found #{locations.size} location records"
+    
+    changed = 0
+    locations.each do |location|
+      next if location.city == city_to
+      location.city = city_to
+      location.save
+      changed += 1
+    end
+    
+    puts "#{Time.now}: completed, changed city to #{city_to.name} on #{changed} locations"
+  end
+  
+  desc "Import/map tag groups using the specified localeze condensed or normalized name"
+  task :import_tag_group_using_localeze_category do |t|
+    name = ENV["NAME"]
+    
+    if name.blank?
+      puts "missing name"
+      eixt
+    end
+    
+    puts "#{Time.now}: looking for localeze condensed and normalized names matching '#{name}'"
+    
+    @objects  = Localeze::NormalizedDetail.find(:all, :conditions => ["name LIKE ?", '%' + name + '%'])
+    
+    @objects.each do |object|
+      import_locations_tagged_to_object(object)
+    end
+    
+    @objects  = Localeze::CondensedDetail.find(:all, :conditions => ["name LIKE ?", '%' + name + '%'])
+
+    @objects.each do |object|
+      import_locations_tagged_to_object(object)
+    end
+  end
+  
+  def import_locations_tagged_to_object(object)
+    # map localeze name to tag group
+    tag_groups = TagGroupImport.to_tag_group(object.name)
+    
+    if tag_groups.empty?
+      puts "xxx no mapping for #{object.name}"
+      return
+    end
+    
+    puts "*** mapped #{object.name} to tag groups #{tag_groups.collect(&:name)}"
+    
+    # find all base records
+    base_records = object.base_records(:select => "id")
+    
+    # find all associated locations and places
+    locations = base_records.collect do |base_record|
+      LocationSource.find_by_source_id(base_record.id).collect(&:location)
+    end.flatten
+    
+    places = locations.collect(&:places).flatten
+
+    puts "*** found #{base_records.size} base records, #{locations.size} locations, #{places.size} places"
+    
+    # places.each do |place|
+    #   puts "*** #{place.name}, tag groups: #{place.tag_groups.collect(&:name).join(" | ")}"
+    # end
+    
+    # add tag groups to places
+    tag_groups.each do |tag_group|
+      places.each do |place|
+        # skip if tag group already includes place
+        next if tag_group.places.include?(place)
+        # puts "*** adding #{place.name} to tag group #{tag_group.name}"
+        tag_group.places.push(place)
       end
     end
-    
-    # add unique tag groups
-    groups.uniq!
-    groups.each do |group|
-      TagGroup.create(:name => group)
-    end
-    
-    puts "#{Time.now}: completed, added #{groups.size} tag groups"
   end
+  
+  # desc "Import tag groups from the localeze log"
+  # task :import_tag_groups_from_localeze_log do |t|
+  # 
+  #   file    = "#{RAILS_ROOT}/log/localeze.log"
+  #   groups  = []
+  #   
+  #   IO.readlines(file).each do |line|
+  #     if line.match(/xxx category ([\w\s-]+) mapped/)
+  #       puts "tag group: " + $1
+  #       groups.push($1)
+  #     end
+  #   end
+  #   
+  #   # add unique tag groups
+  #   groups.uniq!
+  #   groups.each do |group|
+  #     TagGroup.create(:name => group)
+  #   end
+  #   
+  #   puts "#{Time.now}: completed, added #{groups.size} tag groups"
+  # end
   
 end #localeze
 

@@ -2,7 +2,6 @@ namespace :neighbors do
 
   desc "Print neighbor stats"
   task :stats do
-    
     # find cities by density
     density = 25000
     cities  = City.min_density(density).order_by_density
@@ -10,7 +9,7 @@ namespace :neighbors do
     puts "#{Time.now}: found #{cities.size} cities with more than #{density} locations"
     
     cities.each do |city|
-      # use the :group option to get around a rails activerecord bug where the group by clause is lost when using count
+      # use the :group option to get around a rails activerecord bug where the group-by clause is lost when using count
       city_locations_with_neighbors   = LocationNeighbor.with_city(city).count(:group => "location_id").length
       city_locations_neighbors_ratio  = city_locations_with_neighbors.to_f / city.locations_count.to_f
       puts "#{Time.now}: city: #{city.name}, neighbors/locations: #{city_locations_with_neighbors}/#{city.locations_count}, ratio: #{city_locations_neighbors_ratio}"
@@ -23,14 +22,19 @@ namespace :neighbors do
   task :init_all do
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
-    
-    puts "#{Time.now}: initializing neighbors for all locations"
-    
+
+    puts "#{Time.now}: initializing neighbors for all locations with no existing neighbors"
+
     page        = 1
     page_size   = 1000
     ids         = Location.find(:all, :select => 'id').collect(&:id)
-    
+
+    # substract locations that already have neighbors
+    ids         -= LocationNeighbor.count(:group => "location_id").keys
+
     puts "#{Time.now}: found #{ids.size} matching location ids"
+
+    exit
 
     neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
 
@@ -42,18 +46,21 @@ namespace :neighbors do
     city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
-    
+
     if city.blank?
       puts "*** invalid city"
       exit
     end
 
-    puts "#{Time.now}: initializing neighbors for all #{city.name} locations"
+    puts "#{Time.now}: initializing neighbors for all #{city.name} locations with no existing neighbors"
 
     page        = 1
     page_size   = 1000
     ids         = Location.find(:all, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
     
+    # substract locations that already have neighbors
+    ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
+
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
     neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
@@ -66,18 +73,21 @@ namespace :neighbors do
     city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
-    
+
     if city.blank?
       puts "*** invalid city"
       exit
     end
 
-    puts "#{Time.now}: initializing neighbors for all #{city.name} locations with tags"
+    puts "#{Time.now}: initializing neighbors for all #{city.name} locations with tags and no existing neighbors"
 
     page        = 1
     page_size   = 1000
     ids         = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
-    
+
+    # substract locations that already have neighbors
+    ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
+
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
     neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)

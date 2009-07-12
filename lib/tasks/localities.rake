@@ -50,5 +50,22 @@ namespace :localities do
       puts "#{Time.now}: completed"
     end
     
+    desc "Print all cities in csv format"
+    task :to_csv do
+      City.order_by_state_name.each do |city|
+        puts city.to_csv
+      end
+    end
   end # city namespace
+  
+  namespace :zip do
+    
+    desc "Print all zips in csv format"
+    task :to_csv do
+      Zip.order_by_state_name.each do |city|
+        puts city.to_csv
+      end
+    end
+    
+  end # zip namespace
 end

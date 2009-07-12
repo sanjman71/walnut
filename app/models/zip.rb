@@ -5,12 +5,17 @@ class Zip < ActiveRecord::Base
   belongs_to                  :state, :counter_cache => true
   has_many                    :locations
   
+  acts_as_mappable
+
   include NameParam
 
   # find zips with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
   named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+
+  named_scope :exclude,               lambda { |zip| {:conditions => ["id <> ?", zip.is_a?(Integer) ? zip : zip.id] } }
+  named_scope :within_state,          lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
 
   # order zips by location count
   named_scope :order_by_density,      {:order => "zips.locations_count DESC"}
@@ -27,4 +32,9 @@ class Zip < ActiveRecord::Base
     self.name
   end
 
+  # returns true iff the location has a latitude and longitude 
+  def mappable?
+    return true if self.lat and self.lng
+    false
+  end
 end

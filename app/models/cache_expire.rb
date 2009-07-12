@@ -18,4 +18,7 @@ class CacheExpire
     5.minutes
   end
   
+  def self.facets
+    5.minutes
+  end
 end

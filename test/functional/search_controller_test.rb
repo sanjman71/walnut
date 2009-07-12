@@ -72,7 +72,7 @@ class SearchControllerTest < ActionController::TestCase
     @z60610   = Factory(:zip, :name => "60610", :state => @il)
   end
 
-  context "city search results" do
+  context "city search tag page" do
     context "with no locations" do
       setup do
         # ThinkingSphinx::Collection takes 4 arguments: page, per_page, entries, total_entries
@@ -94,6 +94,21 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:attributes) { Hash[:city_id => @chicago.id, :state_id => @il.id, :country_id => @us.id] }
       should_assign_to(:title) { "Food near Chicago, IL" }
       should_assign_to(:h1) { "Food near Chicago, IL" }
+      
+      should "have breadcrumbs link 'United States'" do
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                                 :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
+      end
+
+      should "have breadcrumbs link 'Illinois'" do
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                                 :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
+      end
+
+      should "have breadcrumbs link 'Chicago'" do
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                                 :descendant => {:tag => 'a', :attributes => {:class => 'city', :href => '/search/us/il/chicago'}}
+      end
     end
   end
 
@@ -113,6 +128,29 @@ class SearchControllerTest < ActionController::TestCase
     should_assign_to(:neighborhoods) { [] }
     should_assign_to(:title) { "Chicago, IL Yellow Pages" }
     should_assign_to(:h1) { "Search Places and Events in Chicago, Illinois" }
+
+    should "have h1 tag" do
+      assert_tag :tag => "h1", :content => "Search Places and Events in Chicago, Illinois"
+    end
+    
+    should "have search anything link" do
+      assert_tag :tag => "h5", :descendant => {:tag => 'a', :attributes => {:href => '/search/us/il/chicago/tag/anything'}}
+    end
+    
+    should "have breadcrumbs link 'United States'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
+    end
+
+    should "have breadcrumbs link 'Illinois'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
+    end
+
+    should "have breadcrumbs name 'Chicago'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'span', :attributes => {:class => 'city'}}
+    end
   end
   
   context "neighborhood page" do
@@ -131,6 +169,30 @@ class SearchControllerTest < ActionController::TestCase
     should_assign_to(:neighborhood) { @river_north }
     should_assign_to(:title) { "River North, Chicago, IL Yellow Pages" }
     should_assign_to(:h1) { "Search Places and Events in River North, Chicago, Illinois" }
+
+    should "have h1 tag" do
+      assert_tag :tag => "h1", :content => "Search Places and Events in River North, Chicago, Illinois"
+    end
+
+    should "have breadcrumbs link 'United States'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
+    end
+
+    should "have breadcrumbs link 'Illinois'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
+    end
+
+    should "have breadcrumbs link 'Chicago'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'city', :href => '/search/us/il/chicago'}}
+    end
+
+    should "have breadcrumbs name 'Rvier North'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'span', :attributes => {:class => 'neighborhood'}}
+    end
   end
 
   context "zip page" do
@@ -147,6 +209,25 @@ class SearchControllerTest < ActionController::TestCase
     should_assign_to(:zip) { @z60610 }
     should_assign_to(:cities) { [] }
     should_assign_to(:title) { "IL 60610 Yellow Pages" }
-    should_assign_to(:h1) { "Search Places and Events in Illinois 60610" }
+    should_assign_to(:h1) { "Search Places and Events in IL 60610" }
+
+    should "have h1 tag" do
+      assert_tag :tag => "h1", :content => "Search Places and Events in IL 60610"
+    end
+
+    should "have breadcrumbs link 'United States'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
+    end
+
+    should "have breadcrumbs link 'Illinois'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
+    end
+
+    should "have breadcrumbs name '60610'" do
+      assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                               :descendant => {:tag => 'span', :attributes => {:class => 'zip'}}
+    end
   end
 end

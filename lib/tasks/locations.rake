@@ -48,11 +48,16 @@ namespace :locations do
   
   desc "Add missing location lat/lng coordinates"
   task :geocode do
-    limit     = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 5000  # 15000 is our daily limit
+    city    = ENV["LIMIT"] ? City.find_by_name!(ENV["CITY"]) : nil
+    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 5000  # 15000 is the daily google limit
     
-    location_ids = Location.find(:all, :conditions => ["lat is NULL AND lng is NULL"], :select => 'id')
+    if city
+      location_ids = Location.find(:all, :conditions => ["lat is NULL AND lng is NULL AND city_id = ?", city.id], :select => 'id')
+    else
+      location_ids = Location.find(:all, :conditions => ["lat is NULL AND lng is NULL"], :select => 'id')
+    end
     
-    puts "#{Time.now}: found #{location_ids.size} matching locations, limit #{limit}"
+    puts "#{Time.now}: found #{location_ids.size} matching #{city ? city.name : ''} locations, limit #{limit}"
     
     per_page  = 100
     page      = 1

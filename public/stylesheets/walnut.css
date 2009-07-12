@@ -222,10 +222,10 @@ span.example                                      { color: #666666; font-style: 
 .state_cities                                     { color: #111111; font-weight: bold; padding-bottom: 10px; }
 .state_zips                                       { color: #111111; font-weight: bold; padding-bottom: 10px; }
 
-.neighborhood.related, .zip.related, .city.related, .city.nearby, .tags.related
+.neighborhood.related, .zip.related, .city.related, .city.nearby, .zip.nearby, .tags.related
                                                   { color: #111111;  font-weight: bold; }
 
-a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.related.neighborhood
+a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.nearby.zip, a.related.neighborhood
                                                   { font-weight: normal; color: #0099FF; }
 
 span.neighborhood                                 { margin-right: 2px; }

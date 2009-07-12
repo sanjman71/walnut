@@ -1,0 +1,42 @@
+- title(@title)
+
+-# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
+- content_for :javascript do
+  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
+- javascript("jquery.jmap", "places", "map_markers")
+
+- klasses   = []
+- klasses.push("mappable") if @zip.mappable?
+
+- zip_html = "<strong>#{@zip.name} #{@state.code}</strong>"
+- zip_html += "<br/>Latitude: #{@zip.lat}<br/>Longitude: #{@zip.lng}" if @zip.mappable?
+
+.span-23.mat.prepend-1.last.padding-top-10.padding-bottom-20
+  %h2= @h1
+  %h4.span-7.last#breadcrumbs
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :zip => @zip})
+
+%hr.space
+
+.span-24.last
+  .span-5#sidebar
+    #nearby_zips
+      = render(:partial => 'zips/nearby_zips', :locals => {:title => "Nearby Zips", :zips => @nearby_zips}) #unless @nearby_zips.empty?
+
+  .span-19.last[@zip]
+    .span-10
+      .span-10.unselected{:id => "mappable_0", :class => klasses.join, :lat => @zip.lat, :lng => @zip.lng, :index => 0, :color => '_green', :html => zip_html}
+        %h2= @zip.name
+        %h4
+          == Latitude:
+          = @zip.lat
+        %h4
+          == Longitude
+          = @zip.lng
+      .span-10
+        - unless @cities.blank?
+          %h3== City
+          %h4= @cities.join(" | ")
+        
+    .span-9.last
+      .jmap#map{:style => "width: 350px; height: 430px;"}

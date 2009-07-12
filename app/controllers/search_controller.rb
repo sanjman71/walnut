@@ -104,7 +104,7 @@ class SearchController < ApplicationController
     end
 
     @title        = "#{@state.code} #{@zip.name} Yellow Pages"
-    @h1           = "Search Places and Events in #{@state.name} #{@zip.name}"
+    @h1           = "Search Places and Events in #{@state.code} #{@zip.name}"
   end
   
   def index

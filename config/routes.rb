@@ -64,7 +64,8 @@ ActionController::Routing::Routes.draw do |map|
   
   # zip routes
   map.connect     '/zips/error/:locality', :controller => 'zips', :action => 'error'
-  map.connect     '/zips/:country/:state/:city', :controller => 'zips', :action => 'city'
+  map.connect     '/zips/:country/:state/:city', :controller => 'zips', :action => 'city', :city => /[a-z-]+/
+  map.connect     '/zips/:country/:state/:zip', :controller => 'zips', :action => 'zip', :zip => /\d{5}/
   map.connect     '/zips/:country/:state', :controller => 'zips', :action => 'state'
   map.connect     '/zips/:country', :controller => 'zips', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
@@ -76,9 +77,12 @@ ActionController::Routing::Routes.draw do |map|
   map.about       '/about', :controller => 'home', :action => 'about'
   map.contactus   '/contactus', :controller => 'home', :action => 'contactus'
   
+  map.stats_googlebot     '/bots/googlebot', :controller => 'log_stats', :action => 'googlebot'
+  map.stats_googlemedia   '/bots/googlemedia', :controller => 'log_stats', :action => 'googlebot'
+
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
-  
+
   # Sample of regular route:
   #   map.connect 'products/:id', :controller => 'catalog', :action => 'view'
   # Keep in mind you can assign values other than :controller and :action

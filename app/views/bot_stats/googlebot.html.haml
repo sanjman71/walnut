@@ -1,0 +1,47 @@
+- title(@title)
+
+.span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
+  .span-12
+    %h2= @h1
+    
+%hr.space
+
+/ - rows = @stats.size/3 + (@stats.size % 3 > 0 ? 1 : 0)
+/ 
+/ - (0..rows-1).each do |row|
+/   - stat1 = @stats[row*3]
+/   - stat2 = @stats[row*3+1]
+/   - stat3 = @stats[row*3+2]
+
+
+-# show stats in 3 columns
+- column_size = @stats.size/3 + (@stats.size % 3 > 0 ? 1 : 0)
+- column1     = @stats.slice(0, column_size)
+- column2     = @stats.slice(column_size, column_size)
+- column3     = @stats.slice(column_size*2, column_size)
+
+- (0..column_size-1).each do |i|
+  - stat1 = column1[i]
+  - stat2 = column2[i]
+  - stat3 = column3[i]
+  
+  .span-24.padding-top-10.padding-bottom-10{:class => cycle("shaded", "")}
+    .span-6.prepend-1.border{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
+      .span-4#date
+        = stat1.date.strftime("%a %b %d %Y")
+      .span-1.last#count{:style => 'color: #FF6600;'}
+        = stat1.count
+      
+    -unless stat2.blank?
+      .span-6.prepend-1{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
+        .span-4#date
+          = stat2.date.strftime("%a %b %d %Y")
+        .span-2.last#count{:style => 'color: #FF6600;'}
+          = stat2.count
+
+    -unless stat3.blank?
+      .span-6.prepend-1.last{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
+        .span-4#date
+          = stat3.date.strftime("%a %b %d %Y")
+        .span-2.last#count{:style => 'color: #FF6600;'}
+          = stat3.count

@@ -1,5 +1,23 @@
 namespace :neighborhoods do
   
+  # desc "Remove neighborhoods from locations with no street address"
+  # task :remove_from_locations_with_no_street_address do
+  #   location_ids = Location.with_neighborhoods.no_street_address.all(:select => 'id').collect(&:id)
+  #   
+  #   puts "#{Time.now}: found #{location_ids.size} matching locations"
+  #   
+  #   location_ids.each do |id|
+  #     location = Location.find(id)
+  #     
+  #     # remove all location neighborhoods
+  #     location.neighborhoods.each do |hood|
+  #       location.neighborhoods.delete(hood)
+  #     end
+  #   end
+  #   
+  #   puts "#{Time.now}: completed"
+  # end
+  
   desc "Print neighborhood stats"
   task :stats do
     
@@ -11,8 +29,9 @@ namespace :neighborhoods do
     
     cities.each do |city|
       city_locations_with_hoods   = Location.with_city(city).with_neighborhoods.count
-      city_locations_hoods_ratio  = city_locations_with_hoods.to_f / city.locations_count.to_f
-      puts "#{Time.now}: city: #{city.name}, hoods/locations: #{city_locations_with_hoods}/#{city.locations_count}, ratio: #{city_locations_hoods_ratio}"
+      city_locations_hoodable     = Location.with_city(city).with_street_address.count
+      city_locations_hoods_ratio  = city_locations_with_hoods.to_f / city_locations_hoodable.to_f
+      puts "#{Time.now}: city: #{city.name}, hoods/hoodable: #{city_locations_with_hoods}/#{city_locations_hoodable}, ratio: #{city_locations_hoods_ratio}"
     end
     
     puts "#{Time.now}: completed"
@@ -33,8 +52,8 @@ namespace :neighborhoods do
       exit
     end
 
-    # find locations in the specified city that have been urban mapped
-    location_ids  = Location.with_city(city).urban_mapped.with_neighborhoods.all(:select => "id").collect(&:id)
+    # find locations in the specified city that have been urban mapped, order by locations most recently mapped
+    location_ids  = Location.with_city(city).urban_mapped.with_neighborhoods.all(:select => "id", :order => "urban_mapping_at DESC").collect(&:id)
     
     puts "#{Time.now}: found #{location_ids.size} urban mapped locations in #{city.name}"
     
@@ -43,7 +62,7 @@ namespace :neighborhoods do
       locations.each do |location|
         # skip locations with no street address; these map to the 'center' of the city
         # skip locations with no lat/lng coordinates
-        if location.street_address.blank? or !location.mappable?
+        if !location.neighborhoodable? or !location.mappable?
           skipped += 1
           next
         end
@@ -63,8 +82,8 @@ namespace :neighborhoods do
         neighbors   = Location.search(:geo => origin, :with => attributes, :without_ids => location.id, :order => "@geodist asc",  
                                       :max_matches => limit, :limit => limit)
       
-        # filter out neighbors that already have neighborhoods
-        neighbors   = neighbors.delete_if { |o| o.neighborhoods_count > 0 }
+        # filter out neighbors that already have neighborhoods or that are not neighborhoodable
+        neighbors   = neighbors.delete_if { |o| o.neighborhoods_count > 0 or !o.neighborhoodable? }
         
         puts "#{Time.now}: *** found #{neighbors.size} hood-less neighbors within #{Neighborhood.within_neighborhood_distance_miles} miles"
         
@@ -89,25 +108,56 @@ namespace :neighborhoods do
 
     puts "#{Time.now}: completed, added neighborhoods to #{added} locations, #{skipped} skipped"
   end
-  
-  desc "Import neighborhoods from urban mapping based on city locations with tags"
-  task :import_from_urban_by_city_locations_with_tags do
+
+  desc "Import neighborhoods from urban mapping from city locations"
+  task :import_from_urban_by_city_locations do
     city        = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
-    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 300 # 300 is max requests per day allowed with free api
-    added       = 0
+    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : UrbanMapping.max_requests_per_day
     
     if city.blank?
       puts "*** invalid city"
       exit
     end
 
-    puts "#{Time.now}: importing #{city.name} neighborhoods using city locations with tags, limit #{limit}"
+    puts "#{Time.now}: importing #{city.name} neighborhoods using city neighborhoodable locations, limit #{limit}"
   
-    # find city locations with tags but no neighborhoods
-    ids       = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND neighborhoods_count = 0 AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    # find neighborhoodable city locations with no neighborhoods and not mapped by urban
+    ids = Location.with_city(city).with_street_address.not_urban_mapped.no_neighborhoods.all(:select => 'id').collect(&:id)
+    
+    puts "#{Time.now}: found #{ids.size} matching location ids"
+
+    added     = 0
+    page      = 1
+    page_size = 1000
+    
+    while !(batch_ids = ids.slice((page - 1) * page_size, page_size)).blank?
+      locations = Location.find(batch_ids)
+      added    += add_neighborhoods_to_locations(locations, :limit => limit)
+      break if added >= limit
+      page     += 1
+    end
+
+    puts "#{Time.now}: completed, added #{added} neighborhoods"
+  end
+  
+  desc "Import neighborhoods from urban mapping from city locations with tags"
+  task :import_from_urban_by_city_locations_with_tags do
+    city        = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
+    limit       = ENV["LIMIT"] ? ENV["LIMIT"].to_i : UrbanMapping.max_requests_per_day
+    
+    if city.blank?
+      puts "*** invalid city"
+      exit
+    end
+
+    puts "#{Time.now}: importing #{city.name} neighborhoods using city neighborhoodable locations with tags, limit #{limit}"
+  
+    # find neighborhoodable city locations with tags but no neighborhoods and not mapped by urban
+    ids = Location.with_city(city).with_street_address.not_urban_mapped.no_neighborhoods.all(:joins => :places, :conditions => "places.taggings_count > 0", :select => 'locations.id').collect(&:id)
     
     puts "#{Time.now}: found #{ids.size} matching location ids"
     
+    added     = 0
     page      = 1
     page_size = 1000
     
@@ -153,6 +203,7 @@ namespace :neighborhoods do
 
       add_limit   = limit - added
       added       += add_neighborhoods_to_locations(locations, :limit => add_limit)
+      break if added >= limit
     end
 
     puts "#{Time.now}: completed, added #{added} neighborhoods"
@@ -201,8 +252,12 @@ namespace :neighborhoods do
       begin
         # add neighborhoods from urban mapping
         added += add_urban_neighborhoods(location)
-      rescue UrbanMapping::ExceededRateLimitError
+      rescue UrbanMapping::ExceededRateLimitError => e
         # we're done for today
+        raise e
+        # return added
+      rescue Exception => e
+        puts "#{Time.now}: xxx whoops: #{e.message}"
         return added
       end
       
@@ -237,6 +292,9 @@ namespace :neighborhoods do
   def add_urban_neighborhoods(location)
     begin
       neighborhoods = UrbanMapping::Neighborhood.find_all(location)
+    rescue UrbanMapping::ExceededRateLimitError => e
+      puts "#{Time.now}: xxx #{e.message}"
+      raise e
     rescue Exception => e
       puts "#{Time.now}: xxx #{e.message}"
       return 0

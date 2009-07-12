@@ -1,0 +1,6 @@
+- url_options = Hash[:action => 'zip']
+
+%h4.zip.nearby.bottom= title
+%ul
+  - zips.each do |zip|
+    %li= link_to(zip.name, url_for(url_options.update(:zip => zip)), :class => 'zip nearby')
