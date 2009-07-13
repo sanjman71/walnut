@@ -30,6 +30,11 @@ class User < ActiveRecord::Base
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => 'users.name' }
 
+  # include other required user modules
+  include UserSubscription
+  include UserAppointment
+  include UserInvitation
+  
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
   # uff.  this is really an authorization, not authentication routine.  
