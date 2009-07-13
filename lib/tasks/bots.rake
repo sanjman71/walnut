@@ -1,4 +1,4 @@
-namespace :logs do
+namespace :bots do
   
   desc "Parse access.log"
   task :parse_access_log do
