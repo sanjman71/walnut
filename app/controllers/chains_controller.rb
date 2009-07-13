@@ -23,7 +23,7 @@ class ChainsController < ApplicationController
     # count locations in country
     @count    = @facets[:country_id][@country.id]
 
-    @title    = "#{@chain.name} Store Locator"
+    @title    = "#{@chain.display_name} Store Locator"
     
     # track event
     track_chain_ga_event(params[:controller], @chain, @country)
@@ -39,7 +39,7 @@ class ChainsController < ApplicationController
     # count locations in state
     @count    = @facets[:state_id][@state.id]
 
-    @title    = "#{@chain.name} Locations in #{@state.name}"
+    @title    = "#{@chain.display_name} Locations in #{@state.name}"
 
     # track event
     track_chain_ga_event(params[:controller], @chain, @state)
@@ -51,7 +51,7 @@ class ChainsController < ApplicationController
     @locations  = Location.search(:with => {:chain_ids => @chain.id, :city_id => @city.id}, :include => [:state, :city, :zip],
                                   :page => params[:page], :per_page => 5)
 
-    @title      = "#{@chain.name} Locations in #{@city.name}, #{@state.name}"
+    @title      = "#{@chain.display_name} Locations in #{@city.name}, #{@state.name}"
 
     # enable/disable robots
     @robots     = params[:page].to_i == 0 ? true : false
