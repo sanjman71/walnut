@@ -106,7 +106,7 @@ namespace :events do
     while imported < limit and page <= max_page
       # find future events in the specified city
       conditions = {:location => city.name, :date => 'Future', :page => page, :page_size => per_page, :sort_order => 'popularity'}
-      results    = EventStream::Event.search(conditions)
+      results    = EventStream.search(conditions)
       events     = results['events'] ? results['events']['event'] : []
 
       puts "#{Time.now}: *** processing #{events.size} events"
