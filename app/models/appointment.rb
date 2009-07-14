@@ -34,7 +34,12 @@ class Appointment < ActiveRecord::Base
   CONFIRMATION_CODE_ZERO  = '00000'
   
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :provider,      lambda { |provider| { :conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s} }}
+  named_scope :provider,      lambda { |provider| if (provider)
+                                                    {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
+                                                  else
+                                                    {}
+                                                  end
+                                     }
   named_scope :no_provider,   { :conditions => {:provider_id => nil, :provider_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
