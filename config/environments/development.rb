@@ -21,7 +21,7 @@ config.action_mailer.raise_delivery_errors = false
 config.cache_store = :mem_cache_store
 
 # Google maps api key - http://www.walnut.dev
-GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBRKHyjCFHczuSNpLv6PJ7BM1sjczBSR9dLPitiritgQPAQhDKJM7I0E9g"
+GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBTc9FRQxpBdXNBfmqDixmvtqLMfHRQSYxSyW9ESCg9dmtHb_MLOUEL5MQ"
 GOOGLE_MAPS_API_URL = "http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{GOOGLE_MAPS_API_KEY}"
 
 # Blueprint grid only in development environment

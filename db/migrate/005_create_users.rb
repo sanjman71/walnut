@@ -6,6 +6,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string    :phone,                     :limit => 40
       t.integer   :mobile_carrier_id
       t.string    :crypted_password,          :limit => 40
+      t.string    :identifier,                :limit => 150
       t.string    :salt,                      :limit => 40
       t.datetime  :created_at
       t.datetime  :updated_at

@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
   include Authentication::ByCookieToken
   include Authorization::AasmRoles
 
+  include UserAuthIdentity
+
   # Badges for authorization
   badges_authorized_user
 
@@ -25,7 +27,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id
+  attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id, :identifier
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => 'users.name' }

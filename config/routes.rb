@@ -6,6 +6,9 @@ ActionController::Routing::Routes.draw do |map|
   map.login       '/login',         :controller => 'sessions', :action => 'create', :conditions => {:method => :post}
   map.logout      '/logout',        :controller => 'sessions', :action => 'destroy'
 
+  # rpx routes
+  map.rpx_login   '/rpx/login',     :controller => 'rpx', :action => 'login'
+
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
 
