@@ -4,8 +4,8 @@
   .span-12
     = display_flash(:all)
     
-  .span-12.mat.padding-bottom-10
+  .span-12.mat.padding-bottom-20
     = render :partial => 'sessions/login_form'
 
-  .span-11.prepend-1.last
+  .span-11.prepend-1.last.padding-top-10
     = RPXNow.embed_code('walnut', rpx_login_url)

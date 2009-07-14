@@ -8,7 +8,7 @@ class RpxControllerTest < ActionController::TestCase
     context "create admin user using rpx token" do
       setup do
         # stub RPXNow
-        @rpx_hash = {:name=>'sanjay',:email=>'sanjay@jarna.com',:identifier=>"https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM", :username => 'sanjman71'}
+        @rpx_hash = {:name=>'sanjay',:email=>'sanjay@walnutindustries.com',:identifier=>"https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM", :username => 'sanjman71'}
         RPXNow.stubs(:user_data).returns(@rpx_hash)
         get :login, :token => '12345'
       end
@@ -21,17 +21,17 @@ class RpxControllerTest < ActionController::TestCase
       should_assign_to :data
       
       should "assign user identifier" do
-        @user = User.find_by_email("sanjay@jarna.com")
+        @user = User.find_by_email("sanjay@walnutindustries.com")
         assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @user.identifier
       end
       
       should "assign admin role to user" do
-        @user = User.find_by_email("sanjay@jarna.com")
+        @user = User.find_by_email("sanjay@walnutindustries.com")
         assert_equal ['admin'], @user.roles.collect(&:name)
       end
 
-      should_set_session(:user_id) { User.find_by_email("sanjay@jarna.com").id }
-      should_set_the_flash_to /User sanjay was successfully created/i
+      should_set_session(:user_id) { User.find_by_email("sanjay@walnutindustries.com").id }
+      should_set_the_flash_to /Logged in successfully/i
     end
 
     context "create regular user using rpx token" do
@@ -45,23 +45,39 @@ class RpxControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to("root path") { "/" }
       
-      should_change "User.count", :by => 1
+      should_not_change "User.count"
 
-      should_assign_to :data
-      
-      should "assign user identifier" do
-        @user = User.find_by_email("sanjay@peanut.com")
-        assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @user.identifier
-      end
-      
-      should "not assign admin role to user" do
-        @user = User.find_by_email("sanjay@peanut.com")
-        assert_equal [], @user.roles.collect(&:name)
-      end
-
-      should_set_session(:user_id) { User.find_by_email("sanjay@peanut.com").id }
-      should_set_the_flash_to /User sanjay was successfully created/i
+      should_set_the_flash_to /This feature is coming soon/i
     end
+    
+    # context "create regular user using rpx token" do
+    #   setup do
+    #     # stub RPXNow
+    #     @rpx_hash = {:name=>'sanjay',:email=>'sanjay@peanut.com',:identifier=>"https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM", :username => 'sanjman71'}
+    #     RPXNow.stubs(:user_data).returns(@rpx_hash)
+    #     get :login, :token => '12345'
+    #   end
+    # 
+    #   should_respond_with :redirect
+    #   should_redirect_to("root path") { "/" }
+    #   
+    #   should_change "User.count", :by => 1
+    # 
+    #   should_assign_to :data
+    #   
+    #   should "assign user identifier" do
+    #     @user = User.find_by_email("sanjay@peanut.com")
+    #     assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @user.identifier
+    #   end
+    #   
+    #   should "not assign admin role to user" do
+    #     @user = User.find_by_email("sanjay@peanut.com")
+    #     assert_equal [], @user.roles.collect(&:name)
+    #   end
+    # 
+    #   should_set_session(:user_id) { User.find_by_email("sanjay@peanut.com").id }
+    #   should_set_the_flash_to /User sanjay was successfully created/i
+    # end
     
     context "create session using rpx token" do
       setup do
