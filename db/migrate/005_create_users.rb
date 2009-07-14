@@ -7,6 +7,7 @@ class CreateUsers < ActiveRecord::Migration
       t.integer   :mobile_carrier_id
       t.string    :crypted_password,          :limit => 40
       t.string    :identifier,                :limit => 150
+      t.string    :cal_dav_token,             :limit => 150
       t.string    :salt,                      :limit => 40
       t.datetime  :created_at
       t.datetime  :updated_at

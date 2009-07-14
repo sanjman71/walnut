@@ -19,11 +19,15 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 6..100 #r@a.wk
   validates_uniqueness_of   :email,    :case_sensitive => false
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
-
+  
   before_validation         :format_phone
-
   belongs_to                :mobile_carrier
   
+  validates_presence_of       :cal_dav_token
+  validates_length_of         :cal_dav_token,   :within => 10..150
+  validates_uniqueness_of     :cal_dav_token
+  before_validation_on_create :reset_cal_dav_token
+
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
@@ -75,6 +79,12 @@ class User < ActiveRecord::Base
     self.class.to_s.tableize
   end
   
+  def reset_cal_dav_token
+    cal_dav_token_will_change!
+    # We generate a token with no forward slashes in it, by substituting for / with |.
+    self.cal_dav_token = ActiveSupport::SecureRandom.base64(50).gsub('/', '|')
+  end
+  
   protected
     
   def make_activation_code
@@ -86,4 +96,5 @@ class User < ActiveRecord::Base
   def format_phone
     self.phone.gsub!(/[^\d]/, '') unless self.phone.blank?
   end
+  
 end

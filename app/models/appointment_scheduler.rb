@@ -19,10 +19,10 @@ class AppointmentScheduler
     
     if provider.anyone?
       # find free appointments for any provider, order by start times
-      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
     else
       # find free appointments for a specific provider, order by start times
-      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
     end
     
     # remove appointments that have ended (when compared to Time.now) or appointment providers that do not provide the requested service
@@ -236,7 +236,7 @@ class AppointmentScheduler
   
   # build collection of all free and work appointments that have not been canceled over the specified date range
   def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
-    company.appointments.provider(provider).free_work.upcoming_completed.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at
+    company.appointments.provider(provider).free_work.upcoming_completed.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
   end
   
   # build collection of all unscheduled appointments over the specified date range

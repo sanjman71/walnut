@@ -18,8 +18,8 @@ class Appointment < ActiveRecord::Base
   after_create            :add_customer_role
   
   # Locations
-  has_one                 :locatable_location, :as => :locatable
-  has_one                 :location, :through => :locatable_location
+  has_many                  :locatables_locations, :as => :locatable
+  has_many                  :locations, :through => :locatables_locations
   
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -80,25 +80,25 @@ class Appointment < ActiveRecord::Base
   # general_location is used for broad searches, where a search for appointments in Chicago includes appointments assigned to anywhere
   # as well as those assigned to chicago. A search for appointments assigned to anywhere includes all appointments - no constraints.
   named_scope :general_location,
-                lambda { |location_id|
-                  if (location_id == 0 || location_id.blank?)
+                lambda { |location|
+                  if (location.nil? || location.id == 0 || location.id.blank?)
                     # If the request is for any location, there is no condition
                     {}
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :locations, :conditions => ["locations.id = '?' OR locations.id IS NULL", location_id] }
+                    { :include => :locations, :conditions => ["locations.id = '?' OR locations.id IS NULL", location.id] }
                   end
                 }
   # specific_location is used for narrow searchees, where a search for appointments in Chicago includes only those appointments assigned to
   # Chicago. A search for appointments assigned to anywhere includes only those appointments - not those assigned to Chicago, for example.
   named_scope :specific_location,
-                lambda { |location_id|
+                lambda { |location|
                   # If the request is for any location, there is no condition
-                  if (location_id == 0 || location_id.blank? )
+                  if (location.nil? || location.id == 0 || location.id.blank? )
                     { :include => :locations, :conditions => ["locations.id IS NULL"] }
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :locations, :conditions => ["locations.id = '?'", location_id] }
+                    { :include => :locations, :conditions => ["locations.id = '?'", location.id] }
                   end
                 }
   

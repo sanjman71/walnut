@@ -61,6 +61,18 @@ class UserTest < ActiveSupport::TestCase
 
       should_change "User.count", :by => 1
     end
+    
+  end
+  
+  context "caldav token" do
+    setup do
+      @user2 = User.create(:name => "User 2", :email => "user2@jarna.com", :password => "secret", :password_confirmation => "secret")
+    end
+    
+    should "assign a cal_dav_token" do
+      assert !(@user2.cal_dav_token.blank?)
+    end
+    
   end
 
 end
