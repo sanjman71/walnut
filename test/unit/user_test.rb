@@ -4,12 +4,8 @@ require 'test/factories'
 class UserTest < ActiveSupport::TestCase
 
   should_belong_to    :mobile_carrier
-  
-  # def setup
-  #   # this seems to be required because its a shared table in a different database
-  #   User.delete_all
-  # end
-  
+
+
   context "create user with extra phone characters" do
     setup do
       @user = User.create(:name => "User 1", :email => "user1@jarna.com", 
