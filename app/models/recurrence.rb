@@ -10,6 +10,8 @@ class Recurrence < ActiveRecord::Base
   belongs_to              :customer, :class_name => 'User'
   belongs_to              :location
   has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
+  # Recurrence instances. TODO: Instances of the recurrence are destroyed when the recurrence is destroyed
+  has_many                :appointments, :dependent => :destroy
 
   validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
   validates_presence_of   :provider_id, :if => :provider_required?
@@ -258,30 +260,16 @@ class Recurrence < ActiveRecord::Base
   def create_instances(company, start_at, end_at)
     # Create a RiCal calendar with our recurring appointments
     company.recurrences.each do |recur|
-      cal = RiCal.Calendar do |cal|
-        cal.event do |ev|
-          ev.add_attendee "#{recur.provider.email}"
-          # No customer if this is available time
-          if recur.service.mark_as == "free"
-            ev.summary = "#{recur.provider.name}: Available"
-          else
-            ev.summary = "#{recur.provider.name}: #{recur.service.name} for #{recur.customer.name}"
-            ev.add_attendee "#{recur.customer.email}"
-          end
-          ev.dtstart = recur.start_at
-          ev.dtend =recur.end_at
-          if recur.location
-            ev.location = "#{recur.location.name}"
-          end
-          if recur.notes.size > 0
-            ev.description = "Notes: \n #{recur.notes.map(&:comment).join}"
-          end
-          ev.rrule = recur.rrule
-        end
+      ri_ev = RiCal.Event do |ev|
+        ev.dtstart = recur.start_at
+        ev.dtend =recur.end_at
+        ev.rrule = recur.rrule
       end
-      cal.occurrences(:starting => start_at, :before => end_at).each do |appt|
+      ri_ev.occurrences(:starting => start_at, :before => end_at).each do |ri_occurrence|
         # Create an appointment 
-        Appointment.create(:company => recur.company, :service => recur.service, :provider => recur.provider, :customer => recur.customer, :start_at => appt.start, :end_at => appt.end, :mark_as => recur.mark_as, :state => 'upcoming', :uid => recur.uid)
+        Appointment.create(:company => recur.company, :service => recur.service, :provider => recur.provider,
+          :customer => recur.customer, :start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
+          :mark_as => recur.mark_as, :state => 'upcoming', :uid => recur.uid)
       end
     end
     

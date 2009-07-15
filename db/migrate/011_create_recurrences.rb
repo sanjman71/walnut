@@ -15,7 +15,7 @@ class CreateRecurrences < ActiveRecord::Migration
       t.string      :state
       t.string      :confirmation_code
       t.datetime    :canceled_at
-      
+      t.string      :description
       t.string      :rrule            # iCalendar recurrence rule
       t.datetime    :expanded_to      # recurrence has been expanded up to this datetime (in UTC)
       t.integer     :remaining_count  # The count is added to the rrule, and needs to be decremented every time an appointment is instantiated

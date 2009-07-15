@@ -85,7 +85,7 @@ class Appointment < ActiveRecord::Base
                     {}
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
+                    { :include => :location, :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
                   end
                 }
   # specific_location is used for narrow searchees, where a search for appointments in Chicago includes only those appointments assigned to
@@ -94,10 +94,10 @@ class Appointment < ActiveRecord::Base
                 lambda { |location|
                   # If the request is for any location, there is no condition
                   if (location.nil? || location.id == 0 || location.id.blank? )
-                    { :conditions => ["location_id IS NULL"] }
+                    { :include => :location, :conditions => ["location_id IS NULL"] }
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :conditions => ["location_id = '?'", location.id] }
+                    { :include => :location, :conditions => ["location_id = '?'", location.id] }
                   end
                 }
   
@@ -175,7 +175,7 @@ class Appointment < ActiveRecord::Base
     # initialize duration (in minutes)
     if (self.service.nil? || self.service.free?) and self.duration.blank?
       # initialize duration based on start and end times
-      self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
+      self.duration = (self.end_at - self.start_at) / 60
     elsif self.service and self.duration.blank?
       # initialize duration based on service duration
       self.duration = self.service.duration
@@ -224,7 +224,7 @@ class Appointment < ActiveRecord::Base
     
     if self.start_at and self.end_at
       # start_at must be before end_at
-      if !(start_at.to_i < end_at.to_i)
+      if !(start_at < end_at)
         errors.add_to_base("Appointment start time must be earlier than the apointment end time")
       end
     end
