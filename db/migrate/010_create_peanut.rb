@@ -1,20 +1,5 @@
 class CreatePeanut < ActiveRecord::Migration
   def self.up
-    # create_table :companies do |t|
-    #   t.string  :name
-    #   t.string  :time_zone
-    #   t.string  :subdomain
-    #   t.string  :slogan
-    #   t.text    :description
-    #   t.integer :locations_count, :default => 0       # counter cache
-    #   t.integer :services_count, :default => 0        # counter cache
-    #   t.integer :work_services_count, :default => 0   # counter cache
-    #   t.integer :providers_count, :default => 0       # counter cache
-    #   t.timestamps
-    # end
-    
-    # add_index :companies, [:subdomain]
-    
     # Rename places and any references to places
     
     rename_table :places, :companies
@@ -169,15 +154,6 @@ class CreatePeanut < ActiveRecord::Migration
     
     add_index :invitations, :token
 
-    # create_table :locatables_locations do |t|
-    #   t.references :location
-    #   t.references :locatable, :polymorphic => true
-    # end
-    # 
-    # add_index :locatables_locations, [:location_id]
-    # add_index :locatables_locations, [:locatable_id, :locatable_type], :name => "index_on_locatables"
-    # add_index :locatables_locations, [:location_id, :locatable_id, :locatable_type], :name => "index_on_locations_locatables"
-
     create_table :plans do |t|
       t.string      :name
       t.boolean     :enabled
@@ -272,7 +248,6 @@ class CreatePeanut < ActiveRecord::Migration
     drop_table  :subscriptions
     drop_table  :payments
     drop_table  :plans
-    drop_table  :locatables_locations
     drop_table  :invitations
     drop_table  :notes_subjects
     drop_table  :notes
@@ -285,6 +260,5 @@ class CreatePeanut < ActiveRecord::Migration
     drop_table  :products
     drop_table  :company_services
     drop_table  :services
-    # drop_table  :companies
   end
 end
