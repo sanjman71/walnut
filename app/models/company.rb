@@ -20,7 +20,7 @@ class Company < ActiveRecord::Base
 
   before_validation         :init_subdomain, :downcase_subdomain, :titleize_name
 
-  validates_presence_of     :time_zone
+  # validates_presence_of     :time_zone
 
   has_many                  :company_locations
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location

@@ -2,10 +2,10 @@ class Location < ActiveRecord::Base
   # All addresses must have a country
   validates_presence_of   :country_id
 
-  belongs_to              :country
-  belongs_to              :state
-  belongs_to              :city
-  belongs_to              :zip
+  belongs_to              :country, :counter_cache => :locations_count
+  belongs_to              :state, :counter_cache => :locations_count
+  belongs_to              :city, :counter_cache => :locations_count
+  belongs_to              :zip, :counter_cache => :locations_count
   has_many                :location_neighborhoods
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   has_many                :company_locations
@@ -19,7 +19,7 @@ class Location < ActiveRecord::Base
   has_many                :location_sources
   has_many                :sources, :through => :location_sources
   
-  after_save              :after_save_callback
+  # after_save              :after_save_callback
 
   attr_accessor           :city_str, :zip_str, :state_str, :country_str
 
@@ -49,64 +49,6 @@ class Location < ActiveRecord::Base
   named_scope :min_popularity,        lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
-
-  def before_validation
-    if self.city_id and self.state_id.blank?
-      # set state based on city's state
-      state_id_will_change!
-      self.state_id = self.city.state.id
-    end
-    if self.zip_id and self.state_id.blank?
-      # set state based on zip's state
-      state_id_will_change!
-      self.state_id = self.zip.state.id
-    end
-    if self.state_id and self.country_id.blank?
-      # set country based on state's country
-      country_id_will_change!
-      self.country_id = self.state.country.id
-    end
-  end
-  
-  def city=(new_city)
-    if (new_city)
-      city_id_will_change!
-      state_id_will_change!
-      country_id_will_change!
-      self.city_id = new_city.id
-      self.state = new_city.state
-      self.country = new_city.state.country
-    else
-      city_id_will_change!
-      self.city_id = nil
-    end
-  end
-  
-  def zip=(new_zip)
-    if (new_zip)
-      zip_id_will_change!
-      state_id_will_change!
-      country_id_will_change!
-      self.zip_id = new_zip.id
-      self.state = new_zip.state
-      self.country = new_zip.state.country
-    else
-      zip_id_will_change!
-      self.zip_id = nil
-    end
-  end
-  
-  def state=(new_state)
-    if (new_state)
-      state_id_will_change!
-      country_id_will_change!
-      self.state_id = new_state.id
-      self.country = new_state.country
-    else
-      state_id_will_change!
-      self.state_id = nil
-    end
-  end
 
   define_index do
     indexes companies.name, :as => :name
@@ -205,47 +147,64 @@ class Location < ActiveRecord::Base
   # after_save callback to:
   #  - increment/decrement locality counter caches
   #  x (deprecated) update locality tags (e.g. country, state, city, zip) based on changes to the location object
-  def after_save_callback
-    changed_set = ["country_id", "state_id", "city_id", "zip_id"]
-    
-    self.changes.keys.each do |change|
-      # filter out unless its a locality
-      next unless changed_set.include?(change.to_s)
-      
-      begin
-        # get class object
-        klass_name  = change.split("_").first.titleize
-        klass       = Module.const_get(klass_name)
-      rescue
-        next
-      end
-      
-      old_id, new_id = self.changes[change]
-      
-      if old_id
-        locality = klass.find_by_id(old_id.to_i)
-        # decrement counter cache
-        klass.decrement_counter(:locations_count, locality.id)
-      end
-      
-      if new_id
-        locality = klass.find_by_id(new_id.to_i)
-        # increment counter cache
-        klass.increment_counter(:locations_count, locality.id)
-      end
-    end
-  end
+  # def after_save_callback
+  #   changed_set = ["country_id", "state_id", "city_id", "zip_id"]
+  #   
+  #   self.changes.keys.each do |change|
+  #     # filter out unless its a locality
+  #     next unless changed_set.include?(change.to_s)
+  #     
+  #     begin
+  #       # get class object
+  #       klass_name  = change.split("_").first.titleize
+  #       klass       = Module.const_get(klass_name)
+  #     rescue
+  #       next
+  #     end
+  #     
+  #     old_id, new_id = self.changes[change]
+  #     
+  #     if old_id
+  #       locality = klass.find_by_id(old_id.to_i)
+  #       # decrement counter cache
+  #       klass.decrement_counter(:locations_count, locality.id)
+  #     end
+  #     
+  #     if new_id
+  #       locality = klass.find_by_id(new_id.to_i)
+  #       # increment counter cache
+  #       klass.increment_counter(:locations_count, locality.id)
+  #     end
+  #   end
+  # end
   
   def after_add_neighborhood(hood)
     return if hood.blank?
 
+    changes = 0
+
     if self.city_id.blank?
       # set city based on neighborhood city
-      self.city_id = hood.city.id
-      self.save
+      self.city = hood.city
+      changes += 1
     end
+
+    if self.state_id.blank?
+      if self.city_id
+        # set state based on location state
+        self.state = self.city.state
+        changes += 1
+      elsif hood.city
+        # set state based on neighborhood state
+        self.state = hood.city.state
+        changes += 1
+      end
+    end
+
+    self.save if changes > 0
+    true
   end
-  
+
   def before_remove_neighborhood(hood)
     return if hood.blank?
     # decrement counter caches

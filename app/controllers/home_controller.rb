@@ -8,9 +8,24 @@ class HomeController < ApplicationController
     # find featured city objects
     featured_limit = 5
 
-    self.class.benchmark("Benchmarking #{@featured_city.name} featured set") do
-      @featured_set = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured_set", :expires_in => CacheExpire.locations) do
+    self.class.benchmark("Benchmarking #{@featured_city.name} featured places") do
+      @featured_places = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured:places", :expires_in => CacheExpire.locations) do
         ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Location], :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+      end
+      # @featured_places.map { |o| o.lat = nil; o.lng = nil; o.freeze }
+      @featured_places_title = "#{@featured_city.name} Places"
+    end
+
+    self.class.benchmark("Benchmarking #{@featured_city.name} featured events") do
+      @featured_events = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured:events", :expires_in => CacheExpire.locations) do
+        ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Event], :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+      end
+      @featured_events_title = "#{@featured_city.name} Events"
+
+      # use places if there are no events
+      if @featured_events.blank?
+        @featured_events = ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Location], :page => 2, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+        @featured_events_title = "#{@featured_city.name} Places"
       end
     end
 

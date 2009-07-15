@@ -5,7 +5,6 @@ class CompanyTest < ActiveSupport::TestCase
   
   should_validate_presence_of   :name
   should_validate_presence_of   :subdomain
-  should_validate_presence_of   :time_zone
   should_have_many              :locations
   should_have_many              :phone_numbers
   should_have_many              :company_tag_groups
@@ -30,7 +29,7 @@ class CompanyTest < ActiveSupport::TestCase
       
       @company  = Company.create(:name => "Walnut Industries", :time_zone => "UTC")
       puts @company.errors.full_messages
-      @location = Location.create(:city => @chicago)
+      @location = Location.create(:city => @chicago, :country => @us)
       @company.locations.push(@location)
       @company.reload
     end
@@ -70,7 +69,7 @@ class CompanyTest < ActiveSupport::TestCase
     
     context "then add a location" do
       setup do
-        @location2  = Location.create(:city => @toronto)
+        @location2  = Location.create(:city => @toronto, :country => @us)
         @company.locations.push(@location2)
         @company.reload
       end

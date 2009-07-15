@@ -4,31 +4,31 @@ require 'ar-extensions'
 namespace :init do
 
   desc "Initialize default values."
-  task :all => [:countries, :states, :cities, :communities, :townships, :zips, :tag_groups, :admin_users, "rp:init", "events:init"]
+  task :all => [:countries, :states, :cities, :communities, :townships, :zips, :tag_groups, "rp:init", "events:init"]
 
-  desc "Initialize admin users"
-  task :admin_users do 
-    # Create admin users
-    puts "adding admin user: admin@killianmurphy.com, password: peanut"
-    a = User.create(:name => "Admin Killian", :email => "admin@killianmurphy.com", :phone => "6504502628",
-                    :password => "peanut", :password_confirmation => "peanut")
-    a.register!
-    a.activate!
-    a.grant_role('admin')
-    a.mobile_carrier = MobileCarrier.find_by_name("AT&T/Cingular")
-    a.save
-
-    puts "adding admin user: sanjay@jarna.com, password: peanut"
-    a = User.create(:name => "Admin Sanjay", :email => "sanjay@jarna.com", :phone => "6503876818",
-                    :password => "peanut", :password_confirmation => "peanut")
-    a.register!
-    a.activate!
-    a.grant_role('admin')
-    a.mobile_carrier = MobileCarrier.find_by_name("Verizon Wireless")
-    a.save
-    
-    puts "#{Time.now}: completed"
-  end
+  # desc "Initialize admin users"
+  # task :admin_users do 
+  #   # Create admin users
+  #   puts "adding admin user: admin@killianmurphy.com, password: peanut"
+  #   a = User.create(:name => "Admin Killian", :email => "admin@killianmurphy.com", :phone => "6504502628",
+  #                   :password => "peanut", :password_confirmation => "peanut")
+  #   a.register!
+  #   a.activate!
+  #   a.grant_role('admin')
+  #   a.mobile_carrier = MobileCarrier.find_by_name("AT&T/Cingular")
+  #   a.save
+  # 
+  #   puts "adding admin user: sanjay@jarna.com, password: peanut"
+  #   a = User.create(:name => "Admin Sanjay", :email => "sanjay@jarna.com", :phone => "6503876818",
+  #                   :password => "peanut", :password_confirmation => "peanut")
+  #   a.register!
+  #   a.activate!
+  #   a.grant_role('admin')
+  #   a.mobile_carrier = MobileCarrier.find_by_name("Verizon Wireless")
+  #   a.save
+  #   
+  #   puts "#{Time.now}: completed"
+  # end
   
   desc "Initialize countries."
   task :countries do

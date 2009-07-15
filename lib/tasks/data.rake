@@ -22,28 +22,28 @@ namespace :data do
     puts "#{Time.now}: importing localeze categories and attributes, limit: #{limit}, city: #{city.name if city}, state: #{state.name if state}"
 
 
-    # find places with no tags
+    # find companies with no tags
     conditions    = {:taggings_count => 0}
 
     # add city, state conditions as specified
     conditions["locations.city_id"]  = city.id if city
     conditions["locations.state_id"] = state.id if state
 
-    # find matching place ids
-    place_ids     = Place.find(:all, :limit => limit, :conditions => conditions, :select => "id").collect(&:id)
+    # find matching company ids
+    company_ids = Company.find(:all, :limit => limit, :conditions => conditions, :select => "id").collect(&:id)
 
-    puts "#{Time.now}: found #{place_ids.size} matching places"
+    puts "#{Time.now}: found #{company_ids.size} matching companies"
 
-    until (batch_ids = place_ids.slice((page - 1) * per_page, per_page)).blank?
-      places = Place.find(batch_ids, :include => :locations)
-      places.collect(&:locations).flatten.each do |location|
+    until (batch_ids = company_ids.slice((page - 1) * per_page, per_page)).blank?
+      companies = Company.find(batch_ids, :include => :locations)
+      companies.collect(&:locations).flatten.each do |location|
         # track number of locations checked
-        checked     += 1
+        checked += 1
 
         # make sure location is from localeze, or has a source
         next unless !location.location_sources.blank?
 
-        place             = location.place
+        company           = location.company
         record            = Localeze::BaseRecord.find(location.location_sources.first.source_id)
         
         categories        = record.categories
@@ -61,15 +61,15 @@ namespace :data do
           tags_list   = Localeze::TagFilter.to_tags(group_name, attr_name)
 
           if tags_list.blank?
-            # puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}"
-            DATA_TAGS_LOGGER.debug("xxx skipping attribute, group: #{group_name}, name: #{attr_name} - place:#{place.name}")
+            # puts "*** skipping attribute, group: #{group_name}, name: #{attr_name} - company:#{company.name}"
+            DATA_TAGS_LOGGER.debug("xxx skipping attribute, group: #{group_name}, name: #{attr_name} - company:#{company.name}")
             skipped += 1
           end
 
           tags_list.each do |tag_name|
-            puts "*** tagging #{place.name} with #{tag_name}"
-            place.tag_list.add(tag_name)
-            place.save
+            puts "*** tagging #{company.name} with #{tag_name}"
+            company.tag_list.add(tag_name)
+            company.save
             tagged += 1
           end
         end
@@ -132,15 +132,15 @@ namespace :data do
         # make sure group list is unique
         groups = groups.uniq
         
-        # add place/group mappings
-        place = location.place
+        # add company to tag_group mappings
+        company = location.company
         groups.each do |group|
-          next if group.places.include?(place)
-          group.places.push(place)
-          # puts "*** mapped group: '#{group.name}' to place: #{place.name}:#{place.id}"
+          next if group.companies.include?(company)
+          group.companies.push(company)
+          # puts "*** mapped group: '#{group.name}' to company: #{company.name}:#{company.id}"
           mapped += 1
         end
-                       
+
         # check limit
         if mapped >= limit
           puts "*** reached limit of #{mapped}"
@@ -154,66 +154,66 @@ namespace :data do
     puts "#{Time.now}: completed, checked #{checked} locations, mapped #{mapped} locations, found #{unmapped} locations with no matching categories"
   end
   
-  desc "Import localeze chains"
-  task :import_chains do
-    # intialiaze page parameters, limit
-    page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
-    per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
-    limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
-    offset        = (page - 1) * per_page
-     
-    # initialize conditions hash
-    conditions    = {}
-    
-    added   = 0
-    exists  = 0
-    places  = 0
-    
-    puts "#{Time.now}: importing all localeze chains"
-    
-    page = 1
-    until (chains = Localeze::Chain.find(:all, :conditions => conditions, :limit => per_page, :offset => offset)).blank?
-      chains.each do |localeze_chain|
-        if chain = Chain.find_by_name(localeze_chain.name)
-          # already exists
-          exists += 1
-        else
-          # add chain
-          chain = Chain.create(:name => localeze_chain.name)
-          added += 1
-        end
-        
-        # find all localeze records for this chain
-        puts "#{Time.now}: importing chain info for #{chain.name}"
-        records = Localeze::Chain.find(localeze_chain.id).get(:records)
-        
-        records.each do |record_hash|
-          # map localeze id to a location and place
-          localeze_id = record_hash['id']
-          source      = LocationSource.find_by_source_id(localeze_id).first
-          location    = source.location if source
-          place       = location.place if location
-          
-          # check for valid location and place
-          next if location.blank? or place.blank?
-
-          # the place exists, add chain if its not already mapped
-          if place.chain.blank?
-            puts "*** chain: #{chain.name}, record: #{localeze_id}, mapped to location: #{location.id}, place: #{place.name}"
-            place.chain = chain
-            place.save
-            places += 1
-          end
-        end
-      end
-      
-      # increment page and offset
-      page  += 1
-      offset = (page - 1) * per_page
-    end
-      
-    puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported, and mapped #{places} places to chains"
-  end
+  # desc "Import localeze chains"
+  # task :import_chains do
+  #   # intialiaze page parameters, limit
+  #   page          = ENV["PAGE"] ? ENV["PAGE"].to_i : 1
+  #   per_page      = ENV["PER_PAGE"] ? ENV["PER_PAGE"].to_i : 100
+  #   limit         = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+  #   offset        = (page - 1) * per_page
+  #    
+  #   # initialize conditions hash
+  #   conditions    = {}
+  #   
+  #   added   = 0
+  #   exists  = 0
+  #   places  = 0
+  #   
+  #   puts "#{Time.now}: importing all localeze chains"
+  #   
+  #   page = 1
+  #   until (chains = Localeze::Chain.find(:all, :conditions => conditions, :limit => per_page, :offset => offset)).blank?
+  #     chains.each do |localeze_chain|
+  #       if chain = Chain.find_by_name(localeze_chain.name)
+  #         # already exists
+  #         exists += 1
+  #       else
+  #         # add chain
+  #         chain = Chain.create(:name => localeze_chain.name)
+  #         added += 1
+  #       end
+  #       
+  #       # find all localeze records for this chain
+  #       puts "#{Time.now}: importing chain info for #{chain.name}"
+  #       records = Localeze::Chain.find(localeze_chain.id).get(:records)
+  #       
+  #       records.each do |record_hash|
+  #         # map localeze id to a location and place
+  #         localeze_id = record_hash['id']
+  #         source      = LocationSource.find_by_source_id(localeze_id).first
+  #         location    = source.location if source
+  #         place       = location.place if location
+  #         
+  #         # check for valid location and place
+  #         next if location.blank? or place.blank?
+  # 
+  #         # the place exists, add chain if its not already mapped
+  #         if place.chain.blank?
+  #           puts "*** chain: #{chain.name}, record: #{localeze_id}, mapped to location: #{location.id}, place: #{place.name}"
+  #           place.chain = chain
+  #           place.save
+  #           places += 1
+  #         end
+  #       end
+  #     end
+  #     
+  #     # increment page and offset
+  #     page  += 1
+  #     offset = (page - 1) * per_page
+  #   end
+  #     
+  #   puts "#{Time.now}: completed, added #{added} chains, #{exists} already imported, and mapped #{places} places to chains"
+  # end
   
   # Performance:
   #  - import 10K records in ~14 minutes
@@ -343,24 +343,24 @@ namespace :data do
         end
 
         # look for an existing location with the same street address and name
-        locations = Location.find(:all, :conditions => {:city_id => @city.id, :street_address => record.street_address}, :include => :places)
-        location  = locations.select { |l| l.place_name == record.stdname }.first
+        locations = Location.find(:all, :conditions => {:city_id => @city.id, :street_address => record.street_address}, :include => :companies)
+        location  = locations.select { |l| l.company_name == record.stdname }.first
         
         if location
           # found a matching location, so use it
-          place = location.place
+          company = location.company
         else
           # create location
           options   = {:street_address => record.street_address, :city => @city, :state => @state, :zip => @zip, :country => @country}
           options.merge!(:lat => record.latitude, :lng => record.longitude) if record.mappable?
           location  = Location.create(options)
 
-          # create place
-          place     = Place.create(:name => record.stdname)
-          place.locations.push(location)
+          # create company
+          company   = Company.create(:name => record.stdname, :time_zone => 'UTC')
+          company.locations.push(location)
           
           # reload
-          place.reload
+          company.reload
           location.reload
         end
         
@@ -378,10 +378,10 @@ namespace :data do
           # find or create local chain object
           chain = Chain.find_by_name(localeze_chain.name) || Chain.create(:name => localeze_chain.name)
           
-          if !place.chain?
+          if !company.chain?
             # add chain
-            place.chain = chain
-            place.save
+            company.chain = chain
+            company.save
           end
         end
         
@@ -532,26 +532,26 @@ namespace :data do
     # find all base records
     base_records = object.base_records(:select => "id")
     
-    # find all associated locations and places
+    # find all associated locations and companies
     locations = base_records.collect do |base_record|
       LocationSource.find_by_source_id(base_record.id).collect(&:location)
     end.flatten
     
-    places = locations.collect(&:places).flatten
+    companies = locations.collect(&:companies).flatten
 
-    puts "*** found #{base_records.size} base records, #{locations.size} locations, #{places.size} places"
+    puts "*** found #{base_records.size} base records, #{locations.size} locations, #{companies.size} companies"
     
-    # places.each do |place|
-    #   puts "*** #{place.name}, tag groups: #{place.tag_groups.collect(&:name).join(" | ")}"
+    # companies.each do |company|
+    #   puts "*** #{company.name}, tag groups: #{company.tag_groups.collect(&:name).join(" | ")}"
     # end
     
-    # add tag groups to places
+    # add tag groups to companies
     tag_groups.each do |tag_group|
-      places.each do |place|
-        # skip if tag group already includes place
-        next if tag_group.places.include?(place)
-        # puts "*** adding #{place.name} to tag group #{tag_group.name}"
-        tag_group.places.push(place)
+      companies.each do |company|
+        # skip if tag group already includes company
+        next if tag_group.companies.include?(company)
+        # puts "*** adding #{company.name} to tag group #{tag_group.name}"
+        tag_group.companies.push(company)
       end
     end
   end

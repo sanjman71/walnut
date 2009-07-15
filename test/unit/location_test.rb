@@ -65,7 +65,7 @@ class LocationTest < ActiveSupport::TestCase
   
   context "location with state" do
     setup do
-      @location = Location.create(:name => "Home", :state => @il)
+      @location = Location.create(:name => "Home", :state => @il, :country => @us)
       @il.reload
     end
     
@@ -82,21 +82,32 @@ class LocationTest < ActiveSupport::TestCase
     context "change state" do
       setup do
         @location.state = @on
+        @location.country = @canada
         @location.save
         @on.reload
         @il.reload
+        @us.reload
+        @canada.reload
       end
       
       should "change country to new state's country" do
         assert_equal @on.country, @location.country
       end
       
-      should "decrement old state's locations_count" do
+      should "decrement illinois locations_count" do
         assert_equal 0, @il.locations_count
       end
+
+      should "decrement us locations_count" do
+        assert_equal 0, @us.locations_count
+      end
       
-      should "increment new state's locations_count" do
+      should "increment ontario locations_count" do
         assert_equal 1, @on.locations_count
+      end
+
+      should "increment canada locations_count" do
+        assert_equal 1, @canada.locations_count
       end
     end
     
@@ -115,23 +126,23 @@ class LocationTest < ActiveSupport::TestCase
   
   context "location with a company and city" do
     setup do
-      @location = Location.create(:name => "Home", :city => @chicago)
+      @location = Location.create(:name => "Home", :city => @chicago, :country => @us)
       @company.locations.push(@location)
       @company.reload
       @location.reload
       @chicago.reload
+      @us.reload
     end
     
     should_change "Location.count", :by => 1
     should_change "CompanyLocation.count", :by => 1
 
-    should "have city's state & country" do
-      assert_equal @location.state, @chicago.state
-      assert_equal @location.country, @chicago.state.country
-    end
-
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
+    end
+
+    should "increment us locations_count" do
+      assert_equal 1, @us.locations_count
     end
 
     should "set chicago locations to [@location]" do
@@ -157,9 +168,14 @@ class LocationTest < ActiveSupport::TestCase
     context "change city" do
       setup do
         @location.city = @toronto
+        @location.state = @on
+        @location.country = @canada
         @location.save
         @chicago.reload
+        @us.reload
         @toronto.reload
+        @on.reload
+        @canada.reload
       end
 
       should "remove chicago locations" do
@@ -173,6 +189,30 @@ class LocationTest < ActiveSupport::TestCase
       should "set location's state and country to new city's state and country" do
         assert_equal @toronto.state, @location.state
         assert_equal @toronto.state.country, @location.country
+      end
+      
+      should "decrement chicago locations_count" do
+        assert_equal 0, @chicago.locations_count
+      end
+
+      should "decrement illinois locations_count" do
+        assert_equal 0, @il.locations_count
+      end
+
+      should "decrement us locations_count" do
+        assert_equal 0, @us.locations_count
+      end
+
+      should "increment toronto locations_count" do
+        assert_equal 1, @toronto.locations_count
+      end
+
+      should "increment ontario locations_count" do
+        assert_equal 1, @on.locations_count
+      end
+
+      should "increment canada locations_count" do
+        assert_equal 1, @canada.locations_count
       end
       
       # TODO: We should check the neighborhoods on a location when we change the location's city etc.
@@ -199,20 +239,37 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
 
+  # context "location with city and state" do
+  #   setup do
+  #     @location = Location.create(:city => @chicago, :state => @il, :country => @us)
+  #   end
+  # 
+  #   should_change "Location.count", :by => 1
+  # 
+  #   should "increment city locations_count" do
+  #     assert_equal 1, @chicago.reload.locations_count
+  #   end
+  # 
+  #   should "increment state locations_count" do
+  #     assert_equal 1, @il.reload.locations_count
+  #   end
+  # 
+  #   should "increment country locations_count" do
+  #     assert_equal 1, @us.reload.locations_count
+  #   end
+  # end
+  
   context "location with a company and zip" do
     setup do
-      @location = Location.create(:name => "Home", :zip => @zip)
+      @location = Location.create(:name => "Home", :zip => @zip, :country => @us)
       @company.locations.push(@location)
       @zip.reload
+      @il.reload
+      @us.reload
     end
     
     should_change "Location.count", :by => 1
     should_change "CompanyLocation.count", :by => 1
-
-    should "have zip's state & country" do
-      assert_equal @location.state, @zip.state
-      assert_equal @location.country, @zip.state.country
-    end
 
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
@@ -220,6 +277,10 @@ class LocationTest < ActiveSupport::TestCase
 
     should "set zip locations to [@location]" do
       assert_equal [@location], @zip.locations
+    end
+
+    should "increment us locations_count" do
+      assert_equal 1, @us.locations_count
     end
     
     context "remove zip" do
@@ -270,12 +331,6 @@ class LocationTest < ActiveSupport::TestCase
     should_change "Location.count", :by => 1
     should_change "CompanyLocation.count", :by => 1
   
-    should "have neighborhood's city, state and country" do
-      assert_equal @location.city, @river_north.city
-      assert_equal @location.state, @river_north.city.state
-      assert_equal @location.country, @river_north.city.state.country
-    end
-
     should "have neighborhood locality" do
       assert_contains @location.localities, @river_north
     end
@@ -287,6 +342,24 @@ class LocationTest < ActiveSupport::TestCase
   
     should "set neighborhood locations to [@location]" do
       assert_equal [@location], @river_north.locations
+    end
+
+    should "assign neighborhood's city, state and country" do
+      assert_equal @location.city, @river_north.city
+      assert_equal @location.state, @river_north.city.state
+      assert_equal @location.country, @river_north.city.state.country
+    end
+    
+    should "increment city.locations_count" do
+      assert_equal 1, @location.city.locations_count
+    end
+
+    should "increment state.locations_count" do
+      assert_equal 1, @location.state.locations_count
+    end
+
+    should "increment country.locations_count" do
+      assert_equal 1, @location.country.locations_count
     end
   
     context "remove neighborhood" do

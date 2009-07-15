@@ -126,12 +126,12 @@ class ApplicationController < ActionController::Base
           @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
         end
       when 'search'
-        # find all state cities
-        @cities = @state.cities.order_by_name
+        # find all state cities with locations
+        @cities = @state.cities.with_locations.order_by_name
       when 'zips'
-        # find all state cities and zips
-        @zips   = @state.zips.order_by_density
-        @cities = @state.cities.order_by_name
+        # find all state cities and zips with locations
+        @zips   = @state.zips.with_locations.order_by_density
+        @cities = @state.cities.with_locations.order_by_name
       end
 
       # track events
