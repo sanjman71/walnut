@@ -28,7 +28,6 @@ class CompanyTest < ActiveSupport::TestCase
       @toronto  = Factory(:toronto, :state => @ontario)
       
       @company  = Company.create(:name => "Walnut Industries", :time_zone => "UTC")
-      puts @company.errors.full_messages
       @location = Location.create(:city => @chicago, :country => @us)
       @company.locations.push(@location)
       @company.reload
