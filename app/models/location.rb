@@ -1,7 +1,4 @@
 class Location < ActiveRecord::Base
-  has_many                :locatables_locations
-  has_many                :locatables, :through => :locatables_locations
-
   # All addresses must have a country
   validates_presence_of   :country_id
 
@@ -11,8 +8,8 @@ class Location < ActiveRecord::Base
   belongs_to              :zip
   has_many                :location_neighborhoods
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
-  has_many                :location_places
-  has_many                :places, :through => :location_places
+  has_many                :company_locations
+  has_many                :companies, :through => :company_locations
   has_many                :phone_numbers, :as => :callable
   has_one                 :event_venue
   has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
@@ -30,7 +27,7 @@ class Location < ActiveRecord::Base
   attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type, :city_str, :zip_str, :state_str, :country_str
   
   # used to generated an seo friendly url parameter
-  acts_as_friendly_param  :place_name
+  acts_as_friendly_param  :company_name
   
   named_scope :with_state,            lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
@@ -38,8 +35,8 @@ class Location < ActiveRecord::Base
   named_scope :no_neighborhoods,      { :conditions => ["neighborhoods_count = 0"] }
   named_scope :with_street_address,   { :conditions => ["street_address <> '' AND street_address IS NOT NULL"] }
   named_scope :no_street_address,     { :conditions => ["street_address = '' OR street_address IS NULL"] }
-  named_scope :with_taggings,         { :joins => :places, :conditions => ["places.taggings_count > 0"] }
-  named_scope :no_taggings,           { :joins => :places, :conditions => ["places.taggings_count = 0"] }
+  named_scope :with_taggings,         { :joins => :companies, :conditions => ["companies.taggings_count > 0"] }
+  named_scope :no_taggings,           { :joins => :companies, :conditions => ["companies.taggings_count = 0"] }
   named_scope :with_lat_lng,          { :conditions => ["lat IS NOT NULL and lng IS NOT NULL"] }
   named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
@@ -54,19 +51,18 @@ class Location < ActiveRecord::Base
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
 
   def before_validation
-    if self.city_id.blank? && self.neighborhoods.first
-      city_id_will_change!
-      self.city_id = self.neighborhoods.first.city.id
-    end
-    if self.city_id && self.state.blank?
+    if self.city_id and self.state_id.blank?
+      # set state based on city's state
       state_id_will_change!
       self.state_id = self.city.state.id
     end
-    if self.zip_id && self.state.blank?
+    if self.zip_id and self.state_id.blank?
+      # set state based on zip's state
       state_id_will_change!
       self.state_id = self.zip.state.id
     end
-    if self.state_id && self.country.blank?
+    if self.state_id and self.country_id.blank?
+      # set country based on state's country
       country_id_will_change!
       self.country_id = self.state.country.id
     end
@@ -113,10 +109,10 @@ class Location < ActiveRecord::Base
   end
 
   define_index do
-    indexes places.name, :as => :name
+    indexes companies.name, :as => :name
     indexes street_address, :as => :address
-    indexes places.tags.name, :as => :tags
-    has places.tags(:id), :as => :tag_ids, :facet => true
+    indexes companies.tags.name, :as => :tags
+    has companies.tags(:id), :as => :tag_ids, :facet => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
     has state_id, :type => :integer, :as => :state_id, :facet => true
@@ -125,7 +121,7 @@ class Location < ActiveRecord::Base
     has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # other attributes
     has popularity, :type => :integer, :as => :popularity
-    has places.chain_id, :type => :integer, :as => :chain_ids
+    has companies.chain_id, :type => :integer, :as => :chain_ids
     has recommendations_count, :type => :integer, :as => :recommendations
     has events_count, :type => :integer, :as => :events, :facet => true
     # convert degrees to radians for sphinx
@@ -144,13 +140,13 @@ class Location < ActiveRecord::Base
     end
   end
   
-  # return location's first place
-  def place
-    self.places.first
+  # return location's first company
+  def company
+    self.companies.first
   end
 
-  def place_name
-    self.place ? self.place.name : self.name
+  def company_name
+    @company_name ||= self.company ? self.company.name : self.name
   end
 
   # return collection of location's country, state, city, zip, neighborhoods
@@ -200,7 +196,7 @@ class Location < ActiveRecord::Base
   
   # return md5 location digest
   def to_digest
-    s = "#{self.place_name}:#{self.street_address}:#{self.city ? self.city.name : ''}:#{self.state ? self.state.name : ''}:#{self.zip ? self.zip.name : ''}:#{self.country ? self.country.name : ''}"
+    s = "#{self.company_name}:#{self.street_address}:#{self.city ? self.city.name : ''}:#{self.state ? self.state.name : ''}:#{self.zip ? self.zip.name : ''}:#{self.country ? self.country.name : ''}"
     Digest::MD5.hexdigest(s)
   end
 
@@ -242,6 +238,12 @@ class Location < ActiveRecord::Base
   
   def after_add_neighborhood(hood)
     return if hood.blank?
+
+    if self.city_id.blank?
+      # set city based on neighborhood city
+      self.city_id = hood.city.id
+      self.save
+    end
   end
   
   def before_remove_neighborhood(hood)
@@ -272,16 +274,16 @@ class Location < ActiveRecord::Base
   end
 
   def add_venue_tag
-    return unless @place = self.place
+    return unless @company = self.company
     # add tag 'venue'
-    @place.tag_list.add("venue")
-    @place.save
+    @company.tag_list.add("venue")
+    @company.save
   end
   
   def remove_venue_tag
-    return unless @place = self.place
+    return unless @company = self.company
     # remove tag 'venue'
-    @place.tag_list.remove("venue")
-    @place.save
+    @company.tag_list.remove("venue")
+    @company.save
   end
 end

@@ -3,7 +3,7 @@ class ChainsController < ApplicationController
   before_filter   :init_areas, :only => [:country, :state, :city]
 
   def index
-    @chains   = Chain.places.all(:order => "name ASC")
+    @chains   = Chain.companies.all(:order => "name ASC")
     @country  = Country.default
     
     @title    = "Chain Store Locator"

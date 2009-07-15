@@ -6,6 +6,7 @@ class TimeslotNotEmpty < Exception; end
 class Appointment < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
+  belongs_to              :location
   belongs_to              :provider, :polymorphic => true
   belongs_to              :customer, :class_name => 'User'
   validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
@@ -16,20 +17,16 @@ class Appointment < ActiveRecord::Base
   has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
   before_save             :make_confirmation_code
   after_create            :add_customer_role
-  
-  # Locations
-  has_many                  :locatables_locations, :as => :locatable
-  has_many                  :locations, :through => :locatables_locations
-  
+
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   WORK                    = 'work'      # work appointments can be scheduled in free timeslots
   WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
-  
+
   MARK_AS_TYPES           = [FREE, WORK, WAIT]
-  
+
   NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
-  
+
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
   
@@ -86,7 +83,7 @@ class Appointment < ActiveRecord::Base
                     {}
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :locations, :conditions => ["locations.id = '?' OR locations.id IS NULL", location.id] }
+                    { :include => :location, :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
                   end
                 }
   # specific_location is used for narrow searchees, where a search for appointments in Chicago includes only those appointments assigned to
@@ -95,10 +92,10 @@ class Appointment < ActiveRecord::Base
                 lambda { |location|
                   # If the request is for any location, there is no condition
                   if (location.nil? || location.id == 0 || location.id.blank? )
-                    { :include => :locations, :conditions => ["locations.id IS NULL"] }
+                    { :include => :location, :conditions => ["location_id IS NULL"] }
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :locations, :conditions => ["locations.id = '?'", location.id] }
+                    { :include => :location, :conditions => ["location_id = '?'", location.id] }
                   end
                 }
   
@@ -324,18 +321,18 @@ class Appointment < ActiveRecord::Base
   end
   
   # appointments are only supposed to have one location
-  def location
-    if locations_count == 0
-      # no need to query the database here
-      Location.anywhere
-    else
-      self.locations.first
-    end
-  end
+  # def location
+  #   if locations_count == 0
+  #     # no need to query the database here
+  #     Location.anywhere
+  #   else
+  #     self.locations.first
+  #   end
+  # end
   
-  def location=(location)
-    self.locations << location
-  end
+  # def location=(location)
+  #   self.locations << location
+  # end
   # END: virtual attributes
   
   # allow assignment of customer attributes when creating an appointment
@@ -345,9 +342,9 @@ class Appointment < ActiveRecord::Base
   end
   
   # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
-  def location_id=(id)
-    self.locations << company.locations.find_by_id(id.to_i) unless (id.blank? || id.to_i == 0)
-  end
+  # def location_id=(id)
+  #   self.locations << company.locations.find_by_id(id.to_i) unless (id.blank? || id.to_i == 0)
+  # end
   
   def cancel
     update_attribute(:canceled_at, Time.now)

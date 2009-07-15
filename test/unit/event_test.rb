@@ -14,11 +14,11 @@ class EventTest < ActiveSupport::TestCase
     @chicago        = Factory(:chicago, :state => @il)
     @location       = Location.create(:city => @chicago, :state => @il, :country => @us)
     assert @location.valid?
-    @place          = Place.create(:name => "Kickass Ampthitheater")
-    assert @place.valid?
-    @place.locations.push(@location)
+    @company        = Factory(:company, :name => "Kickass Ampthitheater")
+    assert @company.valid?
+    @company.locations.push(@location)
     @location.reload
-    assert_equal @place, @location.place
+    assert_equal @company, @location.company
     @event_venue    = Factory(:event_venue, :name => "House of Pain", :location_id => @location.id, :city => @chicago.name)
     assert @event_venue.valid?
     @event_venue.reload
@@ -60,7 +60,7 @@ class EventTest < ActiveSupport::TestCase
       assert @event.valid?
       @location.events.push(@event)
       @location.reload
-      @place.reload
+      @company.reload
       @chicago.reload
     end
     
@@ -90,8 +90,8 @@ class EventTest < ActiveSupport::TestCase
       assert_equal 1, @location.popularity
     end
     
-    should "add tag 'venue' to location place" do
-      assert_equal ["venue"], @place.tag_list
+    should "add tag 'venue' to location company" do
+      assert_equal ["venue"], @company.tag_list
     end
     
     context "then add event category with tags" do
@@ -142,7 +142,7 @@ class EventTest < ActiveSupport::TestCase
           @event.destroy
           @event_venue.reload
           @location.reload
-          @place.reload
+          @company.reload
           @chicago.reload
         end
         
@@ -172,8 +172,8 @@ class EventTest < ActiveSupport::TestCase
           assert_equal 0, @event_venue.events_count
         end
 
-        should "remove tag 'venue' from location place" do
-          assert_equal [], @place.tag_list
+        should "remove tag 'venue' from location company" do
+          assert_equal [], @company.tag_list
         end
       end
     end

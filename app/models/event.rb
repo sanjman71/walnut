@@ -59,7 +59,7 @@ class Event < ActiveRecord::Base
   def venue_name
     # use the associated location's name
     if self.location
-      self.location.place_name
+      self.location.company_name
     else
       ""
     end

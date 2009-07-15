@@ -44,11 +44,11 @@
         
   %hr.space
 
-  -# place and locality tags
+  -# company and locality tags
   .span-18#all_tags
-    .span-7.colborder#place_tags
+    .span-7.colborder#tags
       %h2== Keyword Tags
-      - tags = @location.place.tags
+      - tags = @company.tags
       - if tags.blank?
         -# add space to fill in column border
         == &nbsp;

@@ -4,10 +4,10 @@ class LocationsController < ApplicationController
 
   # GET /locations/1-hall-of-justice
   def show
-    @location = Location.find(params[:id], :include => [:places, :country, :state, :city, :zip, :neighborhoods])
-    @place    = @location.place unless @location.blank?
+    @location = Location.find(params[:id], :include => [:companies, :country, :state, :city, :zip, :neighborhoods])
+    @company  = @location.company unless @location.blank?
 
-    if @location.blank? or @place.blank?
+    if @location.blank? or @company.blank?
       redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
     end
 
@@ -50,8 +50,8 @@ class LocationsController < ApplicationController
     end
     
     # initialize title, h1 tags
-    @title    = build_place_title(@place, @location, :city => @city, :state => @state, :zip => @zip)
-    @h1       = @place.name
+    @title    = build_place_title(@company, @location, :city => @city, :state => @state, :zip => @zip)
+    @h1       = @company.name
   end
 
   # GET /locations/:city/random

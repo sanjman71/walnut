@@ -16,11 +16,11 @@ class LocationsControllerTest < ActionController::TestCase
 
   context "show location" do
     setup do
-      @location = Location.create(:country => @us, :state => @il, :city => @chicago, :zip => @zip)
-      @place    = Place.create(:name => "Chicago Pizza")
-      @place.locations.push(@location)
+      @location = Factory(:location, :country => @us, :state => @il, :city => @chicago, :zip => @zip)
+      @company  = Factory(:company, :name => "Chicago Pizza")
+      @company.locations.push(@location)
       # ThinkingSphinx::Collection takes 4 arguments: page, per_page, entries, total_entries
-      # ThinkingSphinx::Search.stubs(:search).returns(ThinkingSphinx::Collection.new(1, 1, 0, 0))
+      ThinkingSphinx::Search.stubs(:search).returns(ThinkingSphinx::Collection.new(1, 1, 0, 0))
       get :show, :id => @location.to_param
     end
     

@@ -4,7 +4,7 @@ class LocationNeighbor < ActiveRecord::Base
   validates_uniqueness_of :neighbor_id, :scope => :location_id
   
   named_scope :with_location,       lambda { |location| {:conditions => ["location_id = ?", location.is_a?(Integer) ? location : location.id], 
-                                                         :include => [:neighbor, {:neighbor => [:city, :places]}] }}
+                                                         :include => [:neighbor, {:neighbor => [:city, :companies]}] }}
      
   # find all 'distinct' locations having neighbors with the specified city or state
   named_scope :with_city,           lambda { |city| { :conditions => ["locations.city_id = ?", city.id], :joins => :location, :group => "location_id" }}

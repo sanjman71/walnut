@@ -10,7 +10,7 @@ class TaggsController < ApplicationController
       @groups       = TagGroup.order_by_name
       @search_text  = @groups.blank? ? "No Tag Groups" : "All Tag Groups (#{@groups.size})"
     when "empty"
-      @groups       = TagGroup.empty.order_by_places_count
+      @groups       = TagGroup.empty.order_by_companies_count
       @search_text  = "Empty Tag Groups (#{@groups.size})"
     else
       @groups       = TagGroup.search_name_and_tags(@search).order_by_name

@@ -1,19 +1,53 @@
 class CreatePeanut < ActiveRecord::Migration
   def self.up
-    create_table :companies do |t|
-      t.string  :name
-      t.string  :time_zone
-      t.string  :subdomain
-      t.string  :slogan
+    # create_table :companies do |t|
+    #   t.string  :name
+    #   t.string  :time_zone
+    #   t.string  :subdomain
+    #   t.string  :slogan
+    #   t.text    :description
+    #   t.integer :locations_count, :default => 0       # counter cache
+    #   t.integer :services_count, :default => 0        # counter cache
+    #   t.integer :work_services_count, :default => 0   # counter cache
+    #   t.integer :providers_count, :default => 0       # counter cache
+    #   t.timestamps
+    # end
+    
+    # add_index :companies, [:subdomain]
+    
+    # Rename places and any references to places
+    
+    rename_table :places, :companies
+
+    change_table :companies do |t|
+      t.string  :time_zone, :limit => 100
+      t.string  :subdomain, :limit => 100
+      t.string  :slogan, :limit => 100
       t.text    :description
-      t.integer :locations_count, :default => 0       # counter cache
       t.integer :services_count, :default => 0        # counter cache
       t.integer :work_services_count, :default => 0   # counter cache
       t.integer :providers_count, :default => 0       # counter cache
-      t.timestamps
     end
-    
-    add_index :companies, [:subdomain]
+
+    rename_table :location_places, :company_locations
+
+    change_table :company_locations do |t|
+      t.rename :place_id, :company_id
+    end
+
+    rename_table :place_tag_groups, :company_tag_groups
+
+    change_table :company_tag_groups do |t|
+      t.rename :place_id, :company_id
+    end
+
+    change_table :chains do |t|
+      t.rename :places_count, :companies_count
+    end
+
+    change_table :tag_groups do |t|
+      t.rename  :places_count, :companies_count
+    end
     
     create_table :services do |t|
       t.string  :name
@@ -22,7 +56,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer :price_in_cents
       t.integer :providers_count, :default => 0             # counter cache
       t.boolean :allow_custom_duration, :default => false   # by default no custom duration
-      
+
       t.timestamps
     end
 
@@ -77,19 +111,19 @@ class CreatePeanut < ActiveRecord::Migration
     create_table :appointments do |t|
       t.integer     :company_id
       t.integer     :service_id
+      t.integer     :location_id
       t.references  :provider, :polymorphic => true    # e.g. users
-      t.integer     :customer_id       # user who booked the appointment
+      t.integer     :customer_id      # user who booked the appointment
       t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at
       t.integer     :duration
       t.string      :time
-      t.integer     :time_start_at  # time of day
-      t.integer     :time_end_at    # time of day
+      t.integer     :time_start_at    # time of day
+      t.integer     :time_end_at      # time of day
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
-      t.integer     :locations_count, :default => 0     # locations counter cache
       t.datetime    :canceled_at
       t.timestamps
     end
@@ -135,14 +169,14 @@ class CreatePeanut < ActiveRecord::Migration
     
     add_index :invitations, :token
 
-    create_table :locatables_locations do |t|
-      t.references :location
-      t.references :locatable, :polymorphic => true
-    end
-
-    add_index :locatables_locations, [:location_id]
-    add_index :locatables_locations, [:locatable_id, :locatable_type], :name => "index_on_locatables"
-    add_index :locatables_locations, [:location_id, :locatable_id, :locatable_type], :name => "index_on_locations_locatables"
+    # create_table :locatables_locations do |t|
+    #   t.references :location
+    #   t.references :locatable, :polymorphic => true
+    # end
+    # 
+    # add_index :locatables_locations, [:location_id]
+    # add_index :locatables_locations, [:locatable_id, :locatable_type], :name => "index_on_locatables"
+    # add_index :locatables_locations, [:location_id, :locatable_id, :locatable_type], :name => "index_on_locations_locatables"
 
     create_table :plans do |t|
       t.string      :name
@@ -204,6 +238,36 @@ class CreatePeanut < ActiveRecord::Migration
   end
 
   def self.down
+    remove_column :companies, :time_zone
+    remove_column :companies, :subdomain
+    remove_column :companies, :slogan
+    remove_column :companies, :description
+    remove_column :companies, :services_count
+    remove_column :companies, :work_services_count
+    remove_column :companies, :providers_count
+    
+    rename_table  :companies, :places
+
+    change_table :company_locations do |t|
+      t.rename :company_id, :place_id
+    end
+    
+    rename_table  :company_locations, :location_places
+    
+    change_table :company_tag_groups do |t|
+      t.rename :company_id, :place_id
+    end
+
+    rename_table :company_tag_groups, :place_tag_groups
+
+    change_table :chains do |t|
+      t.rename :companies_count, :places_count
+    end
+
+    change_table :tag_groups do |t|
+      t.rename  :companies_count, :places_count
+    end
+    
     drop_table  :log_entries
     drop_table  :subscriptions
     drop_table  :payments
@@ -221,6 +285,6 @@ class CreatePeanut < ActiveRecord::Migration
     drop_table  :products
     drop_table  :company_services
     drop_table  :services
-    drop_table  :companies
+    # drop_table  :companies
   end
 end

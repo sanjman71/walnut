@@ -1,17 +1,17 @@
 class TagGroup < ActiveRecord::Base
   validates_presence_of       :name
   validates_uniqueness_of     :name
-  has_many                    :place_tag_groups
-  has_many                    :places, :through => :place_tag_groups, :after_add => :after_add_place, :after_remove => :after_remove_place
+  has_many                    :company_tag_groups
+  has_many                    :companies, :through => :company_tag_groups, :after_add => :after_add_company, :after_remove => :after_remove_company
   
   named_scope                 :search_name,           lambda { |s| {:conditions => ["name REGEXP '%s'", s] }}
   named_scope                 :search_name_and_tags,  lambda { |s| {:conditions => ["name REGEXP '%s' OR tags REGEXP '%s'", s, s] }}
   
   # find tag groups with no tags
-  named_scope                 :empty,                 { :conditions => ["tags = '' OR tags IS NULL"] }
+  named_scope                 :empty, { :conditions => ["tags = '' OR tags IS NULL"] }
   
-  named_scope                 :order_by_name,         { :order => "name ASC" }
-  named_scope                 :order_by_places_count, { :order => "places_count DESC" }
+  named_scope                 :order_by_name, { :order => "name ASC" }
+  named_scope                 :order_by_companies_count, { :order => "companies_count DESC" }
   
   # tags have a limited word length
   TAG_MAX_WORDS = 3
@@ -76,9 +76,9 @@ class TagGroup < ActiveRecord::Base
     Array.new(self.recent_remove_tags ? self.recent_remove_tags.split(",") : [])
   end
   
-  # (re-)apply tags to all places
+  # (re-)apply tags to all companies
   def apply
-    places.each { |place| apply_tags(place) }
+    companies.each { |company| apply_tags(company) }
     # update applied_at timestamp
     update_attribute(:applied_at, Time.now)
   end
@@ -116,17 +116,17 @@ class TagGroup < ActiveRecord::Base
     place.save
   end
   
-  def after_add_place(place)
-    apply_tags(place)
+  def after_add_company(company)
+    apply_tags(company)
   end
   
-  def after_remove_place(place)
-    return if place.blank?
-    place.tag_list.remove(tag_list)
-    place.save
+  def after_remove_company(company)
+    return if company.blank?
+    company.tag_list.remove(tag_list)
+    company.save
     
-    # decrement places_count counter cache
+    # decrement companies_count counter cache
     # TODO: find out why the built-in counter cache doesn't work here
-    TagGroup.decrement_counter(:places_count, id)
+    TagGroup.decrement_counter(:companies_count, id)
   end
 end

@@ -8,7 +8,7 @@ class LocationTest < ActiveSupport::TestCase
   should_belong_to    :city
   should_belong_to    :zip
   should_have_many    :neighborhoods
-  should_have_many    :places
+  should_have_many    :companies
   should_have_many    :phone_numbers
   should_have_many    :neighbors
   should_have_many    :sources
@@ -22,7 +22,7 @@ class LocationTest < ActiveSupport::TestCase
     @toronto      = Factory(:toronto, :state => @on)
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
-    @place        = Place.create(:name => "My Place")
+    @company      = Company.create(:name => "My Company", :time_zone => "UTC")
   end
 
   context "location with country" do
@@ -113,17 +113,17 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
-  context "location with a place and city" do
+  context "location with a company and city" do
     setup do
       @location = Location.create(:name => "Home", :city => @chicago)
-      @place.locations.push(@location)
-      @place.reload
+      @company.locations.push(@location)
+      @company.reload
       @location.reload
       @chicago.reload
     end
     
     should_change "Location.count", :by => 1
-    should_change "LocationPlace.count", :by => 1
+    should_change "CompanyLocation.count", :by => 1
 
     should "have city's state & country" do
       assert_equal @location.state, @chicago.state
@@ -182,32 +182,32 @@ class LocationTest < ActiveSupport::TestCase
       
     end
     
-    context "remove place" do
+    context "remove company" do
       setup do
-        @place.locations.delete(@location)
+        @company.locations.delete(@location)
       end
 
-      should_change "LocationPlace.count", :by => -1
+      should_change "CompanyLocation.count", :by => -1
       
       should "leave chicago locations as [@location]" do
         assert_equal [@location], @chicago.locations
       end
 
-      should "have no places associated with location" do
-        assert_equal [], @location.places
+      should "have no companies associated with location" do
+        assert_equal [], @location.companies
       end
     end
   end
 
-  context "location with a place and zip" do
+  context "location with a company and zip" do
     setup do
       @location = Location.create(:name => "Home", :zip => @zip)
-      @place.locations.push(@location)
+      @company.locations.push(@location)
       @zip.reload
     end
     
     should_change "Location.count", :by => 1
-    should_change "LocationPlace.count", :by => 1
+    should_change "CompanyLocation.count", :by => 1
 
     should "have zip's state & country" do
       assert_equal @location.state, @zip.state
@@ -257,18 +257,18 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
-  context "location with a place and neighborhood" do
+  context "location with a company and neighborhood" do
     setup do
-      @location = Location.new(:name => "Home")
+      @location = Location.create(:name => "Home", :country => @us)
       @location.neighborhoods.push(@river_north)
-      @location.save
-      @place.locations.push(@location)
+      @location.reload
+      @company.locations.push(@location)
       @location.reload
       @river_north.reload
     end
     
     should_change "Location.count", :by => 1
-    should_change "LocationPlace.count", :by => 1
+    should_change "CompanyLocation.count", :by => 1
   
     should "have neighborhood's city, state and country" do
       assert_equal @location.city, @river_north.city
@@ -370,29 +370,29 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
-  context "create 2 locations" do
+  context "merge locations" do
     setup do
       @location1  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
       @location1.phone_numbers.push(PhoneNumber.new(:name => "Work", :number => "1111111111"))
       @location1.location_sources.push(LocationSource.new(:location => @location1, :source_id => 1, :source_type => "Test"))
-      @place1     = Place.create(:name => "Fun Place")
-      @place1.locations.push(@location1)
+      @company1   = Company.create(:name => "Walnut Industries Chicago", :time_zone => "UTC")
+      @company1.locations.push(@location1)
       @location1.reload
-      @place1.tag_list.add("tag1")
-      @place1.save
+      @company1.tag_list.add("tag1")
+      @company1.save
       
       @location2  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
       @location2.phone_numbers.push(PhoneNumber.new(:name => "Work", :number => "2222222222"))
       @location2.location_sources.push(LocationSource.new(:location => @location2, :source_id => 2, :source_type => "Test"))
-      @place2     = Place.create(:name => "Fun Place")
-      @place2.locations.push(@location2)
+      @company2   = Company.create(:name => "Walnut Industries San Francisco", :time_zone => "UTC")
+      @company2.locations.push(@location2)
       @location2.reload
-      @place2.tag_list.add("tag2")
-      @place2.save
+      @company2.tag_list.add("tag2")
+      @company2.save
     end
     
     should_change "Location.count", :by => 2
-    should_change "Place.count", :by => 2
+    should_change "Company.count", :by => 2
     should_change "PhoneNumber.count", :by => 2
     should_change "LocationSource.count", :by => 2
     
@@ -403,12 +403,12 @@ class LocationTest < ActiveSupport::TestCase
       end
       
       should_change "Location.count", :by => -1
-      should_change "Place.count", :by => -1
+      should_change "Company.count", :by => -1
       should_not_change "PhoneNumber.count"
       should_not_change "LocationSource.count"
       
       should "add tags to location1" do
-        assert_equal ["tag1", "tag2"], @location1.place.tag_list
+        assert_equal ["tag1", "tag2"], @location1.company.tag_list
       end
       
       should "add phone number to location1" do
@@ -423,8 +423,8 @@ class LocationTest < ActiveSupport::TestCase
         assert_equal [1, 2], @location1.location_sources.collect(&:source_id)
       end
       
-      should "remove place2" do
-        assert_equal nil, Place.find_by_id(@place2.id)
+      should "remove company2" do
+        assert_equal nil, Company.find_by_id(@company2.id)
       end
       
       should "remove location1" do

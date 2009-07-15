@@ -8,6 +8,8 @@ class Subscription < ActiveRecord::Base
   belongs_to              :plan
   has_many                :payments
   
+  after_create            :after_subcription_create
+  
   attr_accessible         :plan_id, :user_id, :company_id, :plan, :user, :company
 
   delegate                :cost, :to => :plan
@@ -23,7 +25,7 @@ class Subscription < ActiveRecord::Base
   aasm_state            :initialized
   aasm_state            :authorized
   aasm_state            :active       # subscription billed successfully
-  aasm_state            :frozen       # payment declined in the active state
+  aasm_state            :frozen       # payment declined while in active state
   
   aasm_event :authorized do
     transitions :to => :authorized, :from => [:initialized, :active, :authorized]
@@ -133,5 +135,11 @@ class Subscription < ActiveRecord::Base
       @payment
     end
   end
-  
+
+  protected
+
+  def after_subcription_create
+    # create company free service
+    self.company.free_service
+  end
 end

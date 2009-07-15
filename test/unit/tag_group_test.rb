@@ -4,8 +4,8 @@ require 'test/factories'
 class TagGroupTest < ActiveSupport::TestCase
   
   should_validate_presence_of :name
-  should_have_many            :place_tag_groups
-  should_have_many            :places
+  should_have_many            :company_tag_groups
+  should_have_many            :companies
   
   context "tag group" do
     context "with lowercase name" do
@@ -156,39 +156,39 @@ class TagGroupTest < ActiveSupport::TestCase
       @tagg = TagGroup.create(:name => "fashion", :tags => "jeans, diesel")
     end
     
-    context "then add place" do
+    context "then add company" do
       setup do
-        @place = Place.create(:name => "Place 1")
-        @tagg.places.push(@place)
+        @company = Factory(:company)
+        @tagg.companies.push(@company)
         @tagg.reload
-        @place.reload
+        @company.reload
       end
       
-      should_change "PlaceTagGroup.count", :by => 1
+      should_change "CompanyTagGroup.count", :by => 1
       
-      should "add place tags ['diesel', 'jeans']" do
-        assert_equal ["diesel", "jeans"], @place.tag_list
+      should "add company tags ['diesel', 'jeans']" do
+        assert_equal ["diesel", "jeans"], @company.tag_list
       end
       
-      should "increment places_count to 1" do
-        assert_equal 1, @tagg.places_count
+      should "increment companies_count to 1" do
+        assert_equal 1, @tagg.companies_count
       end
             
-      context "then remove place" do
+      context "then remove company" do
         setup do
-          @tagg.places.delete(@place)
+          @tagg.companies.delete(@company)
           @tagg.reload
-          @place.reload
+          @company.reload
         end
         
-        should_change "PlaceTagGroup.count", :by => -1
+        should_change "CompanyTagGroup.count", :by => -1
         
-        should "remove place tags" do
-          assert_equal [], @place.tag_list
+        should "remove company tags" do
+          assert_equal [], @company.tag_list
         end
         
-        should "decrement places_count to 0" do
-          assert_equal 0, @tagg.places_count
+        should "decrement companies_count to 0" do
+          assert_equal 0, @tagg.companies_count
         end
       end
       
@@ -196,7 +196,7 @@ class TagGroupTest < ActiveSupport::TestCase
         setup do
           @tagg.add_tags("zatiny")
           @tagg.save
-          @place.reload
+          @company.reload
         end
         
         should "have the dirty flag set" do
@@ -213,8 +213,8 @@ class TagGroupTest < ActiveSupport::TestCase
             assert_equal false, @tagg.dirty?
           end
 
-          should "add new tag to all tag group places" do
-            assert_equal ["diesel", "jeans", "zatiny"], @place.tag_list
+          should "add new tag to company tags" do
+            assert_equal ["diesel", "jeans", "zatiny"], @company.tag_list
           end
         end
       end

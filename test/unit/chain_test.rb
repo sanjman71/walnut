@@ -4,7 +4,7 @@ require 'test/factories'
 class ChainTest < ActiveSupport::TestCase
   
   should_validate_presence_of   :name
-  should_have_many              :places
+  should_have_many              :companies
 
   context "chain without a display name" do
     setup do

@@ -6,24 +6,24 @@ class LocationHelper
     return locations.first if locations.size == 1
     
     location  = locations.delete_at(0)
-    place     = location.place
+    company   = location.company
     
     add_tags  = []
      
-    # puts "*** keeping location: #{location.place_name}:#{location.id}"
+    # puts "*** keeping location: #{location.company_name}:#{location.id}"
     
     locations.each do |remove_location|
       # puts "*** removing location: #{remove_location.name}:#{remove_location.id}"
       
-      remove_location.places.each do |remove_place|
+      remove_location.companies.each do |remove_company|
         # merge tags
-        if !remove_place.tag_list.blank?
-          place.tag_list.add(remove_place.tag_list)
-          place.save
+        if !remove_company.tag_list.blank?
+          company.tag_list.add(remove_company.tag_list)
+          company.save
         end
         
-        # remove place
-        remove_place.destroy
+        # remove company
+        remove_company.destroy
       end
       
       # merge location phone numbers
