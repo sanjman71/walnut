@@ -12,8 +12,8 @@ class Company < ActiveRecord::Base
                             :with => /^[A-Za-z0-9-]+$/,
                             :message => 'The subdomain can only contain alphanumeric characters and dashes.',
                             :allow_blank => true
-  validates_uniqueness_of   :subdomain,
-                            :case_sensitive => false
+  # validates_uniqueness_of   :subdomain,
+  #                           :case_sensitive => false
   validates_exclusion_of    :subdomain,
                             :in => %w( support blog www billing help api ),
                             :message => "The subdomain <strong>{{value}}</strong> is reserved and unavailable."
