@@ -109,6 +109,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
+      t.string      :uid
       t.datetime    :canceled_at
       t.timestamps
     end

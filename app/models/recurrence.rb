@@ -3,41 +3,42 @@ class AppointmentNotFree < Exception; end
 class AppointmentInvalid < Exception; end
 class TimeslotNotEmpty < Exception; end
 
-class Appointment < ActiveRecord::Base
+class Recurrence < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
-  belongs_to              :location
   belongs_to              :provider, :polymorphic => true
   belongs_to              :customer, :class_name => 'User'
+  belongs_to              :location
+  has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
+
   validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
   validates_presence_of   :provider_id, :if => :provider_required?
   validates_presence_of   :provider_type, :if => :provider_required?
   validates_presence_of   :customer_id, :if => :customer_required?
   validates_inclusion_of  :mark_as, :in => %w(free work wait)
-  validates_presence_of   :uid
-  has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
+
   before_save             :make_confirmation_code
   after_create            :add_customer_role
-  before_validation_on_create     :make_uid
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   WORK                    = 'work'      # work appointments can be scheduled in free timeslots
   WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
-
+  
   MARK_AS_TYPES           = [FREE, WORK, WAIT]
-
+  
   NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
-
+  
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
   
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :provider,      lambda { |provider| if (provider)
-                                                    {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
-                                                  else
-                                                    {}
-                                                  end
+  named_scope :provider,      lambda { |provider| 
+                                        if (provider)
+                                          {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
+                                        else
+                                          {}
+                                        end
                                      }
   named_scope :no_provider,   { :conditions => {:provider_id => nil, :provider_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
@@ -48,12 +49,16 @@ class Appointment < ActiveRecord::Base
   named_scope :past,          lambda { { :conditions => ["end_at <= ?", Time.now] } }
   
   # find appointments overlapping a time range
-  named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
-                                                                             (start_at >= ? AND end_at <= ?)", 
-                                                                             start_at, start_at, end_at, end_at, start_at, end_at] }}
+  named_scope :overlap,       lambda { |start_at, end_at|
+                                        { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?)
+                                                            OR (start_at >= ? AND end_at <= ?)",
+                                            start_at, start_at, end_at, end_at, start_at, end_at]
+                                        }
+                                      }
 
   # find appointments overlapping a time of day range
-  named_scope :time_overlap,  lambda { |time_range| { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
+  named_scope :time_overlap,  lambda { |time_range|
+                                        { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
                                                                        (time_start_at < ? AND time_end_at > ?) OR 
                                                                        (time_start_at >= ? AND time_end_at <= ?)", 
                                                                        time_range.first, time_range.first, 
@@ -100,46 +105,7 @@ class Appointment < ActiveRecord::Base
                     { :conditions => ["location_id = '?'", location.id] }
                   end
                 }
-  
-  # valid when values
-  WHEN_THIS_WEEK            = 'this week'
-  WHEN_PAST_WEEK            = 'past week'
-  WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
-  WHEN_WEEKS                = [WHEN_THIS_WEEK, 'next week', 'later']
-  WHENS_EXTENDED            = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'next 2 weeks', 'next 4 weeks', 'this month', 'later']
-  WHENS_PAST                = ['past week', 'past 2 weeks', 'past month']
-  
-  # valid time of day values
-  TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
-  TIMES_EXTENDED            = ['anytime', 'early morning', 'morning', 'afternoon', 'evening', 'late night']
-  
-  TIME_ANYTIME              = 'anytime'
-  
-  # convert time of day to a seconds range, in utc format
-  TIMES_HASH                = {'anytime'    => [0,        24*3600],     # entire day
-                               'morning'    => [8*3600,   12*3600],     # 8am - 12pm
-                               'afternoon'  => [12*3600,  17*3600],     # 12pm - 5pm
-                               'evening'    => [17*3600,  21*3600],     # 5pm - 9pm
-                               'never'      => [0,        0]
-                              }
 
-  # BEGIN acts_as_state_machine
-  include AASM
-  
-  aasm_column           :state
-  aasm_initial_state    :upcoming
-  aasm_state            :upcoming
-  aasm_state            :completed
-  aasm_state            :canceled
-  
-  aasm_event :checkout do
-    transitions :to => :completed, :from => [:upcoming]
-  end
-
-  aasm_event :cancel do
-    transitions :to => :canceled, :from => [:upcoming]
-  end
-  # END acts_as_state_machine
 
   # TODO - this overrides and fixes a bug in Rails 2.2 - ticket http://rails.lighthouseapp.com/projects/8994/tickets/1339
   def self.create_time_zone_conversion_attribute?(name, column)
@@ -180,48 +146,20 @@ class Appointment < ActiveRecord::Base
       # initialize duration based on service duration
       self.duration = self.service.duration
     end
-        
-    # initialize when, time attributes with default values
 
-    if self.when.nil?
-      self.when = ''
-    end
-
-    if self.time.nil?
-      self.time = ''
-    end
-    
     # initialize time of day attributes
-    
-    if self.mark_as == WAIT
-      # set time to anytime for wait appointments
-      self.time           = TIME_ANYTIME
-      
-      # set time of day values based on time value
-      time_range          = Appointment.time_range(self.time)
-      self.time_start_at  = time_range.first
-      self.time_end_at    = time_range.last
-    else
-      # set time of day values based on appointment start, end times in utc format
-      if self.start_at
-        self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
-      end
+    # set time of day values based on appointment start, end times in utc format
+    if self.start_at
+      self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
+    end
 
-      if self.end_at
-        self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.utc.min * 60
-      end
+    if self.end_at
+      self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.utc.min * 60
     end
   end
   
   def validate
-    if self.when == :error
-      errors.add_to_base("When is invalid")
-    end
 
-    if self.time == :error
-      errors.add_to_base("Time is invalid")
-    end
-    
     if self.start_at and self.end_at
       # start_at must be before end_at
       if !(start_at.to_i < end_at.to_i)
@@ -243,49 +181,7 @@ class Appointment < ActiveRecord::Base
       end
     end
   end
-  
-  # START: override attribute methods
-  def when=(s)
-    if s.blank?
-      # when can be empty
-      write_attribute(:when, '')
-    else
-      daterange = DateRange.parse_when(s)
-      
-      if !daterange.valid?
-        # invalid when
-        write_attribute(:when , :error)
-      else
-        write_attribute(:when, daterange.name)
-        self.start_at   = daterange.start_at
-        self.end_at     = daterange.end_at
-      end
-    end
-  end
-  
-  def time=(s)
-    if s.blank?
-      # time can be empty
-      write_attribute(:time, '')
-    elsif TIMES.include?(s)
-      write_attribute(:time, s)
-    else 
-      # invalid time
-      write_attribute(:time, :error)
-    end
-  end
-  
-  def time(options = {})
-    @time = read_attribute(:time)
-    if @time.blank? and options[:default]
-      # return default value
-      return options[:default]
-    end
-    @time
-  end
-  
-  # END: override attribute methdos
-  
+
   # START: virtual attributes
   def start_at_string
     self.start_at.to_s
@@ -321,19 +217,7 @@ class Appointment < ActiveRecord::Base
   def time_range
     Range.new(time_start_at, time_end_at)
   end
-  
-  def location
-    if self.location_id.nil?
-      Location.anywhere
-    else
-      Location.find_by_id(self.location_id)
-    end
-  end
 
-  # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
-  def location=(new_loc)
-    self.location_id = new_loc.id unless (new_loc.id = 0)
-  end
   # END: virtual attributes
   
   # allow assignment of customer attributes when creating an appointment
@@ -341,25 +225,15 @@ class Appointment < ActiveRecord::Base
   def customer_attributes=(customer_attributes)
     self.customer = User.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
   end
-    
+  
+  # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
+  def location_id=(id)
+    self.location_id = company.locations.find_by_id(id.to_i) unless (id.blank? || id.to_i == 0)
+  end
+  
   def cancel
     update_attribute(:canceled_at, Time.now)
     cancel!
-  end
-  
-  # returns all appointment conflicts
-  # conflict rules:
-  #  - provider must be the same
-  #  - start, end times must overlap
-  #  - must be marked as 'free' or 'work'
-  #  - state must not be 'upcoming' or 'completed'
-  def conflicts
-    @conflicts ||= self.company.appointments.free_work.upcoming_completed.provider(provider).overlap(start_at, end_at)
-  end
-  
-  # returns true if this appointment conflicts with any other
-  def conflicts?
-    self.conflicts.size > 0
   end
 
   def free?
@@ -376,64 +250,44 @@ class Appointment < ActiveRecord::Base
   
   alias :waitlist? :wait?
   
-  # return the collection of waitlist appointments that overlap with this free appointment
-  def waitlist
-    # check that this is a free appointment
-    return [] if self.mark_as != FREE
-    # find wait appointments that overlap in both date and time ranges
-    @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
-  end
-    
-  # narrow an appointment by start, end times
-  def narrow_by_time_range!(start_at, end_at)
-    # validate start, end times
-    raise AppointmentInvalid, "invalid narrow time range" if start_at > self.end_at or end_at < self.start_at or start_at > end_at
-    
-    # narrow appointment by start, end time
-    self.start_at       = start_at if self.start_at < start_at
-    self.end_at         = end_at if self.end_at > end_at
-    self.duration       = (self.end_at.to_i - self.start_at.to_i) / 60
-    
-    # adjust time start, end values
-    self.time_start_at  = self.start_at.utc.hour * 3600 + self.start_at.min * 60
-    self.time_end_at    = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+  # iCalendar uid attribute
+  def uid
+    "#{self.created_at}-r-#{self.id}@walnutindustries.com"
   end
   
-  # narrow an appointment by time of day
-  def narrow_by_time_of_day!(time)
-    return if time == 'anytime'
-    
-    request_time_range = Appointment.time_range(time)
-    current_time_range = Range.new(self.time_start_at, self.time_end_at)
-    
-    if current_time_range.overlap?(request_time_range)
-      # narrow
-      if current_time_range.include?(request_time_range)
-        # find and adjust by the difference in seconds
-        self.start_at += (request_time_range.first - current_time_range.first).seconds
-        self.end_at   += (request_time_range.last - current_time_range.last).seconds
-      elsif current_time_range.include?(request_time_range.first)
-        # first part of request time range overlaps
-        self.start_at += (request_time_range.first - current_time_range.first)
-      else
-        # last part of request time range overlaps
-        self.end_at   += (request_time_range.last - current_time_range.last).seconds
+  def create_instances(company, start_at, end_at)
+    # Create a RiCal calendar with our recurring appointments
+    company.recurrences.each do |recur|
+      cal = RiCal.Calendar do |cal|
+        cal.event do |ev|
+          ev.add_attendee "#{recur.provider.email}"
+          # No customer if this is available time
+          if recur.service.mark_as == "free"
+            ev.summary = "#{recur.provider.name}: Available"
+          else
+            ev.summary = "#{recur.provider.name}: #{recur.service.name} for #{recur.customer.name}"
+            ev.add_attendee "#{recur.customer.email}"
+          end
+          ev.dtstart = recur.start_at
+          ev.dtend =recur.end_at
+          if recur.location
+            ev.location = "#{recur.location.name}"
+          end
+          if recur.notes.size > 0
+            ev.description = "Notes: \n #{recur.notes.map(&:comment).join}"
+          end
+          ev.rrule = recur.rrule
+        end
       end
-      # adjust duration
-      self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
-      # check special case of 0 duration
-      self.start_at = nil if duration == 0
-      self.end_at   = nil if duration == 0
-    else
-      # the requested range does not overlap - narrow to an empty appointment
-      self.start_at       = nil
-      self.end_at         = nil
-      self.time_start_at  = nil
-      self.time_end_at    = nil
-      self.duration       = 0
+      cal.occurrences(:starting => start_at, :before => end_at).each do |appt|
+        # Create an appointment 
+        Appointment.create(:company => recur.company, :service => recur.service, :provider => recur.provider, :customer => recur.customer, :start_at => appt.start, :end_at => appt.end, :mark_as => recur.mark_as, :state => 'upcoming', :uid => recur.uid)
+      end
     end
+    
   end
   
+
   protected
   
   # providers are required for all appointments except waitlist appointments
@@ -462,14 +316,6 @@ class Appointment < ActiveRecord::Base
     end
   end
   
-  # iCalendar uid attribute
-  def make_uid
-    unless self.uid
-      # use a constant string
-      self.uid  = "#{self.created_at}-a-#{self.id}@walnutindustries.com"
-    end
-  end
-
   # add the 'customer' role to a work/wait appointment's customer
   def add_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
