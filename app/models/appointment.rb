@@ -12,12 +12,12 @@ class Appointment < ActiveRecord::Base
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
   # validates_presence_of       :name
-  # validates_presence_of       :company_id, :service_id, :start_at, :end_at, :duration
+  validates_presence_of       :company_id
+  # validates_presence_of       :service_id, :start_at, :end_at, :duration
   # validates_presence_of       :provider_id, :if => :provider_required?
   # validates_presence_of       :provider_type, :if => :provider_required?
   # validates_presence_of       :customer_id, :if => :customer_required?
-  # validates_presence_of       :uid
-  # validates_inclusion_of      :mark_as, :in => %w(free work wait)
+  validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
   after_save                  :update_location_events_count
@@ -538,7 +538,7 @@ class Appointment < ActiveRecord::Base
   def make_uid
     unless self.uid
       # use a constant string
-      self.uid  = "#{self.created_at}-a-#{self.id}@walnutindustries.com"
+      self.uid  = "#{self.created_at.strftime("%Y%m%d%H%M%S")}-a-#{self.id}@walnutindustries.com"
     end
   end
 

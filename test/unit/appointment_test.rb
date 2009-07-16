@@ -3,7 +3,8 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
-  should_validate_presence_of :name
+  # should_validate_presence_of :name
+  should_validate_presence_of :company_id
   should_belong_to            :location
   should_have_many            :event_categories
   should_have_many            :event_tags
@@ -56,8 +57,8 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create event" do
     setup do
-      @appointment = Appointment.new(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1",
-                                      :public => true, :mark_as => Appointment::FREE)
+      @appointment = Appointment.create(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1",
+                                      :public => true, :mark_as => Appointment::FREE, :company => @company)
       assert @appointment.valid?
       @location.appointments.push(@appointment)
       @location.reload

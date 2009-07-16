@@ -183,7 +183,7 @@ class EventVenue < ActiveRecord::Base
     return 1
   end
   
-  # add the event venue as a place
+  # add the event venue as a company
   def add_company(options={})
     log = options.delete(:log) ? true : false
     
@@ -272,7 +272,7 @@ class EventVenue < ActiveRecord::Base
     
     return event if event
     
-    options  = {:name => event_hash['title'], :url => event_hash['url'], :source_type => self.source_type, :source_id => event_hash['id']}
+    options  = {:name => event_hash['title'], :url => event_hash['url'], :source_type => self.source_type, :source_id => event_hash['id'], :company => self.location.company}
     options[:start_at]  = event_hash['start_time'] if event_hash['start_time']
     options[:end_at]    = event_hash['stop_time'] if event_hash['stop_time']
 
