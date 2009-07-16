@@ -67,8 +67,14 @@ class CalDavResource
           app.notes.each do |n|
             ev.add_comment "#{n}"
           end
+          # Free appointments do not take up time on the calendar
+          if app.mark_as == Appointment::FREE
+            ev.transp="TRANSPARENT"
+          else
+            ev.transp="OPAQUE"
+          end
         end
-      end  
+      end
     end
     cal.export
   end
