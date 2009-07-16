@@ -4,21 +4,23 @@ class AppointmentInvalid < Exception; end
 class TimeslotNotEmpty < Exception; end
 
 class Appointment < ActiveRecord::Base
-  belongs_to              :company
-  belongs_to              :service
-  belongs_to              :location
-  belongs_to              :provider, :polymorphic => true
-  belongs_to              :customer, :class_name => 'User'
-  validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
-  validates_presence_of   :provider_id, :if => :provider_required?
-  validates_presence_of   :provider_type, :if => :provider_required?
-  validates_presence_of   :customer_id, :if => :customer_required?
-  validates_inclusion_of  :mark_as, :in => %w(free work wait)
-  validates_presence_of   :uid
-  has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
-  before_save             :make_confirmation_code
-  after_create            :add_customer_role
-  before_validation_on_create     :make_uid
+  belongs_to                  :company
+  belongs_to                  :service
+  belongs_to                  :provider, :polymorphic => true
+  belongs_to                  :customer, :class_name => 'User'
+  belongs_to                  :location
+  has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
+
+  validates_presence_of       :company_id, :service_id, :start_at, :end_at, :duration
+  validates_presence_of       :provider_id, :if => :provider_required?
+  validates_presence_of       :provider_type, :if => :provider_required?
+  validates_presence_of       :customer_id, :if => :customer_required?
+  validates_presence_of       :uid
+  validates_inclusion_of      :mark_as, :in => %w(free work wait)
+
+  before_save                 :make_confirmation_code
+  after_create                :add_customer_role
+  before_validation_on_create :make_uid
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -88,7 +90,7 @@ class Appointment < ActiveRecord::Base
                     { :include => :location, :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
                   end
                 }
-  # specific_location is used for narrow searchees, where a search for appointments in Chicago includes only those appointments assigned to
+  # specific_location is used for narrow searches, where a search for appointments in Chicago includes only those appointments assigned to
   # Chicago. A search for appointments assigned to anywhere includes only those appointments - not those assigned to Chicago, for example.
   named_scope :specific_location,
                 lambda { |location|
@@ -173,7 +175,9 @@ class Appointment < ActiveRecord::Base
     end
 
     # initialize duration (in minutes)
-    if (self.service.nil? || self.service.free?) and self.duration.blank?
+    if (self.start_at.nil? || self.end_at.nil?)
+      self.duration = 0
+    elsif (self.service.nil? || self.service.free?) and self.duration.blank?
       # initialize duration based on start and end times
       self.duration = (self.end_at - self.start_at) / 60
     elsif self.service and self.duration.blank?

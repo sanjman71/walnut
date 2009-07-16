@@ -20,6 +20,7 @@ class CreateRecurrences < ActiveRecord::Migration
       t.datetime    :expanded_to      # recurrence has been expanded up to this datetime (in UTC)
       t.integer     :remaining_count  # The count is added to the rrule, and needs to be decremented every time an appointment is instantiated
       t.datetime    :end_recurrence   # The recurrence ends before this datetime
+      t.string      :uid              # The UID for this recurrence
       t.timestamps
     end
     

@@ -4,26 +4,28 @@ class AppointmentInvalid < Exception; end
 class TimeslotNotEmpty < Exception; end
 
 class Recurrence < ActiveRecord::Base
-  belongs_to              :company
-  belongs_to              :service
-  belongs_to              :provider, :polymorphic => true
-  belongs_to              :customer, :class_name => 'User'
-  belongs_to              :location
-  has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
-  # Recurrence instances. TODO: Instances of the recurrence are destroyed when the recurrence is destroyed
-  has_many                :appointments, :dependent => :destroy
-
-  validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
-  validates_presence_of   :provider_id, :if => :provider_required?
-  validates_presence_of   :provider_type, :if => :provider_required?
-  validates_presence_of   :customer_id, :if => :customer_required?
-  validates_inclusion_of  :mark_as, :in => %w(free work wait)
-
-  before_save             :make_confirmation_code
-  after_create            :add_customer_role
-  
-  after_create            :instantiate_recurrence
-  after_update            :update_recurrence
+  belongs_to                  :company
+  belongs_to                  :service
+  belongs_to                  :provider, :polymorphic => true
+  belongs_to                  :customer, :class_name => 'User'
+  belongs_to                  :location
+  has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
+  # Recurrence instances. TODO: All instances of the recurrence are destroyed when the recurrence is destroyed
+  has_many                    :appointments, :dependent => :destroy
+                              
+  validates_presence_of       :company_id, :service_id, :start_at, :end_at, :duration
+  validates_presence_of       :provider_id, :if => :provider_required?
+  validates_presence_of       :provider_type, :if => :provider_required?
+  validates_presence_of       :customer_id, :if => :customer_required?
+  validates_presence_of       :uid
+  validates_inclusion_of      :mark_as, :in => %w(free work wait)
+                              
+  before_save                 :make_confirmation_code
+  after_create                :add_customer_role
+  before_validation_on_create :make_uid
+                              
+  after_create                :instantiate_recurrence
+  after_update                :update_recurrence
   
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
@@ -49,12 +51,11 @@ class Recurrence < ActiveRecord::Base
   CONFIRMATION_CODE_ZERO  = '00000'
   
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :provider,      lambda { |provider| 
-                                        if (provider)
-                                          {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
-                                        else
-                                          {}
-                                        end
+  named_scope :provider,      lambda { |provider| if (provider)
+                                                    {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
+                                                  else
+                                                    {}
+                                                  end
                                      }
   named_scope :no_provider,   { :conditions => {:provider_id => nil, :provider_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
@@ -65,16 +66,12 @@ class Recurrence < ActiveRecord::Base
   named_scope :past,          lambda { { :conditions => ["end_at <= ?", Time.now] } }
   
   # find appointments overlapping a time range
-  named_scope :overlap,       lambda { |start_at, end_at|
-                                        { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?)
-                                                            OR (start_at >= ? AND end_at <= ?)",
-                                            start_at, start_at, end_at, end_at, start_at, end_at]
-                                        }
-                                      }
+  named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
+                                                                             (start_at >= ? AND end_at <= ?)", 
+                                                                             start_at, start_at, end_at, end_at, start_at, end_at] }}
 
   # find appointments overlapping a time of day range
-  named_scope :time_overlap,  lambda { |time_range|
-                                        { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
+  named_scope :time_overlap,  lambda { |time_range| { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
                                                                        (time_start_at < ? AND time_end_at > ?) OR 
                                                                        (time_start_at >= ? AND time_end_at <= ?)", 
                                                                        time_range.first, time_range.first, 
@@ -106,7 +103,7 @@ class Recurrence < ActiveRecord::Base
                     {}
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
+                    { :include => :location, :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
                   end
                 }
   # specific_location is used for narrow searches, where a search for appointments in Chicago includes only those appointments assigned to
@@ -115,10 +112,10 @@ class Recurrence < ActiveRecord::Base
                 lambda { |location|
                   # If the request is for any location, there is no condition
                   if (location.nil? || location.id == 0 || location.id.blank? )
-                    { :conditions => ["location_id IS NULL"] }
+                    { :include => :location, :conditions => ["location_id IS NULL"] }
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :conditions => ["location_id = '?'", location.id] }
+                    { :include => :location, :conditions => ["location_id = '?'", location.id] }
                   end
                 }
 
@@ -155,9 +152,11 @@ class Recurrence < ActiveRecord::Base
     end
 
     # initialize duration (in minutes)
-    if (self.service.nil? || self.service.free?) and self.duration.blank?
+    if (self.start_at.nil? || self.end_at.nil?)
+      self.duration = 0
+    elsif (self.service.nil? || self.service.free?) and self.duration.blank?
       # initialize duration based on start and end times
-      self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
+      self.duration = (self.end_at - self.start_at) / 60
     elsif self.service and self.duration.blank?
       # initialize duration based on service duration
       self.duration = self.service.duration
@@ -175,10 +174,9 @@ class Recurrence < ActiveRecord::Base
   end
   
   def validate
-
     if self.start_at and self.end_at
       # start_at must be before end_at
-      if !(start_at.to_i < end_at.to_i)
+      if !(start_at < end_at)
         errors.add_to_base("Appointment start time must be earlier than the apointment end time")
       end
     end
@@ -234,6 +232,18 @@ class Recurrence < ActiveRecord::Base
     Range.new(time_start_at, time_end_at)
   end
 
+  def location
+    if self.location_id.nil?
+      Location.anywhere
+    else
+      Location.find_by_id(self.location_id)
+    end
+  end
+
+  # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
+  def location=(new_loc)
+    self.location_id = new_loc.id unless (new_loc.id = 0)
+  end
   # END: virtual attributes
   
   # allow assignment of customer attributes when creating an appointment
@@ -241,12 +251,7 @@ class Recurrence < ActiveRecord::Base
   def customer_attributes=(customer_attributes)
     self.customer = User.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
   end
-  
-  # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
-  def location_id=(id)
-    self.location_id = company.locations.find_by_id(id.to_i) unless (id.blank? || id.to_i == 0)
-  end
-  
+    
   def cancel
     update_attribute(:canceled_at, Time.now)
     cancel!
@@ -265,11 +270,6 @@ class Recurrence < ActiveRecord::Base
   end
   
   alias :waitlist? :wait?
-  
-  # iCalendar uid attribute
-  def uid
-    "#{self.created_at}-r-#{self.id}@walnutindustries.com"
-  end
   
   def self.expand_all_instances(company, starting, before)
     company.recurrences.each do |recur|
@@ -349,6 +349,14 @@ class Recurrence < ActiveRecord::Base
     end
   end
   
+  # iCalendar uid attribute
+  def make_uid
+    unless self.uid
+      # use a constant string
+      self.uid  = "#{self.created_at}-a-#{self.id}@walnutindustries.com"
+    end
+  end
+
   # add the 'customer' role to a work/wait appointment's customer
   def add_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
