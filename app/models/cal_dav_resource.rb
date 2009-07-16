@@ -63,8 +63,9 @@ class CalDavResource
           if app.location
             ev.location    "#{app.location.name}"
           end
-          if app.notes.size > 0
-            ev.description = "Notes: \n #{app.notes.map(&:comment).join}"
+          ev.description = app.description
+          app.notes.each do |n|
+            ev.add_comment n
           end
         end
       end  
