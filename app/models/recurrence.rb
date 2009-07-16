@@ -353,7 +353,7 @@ class Recurrence < ActiveRecord::Base
   def make_uid
     unless self.uid
       # use a constant string
-      self.uid  = "#{self.created_at}-a-#{self.id}@walnutindustries.com"
+      self.uid  = "#{self.created_at.strftime("%Y%m%d%H%M%S")}-r-#{self.id}@walnutindustries.com"
     end
   end
 
