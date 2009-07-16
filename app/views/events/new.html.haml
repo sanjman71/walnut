@@ -1,0 +1,77 @@
+- title("Events")
+- javascript('recurrence', 'date', 'jquery.datePicker')
+- stylesheet('datePicker')
+
+.span-23.prepend-1.mat.padding-top-10.bottom
+  %h2== Add an Event
+
+%hr.space
+
+.span-23.prepend-1.last
+  .span-2.padding-top-10.text-align-right
+    %h2= label_tag "what", "What:"
+  .span-21.last
+    = text_field_tag 'what', '', :class => 'text title big', :style => "width: 300px;"
+
+.span-23.prepend-1.last
+  .span-2.padding-top-5.text-align-right
+    %h3= label_tag "when", "When:"
+  .span-21.last.padding-top-5
+    = text_field_tag 'when', '', :class => 'date-pick', :style => "width: 80px;"
+
+.span-23.prepend-1.padding-bottom-10#recurrence{:style => 'color: #5500BB; font-size: 1.5em; font-weight: bold;'}
+  == &nbsp;
+
+.span-23.prepend-1.last#repeats
+  .span-2.padding-top-5.text-align-right
+    %h3= label_tag "select_repeats", "Repeats:", :class => 'big'
+  .span-21.last
+    = select_tag('select_repeats', options_for_select(@repeat_options.collect{ |o| [o, "#{o.parameterize.underscore}"] }), :class => 'text', :style => 'font-size: 1.1em;')
+
+.span-23.prepend-1.last.hide.bottom.repeat.every#repeats_every_daily
+  %h3
+    = label_tag "select_repeats_daily", "Repeat Every:", :class => 'big'
+    = select_tag('select_repeats_daily', options_for_select(Range.new(1, 30).collect { |i| [i, i]}), :class => 'text')
+    %span{:style => 'font-size: 0.7em; font-weight: bold;'}== Days
+
+.span-23.prepend-1.last.hide.repeat.every#repeats_every_weekly
+  %h3
+    = label_tag "select_repeats_weekly", "Repeat Every:", :class => 'big'
+    = select_tag('select_repeats_weekly', options_for_select(Range.new(1, 30).collect { |i| [i, i]}), :class => 'text')
+    %span{:style => 'font-size: 0.7em; font-weight: bold;'}== Weeks
+
+.span-23.prepend-1.last.hide.repeat.on#repeats_on_weekly
+  %h3
+    = label_tag "select_repeats_weekly", "Repeat On:", :class => 'big'
+    = check_box_tag 'Monday', 'mon', false, :class => 'weekly checkbox day', :id => 'mon'
+    = label_tag 'mon', 'Mon', :class => 'checkbox'
+    = check_box_tag 'Tuesday', 'tue', false, :class => 'weekly checkbox day', :id => 'tue'
+    = label_tag 'tue', 'Tue', :class => 'checkbox'
+    = check_box_tag 'Wednesday', 'wed', false, :class => 'weekly checkbox day', :id => 'wed'
+    = label_tag 'wed', 'Wed', :class => 'checkbox'
+    = check_box_tag 'Thursday', 'thu', false, :class => 'weekly checkbox day', :id => 'thu'
+    = label_tag 'thu', 'Thu', :class => 'checkbox'
+    = check_box_tag 'Friday', 'fri', false, :class => 'weekly checkbox day', :id => 'fri'
+    = label_tag 'fri', 'Fri', :class => 'checkbox'
+    = check_box_tag 'Saturday', 'sat', false, :class => 'weekly checkbox day', :id => 'sat'
+    = label_tag 'sat', 'Sat', :class => 'checkbox'
+    = check_box_tag 'Sunday', 'sun', false, :class => 'weekly checkbox day', :id => 'sun'
+    = label_tag 'sun', 'Sun', :class => 'checkbox'
+
+.span-23.prepend-1.last.hide.repeat.range#repeats_range
+  %h3{:style => 'font-weight: bold;'}== Range:
+  %h3
+    %span{:style => 'font-size: 0.8em; font-weight: bold;'}== Starts:
+    = text_field_tag 'range_starts_date', '', :style => 'width: 90px; font-size: 12px;', :disabled => true
+    %br
+    %span{:style => 'font-size: 0.8em; font-weight: bold;'}== Ends:
+    = radio_button_tag "ends", "Never", true, :id => 'range_ends_never'
+    = label_tag "range_ends_never", "Never", :class => 'small'
+    = radio_button_tag "ends", "Until", false, :id => 'range_ends_until'
+    = label_tag "range_ends_until", "Until", :class => 'small'
+    = text_field_tag 'range_ends_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick hide'
+
+
+-# hidden div always
+.span-23.prepend-1.last.hide.repeat.on
+  %span#select_repeats_every_weekday_monday_friday== &nbsp;
