@@ -53,19 +53,19 @@ class CalDavResource
           ev.add_attendee "#{app.provider.email}"
           # No customer if this is available time
           if app.service.mark_as == "free"
-            ev.summary "#{app.provider.name}: Available"
+            ev.summary = "#{app.provider.name}: Available"
           else
-            ev.summary "#{app.provider.name}: #{app.service.name} for #{app.customer.name}"
+            ev.summary = "#{app.provider.name}: #{app.service.name} for #{app.customer.name}"
             ev.add_attendee "#{app.customer.email}"
           end
-          ev.dtstart     app.start_at
-          ev.dtend       app.end_at
+          ev.dtstart = app.start_at
+          ev.dtend = app.end_at
           if app.location
             ev.location    "#{app.location.name}"
           end
-          ev.description = app.description
+          ev.description = "#{app.description}"
           app.notes.each do |n|
-            ev.add_comment n
+            ev.add_comment "#{n}"
           end
         end
       end  
