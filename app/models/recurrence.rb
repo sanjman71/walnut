@@ -21,6 +21,20 @@ class Recurrence < ActiveRecord::Base
 
   before_save             :make_confirmation_code
   after_create            :add_customer_role
+  
+  after_create            :instantiate_recurrence
+  after_update            :update_recurrence
+  
+  # Recurrence constants
+  # When creating an appointment from a recurrence, only copy over these attributes into the appointment
+  CREATE_APPT_ATTRS        = ["company_id", "service_id", "provider_id", "provider_type", "customer_id", "mark_as",
+                              "uid", "description"]
+
+  # If any of these attributes in a recurrence update, we have to re-expand the instances of the recurrence
+  REEXPAND_INSTANCES_ATTRS = ["rrule", "start_at", "end_at", "duration"]
+
+  # These are the attributes which can be used in an update
+  UPDATE_APPT_ATTRS        = CREATE_APPT_ATTRS - REEXPAND_INSTANCES_ATTRS
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -95,7 +109,7 @@ class Recurrence < ActiveRecord::Base
                     { :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
                   end
                 }
-  # specific_location is used for narrow searchees, where a search for appointments in Chicago includes only those appointments assigned to
+  # specific_location is used for narrow searches, where a search for appointments in Chicago includes only those appointments assigned to
   # Chicago. A search for appointments assigned to anywhere includes only those appointments - not those assigned to Chicago, for example.
   named_scope :specific_location,
                 lambda { |location|
@@ -257,24 +271,55 @@ class Recurrence < ActiveRecord::Base
     "#{self.created_at}-r-#{self.id}@walnutindustries.com"
   end
   
-  def create_instances(company, start_at, end_at)
-    # Create a RiCal calendar with our recurring appointments
+  def self.expand_all_instances(company, starting, before)
     company.recurrences.each do |recur|
-      ri_ev = RiCal.Event do |ev|
-        ev.dtstart = recur.start_at
-        ev.dtend =recur.end_at
-        ev.rrule = recur.rrule
-      end
-      ri_ev.occurrences(:starting => start_at, :before => end_at).each do |ri_occurrence|
-        # Create an appointment 
-        Appointment.create(:company => recur.company, :service => recur.service, :provider => recur.provider,
-          :customer => recur.customer, :start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
-          :mark_as => recur.mark_as, :state => 'upcoming', :uid => recur.uid)
-      end
+      recur.expand_instances(starting, before)
     end
+  end
     
+  def expand_instances(starting, before)
+
+    # Create a RiCal calendar with our recurring appointments
+    ri_ev = RiCal.Event do |ev|
+      ev.dtstart = self.start_at
+      ev.dtend =self.end_at
+      ev.rrule = self.rrule
+    end
+    ri_ev.occurrences(:starting => starting, :before => before).each do |ri_occurrence|
+      # Create an appointment 
+      # We extract the attributes we want to copy over into the appointment
+      attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
+      # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
+      attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
+                            :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
+                            :recurrence_id => self.id})
+      a = Appointment.create(attrs)
+      puts a.errors.full_messages
+    end
+    self.expanded_to = before
   end
   
+  def instantiate_recurrence
+    end_at = Time.now + 4.weeks           # TODO: This needs to come from the company default
+    expand_instances(Time.now, end_at)
+  end
+  
+  def update_recurrence
+    # Check if anything changed
+    if (self.changed?)
+      # Check if any of the attributes changed that cause us to reexpand the recurring instances
+      if ((self.changed & REEXPAND_INSTANCES_ATTRS).size > 0)
+        # We need to rebuild all the instances
+        self.appointments.each {|a| a.destroy}
+        self.expand_instances(Time.now, self.expanded_to)
+      else
+        # We can update the existing instances
+        # Build a hash of the changes, take out any attributes we don't want to update
+        instance_updates = self.changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }
+        self.appointments.each { |a| a.update_attributes(instance_updates) }
+      end
+    end
+  end
 
   protected
   
