@@ -210,6 +210,11 @@ span.example                                      { color: #666666; font-style: 
 #breadcrumbs span                                 { color: #555555; }
 
 
+/* location and event */
+
+div.location.search_result, div.appointment.search_result
+                                                  { height: 70px; }
+
 /* locality styles */
 
 .popular.tags, .popular.categories, .popular.events                

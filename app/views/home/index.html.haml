@@ -15,7 +15,7 @@
     - unless @featured_places.blank?
       %h2{:style => 'color: #5500BB; font-weight: bold;'}= @featured_places_title
       - @featured_places.each_with_index do |object, i|
-        .span-10.letterbox-5.border_bottom[object]
+        .span-10.letterbox-5.border_bottom.search_result[object]
           - case object.class.to_s
           - when 'Location'
             = render(:partial => 'search/location', :locals => {:location => object, :index => i})
@@ -26,7 +26,7 @@
     - unless @featured_events.blank?
       %h2{:style => 'color: #5500BB; font-weight: bold;'}= @featured_events_title
       - @featured_events.each_with_index do |object, i|
-        .span-10.letterbox-5.border_bottom[object]
+        .span-10.letterbox-5.border_bottom.search_result[object]
           - case object.class.to_s
           - when 'Location'
             = render(:partial => 'search/location', :locals => {:location => object, :index => i})
