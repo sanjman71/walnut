@@ -276,8 +276,9 @@ class EventVenue < ActiveRecord::Base
     options[:start_at]  = event_hash['start_time'] if event_hash['start_time']
     options[:end_at]    = event_hash['stop_time'] if event_hash['stop_time']
 
-    # All events are public
+    # All events are public, and "free" - i.e. don't consume calendar time
     options[:public]    = true
+    options[:mark_as]   = Appointment::FREE
     
     # create event
     event = Appointment.create(options)
