@@ -226,9 +226,9 @@ namespace :events do
   
   # desc "Remove all events"
   # task :remove_all do
-  #   puts "#{Time.now}: removing all #{Event.count} events"
+  #   puts "#{Time.now}: removing all #{Appointment.public.count} events"
   #   
-  #   Event.all.each { |e| e.destroy }
+  #   Appointment.public.all.each { |o| o.destroy }
   #   
   #   puts "#{Time.now}: completed"
   # end
