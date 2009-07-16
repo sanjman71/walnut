@@ -1,7 +1,7 @@
 require 'test/test_helper'
 require 'test/factories'
 
-class EventTest < ActiveSupport::TestCase
+class AppointmentTest < ActiveSupport::TestCase
   
   should_validate_presence_of :name
   should_belong_to            :location
@@ -56,18 +56,19 @@ class EventTest < ActiveSupport::TestCase
   
   context "create event" do
     setup do
-      @event = Event.new(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1")
-      assert @event.valid?
-      @location.events.push(@event)
+      @appointment = Appointment.new(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1",
+                                      :public => true, :mark_as => Appointment::FREE)
+      assert @appointment.valid?
+      @location.appointments.push(@appointment)
       @location.reload
       @company.reload
       @chicago.reload
     end
     
-    should_change "Event.count", :by => 1
+    should_change "Appointment.count", :by => 1
     
-    should "add event to location events collection" do
-      assert_equal [@event], @location.events
+    should "add event to location.appointments collection" do
+      assert_equal [@appointment], @location.appointments
     end
 
     should "increment location's event count" do
@@ -75,11 +76,11 @@ class EventTest < ActiveSupport::TestCase
     end
     
     should "have venue name Kickass Ampthitheater" do
-      assert_equal "Kickass Ampthitheater", @event.venue_name
+      assert_equal "Kickass Ampthitheater", @appointment.venue_name
     end
     
     should "add event to event venue events collection" do
-      assert_equal [@event], @event_venue.events
+      assert_equal [@appointment], @event_venue.events
     end
     
     should "increment event venue's event count" do
@@ -96,15 +97,15 @@ class EventTest < ActiveSupport::TestCase
     
     context "then add event category with tags" do
       setup do
-        @event.event_categories.push(@event_category)
+        @appointment.event_categories.push(@event_category)
         @event_category.reload
-        @event.reload
+        @appointment.reload
       end
       
-      should_change "EventCategoryMapping.count", :by => 1
+      should_change "AppointmentEventCategory.count", :by => 1
       
       should "apply category tags to event" do
-        assert_equal ["music", "concert"], @event.event_tags.collect(&:name)
+        assert_equal ["music", "concert"], @appointment.event_tags.collect(&:name)
       end
       
       should "increment event_category.events_count" do
@@ -112,20 +113,20 @@ class EventTest < ActiveSupport::TestCase
       end
       
       should "increment event.taggings_count to 2" do
-        assert_equal 2, @event.taggings_count
+        assert_equal 2, @appointment.taggings_count
       end
       
       context "then remove event category" do
         setup do
-          @event.event_categories.delete(@event_category)
+          @appointment.event_categories.delete(@event_category)
           @event_category.reload
-          @event.reload
+          @appointment.reload
         end
 
-        should_change "EventCategoryMapping.count", :by => -1
+        should_change "AppointmentEventCategory.count", :by => -1
 
         should "remove category tags from event" do
-          assert_equal [], @event.event_tags.collect(&:name)
+          assert_equal [], @appointment.event_tags.collect(&:name)
         end
 
         should "decrement event_category.events_count" do
@@ -133,27 +134,27 @@ class EventTest < ActiveSupport::TestCase
         end
 
         should "decrement event.taggings_count to 0" do
-          assert_equal 0, @event.taggings_count
+          assert_equal 0, @appointment.taggings_count
         end
       end
       
       context "then remove event that has an event category" do
         setup do
-          @event.destroy
+          @appointment.destroy
           @event_venue.reload
           @location.reload
           @company.reload
           @chicago.reload
         end
         
-        should_change "EventCategoryMapping.count", :by => -1
+        should_change "AppointmentEventCategory.count", :by => -1
 
         should "remove category tags from event" do
-          assert_equal [], @event.event_tags.collect(&:name)
+          assert_equal [], @appointment.event_tags.collect(&:name)
         end
 
         should "remove event from location event collection" do
-          assert_equal [], @location.events
+          assert_equal [], @location.appointments
         end
         
         should "decrement location event count" do
@@ -182,18 +183,18 @@ class EventTest < ActiveSupport::TestCase
       setup do
         @event_category2 = Factory(:event_category, :name => "Nothing")
         assert @event_category2.valid?
-        @event.event_categories.push(@event_category2)
+        @appointment.event_categories.push(@event_category2)
         @event_category2.reload
       end
 
-      should_change "EventCategoryMapping.count", :by => 1
+      should_change "AppointmentEventCategory.count", :by => 1
       
       should "have no event tags" do
-        assert_equal [], @event.event_tags
+        assert_equal [], @appointment.event_tags
       end
       
       should "not change event.taggings.count" do
-        assert_equal 0, @event.taggings_count
+        assert_equal 0, @appointment.taggings_count
       end
     end
   end

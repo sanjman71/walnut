@@ -19,7 +19,7 @@ class CreatePeanut < ActiveRecord::Migration
     change_table :company_locations do |t|
       t.rename :place_id, :company_id
     end
-
+    
     rename_table :place_tag_groups, :company_tag_groups
 
     change_table :company_tag_groups do |t|
@@ -94,11 +94,12 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :resources, [:name]
     
     create_table :appointments do |t|
-      t.integer     :company_id
-      t.integer     :service_id
-      t.integer     :location_id
-      t.references  :provider, :polymorphic => true    # e.g. users
-      t.integer     :customer_id      # user who booked the appointment
+      t.references  :company
+      t.references  :service
+      t.references  :location
+      t.references  :provider,            :polymorphic => true    # e.g. users
+      t.references  :customer      # user who booked the appointment
+      t.references  :recurrence     # If this appointment is an instance of a recurrence
       t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at
@@ -109,14 +110,31 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
-      t.string      :uid
+      t.string      :uid              # The iCalendar UID
       t.text        :description
-      t.references  :recurrence
       t.datetime    :canceled_at
+      t.boolean     :public,              :default => true
+
+      t.string      :name,                :limit => 100
+      t.integer     :popularity,          :default => 0
+      t.string      :url,                 :limit => 200
+      t.integer     :taggings_count,      :default => 0   # counter cache
+      t.string      :source_type,         :limit => 20
+      t.string      :source_id,           :limit => 50
+
       t.timestamps
     end
 
     add_index :appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
+    add_index :appointments, :location_id
+    add_index :appointments, :popularity
+    add_index :appointments, :taggings_count
+    
+    create_table :appointment_event_categories, :force => :true do |t|
+      t.references  :appointment
+      t.references  :event_category
+      t.timestamps
+    end
     
     create_table :invoice_line_items do |t|
       t.integer     :invoice_id

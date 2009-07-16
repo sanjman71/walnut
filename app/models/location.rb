@@ -12,12 +12,14 @@ class Location < ActiveRecord::Base
   has_many                :companies, :through => :company_locations
   has_many                :phone_numbers, :as => :callable
   has_one                 :event_venue
-  has_many                :events, :after_add => :after_add_event, :after_remove => :after_remove_event
   has_many                :location_neighbors
   has_many                :neighbors, :through => :location_neighbors
   
   has_many                :location_sources
   has_many                :sources, :through => :location_sources
+
+  has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment
+  has_many                :events, :class_name => "Appointment", :conditions => 'public = TRUE'
   
   # after_save              :after_save_callback
 
@@ -47,7 +49,7 @@ class Location < ActiveRecord::Base
   named_scope :min_popularity,        lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
-
+  
   define_index do
     indexes companies.name, :as => :name
     indexes street_address, :as => :address
@@ -210,24 +212,30 @@ class Location < ActiveRecord::Base
     Location.decrement_counter(:neighborhoods_count, self.id)
   end
 
-  def after_add_event(event)
-    return if event.blank?
-    # increment events_count
-    Location.increment_counter(:events_count, self.id)
-    # increment popularity
-    Location.increment_counter(:popularity, self.id)
-    # add tags
-    add_venue_tag
+  def after_add_appointment(appointment)
+    return if appointment.blank?
+    if appointment.public
+      # increment events_count
+      Location.increment_counter(:events_count, self.id)
+      # increment popularity
+      Location.increment_counter(:popularity, self.id)
+      # add tags
+      add_venue_tag
+    end
+    Location.increment_counter(:appointments_count, self.id)
   end
   
-  def after_remove_event(event)
-    return if event.blank?
-    # decrement events_count
-    Location.decrement_counter(:events_count, self.id)
-    # decrement popularity
-    Location.decrement_counter(:popularity, self.id)
-    # remve tags
-    remove_venue_tag
+  def after_remove_appointment(appointment)
+    return if appointment.blank?
+    if appointment.public
+      # decrement events_count
+      Location.decrement_counter(:events_count, self.id)
+      # decrement popularity
+      Location.decrement_counter(:popularity, self.id)
+      # remve tags
+      remove_venue_tag
+    end
+    Location.decrement_counter(:appointments_count, self.id)
   end
 
   def add_venue_tag

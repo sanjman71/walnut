@@ -82,7 +82,7 @@ class SearchControllerTest < ActionController::TestCase
     
       should_respond_with :success
       should_render_template 'search/no_results.html.haml'
-      should_assign_to(:klasses) { [Event, Location] }
+      should_assign_to(:klasses) { [Appointment, Location] }
       should_assign_to(:country) { @us }
       should_assign_to(:state) { @il }
       should_assign_to(:city) { @chicago }

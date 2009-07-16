@@ -176,15 +176,15 @@ class EventVenue < ActiveRecord::Base
     self.confidence = 10
     self.save
 
-    if log
-      puts "#{Time.now}: *** marked location: #{location.place.name}:#{location.street_address} as event venue:#{self.name}"
+    if log & self.location
+      puts "#{Time.now}: *** marked location: #{self.location.company_name}:#{self.location.street_address} as event venue:#{self.name}"
     end
     
     return 1
   end
   
   # add the event venue as a place
-  def add_place(options={})
+  def add_company(options={})
     log = options.delete(:log) ? true : false
     
     # create location parameters
@@ -200,7 +200,7 @@ class EventVenue < ActiveRecord::Base
     end
 
     hash     = Hash['name' => name, 'street_address' =>  StreetAddress.normalize(address), 'city' => city.name, 'state' => state.name, 'zip' => zip]
-    new_loc  = PlaceHelper.add_place(hash)
+    new_loc  = CompanyHelper.add_company(hash)
     
     if self.lat and self.lng
       new_loc.lat = self.lat
@@ -229,7 +229,7 @@ class EventVenue < ActiveRecord::Base
     self.save
     
     if log
-      puts "#{Time.now}: *** added place: #{new_loc.place_name}:#{new_loc.name}:#{new_loc.id} as an event venue"
+      puts "#{Time.now}: *** added company: #{new_loc.company_name}:#{new_loc.name}:#{new_loc.id} as an event venue"
     end
     
     return 1
@@ -268,16 +268,19 @@ class EventVenue < ActiveRecord::Base
     end
     
     # check if event exits
-    event = Event.find_by_source_id(event_hash['id'])
+    event = Appointment.find_by_source_id(event_hash['id'])
     
     return event if event
     
     options  = {:name => event_hash['title'], :url => event_hash['url'], :source_type => self.source_type, :source_id => event_hash['id']}
     options[:start_at]  = event_hash['start_time'] if event_hash['start_time']
     options[:end_at]    = event_hash['stop_time'] if event_hash['stop_time']
+
+    # All events are public
+    options[:public]    = true
     
     # create event
-    event = Event.create(options)
+    event = Appointment.create(options)
 
     if log
       puts "#{Time.now}: *** created event: #{event.name} @ #{self.name}"
@@ -407,7 +410,7 @@ class EventVenue < ActiveRecord::Base
     categories = categories_hash.map do |category_hash|
       EventCategory.find_by_source_id(category_hash['id'])
     end.compact
-    
+
     # associate event categories with events
     categories.compact.each do |category|
       if log

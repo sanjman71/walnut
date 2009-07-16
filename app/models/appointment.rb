@@ -11,16 +11,17 @@ class Appointment < ActiveRecord::Base
   belongs_to                  :location
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
-  validates_presence_of       :company_id, :service_id, :start_at, :end_at, :duration
-  validates_presence_of       :provider_id, :if => :provider_required?
-  validates_presence_of       :provider_type, :if => :provider_required?
-  validates_presence_of       :customer_id, :if => :customer_required?
-  validates_presence_of       :uid
-  validates_inclusion_of      :mark_as, :in => %w(free work wait)
+  # validates_presence_of       :name
+  # validates_presence_of       :company_id, :service_id, :start_at, :end_at, :duration
+  # validates_presence_of       :provider_id, :if => :provider_required?
+  # validates_presence_of       :provider_type, :if => :provider_required?
+  # validates_presence_of       :customer_id, :if => :customer_required?
+  # validates_presence_of       :uid
+  # validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
-  after_create                :add_customer_role
-  before_validation_on_create :make_uid
+  after_save                  :update_location_events_count
+  after_create                :add_customer_role, :make_uid
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -34,13 +35,35 @@ class Appointment < ActiveRecord::Base
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
   
-  named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :provider,      lambda { |provider| if (provider)
+  has_many                  :appointment_event_category, :dependent => :destroy
+  has_many                  :event_categories, :through => :appointment_event_category, :after_add => :after_add_category, :after_remove => :after_remove_category
+  
+  before_destroy            :before_destroy_callback
+
+  acts_as_taggable_on       :event_tags
+
+  # delegate                  :country, :to => '(location or return nil)'
+  # delegate                  :state, :to => '(location or return nil)'
+  # delegate                  :city, :to => '(location or return nil)'
+  # delegate                  :zip, :to => '(location or return nil)'
+  # delegate                  :neighborhoods, :to => '(location or return nil)'
+  # delegate                  :street_address, :to => '(location or return nil)'
+  delegate                  :lat, :to => '(location or return nil)'
+  delegate                  :lng, :to => '(location or return nil)'
+
+  # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
+  named_scope :future,          lambda { { :conditions => ["start_at >= ?", Time.now.beginning_of_day.utc] } }
+  named_scope :past,            lambda { { :conditions => ["start_at < ?", Time.now.beginning_of_day.utc - 1.day] } } # be conservative
+
+  named_scope :min_popularity,  lambda { |x| {:conditions => ["popularity >= ?", x] }}
+
+  named_scope :service,         lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
+  named_scope :provider,        lambda { |provider| if (provider)
                                                     {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
                                                   else
                                                     {}
                                                   end
-                                     }
+                                        }
   named_scope :no_provider,   { :conditions => {:provider_id => nil, :provider_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
@@ -103,6 +126,9 @@ class Appointment < ActiveRecord::Base
                   end
                 }
   
+  named_scope :public,      {:conditions => "public is TRUE"}
+  named_scope :private,     {:conditions => "public is FALSE"}
+    
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
   WHEN_PAST_WEEK            = 'past week'
@@ -387,58 +413,100 @@ class Appointment < ActiveRecord::Base
     # find wait appointments that overlap in both date and time ranges
     @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
   end
-    
-  # narrow an appointment by start, end times
-  def narrow_by_time_range!(start_at, end_at)
-    # validate start, end times
-    raise AppointmentInvalid, "invalid narrow time range" if start_at > self.end_at or end_at < self.start_at or start_at > end_at
-    
-    # narrow appointment by start, end time
-    self.start_at       = start_at if self.start_at < start_at
-    self.end_at         = end_at if self.end_at > end_at
-    self.duration       = (self.end_at.to_i - self.start_at.to_i) / 60
-    
-    # adjust time start, end values
-    self.time_start_at  = self.start_at.utc.hour * 3600 + self.start_at.min * 60
-    self.time_end_at    = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+  
+  
+  #
+  #
+  # From the Event model
+  #
+  #
+  define_index do
+    indexes name, :as => :name
+    indexes location.street_address, :as => :address
+    has start_at, :as => :start_at
+    has popularity, :type => :integer, :as => :popularity
+    has location_id, :type => :integer, :as => :events, :facet => true
+    # locality attributes, all faceted
+    has location.country_id, :type => :integer, :as => :country_id, :facet => true
+    has location.state_id, :type => :integer, :as => :state_id, :facet => true
+    has location.city_id, :type => :integer, :as => :city_id, :facet => true
+    has location.zip_id, :type => :integer, :as => :zip_id, :facet => true
+    has location.neighborhoods(:id), :as => :neighborhood_ids, :facet => true
+    # event categories
+    has event_categories(:id), :as => :event_category_ids, :facet => true
+    # event tags
+    indexes event_tags.name, :as => :tags
+    has event_tags(:id), :as => :tag_ids, :facet => true
+
+    # only index public appointments
+    where "public = TRUE"
   end
   
-  # narrow an appointment by time of day
-  def narrow_by_time_of_day!(time)
-    return if time == 'anytime'
-    
-    request_time_range = Appointment.time_range(time)
-    current_time_range = Range.new(self.time_start_at, self.time_end_at)
-    
-    if current_time_range.overlap?(request_time_range)
-      # narrow
-      if current_time_range.include?(request_time_range)
-        # find and adjust by the difference in seconds
-        self.start_at += (request_time_range.first - current_time_range.first).seconds
-        self.end_at   += (request_time_range.last - current_time_range.last).seconds
-      elsif current_time_range.include?(request_time_range.first)
-        # first part of request time range overlaps
-        self.start_at += (request_time_range.first - current_time_range.first)
-      else
-        # last part of request time range overlaps
-        self.end_at   += (request_time_range.last - current_time_range.last).seconds
-      end
-      # adjust duration
-      self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
-      # check special case of 0 duration
-      self.start_at = nil if duration == 0
-      self.end_at   = nil if duration == 0
+  def popular!
+    # popularity value decreases the further away it is
+    max_pop_value = 100
+    days_from_now = (self.start_at > Time.now.beginning_of_day.utc) ? (self.start_at - Time.now) / 86400 : max_pop_value
+    self.update_attribute(:popularity, max_pop_value - days_from_now)
+  end
+
+  def unpopular!
+    self.update_attribute(:popularity, 0)
+  end
+
+  # return the event venue's name
+  def venue_name
+    # use the associated location's name
+    if self.location
+      self.location.company_name
     else
-      # the requested range does not overlap - narrow to an empty appointment
-      self.start_at       = nil
-      self.end_at         = nil
-      self.time_start_at  = nil
-      self.time_end_at    = nil
-      self.duration       = 0
+      ""
     end
   end
   
+  # returns true iff the location has a latitude and longitude 
+  def mappable?
+    return true if self.lat and self.lng
+    false
+  end
+
+  def apply_category_tags!(category)
+    return false if category.blank? or category.tags.blank?
+    self.event_tag_list.add(category.tags.split(",")) 
+    self.save
+  end
+
+  def remove_category_tags!(category)
+    return false if category.blank? or category.tags.blank?
+    category.tags.split(",").each { |s| self.event_tag_list.remove(s) }
+    self.save
+  end
+  
+  # remove event references
+  def before_destroy_callback
+    location.appointments.delete(self) if location
+  end
+
   protected
+
+  def after_remove_tagging(tagging)
+    Appointment.decrement_counter(:taggings_count, id)
+  end
+
+  def after_add_category(category)
+    return if category.tags.blank?
+    # add category tags and save object
+    apply_category_tags!(category)
+    # increment counter cache
+    EventCategory.increment_counter(:events_count, category.id)
+  end
+  
+  def after_remove_category(category)
+    return if category.tags.blank?
+    # remove category tags and save object
+    remove_category_tags!(category)
+    # decrement counter cache
+    EventCategory.decrement_counter(:events_count, category.id)
+  end
   
   # providers are required for all appointments except waitlist appointments
   def provider_required?
@@ -480,4 +548,15 @@ class Appointment < ActiveRecord::Base
     self.customer.grant_role('customer', self.company)
   end
   
+  def update_location_events_count
+    if self.location_id && self.changes.keys.include?("public") && !self.changes["public"][0].nil?
+      # If it went from private to public, increment the 
+      if self.changes["public"][1]
+        Location.increment_counter(:events_count, self.location_id)
+      else
+        Location.decrement_counter(:events_count, self.location_id)
+      end
+    end
+  end
+
 end

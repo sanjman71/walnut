@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
         self.class.benchmark("Benchmarking #{@state.name} cities with events") do
           # find city events
           city_limit  = 10
-          @facets     = Event.facets(:with => Search.attributes(@state), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
+          @facets     = Appointment.facets(:with => Search.attributes(@state), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
           @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
         end
       when 'search'

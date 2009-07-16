@@ -33,7 +33,7 @@ class SearchController < ApplicationController
         tags      = Search.load_from_facets(facets, Tag)
 
         tag_limit = 30
-        facets    = Event.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Appointment.facets(:with => Search.attributes(@city), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         tags      += Search.load_from_facets(facets, Tag)
 
         # return sorted, unique tags collection
@@ -44,7 +44,7 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking #{@city.name} events") do
       @events_count = Rails.cache.fetch("#{@city.name.parameterize}:events", :expires_in => CacheExpire.events) do
         # find city events count
-        facets = Event.facets(:with => Search.attributes(@city), :facets => "city_id")
+        facets = Appointment.facets(:with => Search.attributes(@city), :facets => "city_id")
         facets[:city_id][@city.id].to_i
       end
     end
@@ -64,7 +64,7 @@ class SearchController < ApplicationController
         tags      = Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
 
         tag_limit = 30
-        facets    = Event.facets(:with => Search.attributes(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Appointment.facets(:with => Search.attributes(@neighborhood), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         tags      += Search.load_from_facets(facets, Tag)
 
         # return sorted, unique tags collection
@@ -75,7 +75,7 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking #{@neighborhood.name} events") do
       # find neighborhood events count
       @events_count = Rails.cache.fetch("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:events", :expires_in => CacheExpire.events) do
-        facets = Event.facets(:with => Search.attributes(@neighborhood), :facets => "neighborhood_ids")
+        facets = Appointment.facets(:with => Search.attributes(@neighborhood), :facets => "neighborhood_ids")
         facets[:neighborhood_ids][@neighborhood.id].to_i
       end
     end
@@ -95,7 +95,7 @@ class SearchController < ApplicationController
         tags      = Search.load_from_facets(facets, Tag).sort_by { |o| o.name }
 
         tag_limit = 30
-        facets    = Event.facets(:with => Search.attributes(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
+        facets    = Appointment.facets(:with => Search.attributes(@zip), :facets => "tag_ids", :limit => tag_limit, :max_matches => tag_limit)
         tags      += Search.load_from_facets(facets, Tag)
 
         # return sorted, unique tags collection
@@ -132,7 +132,7 @@ class SearchController < ApplicationController
 
     case @search_klass
     when 'search'
-      @klasses        = [Event, Location]
+      @klasses        = [Appointment, Location]
       @facet_klass    = Location
       @sort_order     = :popularity
       @sort_mode      = :desc
@@ -142,8 +142,8 @@ class SearchController < ApplicationController
       @sort_order     = :popularity
       @sort_mode      = :desc
     when 'events'
-      @klasses        = [Event]
-      @facet_klass    = Event
+      @klasses        = [Appointment]
+      @facet_klass    = Appointment
       @sort_order     = :start_at
       @sort_mode      = :asc
     end

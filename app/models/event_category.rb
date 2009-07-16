@@ -2,8 +2,11 @@ class EventCategory < ActiveRecord::Base
   validates_presence_of     :name, :source_type, :source_id
   validates_uniqueness_of   :name
   
-  has_many                  :event_category_mappings, :dependent => :destroy
-  has_many                  :events, :through => :event_category_mappings
+  has_many                  :appointment_event_categories, :dependent => :destroy
+  has_many                  :appointments, :through => :appointment_event_categories
+  
+  has_many                  :events, :through => :appointment_event_categories,
+                            :class_name => "Appointment", :conditions => ['public = TRUE']
   
   named_scope :popular,         { :conditions => ["popularity > 0"] }
   named_scope :order_by_name,   { :order => "name ASC" }

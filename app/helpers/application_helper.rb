@@ -66,19 +66,27 @@ module ApplicationHelper
     features.sort
   end
   
-  # build search route based on the klass parameter
-  # note: searching can only be done by city, zip or neighborhood
-  def build_search_route(klass, where, options={})
+  def klass_to_word(klass)
     case klass.to_s.downcase
-    when 'location', 'locations', 'place', 'places'
-      klass = 'locations'
-    when 'event', 'events'
-      klass = 'events'
+    when 'locations', 'places'
+      'locations'
+    when 'location', 'place'
+      'location'
+    when 'events', 'appointments'
+      'events'
+    when 'event', 'appointment'
+      'event'
     when 'search'
-      klass = 'search'
+      'search'
     else
       raise Exception, "invalid klass #{klass} for search route"
     end
+  end
+  
+  # build search route based on the klass parameter
+  # note: searching can only be done by city, zip or neighborhood
+  def build_search_route(klass, where, options={})
+    klass = klass_to_word(klass.pluralize)
     
     case where
     when 'city'

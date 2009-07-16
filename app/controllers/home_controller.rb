@@ -18,7 +18,7 @@ class HomeController < ApplicationController
 
     self.class.benchmark("Benchmarking #{@featured_city.name} featured events") do
       @featured_events = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured:events", :expires_in => CacheExpire.locations) do
-        ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Event], :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+        ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Appointment], :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
       end
       @featured_events_title = "#{@featured_city.name} Events"
 

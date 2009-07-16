@@ -19,7 +19,7 @@
           - case object.class.to_s
           - when 'Location'
             = render(:partial => 'search/location', :locals => {:location => object, :index => i})
-          - when 'Event'
+          - when 'Appointment'
             = render(:partial => 'search/event', :locals => {:event => object, :index => i})
 
   .span-10.prepend-1.last
@@ -30,7 +30,7 @@
           - case object.class.to_s
           - when 'Location'
             = render(:partial => 'search/location', :locals => {:location => object, :index => i})
-          - when 'Event'
+          - when 'Appointment'
             = render(:partial => 'search/event', :locals => {:event => object, :index => i})
   
   -#.span-13.last

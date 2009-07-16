@@ -50,7 +50,7 @@
         -# filter search results by type
         - @search_filters.keys.each do |klass|
           %span{:style => 'font-weight: bold; font-size: 1.1em;'}
-            = link_to("Search #{klass.pluralize} only", build_search_route(klass, @locality_type, @locality_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
+            = link_to("Search #{klass_to_word(klass.pluralize).titleize} only", build_search_route(klass, @locality_type, @locality_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
             = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
     
     .span-10
@@ -59,7 +59,7 @@
           - case object.class.to_s
           - when 'Location'
             = render(:partial => 'search/location', :locals => {:location => object, :query => @query, :tags => @tags, :index => i})
-          - when 'Event'
+          - when 'Appointment'
             = render(:partial => 'search/event', :locals => {:event => object, :query => @query, :tags => @tags, :index => i})
 
     .span-9.last

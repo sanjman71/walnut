@@ -99,7 +99,7 @@ namespace :events do
     checked     = 0
     missing     = 0
     errors      = 0
-    istart      = Event.count
+    istart      = Appointment.public.count
 
     puts "#{Time.now}: importing #{city.name} events, limit #{limit}, checking at most #{max_page * per_page} events"
 
@@ -114,7 +114,7 @@ namespace :events do
       events.each do |event_hash|
         checked += 1
 
-        if Event.find_by_source_id(event_hash['id'])
+        if Appointment.public.find_by_source_id(event_hash['id'])
           # event already exists
           exists += 1
           next
@@ -158,7 +158,7 @@ namespace :events do
 
           # if its still not mapped, and the confidence value says the location probably doesn't exist, add the venue as a new place
           if !venue.mapped? and venue.confidence == 0
-            venue.add_place(:log => true)
+            venue.add_company(:log => true)
           end
         end
         
@@ -170,7 +170,7 @@ namespace :events do
       
         # import the event
         event = venue.import_event(event_hash, :log => true)
-      
+
         if event
           # tag the event
           EventVenue.tag_event(event, :log => true)
@@ -185,7 +185,7 @@ namespace :events do
       page += 1
     end
     
-    iend = Event.count
+    iend = Appointment.public.count
 
     puts "#{Time.now}: completed, checked #{checked} events, imported #{iend - istart} events, #{exists} already exist, missing #{missing} venues, ended with #{iend} events"
   end
@@ -215,7 +215,7 @@ namespace :events do
   desc "Remove all past events"
   task :remove_past do
     # find all past events
-    events = Event.past
+    events = Appointment.public.past
 
     puts "#{Time.now}: removing all #{events.size} past events"
     
