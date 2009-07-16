@@ -76,7 +76,7 @@ module ApplicationHelper
       'events'
     when 'event', 'appointment'
       'event'
-    when 'search'
+    when 'search', 'searches'
       'search'
     else
       raise Exception, "invalid klass #{klass} for search route"
