@@ -37,7 +37,7 @@ class CreateRecurrences < ActiveRecord::Migration
     end
     
     change_table :locations do |t|
-      t.integer :appointments_count
+      t.integer :appointments_count, :default => 0
       t.string  :timezone
     end
 
