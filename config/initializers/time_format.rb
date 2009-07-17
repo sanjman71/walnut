@@ -7,6 +7,7 @@ Time::DATE_FORMATS[:appt_schedule]              = "%Y%m%dT%H%M%S"               
 Time::DATE_FORMATS[:appt_schedule_day]          = "%Y%m%d"                        # 20081031
 Time::DATE_FORMATS[:appt_short_month_day]       = "%b %d"                         # Oct 31
 Time::DATE_FORMATS[:appt_short_month_day_year]  = "%b %d %Y"                      # Oct 31 2009
+Time::DATE_FORMATS[:appt_short_month]           = "%b"                            # Oct
 
 Time::DATE_FORMATS[:appt_week_day_short]        = "%a"                            # Fri
 Time::DATE_FORMATS[:appt_month_day]             = "%d"                            # 31
