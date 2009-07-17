@@ -25,7 +25,7 @@ class CreateRecurrences < ActiveRecord::Migration
       t.datetime    :start_recurrence # The recurrence starts on or after before this datetime
       t.datetime    :end_recurrence   # The recurrence ends before this datetime
 
-      t.string      :name,                :limit => 100, :null => false
+      t.string      :name,                :limit => 100
       t.integer     :popularity,          :default => 0
       t.string      :url,                 :limit => 200
       t.integer     :taggings_count,      :default => 0   # counter cache

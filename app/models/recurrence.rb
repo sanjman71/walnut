@@ -17,12 +17,11 @@ class Recurrence < ActiveRecord::Base
   validates_presence_of       :provider_id, :if => :provider_required?
   validates_presence_of       :provider_type, :if => :provider_required?
   validates_presence_of       :customer_id, :if => :customer_required?
-  validates_presence_of       :uid
+  # validates_presence_of       :uid
   validates_inclusion_of      :mark_as, :in => %w(free work wait)
                               
   before_save                 :make_confirmation_code
-  after_create                :add_customer_role
-  before_validation_on_create :make_uid
+  after_create                :add_customer_role, :make_uid
                               
   after_create                :instantiate_recurrence
   after_update                :update_recurrence
