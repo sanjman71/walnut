@@ -84,7 +84,9 @@ ActionController::Routing::Routes.draw do |map|
   map.stats_googlemedia   '/bots/googlemedia', :controller => 'log_stats', :action => 'googlebot'
 
   # events controller
-  map.connect   '/events/new', :controller => 'events', :action => 'new'
+  map.new_event     '/locations/:location_id/events/new',       :controller => 'events', :action => 'new'
+  map.create_event  '/locations/:location_id/events',           :controller => 'events', :action => 'create', :conditions => {:method => :post}
+  map.show_event    '/locations/:location_id/event/:event_id',  :controller => 'events', :action => 'show'
 
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}

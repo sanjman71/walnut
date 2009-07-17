@@ -38,6 +38,11 @@
         - unless @location.phone_numbers_count == 0
           = render(:partial => 'phone', :locals => {:location => @location, :max_phones => 3})
         
+      -# location events
+      %h4#add_event
+        - if has_privilege?('manage site') and @location.events_count == 0
+          = link_to "Add Event", new_event_path(@location.id), :style => 'font-weight: bold; color: #007700; font-size: 1.0em;'
+          
       -# location recommendations
       / %h4.recommendations#recommend
       /   = render(:partial => "recommendations", :locals => {:location => @location})
@@ -63,7 +68,7 @@
     
   %hr.space
   
-  - if @location_events.blank?
+  - if @location.events_count == 0
     -# nearby locations
     .last#nearby_places{:class => @nearby_event_venues.blank? ? "span-18" : "span-7 colborder"}
       = render(:partial => 'nearby_places', :locals => {:locations => @nearby_locations, :title => 'Nearby Places'}) unless @nearby_locations.blank?
@@ -74,7 +79,7 @@
   - else
     -# location events
     .last#location_events{:class => "span-7 colborder"}
-      = render(:partial => 'location_events', :locals => {:events => @location_events, :title => 'Upcoming Events'})
+      = render(:partial => 'location_events', :locals => {:location => @location, :events => @location_events, :title => 'Upcoming Events'})
 
     -# nearby event venues
     .span-9.last#nearby_event_venues

@@ -1,77 +1,120 @@
-- title("Events")
-- javascript('recurrence', 'date', 'jquery.datePicker')
-- stylesheet('datePicker')
+- title("#{@location.company_name} Events")
+- javascript('recurrence', 'date', 'ui.core', 'ui.datepicker', 'ui.timepickr', 'jquery.timepickr')
+- stylesheet('ui.core', 'ui.theme', 'ui.datepicker', 'jquery.timepickr')
 
 .span-23.prepend-1.mat.padding-top-10.bottom
-  %h2== Add an Event
+  %h2= @location.company_name
+  %h4== Add Event
 
 %hr.space
 
 .span-23.prepend-1.last
-  .span-2.padding-top-10.text-align-right
+  .span-3.padding-top-10.text-align-right
     %h2= label_tag "what", "What:"
-  .span-21.last
+  .span-20.last
     = text_field_tag 'what', '', :class => 'text title big', :style => "width: 300px;"
 
 .span-23.prepend-1.last
-  .span-2.padding-top-5.text-align-right
+  .span-3.padding-top-10.text-align-right
     %h3= label_tag "when", "When:"
-  .span-21.last.padding-top-5
-    = text_field_tag 'when', '', :class => 'date-pick', :style => "width: 80px;"
+  .span-20.last.padding-top-5
+    = text_field_tag 'when', '', :class => 'datepicker', :style => "width: 100px; background: #EDF3FE; font-size: 1.3em; padding-left: 3px;"
 
-.span-23.prepend-1.padding-bottom-10#recurrence{:style => 'color: #5500BB; font-size: 1.5em; font-weight: bold;'}
+.span-23.prepend-1.last
+  .span-3.padding-top-10.text-align-right
+    %h3= label_tag "starts_at", "Starts at:"
+  .span-20.last.padding-top-5
+    = text_field_tag 'starts_at', '', :style => "width: 100px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
+    
+.span-23.prepend-1.last
+  .span-3.padding-top-10.text-align-right
+    %h3= label_tag "ends_at", "Ends at:"
+  .span-20.last.padding-top-5
+    = text_field_tag 'ends_at', '', :style => "width: 100px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
+
+.span-23.prepend-4.padding-bottom-10#recurrence{:style => 'color: #5500BB; font-size: 1.3em; font-weight: bold;'}
   == &nbsp;
 
 .span-23.prepend-1.last#repeats
-  .span-2.padding-top-5.text-align-right
+  .span-3.text-align-right{:style => 'padding-top: 8px;'}
     %h3= label_tag "select_repeats", "Repeats:", :class => 'big'
-  .span-21.last
-    = select_tag('select_repeats', options_for_select(@repeat_options.collect{ |o| [o, "#{o.parameterize.underscore}"] }), :class => 'text', :style => 'font-size: 1.1em;')
+  .span-20.last
+    = select_tag('select_repeats', options_for_select(@repeat_options.collect{ |o| [o, "#{o.parameterize.underscore}"] }), :class => 'text', :style => 'font-size: 1.3em;')
 
 .span-23.prepend-1.last.hide.bottom.repeat.every#repeats_every_daily
-  %h3
-    = label_tag "select_repeats_daily", "Repeat Every:", :class => 'big'
+  .span-3.padding-top-5.text-align-right
+    %h3= label_tag "select_repeats_daily", "Repeat Every:", :class => 'big'
+  .span-20.last
     = select_tag('select_repeats_daily', options_for_select(Range.new(1, 30).collect { |i| [i, i]}), :class => 'text')
-    %span{:style => 'font-size: 0.7em; font-weight: bold;'}== Days
+    %span{:style => 'font-weight: bold;'}== Days
 
 .span-23.prepend-1.last.hide.repeat.every#repeats_every_weekly
-  %h3
-    = label_tag "select_repeats_weekly", "Repeat Every:", :class => 'big'
+  .span-3.padding-top-5.text-align-right
+    %h3= label_tag "select_repeats_weekly", "Repeat Every:", :class => 'big'
+  .span-20.last
     = select_tag('select_repeats_weekly', options_for_select(Range.new(1, 30).collect { |i| [i, i]}), :class => 'text')
-    %span{:style => 'font-size: 0.7em; font-weight: bold;'}== Weeks
+    %span{:style => 'font-weight: bold;'}== Weeks
 
 .span-23.prepend-1.last.hide.repeat.on#repeats_on_weekly
-  %h3
-    = label_tag "select_repeats_weekly", "Repeat On:", :class => 'big'
-    = check_box_tag 'Monday', 'mon', false, :class => 'weekly checkbox day', :id => 'mon'
-    = label_tag 'mon', 'Mon', :class => 'checkbox'
-    = check_box_tag 'Tuesday', 'tue', false, :class => 'weekly checkbox day', :id => 'tue'
-    = label_tag 'tue', 'Tue', :class => 'checkbox'
-    = check_box_tag 'Wednesday', 'wed', false, :class => 'weekly checkbox day', :id => 'wed'
-    = label_tag 'wed', 'Wed', :class => 'checkbox'
-    = check_box_tag 'Thursday', 'thu', false, :class => 'weekly checkbox day', :id => 'thu'
-    = label_tag 'thu', 'Thu', :class => 'checkbox'
-    = check_box_tag 'Friday', 'fri', false, :class => 'weekly checkbox day', :id => 'fri'
-    = label_tag 'fri', 'Fri', :class => 'checkbox'
-    = check_box_tag 'Saturday', 'sat', false, :class => 'weekly checkbox day', :id => 'sat'
-    = label_tag 'sat', 'Sat', :class => 'checkbox'
-    = check_box_tag 'Sunday', 'sun', false, :class => 'weekly checkbox day', :id => 'sun'
+  .span-3.padding-top-5.text-align-right
+    %h3= label_tag "select_repeats_weekly", "Repeat On:", :class => 'big'
+  .span-20.last
+    = check_box_tag 'Sunday', 'sun', false, :class => 'weekly checkbox day', :id => 'sun', :byday => 'su'
     = label_tag 'sun', 'Sun', :class => 'checkbox'
+    = check_box_tag 'Monday', 'mon', false, :class => 'weekly checkbox day', :id => 'mon', :byday => 'mo'
+    = label_tag 'mon', 'Mon', :class => 'checkbox'
+    = check_box_tag 'Tuesday', 'tue', false, :class => 'weekly checkbox day', :id => 'tue', :byday => 'tu'
+    = label_tag 'tue', 'Tue', :class => 'checkbox'
+    = check_box_tag 'Wednesday', 'wed', false, :class => 'weekly checkbox day', :id => 'wed', :byday => 'we'
+    = label_tag 'wed', 'Wed', :class => 'checkbox'
+    = check_box_tag 'Thursday', 'thu', false, :class => 'weekly checkbox day', :id => 'thu', :byday => 'th'
+    = label_tag 'thu', 'Thu', :class => 'checkbox'
+    = check_box_tag 'Friday', 'fri', false, :class => 'weekly checkbox day', :id => 'fri', :byday => 'fr'
+    = label_tag 'fri', 'Fri', :class => 'checkbox'
+    = check_box_tag 'Saturday', 'sat', false, :class => 'weekly checkbox day', :id => 'sat', :byday => 'sa'
+    = label_tag 'sat', 'Sat', :class => 'checkbox'
 
 .span-23.prepend-1.last.hide.repeat.range#repeats_range
-  %h3{:style => 'font-weight: bold;'}== Range:
-  %h3
-    %span{:style => 'font-size: 0.8em; font-weight: bold;'}== Starts:
-    = text_field_tag 'range_starts_date', '', :style => 'width: 90px; font-size: 12px;', :disabled => true
-    %br
-    %span{:style => 'font-size: 0.8em; font-weight: bold;'}== Ends:
-    = radio_button_tag "ends", "Never", true, :id => 'range_ends_never'
-    = label_tag "range_ends_never", "Never", :class => 'small'
-    = radio_button_tag "ends", "Until", false, :id => 'range_ends_until'
-    = label_tag "range_ends_until", "Until", :class => 'small'
-    = text_field_tag 'range_ends_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick hide'
+  .span-3.text-align-right
+    %h3{:style => 'font-weight: bold;'}== Ends:
+  .span-20.last
+    %h3
+      = radio_button_tag "ends", "Never", true, :id => 'range_end_never'
+      = label_tag "range_end_never", "Never", :class => 'small'
+      = radio_button_tag "ends", "Until", false, :id => 'range_end_until'
+      = label_tag "range_end_until", "Until", :class => 'small'
+      = text_field_tag 'range_end_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick hide'
 
+-# hidden div always to receive jquery events
+.span-23.prepend-1.last.hide.repeat.on
+  %span#select_repeats_does_not_repeat== &nbsp;
 
--# hidden div always
+-# hidden div always to receive jquery events
 .span-23.prepend-1.last.hide.repeat.on
   %span#select_repeats_every_weekday_monday_friday== &nbsp;
+
+
+- form_for(Appointment.new, :url => url_for(:controller => 'events', :action => 'create', :location_id=> @location.id), :method => :post, :html => {:id => 'add_event_form'}) do |f|
+  = hidden_field_tag :name, ''
+  = hidden_field_tag :dstart, ''
+  = hidden_field_tag :tstart, ''
+  = hidden_field_tag :tend, ''
+  %br
+  = text_field_tag :freq, '', :disabled => true
+  %br
+  = text_field_tag :byday, '', :disabled => true
+  %br
+  = text_field_tag :interval, '', :disabled => true
+  %br
+  = text_field_tag :until, '', :disabled => true
+  
+  %hr.space
+  %hr.space
+
+  .span-16.last.prepend-1
+    %h2#submit
+      = f.submit "Create Event", :class => 'big button'
+      %span{:style => 'font-size: 11px;'}
+        == or
+        = link_to 'Cancel', location_path(@location.id)
+

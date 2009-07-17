@@ -18,9 +18,19 @@ $.fn.init_repeating = function () {
     // empty recurrence text
     $("#recurrence").text("");
     // initialize start date to today
-    $("#range_starts_date").attr("value", (new Date()).zeroTime().asString());
+    //$("#range_starts_date").attr("value", (new Date()).zeroTime().asString());
     // send change event to selected option
     $(select_repeats_id).change();
+  })
+
+  $("#select_repeats_does_not_repeat").change(function () {
+    $current_recurrence_type = 'does_not_repeat';
+    // hide range div
+    $("#repeats_range").hide();
+    // clear recurrence fields
+    $("#freq").attr('value', '');
+    $("#byday").attr('value', '');
+    $("#interval").attr('value', '')
   })
   
   $("#select_repeats_daily").change(function () {
@@ -46,16 +56,18 @@ $.fn.init_repeating = function () {
     $(document).set_weekly_recurrence();
   })
 
-  $("#range_ends_until").click(function () {
+  $("#range_end_until").click(function () {
     // show date field
-    $("#range_ends_date").show();
+    $("#range_end_date").show();
   })
 
-  $("#range_ends_never").click(function () {
+  $("#range_end_never").click(function () {
     // hide date field
-    $("#range_ends_date").hide();
+    $("#range_end_date").hide();
     // clear date field
-    $("#range_ends_date").attr("value", '');
+    $("#range_end_date").attr("value", '');
+    // clear recurrence 'until' field
+    $("#until").attr('value', '');
     // update recurrence using end date
     $(document).set_recurrence();
   })
@@ -66,82 +78,170 @@ $.fn.set_recurrence = function () {
 }
 
 $.fn.set_daily_recurrence = function () {
-  days = $("#select_repeats_daily option:selected").attr("value");
+  interval = $("#select_repeats_daily option:selected").attr("value");
   
-  if (days == 1) {
-    var recurrence = "Daily";
+  if (interval == 1) {
+    var s = "Daily";
   } else {
-    var recurrence = "Every " + days + " days";
+    var s = "Every " + interval + " days";
   }
   
   // add end date
-  recurrence += $(document).get_recurrence_range_end_date();
+  s += $(document).get_recurrence_range_date();
   
-  $("#recurrence").text(recurrence);
+  $("#recurrence").text(s);
+  
+  // set recurrence values
+  $("#freq").attr('value', 'daily');
+  $("#byday").attr('value', '');
+  $("#interval").attr('value', interval);
 }
 
 $.fn.set_weekly_recurrence = function () {
   // every 'x' weeks or 'weekly'
-  var weeks = $("#select_repeats_weekly option:selected").attr("value");
+  var interval = $("#select_repeats_weekly option:selected").attr("value");
   
-  if (weeks == 1) {
+  if (interval == 1) {
     var every_weeks = "Weekly";
   } else {
-    var every_weeks = "Every " + weeks + " weeks";
+    var every_weeks = "Every " + interval + " weeks";
   }
   
-  var days = new Array();
+  var days   = new Array();
+  var bydays = new Array();
   // on monday, tuesday ...
   $('.checkbox.day:checked').each(function() {
     days.push($(this).attr("name"));
+    bydays.push($(this).attr("byday"));
   })
   // build recurrence, e.g. "Every 2 weeks on Monday, Wednesday"
-  var recurrence = every_weeks + " on " + days.join(", ");
+  var s = every_weeks + " on " + days.join(", ");
   
-  // add end date
-  recurrence += $(document).get_recurrence_range_end_date();
-  $("#recurrence").text(recurrence);
+  // add range date
+  s += $(document).get_recurrence_range_date();
+  
+  $("#recurrence").text(s);
+
+  // set recurrence values
+  $("#freq").attr('value', 'weekly');
+  $("#byday").attr('value', bydays.join(","));
+  $("#interval").attr('value', interval);
 }
 
 $.fn.set_every_weekday_monday_friday_recurrence = function () {
-  var recurrence = "Weekly on Weekdays";
-  recurrence += $(document).get_recurrence_range_end_date();
-  $("#recurrence").text(recurrence);
+  var s = "Weekly on Weekdays";
+  s += $(document).get_recurrence_range_date();
+  $("#recurrence").text(s);
+
+  // set recurrence values
+  $("#freq").attr('value', 'weekly');
+  $("#byday").attr('value', 'mo,tu,we,th,fr');
+  $("#interval").attr('value', '');
 }
 
-$.fn.get_recurrence_range_end_date = function() {
-  var end_date = $("#range_ends_date").attr("value");
+$.fn.get_recurrence_range_date = function() {
   var s = ''
-  if (end_date) 
+
+  if ($("#range_start_date").attr("value")) {
+    // start date display looks like 'starting xx/yy/zz'
+    s += ", starting " + $("#range_start_date").attr("value");
+  }
+  
+  if ($("#range_end_date").attr("value")) 
   {
     // end date looks like 'until xx/yy/zz' 
-    s += ", until " + end_date;
+    s += ", until " + $("#range_end_date").attr("value");
   }
   return s
 }
 
-$.fn.init_datepicker = function(s) {
-  var defaults = {start_date : "07/01/2009", end_date : "12/31/2009", max_days : 7}
-  s = $.extend({}, defaults, s);
-  
-  // initialize date picker object
-  $('.date-pick').datePicker({clickInput:true, createButton:false, startDate:s.start_date, endDate:s.end_date});
+$.fn.init_datepicker = function () {
+  $(".datepicker").datepicker({minDate: +0, maxDate: '+3m'});
+}
 
-  // bind to end date selected event
-  $('#range_ends_date').bind(
-    'dpClosed',
-    function(e, selectedDates)
-    {
-      // update recurrence
-      $(document).set_recurrence();
+$.fn.init_timepicker = function() {
+  $("#starts_at").timepickr({convention:12});
+  $("#ends_at").timepickr({convention:12});
+}
+
+// convert mm/dd/yyyy date to yyyymmdd string
+$.fn.convert_date_to_string = function(s) {
+  re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/
+  match = s.match(re);
+  s     = match[3] + match[1] + match[2]
+  return s
+}
+
+// convert '03:00 pm' time format to 'hhmmss' 24 hour time format
+$.fn.convert_time_ampm_to_string = function(s) {
+  re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
+  match   = s.match(re);
+
+  // convert hour to integer, leave minute as string
+  hour    = parseInt(match[1], 10); 
+  minute  = match[2];
+
+  if (match[3] == 'pm') {
+    // add 12 for pm
+    hour += 12;
+  }
+
+  value = hour < 10 ? "0" + hour.toString() : hour.toString()
+  value += minute + "00";
+  return value
+}
+
+$.fn.init_event_form = function() {
+  // handle submit event
+  $("#add_event_form").submit(function () {
+    if (!$("#what").attr('value')) {
+      alert("Please specify an event name");
+      return false;
+    } else {
+      // copy 'what' field to 'name
+      $("#name").attr('value', $("#what").attr('value'));
     }
-  )
+    
+    if (!$("#when").attr('value')) {
+      alert("Please specify an event date");
+      return false;
+    } else {
+      // format 'when' field for 'dstart'
+      s = $(document).convert_date_to_string($("#when").attr('value'));
+      $("#dstart").attr('value', s);
+    }
+
+    if (!$("#starts_at").attr('value')) {
+      alert("Please specify an event start time");
+      return false;
+    } else {
+      // format 'starts_at' field for 'tstart'
+      s = $(document).convert_time_ampm_to_string($("#starts_at").attr('value'));
+      $("#tstart").attr('value', s);
+    }
+
+    if (!$("#ends_at").attr('value')) {
+      alert("Please specify an event end time");
+      return false;
+    } else {
+      // format 'ends_at' field for 'tend'
+      s = $(document).convert_time_ampm_to_string($("#ends_at").attr('value'));
+      $("#tend").attr('value', s);
+    }
+    
+    // tend must be later than tstart
+    if ($("#tend").attr('value') < $("#tstart").attr('value')) {
+      alert("The event end time can not be earlier than the start time");
+      return false;
+    }
+    
+    return true;
+  })
 }
 
 $(document).ready(function() {
-  Date.firstDayOfWeek = 7;
-  Date.format = 'mm/dd/yyyy';
-  $(document).init_datepicker({start_date : (new Date()).addDays(1).asString(), end_date : (new Date()).addMonths(3).asString(), max_days:10});
-
+  $(document).init_datepicker();
+  $(document).init_timepicker();
   $(document).init_repeating();
+  $(document).init_event_form();
 })
