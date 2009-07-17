@@ -13,7 +13,8 @@ class Recurrence < ActiveRecord::Base
   # Recurrence instances. TODO: All instances of the recurrence are destroyed when the recurrence is destroyed
   has_many                    :appointments, :dependent => :destroy
                               
-  validates_presence_of       :company_id, :service_id, :start_at, :end_at, :duration
+  validates_presence_of       :company_id, :start_at, :end_at, :duration
+  validates_presence_of       :service_id, :if => :service_required?
   validates_presence_of       :provider_id, :if => :provider_required?
   validates_presence_of       :provider_type, :if => :provider_required?
   validates_presence_of       :customer_id, :if => :customer_required?
@@ -28,10 +29,10 @@ class Recurrence < ActiveRecord::Base
   
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
-  CREATE_APPT_ATTRS        = ["company_id", "service_id", "provider_id", "provider_type", "customer_id", "mark_as",
-                              "uid", "description"]
+  CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
+                              "confirmation_code", "uid", "description", "public"]
 
-  # If any of these attributes in a recurrence update, we have to re-expand the instances of the recurrence
+  # If any of these attributes change in a recurrence update, we have to re-expand the instances of the recurrence
   REEXPAND_INSTANCES_ATTRS = ["rrule", "start_at", "end_at", "duration"]
 
   # These are the attributes which can be used in an update
@@ -270,6 +271,14 @@ class Recurrence < ActiveRecord::Base
   
   alias :waitlist? :wait?
   
+  def public?
+    self.public
+  end
+  
+  def private?
+    !self.public
+  end
+  
   def self.expand_all_instances(company, starting, before)
     company.recurrences.each do |recur|
       recur.expand_instances(starting, before)
@@ -322,10 +331,16 @@ class Recurrence < ActiveRecord::Base
 
   protected
   
-  # providers are required for all appointments except waitlist appointments
+  # service is required for all work appointments and all private free appointments
+  def service_required?
+    return true if (work? || (free? && private?))
+    false
+  end
+
+  # providers are required for all work appointments
   def provider_required?
-    return false if wait?
-    true
+    return true if (work? || (free? && private?))
+    false
   end
   
   # customers are required for work and waitlist appointments

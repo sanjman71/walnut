@@ -17,7 +17,7 @@ class CreateRecurrences < ActiveRecord::Migration
       t.string      :uid              # The iCalendar UID
       t.text        :description
       t.datetime    :canceled_at
-      t.boolean     :public,              :default => true
+      t.boolean     :public,              :default => false
 
       t.string      :rrule            # iCalendar recurrence rule
       t.datetime    :expanded_to      # recurrence has been expanded up to this datetime (in UTC)

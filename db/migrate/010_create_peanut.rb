@@ -113,7 +113,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :uid              # The iCalendar UID
       t.text        :description
       t.datetime    :canceled_at
-      t.boolean     :public,              :default => true
+      t.boolean     :public,              :default => false
 
       t.string      :name,                :limit => 100
       t.integer     :popularity,          :default => 0

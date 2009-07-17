@@ -13,10 +13,11 @@ class Appointment < ActiveRecord::Base
 
   # validates_presence_of       :name
   validates_presence_of       :company_id
-  # validates_presence_of       :service_id, :start_at, :end_at, :duration
-  # validates_presence_of       :provider_id, :if => :provider_required?
-  # validates_presence_of       :provider_type, :if => :provider_required?
-  # validates_presence_of       :customer_id, :if => :customer_required?
+  validates_presence_of       :start_at, :end_at, :duration
+  validates_presence_of       :service_id, :if => :service_required?
+  validates_presence_of       :provider_id, :if => :provider_required?
+  validates_presence_of       :provider_type, :if => :provider_required?
+  validates_presence_of       :customer_id, :if => :customer_required?
   validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
@@ -414,6 +415,13 @@ class Appointment < ActiveRecord::Base
     @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
   end
   
+  def public?
+    self.public
+  end
+  
+  def private?
+    !self.public
+  end
   
   #
   #
@@ -508,10 +516,16 @@ class Appointment < ActiveRecord::Base
     EventCategory.decrement_counter(:events_count, category.id)
   end
   
-  # providers are required for all appointments except waitlist appointments
+  # service is required for all work appointments
+  def service_required?
+    return true if (work? || (free? && private?))
+    false
+  end
+
+  # providers are required for all work appointments
   def provider_required?
-    return false if wait?
-    true
+    return true if (work? || (free? && private?))
+    false
   end
   
   # customers are required for work and waitlist appointments
