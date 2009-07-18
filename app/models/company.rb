@@ -43,7 +43,6 @@ class Company < ActiveRecord::Base
   has_many                  :services, :through => :company_services, :after_add => :after_add_service, :after_remove => :after_remove_service
   has_many                  :products
   has_many                  :appointments
-  has_many                  :recurrences
   has_many                  :customers, :through => :appointments, :uniq => true
   has_many                  :invitations
 

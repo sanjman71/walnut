@@ -34,6 +34,10 @@ class CreatePeanut < ActiveRecord::Migration
       t.rename  :places_count, :companies_count
     end
     
+    change_table :locations do |t|
+      t.integer :appointments_count, :default => 0
+    end
+    
     create_table :services do |t|
       t.string  :name
       t.integer :duration
@@ -99,7 +103,6 @@ class CreatePeanut < ActiveRecord::Migration
       t.references  :location
       t.references  :provider,            :polymorphic => true    # e.g. users
       t.references  :customer      # user who booked the appointment
-      t.references  :recurrence     # If this appointment is an instance of a recurrence
       t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at
@@ -121,6 +124,14 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer     :taggings_count,      :default => 0   # counter cache
       t.string      :source_type,         :limit => 20
       t.string      :source_id,           :limit => 50
+
+      # Recurrence information
+      t.references  :recur_parent, :class => "Appointment"  # If this appointment is an instance of a recurring appointment
+      t.string      :recur_rule, :limit => 200              # iCalendar recurrence rule
+      t.datetime    :recur_expanded_to                      # recurrence has been expanded up to this datetime (in UTC)
+      t.integer     :recur_remaining_count                  # The count can be added to the recur_rule. Not currently supported / used
+      t.datetime    :recur_until                            # The recurrence ends before this datetime
+      t.integer     :recur_instances_count                  # The number of recurrence instances
 
       t.timestamps
     end
@@ -264,6 +275,8 @@ class CreatePeanut < ActiveRecord::Migration
     change_table :tag_groups do |t|
       t.rename  :companies_count, :places_count
     end
+
+    remove_column :locations, :appointments_count
     
     drop_table  :log_entries
     drop_table  :subscriptions

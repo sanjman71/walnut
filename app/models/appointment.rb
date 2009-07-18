@@ -11,6 +11,11 @@ class Appointment < ActiveRecord::Base
   belongs_to                  :location
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
+  # Recurrences - an appointment might have a recurrence rule
+  # If so, the appointment may have multiple recurrence instances
+  has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id"
+  belongs_to                  :recur_parent, :counter_cache => :recur_instances_count, :class_name => "Appointment", :foreign_key => "recur_parent_id"
+
   # validates_presence_of       :name
   validates_presence_of       :company_id
   validates_presence_of       :start_at, :end_at, :duration
@@ -39,6 +44,21 @@ class Appointment < ActiveRecord::Base
   has_many                  :event_categories, :through => :appointment_event_category, :after_add => :after_add_category, :after_remove => :after_remove_category
   
   before_destroy            :before_destroy_callback
+
+  # If the appointment is updated, and is a recurrence, we need to do some work
+  after_update              :update_recurrence
+  
+  # Recurrence constants
+  # When creating an appointment from a recurrence, only copy over these attributes into the appointment
+  CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
+                              "confirmation_code", "uid", "description", "public"]
+
+  # If any of these attributes change in a recurrence update, we have to re-expand the instances of the recurrence
+  REEXPAND_INSTANCES_ATTRS = ["recur_rule", "start_at", "end_at", "duration"]
+
+  # These are the attributes which can be used in an update
+  UPDATE_APPT_ATTRS        = CREATE_APPT_ATTRS - REEXPAND_INSTANCES_ATTRS
+
 
   acts_as_taggable_on       :event_tags
 
@@ -126,9 +146,14 @@ class Appointment < ActiveRecord::Base
                   end
                 }
   
-  named_scope :public,      {:conditions => "public is TRUE"}
-  named_scope :private,     {:conditions => "public is FALSE"}
-    
+  named_scope :public,                    { :conditions => "public = TRUE" }
+  named_scope :private,                   { :conditions => "public = FALSE" }
+  
+  named_scope :recurring,                 { :conditions => ["recur_rule IS NOT NULL AND recur_rule != ''"] }
+  named_scope :not_recurring,             { :conditions => ["recur_rule IS NULL OR recur_rule = ''"] }
+  named_scope :recurrence_instances,      { :conditions => ["recur_parent_id IS NOT NULL"]}
+  named_scope :not_recurrence_instances,  { :conditions => ["recur_parent_id IS NULL"] }
+
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
   WHEN_PAST_WEEK            = 'past week'
@@ -421,7 +446,11 @@ class Appointment < ActiveRecord::Base
   def private?
     !self.public
   end
-  
+
+  def recurrence?
+    !self.recur_rule.blank?
+  end
+    
   #
   #
   # From the Event model
@@ -444,6 +473,9 @@ class Appointment < ActiveRecord::Base
     # event tags
     indexes event_tags.name, :as => :tags
     has event_tags(:id), :as => :tag_ids, :facet => true
+    
+    indexes recur_parent.event_tags.name, :as => :recur_tags
+    has recur_parent.event_tags(:id), :as => :recur_tag_ids, :facet => true
 
     # only index public appointments
     where "public = TRUE"
@@ -492,6 +524,47 @@ class Appointment < ActiveRecord::Base
   def before_destroy_callback
     location.appointments.delete(self) if location
   end
+
+  def self.expand_all_recurrences(company, starting, before, count = nil)
+    company.appointments.recurring.each do |recur|
+      recur.expand_recurrence(starting, before, count)
+    end
+  end
+  
+  def expand_recurrence(starting, before, count = nil)
+    
+    return if recur_rule.blank?
+
+    # Make sure we start expanding after the end of the master appointment.
+    # Otherwise we will get an instance created on top of the master
+    if starting < self.end_at
+      starting = self.end_at
+    end
+
+    # Create a RiCal calendar with our recurring appointments
+    ri_ev = nil
+    ri_ev = RiCal.Event do |ev|
+      ev.dtstart = self.start_at
+      ev.dtend =self.end_at
+      ev.rrule = self.recur_rule
+    end
+    args = {:starting => starting, :before => before}
+    args = args.merge({:count => count}) unless count.nil?
+
+    ri_ev.occurrences(args).each do |ri_occurrence|
+      # Create an appointment 
+      # We extract the attributes we want to copy over into the new appointment instances
+      attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
+      # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
+      attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
+                            :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
+                            :recur_parent_id => self.id})
+      self.recur_instances.create(attrs)
+    end
+    self.recur_expanded_to = before
+    self.recur_instances
+  end
+
 
   protected
 
@@ -551,7 +624,7 @@ class Appointment < ActiveRecord::Base
   def make_uid
     unless self.uid
       # use a constant string
-      self.uid  = "#{self.created_at.strftime("%Y%m%d%H%M%S")}-a-#{self.id}@walnutindustries.com"
+      self.uid  = "#{self.created_at.strftime("%Y%m%d%H%M%S")}-#{self.id}@walnutindustries.com"
     end
   end
 
@@ -559,6 +632,24 @@ class Appointment < ActiveRecord::Base
   def add_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
     self.customer.grant_role('customer', self.company)
+  end
+
+  def update_recurrence
+    # Check if anything changed
+    if (self.changed?)
+      # Check if any of the attributes changed that cause us to reexpand the recurring instances
+      if ((self.changed & REEXPAND_INSTANCES_ATTRS).size > 0)
+        # We need to rebuild all the instances
+        self.recur_instances.each {|a| a.destroy}
+        # Make sure we start expanding after the end of the original appointment
+        self.expand_recurrence(Time.now > self.end_at ? Time.now : self.end_at, self.recur_expanded_to)
+      else
+        # We can update the existing instances
+        # Build a hash of the changes, take out any attributes we don't want to update
+        instance_updates = self.changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }
+        self.recur_instances.each { |a| a.update_attributes(instance_updates) }
+      end
+    end
   end
 
 end
