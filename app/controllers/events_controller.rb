@@ -32,6 +32,8 @@ class EventsController < ApplicationController
     @until        = params[:until].to_s
     @interval     = params[:interval].to_i
 
+    @recur_rule   = ""
+
     if !@freq.blank?
       # build recurrence rule from rule components
       tokens = ["FREQ=#{@freq}"]
@@ -44,10 +46,10 @@ class EventsController < ApplicationController
         tokens.push("UNTIL=#{@until}T000000Z")
       end
 
-      @rrule = tokens.join(";")
+      @recur_rule = tokens.join(";")
     end
     
-    if @rrule.blank?
+    if @recur_rule.blank?
       # create event, which are always public and marked as 'free'
       @appointment = @location.appointments.create(:company => @company, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc, 
                                                    :mark_as => Appointment::FREE, :public => true)
@@ -62,7 +64,7 @@ class EventsController < ApplicationController
     else
       # create event recurrence, which are always public and marked as 'free'
       @recurrence = Recurrence.create(:company => @company, :location_id => @location.id, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc,
-                                      :rrule => @rrule, :mark_as => Appointment::FREE, :public => true)
+                                      :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
 
       if @recurrence.valid?
         # expand the occurrence exactly once within a reasonable time frame to create at most one appointment

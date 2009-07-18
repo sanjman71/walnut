@@ -28,9 +28,9 @@ class EventsControllerTest < ActionController::TestCase
     end
 
     should_change "Appointment.count", :by => 1
-    should_not_change "Recurrence.count"
+    should_not_change "Appointment.recurring.count"
     
-    should_not_assign_to :rrule
+    should_not_assign_to :recur_rule
     
     should "mark appointment as public" do
       assert_equal true, assigns(:appointment).public
@@ -67,7 +67,7 @@ class EventsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "#{@dstart}T110000" }
       should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO" }
 
-      should_change "Recurrence.count", :by => 1
+      should_change "Appointment.recurring.count", :by => 1
       should_change "Appointment.count", :by => 1  # expand occurence with 1 appointment
     end
     
@@ -83,9 +83,9 @@ class EventsControllerTest < ActionController::TestCase
     
       should_assign_to(:dtstart) { "#{@dstart}T090000" }
       should_assign_to(:dtend) { "#{@dstart}T110000" }
-      should_assign_to(:rrule) { "FREQ=DAILY" }
+      should_assign_to(:recur_rule) { "FREQ=DAILY" }
 
-      should_change "Recurrence.count", :by => 1
+      should_change "Appointment.recurring.count", :by => 1
       should_change "Appointment.count", :by => 1  # expand occurence with 1 appointment
     end
   end
