@@ -65,10 +65,10 @@ class EventsControllerTest < ActionController::TestCase
 
       should_assign_to(:dtstart) { "#{@dstart}T090000" }
       should_assign_to(:dtend) { "#{@dstart}T110000" }
-      should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO" }
+      should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO" }
 
       should_change "Appointment.recurring.count", :by => 1
-      should_change "Appointment.count", :by => 1  # expand occurence with 1 appointment
+      should_change "Appointment.count", :by => 1 
     end
     
     context "daily that never ends" do
@@ -86,7 +86,7 @@ class EventsControllerTest < ActionController::TestCase
       should_assign_to(:recur_rule) { "FREQ=DAILY" }
 
       should_change "Appointment.recurring.count", :by => 1
-      should_change "Appointment.count", :by => 1  # expand occurence with 1 appointment
+      should_change "Appointment.count", :by => 1 
     end
   end
 end

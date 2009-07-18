@@ -32,8 +32,6 @@ class EventsController < ApplicationController
     @until        = params[:until].to_s
     @interval     = params[:interval].to_i
 
-    @recur_rule   = ""
-
     if !@freq.blank?
       # build recurrence rule from rule components
       tokens = ["FREQ=#{@freq}"]
@@ -48,34 +46,21 @@ class EventsController < ApplicationController
 
       @recur_rule = tokens.join(";")
     end
-    
-    if @recur_rule.blank?
-      # create event, which are always public and marked as 'free'
-      @appointment = @location.appointments.create(:company => @company, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc, 
-                                                   :mark_as => Appointment::FREE, :public => true)
+  
+    # build appointment options hash; events are always public and marked as 'free'
+    options = Hash[:company => @company, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => Appointment::FREE, 
+                   :public => true]
+    # add optional recurrence if specified
+    options[:recur_rule] = @recur_rule if !@recur_rule.blank?
 
+    # create event, possibly recurring
+    @appointment = @location.appointments.create(options)
 
-      if @appointment.valid?
-        flash[:notice] = "Created event #{@name}"
-      else
-        @error = true
-        flash[:error] = "Could not create event #{@name}"
-      end
+    if @appointment.valid?
+      flash[:notice] = "Created event #{@name}"
     else
-      # create event recurrence, which are always public and marked as 'free'
-      @recurrence = Recurrence.create(:company => @company, :location_id => @location.id, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc,
-                                      :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
-
-      if @recurrence.valid?
-        # expand the occurrence exactly once within a reasonable time frame to create at most one appointment
-        recur_start   = Time.now
-        recur_before  = Time.now + 3.months
-        @recurrence.expand_instances(recur_start, recur_before, 1)
-        flash[:notice] = "Created event #{@name}"
-      else
-        @error = true
-        flash[:error] = "Could not create event #{@name}"
-      end
+      @error = true
+      flash[:error] = "Could not create event #{@name}"
     end
 
     respond_to do |format|
