@@ -67,7 +67,7 @@ namespace :locations do
       locations = Location.find(batch_ids)
       locations.each do |location|
       
-        puts "*** location: #{location.id}:#{location.place_name}:#{location.street_address}:#{location.city.name}:#{location.state.name}:#{location.zip ? location.zip.name : ''}"
+        puts "*** location: #{location.id}:#{location.company_name}:#{location.street_address}:#{location.city.name}:#{location.state.name}:#{location.zip ? location.zip.name : ''}"
         location.geocode_latlng!
         
         added += 1
@@ -104,7 +104,7 @@ namespace :locations do
       
       # build hash mapping location names to locations
       names     = locations.inject(Hash.new([])) do |hash, location|
-        hash[location.place_name] = hash[location.place_name] + Array(location)
+        hash[location.company_name] = hash[location.company_name] + Array(location)
         hash
       end
       

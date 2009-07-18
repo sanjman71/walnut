@@ -72,7 +72,7 @@ namespace :neighborhoods do
           next unless "#{location.id}:#{location.name}".match(/#{filter}/)
         end
         
-        puts "#{Time.now}: *** finding neighbors for #{location.id}:#{location.place_name}"
+        puts "#{Time.now}: *** finding neighbors for #{location.id}:#{location.company_name}"
       
         # find neighbors, constrained by city and distance
         attributes  = ::Search.attributes(Array(location.city))
@@ -247,7 +247,7 @@ namespace :neighborhoods do
       # skip if location has already been mapped or has neighborhoods (i.e. mapped w/o using urban mapping)
       next if !location.urban_mapping_at.blank? or location.neighborhoods_count > 0
 
-      puts "#{Time.now}: *** mapping location #{location.id}:#{location.place_name}"
+      puts "#{Time.now}: *** mapping location #{location.id}:#{location.company_name}"
 
       begin
         # add neighborhoods from urban mapping
@@ -300,7 +300,7 @@ namespace :neighborhoods do
       return 0
     end
     
-    puts "#{Time.now}: *** mapped location #{location.id}:#{location.place_name} to urban hoods #{neighborhoods.collect(&:name).join(',')}"
+    puts "#{Time.now}: *** mapped location #{location.id}:#{location.company_name} to urban hoods #{neighborhoods.collect(&:name).join(',')}"
 
     added = 0
     
@@ -318,7 +318,7 @@ namespace :neighborhoods do
   end
   
   def add_neighborhoods_to_neighbor(location, neighbor)
-    puts "#{Time.now}: *** adding neighborhoods #{location.neighborhoods.collect(&:name).join(',')} to location #{neighbor.id}:#{neighbor.place_name}"
+    puts "#{Time.now}: *** adding neighborhoods #{location.neighborhoods.collect(&:name).join(',')} to location #{neighbor.id}:#{neighbor.company_name}"
 
     added = 0
     location.neighborhoods.each do |neighborhood|
