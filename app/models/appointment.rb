@@ -14,7 +14,7 @@ class Appointment < ActiveRecord::Base
   # Recurrences - an appointment might have a recurrence rule
   # If so, the appointment may have multiple recurrence instances
   has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id"
-  belongs_to                  :recur_parent, :counter_cache => :recur_instances_count, :class_name => "Appointment", :foreign_key => "recur_parent_id"
+  belongs_to                  :recur_parent, :class_name => "Appointment", :foreign_key => "recur_parent_id"
 
   # validates_presence_of       :name
   validates_presence_of       :company_id
@@ -51,7 +51,7 @@ class Appointment < ActiveRecord::Base
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
   CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
-                              "confirmation_code", "uid", "description", "public"]
+                              "confirmation_code", "uid", "description", "public", "name", "popularity", "url"]
 
   # If any of these attributes change in a recurrence update, we have to re-expand the instances of the recurrence
   REEXPAND_INSTANCES_ATTRS = ["recur_rule", "start_at", "end_at", "duration"]
@@ -559,7 +559,11 @@ class Appointment < ActiveRecord::Base
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
                             :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
                             :recur_parent_id => self.id})
-      self.recur_instances.create(attrs)
+      if self.location_id
+        self.location.appointments.create(attrs)
+      else
+        Appointment.create(attrs)
+      end
     end
     self.recur_expanded_to = before
     self.recur_instances

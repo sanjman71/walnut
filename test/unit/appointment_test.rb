@@ -3,17 +3,29 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
+
+  should_belong_to              :company
+  should_belong_to              :service
+  should_belong_to              :provider
+  should_belong_to              :customer
+  should_belong_to              :location
+  should_have_one               :invoice
+  should_have_many              :event_categories
+  should_have_many              :event_tags
+
   # should_validate_presence_of :name
-  should_validate_presence_of :company_id
-  should_belong_to            :location
-  should_have_many            :event_categories
-  should_have_many            :event_tags
+  should_validate_presence_of   :company_id
+  should_validate_presence_of   :start_at
+  should_validate_presence_of   :end_at
+  should_validate_presence_of   :duration
+  should_allow_values_for       :mark_as, "free", "work", "wait"
   
   def setup
     @us             = Factory(:us)
     @il             = Factory(:il, :country => @us)
     @chicago        = Factory(:chicago, :state => @il)
-    @location       = Location.create(:city => @chicago, :state => @il, :country => @us)
+    @z60610         = Factory(:zip, :name => "60610", :state => @il)
+    @location       = Factory(:location, :country => @us, :state => @il, :city => @chicago, :zip => @zip)
     assert @location.valid?
     @company        = Factory(:company, :name => "Kickass Ampthitheater")
     assert @company.valid?
@@ -200,4 +212,50 @@ class AppointmentTest < ActiveSupport::TestCase
       end
     end
   end
+  
+  context "recurrence" do
+    setup do
+      @start_at_utc = Time.now.utc.beginning_of_day
+      @end_at_utc   = @start_at_utc + 2.hours
+      @recur_rule        = "FREQ=DAILY";
+      @recurrence   = Appointment.create(:company => @company, :location_id => @location.id, :name => "Happy Hour",
+                                         :start_at => @start_at_utc, :end_at => @end_at_utc,
+                                         :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
+    end
+    
+    should_change "Appointment.recurring.count", :by => 1
+    
+    context "expand 1 instance" do
+      setup do
+        @appointments = @recurrence.expand_recurrence(Time.now, Time.now + 3.months, 1)
+      end
+      
+      should_change "Appointment.count", :by => 1
+      
+      should "return 1 appointment" do
+        assert_equal 1, @appointments.size
+      end
+      
+      should "copy recurrence name to appointment" do
+        @appointment = @appointments.first
+        assert_equal "Happy Hour", @appointment.name
+      end
+
+      should "copy recurrence start, end hours and duration to appointment" do
+        @appointment = @appointments.first
+        assert_equal 0, @appointment.start_at.utc.hour
+        assert_equal 2, @appointment.end_at.utc.hour
+        assert_equal 120, @appointment.duration
+      end
+      
+      should "should increment location.appointments_count" do
+        assert_equal 1, @location.reload.appointments_count 
+      end
+      
+      should "should increment location.events_count" do
+        assert_equal 1, @location.reload.events_count 
+      end
+    end
+  end
+  
 end

@@ -131,7 +131,6 @@ class CreatePeanut < ActiveRecord::Migration
       t.datetime    :recur_expanded_to                      # recurrence has been expanded up to this datetime (in UTC)
       t.integer     :recur_remaining_count                  # The count can be added to the recur_rule. Not currently supported / used
       t.datetime    :recur_until                            # The recurrence ends before this datetime
-      t.integer     :recur_instances_count                  # The number of recurrence instances
 
       t.timestamps
     end
