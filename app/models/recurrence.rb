@@ -24,7 +24,6 @@ class Recurrence < ActiveRecord::Base
   before_save                 :make_confirmation_code
   after_create                :add_customer_role, :make_uid
                               
-  after_create                :instantiate_recurrence
   after_update                :update_recurrence
   
   # Recurrence constants
@@ -279,21 +278,26 @@ class Recurrence < ActiveRecord::Base
     !self.public
   end
   
-  def self.expand_all_instances(company, starting, before)
+  def self.expand_all_instances(company, starting, before, count = nil)
     company.recurrences.each do |recur|
-      recur.expand_instances(starting, before)
+      recur.expand_instances(starting, before, count)
     end
   end
     
-  def expand_instances(starting, before)
+  def expand_instances(starting, before, count = nil)
 
     # Create a RiCal calendar with our recurring appointments
+    ri_ev = nil
+    appointments = []
     ri_ev = RiCal.Event do |ev|
       ev.dtstart = self.start_at
       ev.dtend =self.end_at
       ev.rrule = self.rrule
     end
-    ri_ev.occurrences(:starting => starting, :before => before).each do |ri_occurrence|
+    args = {:starting => starting, :before => before}
+    args = args.merge({:count => count}) unless count.nil?
+
+    ri_ev.occurrences(args).each do |ri_occurrence|
       # Create an appointment 
       # We extract the attributes we want to copy over into the appointment
       attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
@@ -301,15 +305,10 @@ class Recurrence < ActiveRecord::Base
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
                             :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
                             :recurrence_id => self.id})
-      a = Appointment.create(attrs)
-      puts a.errors.full_messages
+      appointments << Appointment.create(attrs)
     end
     self.expanded_to = before
-  end
-  
-  def instantiate_recurrence
-    end_at = Time.now + 4.weeks           # TODO: This needs to come from the company default
-    expand_instances(Time.now, end_at)
+    appointments
   end
   
   def update_recurrence
@@ -337,7 +336,7 @@ class Recurrence < ActiveRecord::Base
     false
   end
 
-  # providers are required for all work appointments
+  # providers are required for all work appointments and all private free appointments
   def provider_required?
     return true if (work? || (free? && private?))
     false
