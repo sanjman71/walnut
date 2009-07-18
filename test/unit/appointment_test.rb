@@ -58,7 +58,8 @@ class AppointmentTest < ActiveSupport::TestCase
   context "create event" do
     setup do
       @appointment = Appointment.create(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1",
-                                      :public => true, :mark_as => Appointment::FREE, :company => @company)
+                                      :public => true, :mark_as => Appointment::FREE, :company => @company, 
+                                      :start_at => Time.now, :end_at => Time.now + 2.hours)
       assert @appointment.valid?
       @location.appointments.push(@appointment)
       @location.reload
