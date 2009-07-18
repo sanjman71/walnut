@@ -32,16 +32,22 @@ class EventsController < ApplicationController
     @until        = params[:until].to_s
     @interval     = params[:interval].to_i
 
-    # build recurrence rule from rule components
-    tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
+    if !@freq.blank?
+      # build recurrence rule from rule components
+      tokens = ["FREQ=#{@freq}"]
 
-    unless @until.blank?
-      tokens.push("UNTIL=#{@until}T000000Z")
+      unless @byday.blank?
+        tokens.push("BYDAY=#{@byday}")
+      end
+
+      unless @until.blank?
+        tokens.push("UNTIL=#{@until}T000000Z")
+      end
+
+      @rrule = tokens.join(";")
     end
-
-    @rrule        = tokens.join(";")
     
-    if @freq.blank?
+    if @rrule.blank?
       # create event, which are always public and marked as 'free'
       @appointment = @location.appointments.create(:company => @company, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc, 
                                                    :mark_as => Appointment::FREE, :public => true)
@@ -55,17 +61,21 @@ class EventsController < ApplicationController
       end
     else
       # create event recurrence, which are always public and marked as 'free'
-      @recurrence = Recurrence.create(:company => @company, :location_id => @location.id, :start_at => @start_at_utc, :end_at => @end_at_utc,
+      @recurrence = Recurrence.create(:company => @company, :location_id => @location.id, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc,
                                       :rrule => @rrule, :mark_as => Appointment::FREE, :public => true)
 
       if @recurrence.valid?
+        # expand the occurrence exactly once within a reasonable time frame to create at most one appointment
+        recur_start   = Time.now
+        recur_before  = Time.now + 3.months
+        @recurrence.expand_instances(recur_start, recur_before, 1)
         flash[:notice] = "Created event #{@name}"
       else
         @error = true
         flash[:error] = "Could not create event #{@name}"
       end
     end
-    
+
     respond_to do |format|
       format.html do
         if @error

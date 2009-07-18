@@ -21,7 +21,6 @@ class Appointment < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
-  after_save                  :update_location_events_count
   after_create                :add_customer_role, :make_uid
 
   # appointment mark_as constants
@@ -560,17 +559,6 @@ class Appointment < ActiveRecord::Base
   def add_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
     self.customer.grant_role('customer', self.company)
-  end
-  
-  def update_location_events_count
-    if self.location_id && self.changes.keys.include?("public") && !self.changes["public"][0].nil?
-      # If it went from private to public, increment the 
-      if self.changes["public"][1]
-        Location.increment_counter(:events_count, self.location_id)
-      else
-        Location.decrement_counter(:events_count, self.location_id)
-      end
-    end
   end
 
 end

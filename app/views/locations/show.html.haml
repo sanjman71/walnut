@@ -41,7 +41,7 @@
       -# location events
       %h4#add_event
         - if has_privilege?('manage site') and @location.events_count == 0
-          = link_to "Add Event", new_event_path(@location.id), :style => 'font-weight: bold; color: #007700; font-size: 1.0em;'
+          = link_to "Add Event", new_event_path(@location.id), :style => 'font-weight: bold; color: #0099FF; font-size: 1.0em;'
           
       -# location recommendations
       / %h4.recommendations#recommend

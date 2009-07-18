@@ -30,6 +30,8 @@ class EventsControllerTest < ActionController::TestCase
     should_change "Appointment.count", :by => 1
     should_not_change "Recurrence.count"
     
+    should_not_assign_to :rrule
+    
     should "mark appointment as public" do
       assert_equal true, assigns(:appointment).public
     end
@@ -50,21 +52,41 @@ class EventsControllerTest < ActionController::TestCase
     should_redirect_to("location show") { location_path(@location) }
   end
   
-  # context "create recurrence event" do
-  #   context "weekly" do
-  #     setup do
-  #       @controller.stubs(:current_privileges).returns(["manage site"])
-  #       post :create,
-  #            {:name => 'Wings Special', :location_id => @location.id, :dstart => "20090201", :tstart => "090000", :tend => "110000", 
-  #             :freq => 'weekly', :byday => 'mo'}
-  #     end
-  #   
-  #     # should_assign_to(:dtstart) { "20090201T090000" }
-  #     # should_assign_to(:dtend) { "20090201T110000" }
-  #     # should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO" }
-  #   
-  #     should_change "Recurrence.count", :by => 1
-  #     # should_change "Appointment.count", :by => 4  # 4 weeks, 1 appt a week
-  #   end
-  # end
+  context "create recurrence event" do
+    context "weekly that never ends" do
+      setup do
+        @controller.stubs(:current_privileges).returns(["manage site"])
+
+        @dstart = Time.now.to_s(:appt_schedule_day)
+        post :create,
+             {:name => 'Wings Special', :location_id => @location.id, :dstart => @dstart, :tstart => "090000", :tend => "110000", 
+              :freq => 'weekly', :byday => 'mo'}
+      end
+
+      should_assign_to(:dtstart) { "#{@dstart}T090000" }
+      should_assign_to(:dtend) { "#{@dstart}T110000" }
+      should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO" }
+
+      should_change "Recurrence.count", :by => 1
+      should_change "Appointment.count", :by => 1  # expand occurence with 1 appointment
+    end
+    
+    context "daily that never ends" do
+      setup do
+        @controller.stubs(:current_privileges).returns(["manage site"])
+
+        @dstart = Time.now.to_s(:appt_schedule_day)
+        post :create,
+             {:name => 'Wings Special', :location_id => @location.id, :dstart => @dstart, :tstart => "090000", :tend => "110000", 
+              :freq => 'daily'}
+      end
+    
+      should_assign_to(:dtstart) { "#{@dstart}T090000" }
+      should_assign_to(:dtend) { "#{@dstart}T110000" }
+      should_assign_to(:rrule) { "FREQ=DAILY" }
+
+      should_change "Recurrence.count", :by => 1
+      should_change "Appointment.count", :by => 1  # expand occurence with 1 appointment
+    end
+  end
 end

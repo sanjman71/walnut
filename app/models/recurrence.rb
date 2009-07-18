@@ -28,8 +28,8 @@ class Recurrence < ActiveRecord::Base
   
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
-  CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
-                              "confirmation_code", "uid", "description", "public"]
+  CREATE_APPT_ATTRS        = ["company_id", "service_id", "provider_id", "provider_type", "customer_id", "mark_as",
+                              "confirmation_code", "uid", "description", "public", "name"]
 
   # If any of these attributes change in a recurrence update, we have to re-expand the instances of the recurrence
   REEXPAND_INSTANCES_ATTRS = ["rrule", "start_at", "end_at", "duration"]
@@ -305,7 +305,15 @@ class Recurrence < ActiveRecord::Base
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
                             :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
                             :recurrence_id => self.id})
-      appointments << Appointment.create(attrs)
+                            
+      # If there is a location, use the location.appointments collection to create the appt so its callbacks are invoked
+      # Otherwise, use the attributes hash to create the appointment
+      if self.location_id
+        appointment = self.location.appointments.create(attrs)
+      else
+        appointment = Appointment.create(attrs)
+      end
+      appointments.push(appointment)
     end
     self.expanded_to = before
     appointments

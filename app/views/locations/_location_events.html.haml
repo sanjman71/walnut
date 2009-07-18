@@ -2,7 +2,7 @@
   = title
   - if has_privilege?('manage site')
     == &nbsp;
-    = link_to "Add Event", new_event_path(location.id), :style => 'font-weight: bold; color: #007700; font-size: 0.7em;'
+    = link_to "Add Event", new_event_path(location.id), :style => 'font-weight: bold; color: #0099FF; font-size: 0.6em;'
     
 - events.each do |event|
   .span-7.append-1[event]{:style => 'margin-bottom: 20px;'}
