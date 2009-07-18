@@ -2,6 +2,7 @@ class City < ActiveRecord::Base
   validates_presence_of       :name, :state_id
   validates_uniqueness_of     :name, :scope => :state_id
   belongs_to                  :state, :counter_cache => true
+  belongs_to                  :timezone
   has_many                    :neighborhoods
   has_many                    :locations
   
@@ -17,7 +18,13 @@ class City < ActiveRecord::Base
   # find cities with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
-  named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+  # find cities with/without lat/lng
+  named_scope :with_latlng,           { :conditions => ["lat IS NOT NULL AND lng IS NOT NULL"] }
+  named_scope :no_latlng,             { :conditions => ["lat IS NULL AND lng IS NULL"] }
+
+  # find cities with/without timezones
+  named_scope :with_timezones,        { :conditions => ["timezone_id IS NOT NULL"] }
+  named_scope :no_timezones,          { :conditions => ["timezone_id IS NULL"] }
 
   named_scope :min_density,           lambda { |density| { :conditions => ["locations_count >= ?", density] }}
 

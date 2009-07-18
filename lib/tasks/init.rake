@@ -4,7 +4,7 @@ require 'ar-extensions'
 namespace :init do
 
   desc "Initialize default values."
-  task :all => [:countries, :states, :cities, :communities, :townships, :zips, :tag_groups, "rp:init", "events:init"]
+  task :all => [:countries, :states, :cities, :communities, :townships, :zips, :timezones, :tag_groups, "rp:init", "events:init"]
 
   # desc "Initialize admin users"
   # task :admin_users do 
@@ -92,6 +92,83 @@ namespace :init do
     end
     
     puts "#{Time.now}: geocoded #{Location.count} locations"
+  end
+  
+  desc "Initialize time zones"
+  task :timezones do
+    klass   = Timezone
+    columns = [:name, :utc_offset, :utc_dst_offset]
+    file    = "#{RAILS_ROOT}/data/timezones.txt"
+    values  = []
+    options = { :validate => false }
+
+    puts "#{Time.now}: importing timezones ... parsing file #{file}" 
+    # use File.open here instead of FasterCSV because FasterCSV doesn't like the file format
+    File.open(file).each do |row|
+      name, utc_offset, utc_dst_offset = row.split(" ")
+      
+      # skip if object already exists
+      next if Timezone.find_by_name(name)
+
+      # convert offset in hours to seconds
+      utc_offset      = utc_offset.to_f * 3600
+      utc_dst_offset  = utc_dst_offset.to_f * 3600
+      
+      value = [name, utc_offset, utc_dst_offset]
+      values << value
+    end
+
+    # import data
+    puts "#{Time.now}: importing data, starting with #{klass.count} objects"
+    klass.import columns, values, options if values.any?
+    puts "#{Time.now}: completed, ended with #{klass.count} objects"
+    
+    puts "#{Time.now}: mapping timezones to rails timezones"
+    
+    # map unmapped timezones to rails timezones
+    Timezone.find(:all, :conditions => ["rails_time_zone_name IS NULL"]).each do |timezone|
+      # find all matching rails timezones
+      rails_time_zones = ActiveSupport::TimeZone.all.find_all { |tz| tz.utc_offset == timezone.utc_offset }
+      
+      if rails_time_zones.empty? 
+        # puts "*** timezone: #{timezone.name} could not be mapped to a rails time zone"
+        next
+      end
+      
+      # check 'America' time zones that may be mapped to more than 1 rails time zone
+      if timezone.name.match(/America\//) and rails_time_zones.size > 1
+        # map to rails time zone in us or canada
+        us_cities = ["Anchorage", "Boise", "Chicago", "Dawson", "Dawson Creek", "Denver", "Detroit", "Indiana", "Kentucky", "Juneau", "Menominee",
+                     "Los Angeles", "New York", "North Dakota", "Phoenix", "Shiprock"]
+        
+        ca_cities = ["Edmonton", "Montreal", "Toronto", "Vancouver", "Winnipeg"]
+        
+        city_name = timezone.name.split("/")[1].titleize
+        
+        if us_cities.include?(city_name) || ca_cities.include?(city_name)
+          # map us/canada city to a us/canada rails timezone
+          us_rails_time_zones = rails_time_zones.find_all { |tz| tz.name.match(/US/) }
+
+          if us_rails_time_zones.size == 1
+            us_rails_time_zone = us_rails_time_zones.first
+            timezone.rails_time_zone_name = us_rails_time_zone.name
+            timezone.save
+          end
+        end
+      end
+
+      # TODO: we need to uniquely identify a timezone from this list
+      if rails_time_zones.size > 1
+        # puts "xxx timezone: #{timezone.name} - found #{rails_time_zones.size} mappings to #{rails_time_zones.collect(&:name).join(" | ")}"
+        next
+      end
+
+      # found a unique mapping so add the rails time zone
+      timezone.rails_time_zone_name = rails_time_zones.first.name
+      timezone.save
+    end
+    
+    puts "#{Time.now}: completed"
   end
   
   desc "Initialize default tag groups"

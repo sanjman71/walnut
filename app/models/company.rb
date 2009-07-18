@@ -34,6 +34,7 @@ class Company < ActiveRecord::Base
   has_many                  :cities, :through => :locations
   has_many                  :zips, :through => :locations
 
+  belongs_to                :timezone
   belongs_to                :chain, :counter_cache => true
 
   # Appointment-related info

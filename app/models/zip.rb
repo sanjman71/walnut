@@ -3,6 +3,7 @@ class Zip < ActiveRecord::Base
   validates_format_of         :name, :with => /\d{5,5}/
   validates_uniqueness_of     :name, :scope => :state_id
   belongs_to                  :state, :counter_cache => true
+  belongs_to                  :timezone
   has_many                    :locations
   
   acts_as_mappable
@@ -14,7 +15,7 @@ class Zip < ActiveRecord::Base
   # find zips with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
-  named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+  named_scope :no_latlng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
 
   named_scope :exclude,               lambda { |zip| {:conditions => ["id <> ?", zip.is_a?(Integer) ? zip : zip.id] } }
   named_scope :within_state,          lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }

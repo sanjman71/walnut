@@ -9,6 +9,7 @@ class CompanyTest < ActiveSupport::TestCase
   should_have_many              :phone_numbers
   should_have_many              :company_tag_groups
   should_have_many              :tag_groups
+  should_belong_to              :timezone
   should_belong_to              :chain
   should_have_one               :subscription
   should_have_many              :services

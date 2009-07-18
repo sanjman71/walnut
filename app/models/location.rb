@@ -6,6 +6,7 @@ class Location < ActiveRecord::Base
   belongs_to              :state, :counter_cache => :locations_count
   belongs_to              :city, :counter_cache => :locations_count
   belongs_to              :zip, :counter_cache => :locations_count
+  belongs_to              :timezone
   has_many                :location_neighborhoods
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   has_many                :company_locations
@@ -37,8 +38,8 @@ class Location < ActiveRecord::Base
   named_scope :no_street_address,     { :conditions => ["street_address = '' OR street_address IS NULL"] }
   named_scope :with_taggings,         { :joins => :companies, :conditions => ["companies.taggings_count > 0"] }
   named_scope :no_taggings,           { :joins => :companies, :conditions => ["companies.taggings_count = 0"] }
-  named_scope :with_lat_lng,          { :conditions => ["lat IS NOT NULL and lng IS NOT NULL"] }
-  named_scope :no_lat_lng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+  named_scope :with_latlng,           { :conditions => ["lat IS NOT NULL and lng IS NOT NULL"] }
+  named_scope :no_latlng,             { :conditions => ["lat IS NULL and lng IS NULL"] }
   named_scope :urban_mapped,          { :conditions => ["urban_mapping_at <> ''"] }
   named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }

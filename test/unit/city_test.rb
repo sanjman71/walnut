@@ -4,6 +4,7 @@ require 'test/factories'
 class CityTest < ActiveSupport::TestCase
 
   should_belong_to    :state
+  should_belong_to    :timezone
   should_have_many    :neighborhoods
   should_have_many    :locations
   

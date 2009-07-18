@@ -7,6 +7,7 @@ class LocationTest < ActiveSupport::TestCase
   should_belong_to    :state
   should_belong_to    :city
   should_belong_to    :zip
+  should_belong_to    :timezone
   should_have_many    :neighborhoods
   should_have_many    :companies
   should_have_many    :phone_numbers
