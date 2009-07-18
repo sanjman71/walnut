@@ -21,11 +21,13 @@ class HomeController < ApplicationController
         ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Appointment], :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
       end
       @featured_events_title = "#{@featured_city.name} Events"
+      @featured_events_date  = "Today is #{Time.now.to_s(:appt_day_short)}"
 
       # use places if there are no events
       if @featured_events.blank?
         @featured_events = ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Location], :page => 2, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
         @featured_events_title = "#{@featured_city.name} Places"
+        @featured_events_date  = nil
       end
     end
 

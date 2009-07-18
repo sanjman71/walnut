@@ -24,7 +24,11 @@
 
   .span-10.prepend-1.last
     - unless @featured_events.blank?
-      %h2{:style => 'color: #5500BB; font-weight: bold;'}= @featured_events_title
+      %h2{:style => 'color: #5500BB; font-weight: bold;'}
+        = @featured_events_title
+        - unless @featured_events_date.blank?
+          %span{:style => 'font-size: 0.6em; padding-left: 10px;'}= @featured_events_date
+
       - @featured_events.each_with_index do |object, i|
         .span-10.letterbox-5.border_bottom.search_result[object]
           - case object.class.to_s
@@ -32,7 +36,7 @@
             = render(:partial => 'search/location', :locals => {:location => object, :index => i})
           - when 'Appointment'
             = render(:partial => 'search/event', :locals => {:event => object, :index => i})
-  
+
   -#.span-13.last
     -#- unless @featured_set.blank?
       -#.jmap#map{:style => "width: 500px; height: 390px;"}
