@@ -52,6 +52,18 @@ Factory.define :neighborhood do |o|
   o.city        { |o| Factory(:city) }
 end
 
+Factory.define :timezone do |o|
+  o.name            "UTC"
+  o.utc_offset      0
+  o.utc_dst_offset  0
+end
+
+Factory.define :timezone_chicago, :class => :Timezone do |o|
+  o.name            "America/Chicago"
+  o.utc_offset      -21600
+  o.utc_dst_offset  -18000
+end
+
 Factory.define :user do |u|
   u.name                  { |s| Factory.next :user_name }
   u.email                 { |s| Factory.next :user_email }

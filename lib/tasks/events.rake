@@ -127,7 +127,7 @@ namespace :events do
         
         if venue.blank? and (city_name == city.name or region == region_name)
           # missing venue in the requested city, add it
-          puts "#{Time.now}: *** importing venue: #{event_hash['venue_name']}:#{event_hash['venue_id']}"
+          puts "#{Time.now}: *** importing venue: #{event_hash['location_name']}:#{event_hash['venue_id']}"
           
           begin
             # get venue info
@@ -147,7 +147,7 @@ namespace :events do
         
         if venue.blank?
           # missing venue, but its not in the requested city
-          puts "#{Time.now}: xxx skipping venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
+          puts "#{Time.now}: xxx skipping venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
           missing += 1
           next
         end
@@ -164,7 +164,7 @@ namespace :events do
         
         if !venue.mapped?
           # the venue could not be mapped to a location
-          puts "#{Time.now}: xxx unmapped venue: #{event_hash['venue_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
+          puts "#{Time.now}: xxx unmapped venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
           next
         end
       

@@ -13,7 +13,6 @@ class AppointmentTest < ActiveSupport::TestCase
   should_have_many              :event_categories
   should_have_many              :event_tags
 
-  # should_validate_presence_of :name
   should_validate_presence_of   :company_id
   should_validate_presence_of   :start_at
   should_validate_presence_of   :end_at
@@ -90,7 +89,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
     
     should "have venue name Kickass Ampthitheater" do
-      assert_equal "Kickass Ampthitheater", @appointment.venue_name
+      assert_equal "Kickass Ampthitheater", @appointment.location_name
     end
     
     should "add event to event venue events collection" do

@@ -22,10 +22,12 @@ class Location < ActiveRecord::Base
   has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment
   has_many                :events, :class_name => "Appointment", :conditions => 'public = TRUE'
   
+  # Note: the after_save_callback is deprecated, but its left here commented out for now
   # after_save              :after_save_callback
 
   # make sure only accessible attributes are written to from forms etc.
-  attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng, :source_id, :source_type
+  attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng,
+                          :timezone, :timezone_id, :source_id, :source_type
   
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :company_name
@@ -113,6 +115,17 @@ class Location < ActiveRecord::Base
     return false if street_address.blank?
     # can't map if there's no lat/lng
     mappable?
+  end
+
+  def timezone
+    if !self.timezone_id.blank?
+      Timezone.find_by_id(self.timezone_id)
+    elsif !self.city_id.blank?
+      # use city's timezone if location timezone is empty
+      self.city.timezone
+    else
+      nil
+    end
   end
 
   def refer_to?

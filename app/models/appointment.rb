@@ -492,10 +492,10 @@ class Appointment < ActiveRecord::Base
     self.update_attribute(:popularity, 0)
   end
 
-  # return the event venue's name
-  def venue_name
+  # return the event location's name
+  def location_name
     # use the associated location's name
-    if self.location
+    if !self.location_id.blank?
       self.location.company_name
     else
       ""

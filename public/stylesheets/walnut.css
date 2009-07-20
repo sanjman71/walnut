@@ -131,8 +131,14 @@ a.location.name:hover                             { color: #FFFFFF; background-c
 
 /* event location link styles */
 
+a.event.location                                  { color: #008800; font-size: 1.0em; }
+a.event.location:hover                            { color: #FFFFFF; background-color: #008800; }
+
 a.event.location.name                             { color: #006600; font-size: 1.1em; font-weight: bold; }
 a.event.location.name:hover                       { color: #FFFFFF; background-color: #006600; }
+
+a.event.add                                       { color: #006600; font-weight: bold; }
+a.event.add:hover                                 { color: #FFFFFF; background-color: #006600; }
 
 /* event link styles */
 

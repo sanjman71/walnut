@@ -19,7 +19,7 @@ class LocationTest < ActiveSupport::TestCase
     @canada       = Factory(:canada)
     @il           = Factory(:il, :country => @us)
     @on           = Factory(:ontario, :country => @canada)
-    @chicago      = Factory(:chicago, :state => @il)
+    @chicago      = Factory(:chicago, :state => @il, :timezone => Factory(:timezone_chicago))
     @toronto      = Factory(:toronto, :state => @on)
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
@@ -444,6 +444,39 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
+  context "location timezone" do
+    context "where location timezone is set" do
+      setup do
+        @timezone  = Factory(:timezone, :name => "America/New_York")
+        @location  = Location.create(:country => @us, :state => @illinois, :city => @chicago, :timezone => @timezone)
+      end
+
+      should "use location's timezone" do
+        assert_equal @timezone, @location.timezone
+      end
+    end
+
+    context "where location timezone is empty" do
+      setup do
+        @location  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
+      end
+
+      should "use city's timezone" do
+        assert_equal @chicago.timezone, @location.timezone
+      end
+    end
+    
+    context "where location city is empty" do
+      setup do
+        @location  = Location.create(:country => @us, :state => @illinois)
+      end
+
+      should "have no timezone" do
+        assert_equal nil, @location.timezone
+      end
+    end
+  end
+
   context "merge locations" do
     setup do
       @location1  = Location.create(:country => @us, :state => @illinois, :city => @chicago)

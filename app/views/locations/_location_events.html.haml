@@ -2,7 +2,7 @@
   = title
   - if has_privilege?('manage site')
     == &nbsp;
-    = link_to "Add Event", new_event_path(location.id), :style => 'font-weight: bold; color: #0099FF; font-size: 0.6em;'
+    = link_to "Add Event", new_event_path(location.id), :style => 'font-size: 0.6em;', :class => 'event add'
     
 - events.each do |event|
   .span-7.append-1[event]{:style => 'margin-bottom: 20px;'}
@@ -11,4 +11,5 @@
     %span{:style => 'font-size: 1.1em; color: #FF6600; font-weight: bold;'}
       = event.start_at.to_s(:appt_short_month)
       = event.start_at.to_s(:appt_month_day)
-    %span{:style => 'font-size: 0.9em; padding-left: 3px;'}= link_to "Details", event.url
+    - if !event.url.blank?
+      %span{:style => 'font-size: 0.9em; padding-left: 3px;'}= link_to "Details", event.url
