@@ -20,16 +20,16 @@ class EventsControllerTest < ActionController::TestCase
 
   context "create one-time event" do
     setup do
-      @updated_at = @location.updated_at
       # stub user privileges
       @controller.stubs(:current_privileges).returns(["manage site"])
       post :create,
            {:name => 'Wings Special', :location_id => @location.id, :dstart => "20090201", :tstart => "090000", :tend => "110000", :freq => ''}
+      @location.reload
     end
 
     should_change "Appointment.count", :by => 1
     should_not_change "Appointment.recurring.count"
-    
+    should_change "@location.updated_at"
     should_not_assign_to :recur_rule
     
     should "mark appointment as public" do
@@ -43,11 +43,7 @@ class EventsControllerTest < ActionController::TestCase
     should "increment location.appointments_count" do
       assert_equal 1, @location.reload.appointments_count
     end
-    
-    should "update location.updated_at timestamp" do
-      assert_not_equal @updated_at, @location.reload.updated_at
-    end
-    
+
     should_respond_with :redirect
     should_redirect_to("location show") { location_path(@location) }
   end
