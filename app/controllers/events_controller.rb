@@ -48,8 +48,8 @@ class EventsController < ApplicationController
     end
   
     # build appointment options hash; events are always public and marked as 'free'
-    options = Hash[:company => @company, :name => @name, :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => Appointment::FREE, 
-                   :public => true]
+    options = Hash[:company => @company, :name => @name, :creator => current_user, :start_at => @start_at_utc, :end_at => @end_at_utc, 
+                   :mark_as => Appointment::FREE, :public => true]
     # add optional recurrence if specified
     options[:recur_rule] = @recur_rule if !@recur_rule.blank?
 

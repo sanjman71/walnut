@@ -102,7 +102,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.references  :service
       t.references  :location
       t.references  :provider,            :polymorphic => true    # e.g. users
-      t.references  :customer      # user who booked the appointment
+      t.references  :customer             # user who booked the appointment
+      t.references  :creator              # user who created the appointment
       t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at
@@ -136,9 +137,12 @@ class CreatePeanut < ActiveRecord::Migration
     end
 
     add_index :appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
+    add_index :appointments, :company_id
     add_index :appointments, :location_id
     add_index :appointments, :popularity
     add_index :appointments, :taggings_count
+    add_index :appointments, :customer_id
+    add_index :appointments, :creator_id
     
     create_table :appointment_event_categories, :force => :true do |t|
       t.references  :appointment

@@ -8,6 +8,7 @@ class Appointment < ActiveRecord::Base
   belongs_to                  :service
   belongs_to                  :provider, :polymorphic => true
   belongs_to                  :customer, :class_name => 'User'
+  belongs_to                  :creator, :class_name => 'User'
   belongs_to                  :location
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
@@ -193,6 +194,32 @@ class Appointment < ActiveRecord::Base
     transitions :to => :canceled, :from => [:upcoming]
   end
   # END acts_as_state_machine
+
+  # Sphinx index
+  define_index do
+    indexes name, :as => :name
+    indexes location.street_address, :as => :address
+    has start_at, :as => :start_at
+    has popularity, :type => :integer, :as => :popularity
+    has location_id, :type => :integer, :as => :events, :facet => true
+    # locality attributes, all faceted
+    has location.country_id, :type => :integer, :as => :country_id, :facet => true
+    has location.state_id, :type => :integer, :as => :state_id, :facet => true
+    has location.city_id, :type => :integer, :as => :city_id, :facet => true
+    has location.zip_id, :type => :integer, :as => :zip_id, :facet => true
+    has location.neighborhoods(:id), :as => :neighborhood_ids, :facet => true
+    # event categories
+    has event_categories(:id), :as => :event_category_ids, :facet => true
+    # event tags
+    indexes event_tags.name, :as => :tags
+    has event_tags(:id), :as => :tag_ids, :facet => true
+
+    indexes recur_parent.event_tags.name, :as => :recur_tags
+    has recur_parent.event_tags(:id), :as => :recur_tag_ids, :facet => true
+
+    # only index public appointments
+    where "public = TRUE"
+  end
 
   # TODO - this overrides and fixes a bug in Rails 2.2 - ticket http://rails.lighthouseapp.com/projects/8994/tickets/1339
   def self.create_time_zone_conversion_attribute?(name, column)
@@ -451,36 +478,6 @@ class Appointment < ActiveRecord::Base
     !self.recur_rule.blank?
   end
     
-  #
-  #
-  # From the Event model
-  #
-  #
-  define_index do
-    indexes name, :as => :name
-    indexes location.street_address, :as => :address
-    has start_at, :as => :start_at
-    has popularity, :type => :integer, :as => :popularity
-    has location_id, :type => :integer, :as => :events, :facet => true
-    # locality attributes, all faceted
-    has location.country_id, :type => :integer, :as => :country_id, :facet => true
-    has location.state_id, :type => :integer, :as => :state_id, :facet => true
-    has location.city_id, :type => :integer, :as => :city_id, :facet => true
-    has location.zip_id, :type => :integer, :as => :zip_id, :facet => true
-    has location.neighborhoods(:id), :as => :neighborhood_ids, :facet => true
-    # event categories
-    has event_categories(:id), :as => :event_category_ids, :facet => true
-    # event tags
-    indexes event_tags.name, :as => :tags
-    has event_tags(:id), :as => :tag_ids, :facet => true
-    
-    indexes recur_parent.event_tags.name, :as => :recur_tags
-    has recur_parent.event_tags(:id), :as => :recur_tag_ids, :facet => true
-
-    # only index public appointments
-    where "public = TRUE"
-  end
-  
   def popular!
     # popularity value decreases the further away it is
     max_pop_value = 100

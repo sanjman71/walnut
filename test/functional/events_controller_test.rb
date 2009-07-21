@@ -15,12 +15,15 @@ class EventsControllerTest < ActionController::TestCase
     @company  = Factory(:company, :name => "Chicago Pizza")
     @company.locations.push(@location)
     
+    @user     = Factory(:user, :name => "Event Creator")
+
     @controller = EventsController.new
   end
 
   context "create one-time event" do
     setup do
       # stub user privileges
+      @controller.stubs(:current_user).returns(@user)
       @controller.stubs(:current_privileges).returns(["manage site"])
       post :create,
            {:name => 'Wings Special', :location_id => @location.id, :dstart => "20090201", :tstart => "090000", :tend => "110000", :freq => ''}
@@ -44,6 +47,10 @@ class EventsControllerTest < ActionController::TestCase
       assert_equal 1, @location.reload.appointments_count
     end
 
+    should "set appointment creator" do
+      assert_equal @user, assigns(:appointment).creator
+    end
+  
     should_respond_with :redirect
     should_redirect_to("location show") { location_path(@location) }
   end

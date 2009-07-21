@@ -38,7 +38,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert @event_category.valid?
   end
   
-  context "validate event venue source is nil" do
+  context "event venue source" do
     should "have location_source_type is nil" do
       assert_equal nil, @event_venue.location_source_type
     end
@@ -216,7 +216,7 @@ class AppointmentTest < ActiveSupport::TestCase
     setup do
       @start_at_utc = Time.now.utc.beginning_of_day
       @end_at_utc   = @start_at_utc + 2.hours
-      @recur_rule        = "FREQ=DAILY";
+      @recur_rule   = "FREQ=DAILY";
       @recurrence   = Appointment.create(:company => @company, :location_id => @location.id, :name => "Happy Hour",
                                          :start_at => @start_at_utc, :end_at => @end_at_utc,
                                          :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
