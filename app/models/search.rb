@@ -29,54 +29,46 @@ class Search
     # valid patterns
     match_field_token   = "([a-zA-Z]+):([0-9a-zA-Z]+)"
     match_field_quotes  = "([a-zA-Z]+):'([0-9a-zA-Z ]+)'"
-    match_all_quotes    = "[ ]*'([0-9a-zA-Z ]+)'"
+    match_quoted_phrase = "([ ]*)'([0-9a-zA-Z ]+)'"
 
-    while true
-      if matches = s.match(/#{match_field_token}/)
-        key   = matches[1].to_sym
-        value = matches[2]
-      
-        # removed matched string
-        s = s.gsub(/#{match_field_token}/, '').strip
-      elsif matches = s.match(/#{match_field_quotes}/)
-        key   = matches[1].to_sym
-        value = matches[2]
+    # find all field matches, with or without quotes
+    matches = s.scan(/#{match_field_token}/) + s.scan(/#{match_field_quotes}/)
 
-        # removed matched string
-        s = s.gsub(/#{match_field_quotes}/, '').strip
-      elsif matches = s.match(/#{match_all_quotes}/)
-        key   = '*'.to_sym
-        value = matches[1]
+    # find quoted phrase across all fields
+    matches = s.scan(/#{match_quoted_phrase}/) if matches.empty?
 
-        # removed matched string
-        s = s.gsub(/#{match_all_quotes}/, '').strip
-      else
-        # no (more matches)
-        break
-      end
-    
-      if all_attributes.include?(key)
-        case key
-        when :events, :popularity
-          # value should be an int or a range
-          if value.to_i > 0
-            value = value.to_i..2**30
+    if !matches.empty?
+      # build fields or attributes from matched substrings
+      matches.each do |key, value|
+        key = key.blank? ? '*'.to_sym : key.to_sym
+
+        if all_attributes.include?(key)
+          case key
+          when :events, :popularity
+            # value should be an int or a range
+            if value.to_i > 0
+              value = value.to_i..2**30
+            else
+              value = 0
+            end
+            attributes[key] = value
           else
-            value = 0
+            attributes[key] = value
           end
-          attributes[key] = value
-        else
-          attributes[key] = value
+        elsif all_fields.include?(key.to_sym)
+          # fields are usually strings
+          fields[key] = value.to_s
         end
-      elsif all_fields.include?(key)
-        # fields are usually strings
-        fields[key] = value.to_s
       end
-    end
     
+      # remove matches from string
+      s = s.gsub(/#{match_field_token}/, '').strip
+      s = s.gsub(/#{match_field_quotes}/, '').strip
+    end
+
     # check for special anything search
     s = s.gsub(@@anything_search, '')
-    
+
     # add query, both as default with implicity 'and' operator and explicit 'or' operator
     tokenized           = normalize(s).strip.split#.map{ |s| s = normalize(s) }.compact
     hash[:query_and]    = tokenized.join(" ")

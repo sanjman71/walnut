@@ -20,7 +20,7 @@ class SearchTest < ActiveSupport::TestCase
     setup do
       @hash = Search.query("hair salon")
     end
-    
+
     should "have query" do
       assert_equal Hash[:query_raw => "hair salon", :query_and => "hair salon", :query_or => "hair | salon"], @hash
     end
@@ -30,7 +30,7 @@ class SearchTest < ActiveSupport::TestCase
     setup do
       @hash = Search.query("events:1")
     end
-    
+
     should "have attributes hash" do
       assert_equal Hash[:query_raw => "events:1", :query_and => '', :query_or => '', :attributes => {:events => 1..2**30}], @hash
     end
@@ -50,7 +50,7 @@ class SearchTest < ActiveSupport::TestCase
     setup do
       @hash = Search.query("address:'200 grand'")
     end
-    
+
     should "have fields hash" do
       assert_equal Hash[:query_raw => "address:'200 grand'", :query_and => '', :query_or => '', :fields => {:address => '200 grand'}], @hash
     end
@@ -65,7 +65,7 @@ class SearchTest < ActiveSupport::TestCase
       assert_equal Hash[:query_raw => "address:'200 Grand Ave'", :query_and => '', :query_or => '', :fields => {:address => '200 Grand Ave'}], @hash
     end
   end
-  
+
   context "search query with a query string and events attribute" do
     setup do
       @hash = Search.query("music events:1")
@@ -75,7 +75,7 @@ class SearchTest < ActiveSupport::TestCase
       assert_equal Hash[:query_raw => "music events:1", :query_and => 'music', :query_or => 'music', :attributes => {:events => 1..2**30}], @hash
     end
   end
-
+  
   context "search query with a query string and popularity attribute" do
     setup do
       @hash = Search.query("bar popularity:50")
@@ -85,7 +85,7 @@ class SearchTest < ActiveSupport::TestCase
       assert_equal Hash[:query_raw => "bar popularity:50", :query_and => 'bar', :query_or => 'bar', :attributes => {:popularity => 50..2**30}], @hash
     end
   end
-
+  
   context "search query with a query string and address field" do
     setup do
       @hash = Search.query("music address:'200 grand'")
@@ -95,7 +95,17 @@ class SearchTest < ActiveSupport::TestCase
       assert_equal Hash[:query_raw => "music address:'200 grand'", :query_and => 'music', :query_or => 'music', :fields => {:address => '200 grand'}], @hash
     end
   end
-
+  
+  context "search query with a name field adn address field" do
+    setup do
+      @hash = Search.query("name:'pizza' address:'200 grand'")
+    end
+    
+    should "have fields hash" do
+      assert_equal Hash[:query_raw => "name:'pizza' address:'200 grand'", :query_and => '', :query_or => '', :fields => {:name => 'pizza', :address => '200 grand'}], @hash
+    end
+  end
+  
   context "search query with a query string, events attribute and address field" do
     setup do
       @hash = Search.query("music concerts events:1 address:'200 grand'")
