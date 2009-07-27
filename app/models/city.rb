@@ -44,6 +44,10 @@ class City < ActiveRecord::Base
     end
   end
   
+  def self.popular_density
+    25000
+  end
+
   def anywhere?
     self.id == 0
   end
