@@ -11,17 +11,25 @@ class AddTimezones < ActiveRecord::Migration
       t.references :timezone
     end
 
+    add_index :locations, :timezone_id
+
     change_table :companies do |t|
       t.references :timezone
     end
+
+    add_index :companies, :timezone_id
 
     change_table :cities do |t|
       t.references :timezone
     end
 
+    add_index :cities, :timezone_id
+
     change_table :zips do |t|
       t.references :timezone
     end
+
+    add_index :zips, :timezone_id
   end
 
   def self.down
