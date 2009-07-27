@@ -63,18 +63,19 @@ class DateRange
   end
   
   def self.today
-    Time.today.utc
+    Time.zone.today.utc
   end
   
   # return start_at and end_at dates as a date range (e.g. "20090101..20090201")
+  # Use default time zone, not UTC
   def to_url_param(options={})
     case options[:for]
     when :start_date
-      @start_at.to_s(:appt_schedule_day)
+      @start_at.in_time_zone.to_s(:appt_schedule_day)
     when :end_date
-      @end_at.to_s(:appt_schedule_day)
+      @end_at.in_time_zone.to_s(:appt_schedule_day)
     else
-      "#{@start_at.to_s(:appt_schedule_day)}..#{@end_at.to_s(:appt_schedule_day)}"
+      "#{@start_at.in_time_zone.to_s(:appt_schedule_day)}..#{@end_at.in_time_zone.to_s(:appt_schedule_day)}"
     end
   end
   
@@ -84,8 +85,8 @@ class DateRange
   #  - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
   #  - include   => :today, add today if utc day <> local time day 
   def self.parse_when(s, options={})
-    # initialize now to utc time
-    now = Time.now.utc
+    # initialize now in the current time zone
+    now = Time.zone.now
     
     if (m = s.match(/next (\d{1}) week/)) # e.g. 'next 3 weeks', 'next 1 week'
       # use [today, today + n weeks - 1.second], always end on sunday at midnight
@@ -107,7 +108,7 @@ class DateRange
         end_at    = now.end_of_week
         start_at  = now.beginning_of_day
         if options[:include] == :today
-          start_at -= 1.day if now.yday > Time.now.yday
+          start_at -= 1.day if now.yday > Time.zone.now.yday
         end
       when 'next week'
         # next week starts on monday, and end on sunday at midnight
@@ -130,11 +131,15 @@ class DateRange
         return DateRange.new(Hash[:name => 'error'])
       end
     end
-    
+
     # adjust calendar based on start_on and end_on days
     start_at  = adjust_start_day_to_start_on(start_at, options)
     end_at    = adjust_end_day_to_end_on(end_at, options)
       
+    # Convert to UTC
+    start_at  = start_at.utc
+    end_at    = end_at.utc
+    
     range     = "#{start_at.to_s(:appt_short_month_day_year)} - #{end_at.to_s(:appt_short_month_day_year)}"
     name      = "#{s.titleize}"
     DateRange.new(Hash[:name => name, :name_with_dates => "#{name}: #{range}", :start_at => start_at, :end_at => end_at])
@@ -150,8 +155,8 @@ class DateRange
     inclusive = options.has_key?(:inclusive) ? options[:inclusive] : true
     
     # build start_at, end_at times in local time format
-    start_at  = Time.parse(start_date).beginning_of_day
-    end_at    = Time.parse(end_date).beginning_of_day
+    start_at  = Time.zone.parse(start_date).beginning_of_day
+    end_at    = Time.zone.parse(end_date).beginning_of_day
 
     # build name from start_at, end_at times
     name      = "#{start_at.to_s(:appt_short_month_day_year)} - #{end_at.to_s(:appt_short_month_day_year)}"
