@@ -138,8 +138,9 @@ class Company < ActiveRecord::Base
     Company.decrement_counter(:locations_count, id)
   end
   
-  def after_remove_tagging(tagging)
+  def after_remove_tagging(tag)
     Company.decrement_counter(:taggings_count, id)
+    Tag.decrement_counter(:taggings_count, tag.id)
   end
   
   # manage both the services count and work service count
