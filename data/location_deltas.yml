@@ -11,6 +11,12 @@ city: Atlanta
 state: Georgia
 zip: 30310
 ---
+name: Piedmont Park
+street_address: 1071 Piedmont Ave NE
+city: Atlanta
+state: Georgia
+zip: 30309
+---
 name: Rialto Center for the Arts
 street_address: 80 Forsyth Street
 city: Atlanta
@@ -45,6 +51,13 @@ street_address: 331 E Randolph St
 city: Chicago
 state: Illinois
 zip: 60601
+---
+# Castaways is part of North Avenue Beach House
+name: North Avenue Beach House
+street_address: 1603 N Lake Shore Dr
+city: Chicago
+state: Illinois
+zip: 60614
 ---
 name: Revive @ El Ray
 street_address: 3504 S Western Ave
@@ -132,6 +145,12 @@ city: Charlotte
 state: North Carolina
 zip: 28208
 ---
+name: Dancers Unite Fine Arts Academy LLC
+street_address: 220 E Park Ave
+city: Charlotte
+state: North Carolina
+zip: 28203
+---
 name: Historic Downtown
 street_address: 134 N Main St
 city: Belmont
@@ -149,6 +168,12 @@ street_address: 310 N Kings Dr
 city: Charlotte
 state: North Carolina
 zip: 28204
+---
+name: NC Music Factory
+street_address: 817 Hamilton St
+city: Charlotte
+state: North Carolina
+zip: 28206
 ---
 name: NoDa (Historic North Davidson Arts District)
 street_address: 3306 N Davidson St
@@ -183,12 +208,41 @@ source_id: 137655263
 name: Bojangles' Coliseum
 ---
 source_type: Localeze::BaseRecord
+source_id: 151689605
+name: Promenade On Providence
+---
+source_type: Localeze::BaseRecord
 source_id: 134157518
 name: Time Warner Cable Arena
 ---
 source_type: Localeze::BaseRecord
 source_id: 14367393
 name: Verizon Wireless Amphitheatre Charlotte
+---
+# New York and vicinity
+name: Union Hall
+street_address: 702 Union St
+city: Brooklyn
+state: New York
+zip: 11215
+---
+name: Citi Field
+street_address: Roosevelt Ave
+city: Flushing
+state: New York
+zip: 11368
+---
+name: Hammerstein Ballroom
+street_address: 311 W 34th St
+city: New York
+state: New York
+zip: 10001
+---
+name: Webster Hall
+street_address: 125 E 11th St
+city: New York
+state: New York
+zip: 10003
 ---
 # Philadelphia
 name: Alexander's
