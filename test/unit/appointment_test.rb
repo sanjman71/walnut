@@ -11,7 +11,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_belong_to              :location
   should_have_one               :invoice
   should_have_many              :event_categories
-  should_have_many              :event_tags
+  should_have_many              :tags
 
   should_validate_presence_of   :company_id
   should_validate_presence_of   :start_at
@@ -47,8 +47,24 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal nil, @event_venue.location_source_id
     end
   end
-  
-  context "create event venue mapped to a location sourced from localeze" do
+
+  context "appointment with location anywhere" do
+    setup do
+      @start_at_utc = Time.now.utc.beginning_of_day
+      @end_at_utc   = @start_at_utc + 2.hours
+      @appointment  = Appointment.create(:company => @company, :location => Location.anywhere, :name => "Happy Hour",
+                                         :start_at => @start_at_utc, :end_at => @end_at_utc,
+                                         :mark_as => Appointment::FREE, :public => true)
+    end
+
+    should_change "Appointment.count", :by => 1
+
+    should "have nil location" do
+      assert_equal nil, @appointment.location
+    end
+  end
+
+  context "create event venue mapped to a location with a localeze location source" do
     setup do
       @location.location_sources.push(LocationSource.new(:source_id => 101, :source_type => "Localeze::BaseRecord"))
       @new_venue = Factory(:event_venue, :name => "New Venue", :location_id => @location.id, :city => @chicago.name)
@@ -68,11 +84,10 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create event" do
     setup do
-      @appointment = Appointment.create(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1",
-                                      :public => true, :mark_as => Appointment::FREE, :company => @company, 
-                                      :start_at => Time.now, :end_at => Time.now + 2.hours)
+      @appointment = @location.appointments.create(:name => "Fall Out Boy", :source_type => EventSource::Eventful, :source_id => "1",
+                                                   :public => true, :mark_as => Appointment::FREE, :company => @company, 
+                                                   :start_at => Time.now, :end_at => Time.now + 2.hours)
       assert @appointment.valid?
-      @location.appointments.push(@appointment)
       @location.reload
       @company.reload
       @chicago.reload
@@ -118,7 +133,7 @@ class AppointmentTest < ActiveSupport::TestCase
       should_change "AppointmentEventCategory.count", :by => 1
       
       should "apply category tags to event" do
-        assert_equal ["music", "concert"], @appointment.event_tags.collect(&:name)
+        assert_equal ["music", "concert"], @appointment.tags.collect(&:name)
       end
       
       should "increment event_category.events_count" do
@@ -139,7 +154,7 @@ class AppointmentTest < ActiveSupport::TestCase
         should_change "AppointmentEventCategory.count", :by => -1
 
         should "remove category tags from event" do
-          assert_equal [], @appointment.event_tags.collect(&:name)
+          assert_equal [], @appointment.tags.collect(&:name)
         end
 
         should "decrement event_category.events_count" do
@@ -163,15 +178,19 @@ class AppointmentTest < ActiveSupport::TestCase
         should_change "AppointmentEventCategory.count", :by => -1
 
         should "remove category tags from event" do
-          assert_equal [], @appointment.event_tags.collect(&:name)
+          assert_equal [], @appointment.tags.collect(&:name)
         end
 
-        should "remove event from location event collection" do
+        should "remove event from location appointments collection" do
           assert_equal [], @location.appointments
         end
         
-        should "decrement location event count" do
+        should "decrement location events_count" do
           assert_equal 0, @location.events_count
+        end
+
+        should "decrement location appointments_count" do
+          assert_equal 0, @location.appointments_count
         end
 
         should "decrement location's popularity value" do
@@ -202,8 +221,8 @@ class AppointmentTest < ActiveSupport::TestCase
 
       should_change "AppointmentEventCategory.count", :by => 1
       
-      should "have no event tags" do
-        assert_equal [], @appointment.event_tags
+      should "have no tags" do
+        assert_equal [], @appointment.tags
       end
       
       should "not change event.taggings.count" do

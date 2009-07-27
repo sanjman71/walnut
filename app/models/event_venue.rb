@@ -46,7 +46,7 @@ class EventVenue < ActiveRecord::Base
   end
   
   def events
-    self.location.blank? ? [] : self.location.events
+    self.location.blank? ? [] : self.location.appointments
   end
   
   def events_count
@@ -273,22 +273,29 @@ class EventVenue < ActiveRecord::Base
     return event if event
     
     options  = {:name => event_hash['title'], :url => event_hash['url'], :source_type => self.source_type, :source_id => event_hash['id'], :company => self.location.company}
-    options[:start_at]  = event_hash['start_time'] if event_hash['start_time']
-    options[:end_at]    = event_hash['stop_time'] if event_hash['stop_time']
 
-    # All events are public, and "free" - i.e. don't consume calendar time
+    # all events must have a start and end time, converted to the location time zone
+    options[:start_at]  = event_hash['start_time'].to_time(:utc).in_time_zone(self.location.timezone.rails_time_zone_name) if event_hash['start_time']
+    options[:end_at]    = event_hash['stop_time'].to_time(:utc).in_time_zone(self.location.timezone.rails_time_zone_name) if event_hash['stop_time']
+
+    # all events must have an end_at time, defaults to start_at end of day 
+    options[:end_at]    = options[:start_at].end_of_day if options[:end_at].blank?
+
+    # all events are public, and "free" - i.e. don't consume calendar time
     options[:public]    = true
     options[:mark_as]   = Appointment::FREE
-    
-    # create event
-    event = Appointment.create(options)
+
+    # create event by adding it to the location
+    event = location.appointments.create(options)
 
     if log
-      puts "#{Time.now}: *** created event: #{event.name} @ #{self.name}"
+      if event.valid?
+        puts "#{Time.now}: *** created event: #{event.name} @ #{self.name}"
+      else
+        puts "#{Time.now}: xxx create event errors: #{event.errors.full_messages.join(", ")}"
+        return nil
+      end
     end
-    
-    # add event to location
-    self.location.events.push(event)
 
     event
   end

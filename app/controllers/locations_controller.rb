@@ -25,7 +25,7 @@ class LocationsController < ApplicationController
       # find upcoming events at this event venue
       self.class.benchmark("Benchmarking upcoming events at event venue") do
         @event_limit      = LocationNeighbor.default_limit
-        @location_events  = @location.events.future.all(:order => 'start_at asc')
+        @location_events  = @location.appointments.public.future.all(:order => 'start_at asc')
         # logger.debug("*** location events: #{@location_events.size}")
       end
     end

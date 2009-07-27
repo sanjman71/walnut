@@ -52,8 +52,13 @@
   - rake events:import CITY=Philadelphia LIMIT=10
   - rake events:import CITY=Philadelphia REGION=Pennsylvania LIMIT=10
   
-  - rake events:import CITY=Atlanta LIMIT=5
-  - rake events:import CITY=Atlanta REGION=Georgia LIMIT=5
+  - rake events:import CITY=Atlanta LIMIT=10
+  - rake events:import CITY=Atlanta REGION=Georgia LIMIT=10
+
+  - rake events:import CITY='New York' LIMIT=10
+  - rake events:import CITY='New York' REGION='New York' LIMIT=10
+  - rake events:import CITY='New York' REGION='New Jersey' LIMIT=10
+  - rake events:import CITY='Brooklyn' LIMIT=10
   
 6. Import neighborhoods:
   * import neighborhoods from urban mapping by city's popular tags (300 request per day with the free api)

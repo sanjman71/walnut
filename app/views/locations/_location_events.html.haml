@@ -11,5 +11,6 @@
     %span{:style => 'font-size: 1.1em; color: #FF6600; font-weight: bold;'}
       = event.start_at.to_s(:appt_short_month)
       = event.start_at.to_s(:appt_month_day)
+      = event.start_at.to_s(:appt_time)
     - if !event.url.blank?
       %span{:style => 'font-size: 0.9em; padding-left: 3px;'}= link_to "Details", event.url

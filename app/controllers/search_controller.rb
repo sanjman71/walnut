@@ -13,7 +13,7 @@ class SearchController < ApplicationController
     # @country, @state, @cities, @zips all initialized in before filter
     
     # partition cities into 2 groups, popular and all
-    popular_threshold = 25000
+    popular_threshold = City.popular_density
     @popular_cities, @all_cities = @cities.partition do |city|
       city.locations_count > popular_threshold
     end
@@ -151,7 +151,7 @@ class SearchController < ApplicationController
     self.class.benchmark("Benchmarking query '#{@query_or}'") do
       @objects = ThinkingSphinx::Search.search(@query_or, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                                :match_mode => :extended, :page => params[:page], :per_page => 5,
-                                               :order => @sort_order, :sort_mode => @sort_mode)
+                                               :order => @sort_order, :sort_mode => @sort_mode, :include => [:company])
     end
 
     # filter objects by class if this was a generic search

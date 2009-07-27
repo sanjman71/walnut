@@ -15,10 +15,10 @@
     %h5.mapping.bottom{:style => 'color: #555;'}
       - if venue.mapped?
         == Mapped to
-        = link_to venue.location.place.name, location_path(venue.location)
+        = link_to venue.location.company_name, location_path(venue.location)
         == &nbsp;|&nbsp;
         == Source - #{venue.location_source_type}:#{venue.location_source_id}
         == &nbsp;|&nbsp;
         == Events: #{venue.location.events_count}
-      - else
-        = link_to 'Add this place', add_venue_path(venue)
+      -#- else
+        -#= link_to 'Add this place', add_venue_path(venue)

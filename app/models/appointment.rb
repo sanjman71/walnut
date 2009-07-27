@@ -61,7 +61,7 @@ class Appointment < ActiveRecord::Base
   UPDATE_APPT_ATTRS        = CREATE_APPT_ATTRS - REEXPAND_INSTANCES_ATTRS
 
 
-  acts_as_taggable_on       :event_tags
+  acts_as_taggable_on       :tags
 
   # delegate                  :country, :to => '(location or return nil)'
   # delegate                  :state, :to => '(location or return nil)'
@@ -211,8 +211,8 @@ class Appointment < ActiveRecord::Base
     # event categories
     has event_categories(:id), :as => :event_category_ids, :facet => true
     # event tags
-    indexes event_tags.name, :as => :tags
-    has event_tags(:id), :as => :tag_ids, :facet => true
+    indexes tags.name, :as => :tags
+    has tags(:id), :as => :tag_ids, :facet => true
 
     indexes recur_parent.event_tags.name, :as => :recur_tags
     has recur_parent.event_tags(:id), :as => :recur_tag_ids, :facet => true
@@ -403,14 +403,6 @@ class Appointment < ActiveRecord::Base
   def time_range
     Range.new(time_start_at, time_end_at)
   end
-  
-  def location
-    if self.location_id.nil?
-      Location.anywhere
-    else
-      Location.find_by_id(self.location_id)
-    end
-  end
 
   # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
   def location=(new_loc)
@@ -507,13 +499,13 @@ class Appointment < ActiveRecord::Base
 
   def apply_category_tags!(category)
     return false if category.blank? or category.tags.blank?
-    self.event_tag_list.add(category.tags.split(",")) 
+    self.tag_list.add(category.tags.split(",")) 
     self.save
   end
 
   def remove_category_tags!(category)
     return false if category.blank? or category.tags.blank?
-    category.tags.split(",").each { |s| self.event_tag_list.remove(s) }
+    category.tags.split(",").each { |s| self.tag_list.remove(s) }
     self.save
   end
   
@@ -569,8 +561,9 @@ class Appointment < ActiveRecord::Base
 
   protected
 
-  def after_remove_tagging(tagging)
+  def after_remove_tagging(tag)
     Appointment.decrement_counter(:taggings_count, id)
+    Tag.decrement_counter(:taggings_count, tag.id)
   end
 
   def after_add_category(category)

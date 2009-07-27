@@ -11,7 +11,9 @@ class Location < ActiveRecord::Base
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   has_many                :company_locations
   has_many                :companies, :through => :company_locations
+  has_one                 :company, :through => :company_locations # first company
   has_many                :phone_numbers, :as => :callable
+  has_one                 :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable # first phone number
   has_one                 :event_venue
   has_many                :location_neighbors
   has_many                :neighbors, :through => :location_neighbors
@@ -20,18 +22,17 @@ class Location < ActiveRecord::Base
   has_many                :sources, :through => :location_sources
 
   has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment
-  has_many                :events, :class_name => "Appointment", :conditions => 'public = TRUE'
   
-  # Note: the after_save_callback is deprecated, but its left here commented out for now
+  # Note: the after_save_callback is deprecated, but its left here commented out for now for documentation purposes
   # after_save              :after_save_callback
 
   # make sure only accessible attributes are written to from forms etc.
   attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng,
                           :timezone, :timezone_id, :source_id, :source_type
-  
+
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :company_name
-  
+
   named_scope :with_state,            lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
@@ -51,8 +52,11 @@ class Location < ActiveRecord::Base
   named_scope :min_phone_numbers,     lambda { |x| {:conditions => ["phone_numbers_count >= ?", x] }}
   named_scope :min_popularity,        lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
+  named_scope :with_appointments,     { :conditions => ["appointments_count > 0"]}
+  named_scope :with_events,           { :conditions => ["events_count > 0"]}
+
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
-  
+
   define_index do
     indexes companies.name, :as => :name
     indexes street_address, :as => :address
@@ -84,11 +88,6 @@ class Location < ActiveRecord::Base
       l.send(:id=, 0)
     end
   end
-  
-  # return location's first company
-  def company
-    self.companies.first
-  end
 
   def company_name
     @company_name ||= self.company ? self.company.name : self.name
@@ -98,18 +97,13 @@ class Location < ActiveRecord::Base
   def localities
     [country, state, city, zip].compact + neighborhoods.compact
   end
-  
-  def primary_phone_number
-    return nil if phone_numbers_count == 0
-    phone_numbers.first
-  end
-  
+
   # returns true iff the location has a latitude and longitude 
   def mappable?
     return true if self.lat and self.lng
     false
   end
-  
+
   def neighborhoodable?
     # can't map to a neighborhood if there is no street address
     return false if street_address.blank?

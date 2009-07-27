@@ -122,9 +122,14 @@ class CompanyTest < ActiveSupport::TestCase
     should_change "Tag.count", :by => 2
     should_change "Tagging.count", :by => 2
     
-    should "set tag.taggings_count to 1" do
+    should "increment tag.taggings count to 1" do
       assert_equal 1, Tag.find_by_name("pizza").taggings.count
       assert_equal 1, Tag.find_by_name("soccer").taggings.count
+    end
+
+    should "increment tag.taggings_count to 1" do
+      assert_equal 1, Tag.find_by_name("pizza").taggings_count
+      assert_equal 1, Tag.find_by_name("soccer").taggings_count
     end
     
     should "increment place.taggings_count to 2" do
@@ -140,8 +145,12 @@ class CompanyTest < ActiveSupport::TestCase
 
       should_change "Tagging.count", :by => -1
       
-      should "descrement tag.taggings_count to 0" do
+      should "decrement tag.taggings count to 0" do
         assert_equal 0, Tag.find_by_name("pizza").taggings.count
+      end
+
+      should "decrement tag.taggings_count to 0" do
+        assert_equal 0, Tag.find_by_name("pizza").taggings_count
       end
 
       should "decrement place.taggings_count to 1" do

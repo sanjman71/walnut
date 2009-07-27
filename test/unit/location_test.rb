@@ -10,6 +10,7 @@ class LocationTest < ActiveSupport::TestCase
   should_belong_to    :timezone
   should_have_many    :neighborhoods
   should_have_many    :companies
+  should_have_one     :company
   should_have_many    :phone_numbers
   should_have_many    :neighbors
   should_have_many    :sources
@@ -24,6 +25,85 @@ class LocationTest < ActiveSupport::TestCase
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
     @company      = Company.create(:name => "My Company", :time_zone => "UTC")
+  end
+
+  context "location with a company" do
+    setup do
+      @location = Location.create(:name => "Home", :country => @us)
+      @company.locations.push(@location)
+      @company.reload
+    end
+
+    should_change "Location.count", :by => 1
+    should_change "CompanyLocation.count", :by => 1
+    
+    should "increment company.locations_count" do
+      assert_equal 1, @company.locations_count
+    end
+    
+    should "increment us.locations_count" do
+      assert_equal 1, @us.reload.locations_count
+    end
+    
+    context "add second company to location" do
+      setup do
+        @company2 = Factory(:company, :name => "Company 2")
+        @company2.locations.push(@location)
+        @company2.reload
+      end
+
+      should_change "CompanyLocation.count", :by => 1
+
+      should "increment company2.locations_count" do
+        assert_equal 1, @company2.locations_count
+      end
+      
+      should "add to location.companies" do
+        assert_equal [@company, @company2], @location.companies
+      end
+      
+      should "have company as location.comapny" do
+        assert_equal @company, @location.company
+      end
+
+      context "remove company" do
+        setup do
+          @company.locations.delete(@location)
+        end
+
+        should_change "CompanyLocation.count", :by => -1
+        
+        should "have 1 company in location.companies" do
+          assert_equal [@company2], @location.companies
+        end
+
+        should "have company2 as location.comapny" do
+          assert_equal @company2, @location.company
+        end
+      end
+    end
+ 
+    context "remove company location" do
+      setup do
+        @company.locations.delete(@location)
+      end
+      
+      should_change "CompanyLocation.count", :by => -1
+      
+      context "then destroy company and location" do
+        setup do
+          @company.destroy
+          @location.destroy
+        end
+
+        should_change "Location.count", :by => -1
+        should_change "Company.count", :by => -1
+        
+        should "decrement us.locations_count" do
+          assert_equal 0, @us.reload.locations_count
+        end
+      end
+    end
   end
 
   context "location with country" do
@@ -125,18 +205,15 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
-  context "location with a company and city" do
+  context "location with a city" do
     setup do
       @location = Location.create(:name => "Home", :city => @chicago, :country => @us)
-      @company.locations.push(@location)
-      @company.reload
       @location.reload
       @chicago.reload
       @us.reload
     end
     
     should_change "Location.count", :by => 1
-    should_change "CompanyLocation.count", :by => 1
 
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
@@ -222,22 +299,6 @@ class LocationTest < ActiveSupport::TestCase
       # end
       
     end
-    
-    context "remove company" do
-      setup do
-        @company.locations.delete(@location)
-      end
-
-      should_change "CompanyLocation.count", :by => -1
-      
-      should "leave chicago locations as [@location]" do
-        assert_equal [@location], @chicago.locations
-      end
-
-      should "have no companies associated with location" do
-        assert_equal [], @location.companies
-      end
-    end
   end
 
   # context "location with city and state" do
@@ -260,17 +321,15 @@ class LocationTest < ActiveSupport::TestCase
   #   end
   # end
   
-  context "location with a company and zip" do
+  context "location with a zip" do
     setup do
       @location = Location.create(:name => "Home", :zip => @zip, :country => @us)
-      @company.locations.push(@location)
       @zip.reload
       @il.reload
       @us.reload
     end
     
     should_change "Location.count", :by => 1
-    should_change "CompanyLocation.count", :by => 1
 
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
@@ -319,18 +378,16 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
   
-  context "location with a company and neighborhood" do
+  context "location with a neighborhood" do
     setup do
       @location = Location.create(:name => "Home", :country => @us)
       @location.neighborhoods.push(@river_north)
       @location.reload
-      @company.locations.push(@location)
       @location.reload
       @river_north.reload
     end
     
     should_change "Location.count", :by => 1
-    should_change "CompanyLocation.count", :by => 1
   
     should "have neighborhood locality" do
       assert_contains @location.localities, @river_north

@@ -11,16 +11,16 @@
 
     .span-7.info
       %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
-        = event.name
-      %h4.venue.margin-bottom-5{:style => 'color: #555;'}
-        - unless event.location.blank?
-          -# link to event location
-          == @
-          = link_to event.location_name, location_path(event.location), :class => 'event location'
-
+        = truncate(event.name, :length => 40)
+      %h4.venue.margin-bottom-5
+        -# link to event location
+        = link_to event.location_name, location_path(event.location), :class => 'event location'
+          
+      %h6.details.bottom{:style => 'font-weight: normal;'}
+        %span{:style => 'color: #111111; font-size: 1.1em;'}= event.start_at.to_s(:appt_time)
         - if !event.url.blank?
-          - # link to event url, especially important for eventful events
-          %span{:style => 'font-size: 0.8em; padding-left: 3px;'}= link_to "Details", event.url
+          - # link to event url, important for eventful events
+          %span{:style => 'font-size: 1.0em; padding-left: 5px;'}= link_to "Details", event.url
           
     .span-2.date.last
       = render(:partial => 'events/calendar_date', :locals => {:date => event.start_at})
