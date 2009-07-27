@@ -8,14 +8,14 @@ namespace :chains do
       # skip chains with valid display names
       next unless chain.read_attribute(:display_name).blank?
       
-      # build histogram of all chain place names
-      place_names = chain.places.inject(Hash.new(0)) do |hash, place|
-        hash[place.name] = hash[place.name] + 1
+      # build histogram of all chain company names
+      company_names = chain.companies.inject(Hash.new(0)) do |hash, company|
+        hash[company.name] = hash[company.name] + 1
         hash
       end
 
       # use the most comman place name as the display name
-      sorted  = place_names.sort { |a, b| -a[1] <=> -b[1] }
+      sorted  = company_names.sort { |a, b| -a[1] <=> -b[1] }
       name    = sorted.first[0]
       
       if chain.display_name != name

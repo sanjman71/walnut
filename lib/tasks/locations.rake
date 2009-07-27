@@ -21,9 +21,9 @@ namespace :locations do
   #   puts "#{Time.now}: completed, added #{added} location sources"
   # end
   
-  # desc "Move phone numbers from places to locations"
+  # desc "Move phone numbers from companies to locations"
   # task :move_phones do
-  #   puts "#{Time.now}: moving phone numbers from places to locations"
+  #   puts "#{Time.now}: moving phone numbers from companies to locations"
   #   
   #   moved = 0
   #   
@@ -100,7 +100,7 @@ namespace :locations do
     
     groups.each do |street_address, count|
       # find all locations with the street address
-      locations = Location.find(:all, :conditions => {:city_id => city.id, :street_address => street_address}, :include => :places)
+      locations = Location.find(:all, :conditions => {:city_id => city.id, :street_address => street_address}, :include => :companies)
       
       # build hash mapping location names to locations
       names     = locations.inject(Hash.new([])) do |hash, location|
@@ -144,12 +144,12 @@ namespace :locations do
   end
   
   def edit_location(location, object)
-    place = location.place
+    company = location.company
     
-    if object["name"] and place.name != object['name']
-      puts "#{Time.now}: *** changing name on location #{location.id} from #{place.name} to #{object["name"]}"
-      place.name = object["name"]
-      place.save
+    if object["name"] and company.name != object['name']
+      puts "#{Time.now}: *** changing name on location #{location.id} from #{company.name} to #{object["name"]}"
+      company.name = object["name"]
+      company.save
     end
     
     if object["street_address"] and location.street_address != object["street_address"]
@@ -160,11 +160,11 @@ namespace :locations do
   end
   
   def add_location(object)
-    # check if location/place exists before adding
-    places    = Place.find(:all, :conditions => {:name => object['name']})
+    # check if location/company exists before adding
+    companies = Company.find(:all, :conditions => {:name => object['name']})
     
-    if places.size > 0
-      puts "#{Time.now}: ok place #{object['name']} already exists"
+    if companies.size > 0
+      puts "#{Time.now}: ok company #{object['name']} already exists"
       return
     end
     
@@ -184,6 +184,6 @@ namespace :locations do
     
     puts "#{Time.now}: *** adding location #{object["name"]}:#{object["city"]}"
     
-    location = PlaceHelper.add_place(object)
+    location = CompanyHelper.add_company(object)
   end
 end

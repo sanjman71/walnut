@@ -168,6 +168,12 @@ namespace :events do
           next
         end
       
+        # check the location time zone
+        if venue.location.timezone.blank?
+          puts "#{Time.now}: xxx location #{venue.location.id}:#{venue.location.company_name} does not have a timezone"
+          next
+        end
+        
         # import the event
         event = venue.import_event(event_hash, :log => true)
 
@@ -211,25 +217,46 @@ namespace :events do
     
     puts "#{Time.now}: completed"
   end
-  
+
   desc "Remove all past events"
   task :remove_past do
     # find all past events
     events = Appointment.public.past
 
     puts "#{Time.now}: removing all #{events.size} past events"
-    
+
     events.each { |e| e.destroy }
+
+    puts "#{Time.now}: completed"
+  end
+
+  desc "Remove all events"
+  task :remove_all do
+    puts "#{Time.now}: removing all #{Appointment.public.count} events"
+    
+    Appointment.public.all.each do |appointment|
+      location = appointment.location
+      location.appointments.delete(appointment)
+    end
     
     puts "#{Time.now}: completed"
   end
-  
-  # desc "Remove all events"
-  # task :remove_all do
-  #   puts "#{Time.now}: removing all #{Appointment.public.count} events"
-  #   
-  #   Appointment.public.all.each { |o| o.destroy }
-  #   
+
+  # desc "Remove all event tags"
+  # task :remove_tags do
+  #   Event.all.each do |event|
+  #     tags_array = event.event_tag_list
+  #     next if tags_array.empty?
+  #     
+  #     # remove all tags and save event
+  #     tags_array.each do |tag_name|
+  #       puts "*** tag before remove: #{Tag.find_by_name(tag_name).inspect}"
+  #       event.event_tag_list.remove(tag_name)
+  #       puts "*** tag after remove: #{Tag.find_by_name(tag_name).inspect}"
+  #     end
+  #     event.save
+  #   end
+  # 
   #   puts "#{Time.now}: completed"
   # end
 end

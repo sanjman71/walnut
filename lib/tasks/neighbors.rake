@@ -83,7 +83,7 @@ namespace :neighbors do
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :include => :places, :conditions => ["city_id = ? AND places.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    ids         = Location.find(:all, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
 
     # substract locations that already have neighbors
     ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys

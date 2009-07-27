@@ -153,7 +153,7 @@ namespace :neighborhoods do
     puts "#{Time.now}: importing #{city.name} neighborhoods using city neighborhoodable locations with tags, limit #{limit}"
   
     # find neighborhoodable city locations with tags but no neighborhoods and not mapped by urban
-    ids = Location.with_city(city).with_street_address.not_urban_mapped.no_neighborhoods.all(:joins => :places, :conditions => "places.taggings_count > 0", :select => 'locations.id').collect(&:id)
+    ids = Location.with_city(city).with_street_address.not_urban_mapped.no_neighborhoods.all(:joins => :companies, :conditions => "companies.taggings_count > 0", :select => 'locations.id').collect(&:id)
     
     puts "#{Time.now}: found #{ids.size} matching location ids"
     
