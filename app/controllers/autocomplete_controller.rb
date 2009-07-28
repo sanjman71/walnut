@@ -1,5 +1,5 @@
 class AutocompleteController < ApplicationController
-  skip_before_filter :init_current_privileges, :init_current_roles
+  skip_before_filter :init_current_privileges
   
   def where
     @q = params[:q].to_s.strip

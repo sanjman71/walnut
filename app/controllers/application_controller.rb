@@ -27,8 +27,8 @@ class ApplicationController < ActionController::Base
   # from your application log (in this case, all fields with names like "password"). 
   filter_parameter_logging :password
   
-  # Load and cache all user privileges and roles on each call so we don't have to keep checking the database
-  before_filter :init_current_privileges, :init_current_roles
+  # Load and cache all user privileges on each call so we don't have to keep checking the database
+  before_filter :init_current_privileges
   
   # Default application layout
   layout 'home'
@@ -71,14 +71,14 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  def init_current_roles
-    if logged_in?
-      # load privileges without an authorizable object
-      @current_roles = current_user.roles.collect(&:name)
-    else
-      @current_roles = []
-    end
-  end
+  # def init_current_roles
+  #   if logged_in?
+  #     # load privileges without an authorizable object
+  #     @current_roles = current_user.roles.collect(&:name)
+  #   else
+  #     @current_roles = []
+  #   end
+  # end
   
   def init_localities
     # country is required for all actions
