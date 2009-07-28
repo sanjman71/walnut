@@ -48,19 +48,27 @@ class TimeRange
   end
   
   # time_start_at and time_end_at are expressed in seconds, in UTC time
+  # time_end_at is calculated as time_start_at + duration
+  # As a result, time_end_at may be > 24 hours (86400 seconds). This is useful, as it indicates a slot crossing midnight
+  # However, we do not want to have time_start_at > 24 hours, in this case both should have 24 hours subtracted.
+  # This is done by reducing time_start_at as required. This should only be necessary for the _utc form.
   def time_start_at
     @time_start_at ||= self.start_at.in_time_zone.hour * 3600 + self.start_at.in_time_zone.min * 60
+    @time_start_at -= (24 * 3600) unless (@time_start_at < 24 * 3600)
+    @time_start_at
   end
   
   def time_end_at
-    @time_end_at ||= self.end_at.in_time_zone.hour * 3600 + self.end_at.in_time_zone.min * 60
+    @time_end_at ||= self.time_start_at + (@duration * 60)
   end
   
   def time_start_at_utc
     @time_start_at_utc ||= self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
+    @time_start_at_utc -= (24 * 3600) unless (@time_start_at_utc < 24 * 3600)
+    @time_start_at_utc
   end
   
   def time_end_at_utc
-    @time_end_at_utc ||= self.end_at.utc.hour * 3600 + self.end_at.utc.min * 60
+    @time_end_at_utc ||= self.time_start_at_utc + (@duration * 60)
   end
 end
