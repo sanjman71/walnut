@@ -21,12 +21,11 @@ namespace :neighborhoods do
   desc "Print neighborhood stats"
   task :stats do
     
-    # find cities by density
-    density = 25000
-    cities  = City.min_density(density).order_by_density
-    
-    puts "#{Time.now}: found #{cities.size} cities with more than #{density} locations"
-    
+    # find cities with neighborhoods
+    cities = City.with_neighborhoods.order_by_density.all(:limit => 10)
+
+    puts "#{Time.now}: found top #{cities.size} cities with neighborhoods"
+
     cities.each do |city|
       city_locations_with_hoods   = Location.with_city(city).with_neighborhoods.count
       city_locations_hoodable     = Location.with_city(city).with_street_address.count

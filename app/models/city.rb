@@ -18,6 +18,9 @@ class City < ActiveRecord::Base
   # find cities with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
+  # find cities with neighborhoods
+  named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
+
   # find cities with/without lat/lng
   named_scope :with_latlng,           { :conditions => ["lat IS NOT NULL AND lng IS NOT NULL"] }
   named_scope :no_latlng,             { :conditions => ["lat IS NULL AND lng IS NULL"] }

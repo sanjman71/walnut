@@ -5,7 +5,7 @@ class HomeController < ApplicationController
 
     self.class.benchmark("Benchmarking featured/closest city") do
       # find a city to highlight
-      @featured_city  = find_closest_city_using_ip
+      @featured_city  = find_closest_city_using_ip || find_default_city
       @featured_state = @featured_city.state
     end
 
@@ -74,6 +74,13 @@ class HomeController < ApplicationController
 
   protected
 
+  def find_default_city
+    city = Rails.cache.fetch("default_city", :expires_in => 24.hours) do
+      state = State.find_by_name("Illinois")
+      city  = state.cities.find_by_name("Chicago")
+    end
+  end
+  
   def find_random_city
     # find a randomly selected featured city
     city = City.min_density(City.popular_density).order_by_density.all(:limit => 1, :include => :state, :order => 'rand()').first
@@ -92,7 +99,7 @@ class HomeController < ApplicationController
       # raise Exception, "skipping"
     rescue Exception => e
       logger.debug("xxx find closest city exception: #{e.message}")
-      city = City.find_by_name("Chicago")
+      city  = nil
     end
 
     city
