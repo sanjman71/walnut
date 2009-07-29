@@ -140,7 +140,7 @@ class DateRange
     start_at  = start_at.utc
     end_at    = end_at.utc
     
-    range     = "#{start_at.to_s(:appt_short_month_day_year)} - #{end_at.to_s(:appt_short_month_day_year)}"
+    range     = "#{start_at.in_time_zone.to_s(:appt_short_month_day_year)} - #{end_at.in_time_zone.to_s(:appt_short_month_day_year)}"
     name      = "#{s.titleize}"
     DateRange.new(Hash[:name => name, :name_with_dates => "#{name}: #{range}", :start_at => start_at, :end_at => end_at])
   end
@@ -179,9 +179,9 @@ class DateRange
   def self.adjust_start_day_to_start_on(start_at, options)
     start_on = options[:start_on] || start_at.wday
     
-    if start_on != start_at.wday
+    if start_on != start_at.in_time_zone.wday
       # need to show x days before start_at to start on the correct day
-      subtract_days = start_at.wday > start_on ? start_at.wday - start_on : 7 - (start_on - start_at.wday)
+      subtract_days = start_at.in_time_zone.wday > start_on ? start_at.in_time_zone.wday - start_on : 7 - (start_on - start_at.in_time_zone.wday)
       start_at      -= subtract_days.days
     end
     
@@ -193,9 +193,9 @@ class DateRange
     # if end_on was specified, adjust it 1 day because we really want the beginning of the next day
     end_on = options[:end_on] ? options[:end_on] : end_at.wday
     
-    if end_on != end_at.wday
+    if end_on != end_at.in_time_zone.wday
       # add x days if the end on day is greater than the current day of the week, always end at midnight the previous day
-      add_days    = end_on > end_at.wday ? end_on - end_at.wday + 1 : 7 - (end_at.wday - end_on)
+      add_days    = end_on > end_at.in_time_zone.wday ? end_on - end_at.in_time_zone.wday + 1 : 7 - (end_at.in_time_zone.wday - end_on)
       end_at     += add_days.days - 1.second
     end
     
