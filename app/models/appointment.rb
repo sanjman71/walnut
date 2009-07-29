@@ -12,6 +12,11 @@ class Appointment < ActiveRecord::Base
   belongs_to                  :location
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
+  # Relationships between free and work appointments, and between appointments and capacity
+  has_many                    :work_appointments, :class_name => "Appointment", :foreign_key => :free_appointment_id # Free appointments have 
+  belongs_to                  :free_appointment, :class_name => "Appointment"       # Work appointments refer to their corresponding free appointment
+  has_many                    :capacity_slots, :foreign_key => :free_appointment_id # free appointments refer to their corresponding capacity_slots
+
   # Recurrences - an appointment might have a recurrence rule
   # If so, the appointment may have multiple recurrence instances
   has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id"
@@ -27,7 +32,7 @@ class Appointment < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
-  after_create                :add_customer_role, :make_uid
+  after_create                :add_customer_role, :make_uid, :make_capacity_slot
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -97,6 +102,11 @@ class Appointment < ActiveRecord::Base
   named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
                                                                              (start_at >= ? AND end_at <= ?)", 
                                                                              start_at, start_at, end_at, end_at, start_at, end_at] }}
+
+  # find appointments overlapping a time range
+  named_scope :overlap_incl,  lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
+                                                                            (start_at >= ? AND end_at <= ?)", 
+                                                                            start_at, start_at, end_at, end_at, start_at, end_at] }}
 
   # find appointments overlapping a time of day range
   named_scope :time_overlap,  lambda { |time_range| { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
@@ -284,14 +294,15 @@ class Appointment < ActiveRecord::Base
       self.time_start_at  = time_range.first
       self.time_end_at    = time_range.last
     else
-      # set time of day values based on appointment start, end times in utc format
+      # set time of day values based on appointment start and duration in utc format
+      # Note that the end time can be > 24 hours, if the appointment (in UTC time) crosses a day boundary
       if self.start_at
         self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
+        if self.duration
+          self.time_end_at = self.time_start_at + (duration * 60)
+        end
       end
 
-      if self.end_at
-        self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.utc.min * 60
-      end
     end
   end
   
@@ -396,8 +407,8 @@ class Appointment < ActiveRecord::Base
     else
       raise ArgumentError, "expected TimeRange or Hash"
     end
-    self.start_at   = time_range.start_at
-    self.end_at     = time_range.end_at
+    self.start_at   = time_range.start_at.utc
+    self.end_at     = time_range.end_at.utc
   end
   
   def time_range
@@ -430,7 +441,22 @@ class Appointment < ActiveRecord::Base
   def conflicts
     @conflicts ||= self.company.appointments.free_work.upcoming_completed.provider(provider).overlap(start_at, end_at)
   end
-  
+
+  # Conflicting free time conflicts
+  def free_conflicts
+    @conflicts ||= self.company.appointments.free.upcoming_completed.provider(provider).overlap(start_at, end_at)
+  end
+
+  # Affected capacity slots include those overlapping a time range, not necessarily covering all of it
+  def affected_capacity_slots
+    @eligible_slots ||= self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gt(self.duration).order_capacity
+  end
+
+  # Eligible capacity slot which completely covers the time range and has enough capacity to satisfy the request
+  def eligible_capacity_slot
+    @eligible_slot ||= self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).order_capacity.first
+  end
+
   # returns true if this appointment conflicts with any other
   def conflicts?
     self.conflicts.size > 0
@@ -522,6 +548,8 @@ class Appointment < ActiveRecord::Base
   
   def expand_recurrence(starting, before, count = nil)
     
+    # puts "***** expanding #{self.id}, start_at #{self.start_at.utc}, end_at #{self.end_at.utc}, recur_rule #{self.recur_rule}"
+    # puts "starting: #{starting.utc}, before: #{before.utc}"
     return if recur_rule.blank?
 
     # Make sure we start expanding after the end of the master appointment.
@@ -548,6 +576,7 @@ class Appointment < ActiveRecord::Base
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
                             :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
                             :recur_parent_id => self.id})
+      # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
       if self.location_id
         self.location.appointments.create(attrs)
       else
@@ -626,6 +655,17 @@ class Appointment < ActiveRecord::Base
   def add_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
     self.customer.grant_role('customer', self.company)
+  end
+  
+  def make_capacity_slot
+    # All appointments should have capacity. If not specified, this is 1
+    self.capacity ||= 1
+    # Free appointments that are not public have associated capacity slots
+    # This is how we differentiate events from other appointments right now
+    # We commit the changes in this call, as the free appointment has already been created.
+    if (self.mark_as == FREE && !self.public)
+      CapacitySlot.merge_or_add(self, true)
+    end
   end
 
   def update_recurrence

@@ -1,7 +1,6 @@
 class AppointmentScheduler
   
-  # find free appointments in the 
-  def self.find_free_appointments(company, location, provider, service, duration, daterange, date_time_options={}, options={})
+  def self.find_free_capacity_slots(company, location, provider, service, duration, daterange, options={})
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "location is required" if location.blank?
     raise ArgumentError, "provider is required" if provider.blank?
@@ -13,24 +12,26 @@ class AppointmentScheduler
     start_at    = daterange.start_at
     end_at      = daterange.end_at
     
-    # use time range if it was specified, default to 'anytime'
-    time        = date_time_options.has_key?(:time) ? date_time_options[:time] : 'anytime'
-    time_range  = Appointment.time_range(time)
+    # use time range if it was specified
+    time_range = options.has_key?(:time_range) ? options[:time_range] : nil
+    
+    # use the capacity requested or the default
+    capacity_req = options[:capacity] || 1
     
     if provider.anyone?
       # find free appointments for any provider, order by start times
-      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
+      slots = company.capacity_slots.overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).free.general_location(location).capacity_gteq(capacity_req).order_start_at
     else
       # find free appointments for a specific provider, order by start times
-      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
+      slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
     end
     
-    # remove appointments that have ended (when compared to Time.now) or appointment providers that do not provide the requested service
-    appointments.select { |appt| appt.end_at.utc > Time.now.utc and service.provided_by?(appt.provider) }
+    # remove slots that have ended (when compared to Time.now) or appointment providers that do not provide the requested service
+    slots.select { |slot| slot.end_at.utc > Time.now.utc and service.provided_by?(slot.free_appointment.provider) }
   end
   
   # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, provider, service, date_time_options)
+  def self.create_free_appointment(company, provider, service, options)
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "provider is required" if provider.blank?
     raise ArgumentError, "service is required" if service.blank?
@@ -41,7 +42,7 @@ class AppointmentScheduler
     raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
     
     # create a new appointment object
-    free_hash         = {:company => company, :service => service, :provider => provider}.merge(date_time_options)
+    free_hash         = {:company => company, :service => service, :provider => provider}.merge(options)
     free_appointment  = Appointment.new(free_hash)
                       
     # free appointments should not have conflicts
@@ -50,9 +51,18 @@ class AppointmentScheduler
     end
     
     # save appointment
-    free_appointment.save
+    # commit the capacity changes
+    Appointment.transaction do
+      free_appointment.save
+      free_appointment.capacity_slots.each do |slot|
+        if !slot.valid?
+          raise ActiveRecord::Rollback
+        end
+      end
+    end
+      
     
-    raise AppointmentInvalid unless free_appointment.valid?
+    raise AppointmentInvalid, free_appointment.errors.full_messages unless free_appointment.valid?
     
     free_appointment
   end
@@ -71,24 +81,117 @@ class AppointmentScheduler
     
     # should be a service provided by the provider
     raise AppointmentInvalid if !service.provided_by?(provider)
-    
+
+    # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
     work_hash         = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
     work_appointment  = Appointment.new(work_hash)
     
+    # Find a capacity slot to accomodate the work appointment
+    sel_capacity_slot = work_appointment.eligible_capacity_slot
+
+    # If we can't find capacity, fail
+    if sel_capacity_slot.blank?
+      raise AppointmentInvalid, "No capacity available"
+    else
+      # Otherwise update the work appointment with the corresponding free appointment
+      work_appointment.free_appointment = sel_capacity_slot.free_appointment
+    end
+
     raise AppointmentInvalid if !work_appointment.valid?
     
     # should have exactly 1 free time conflict
-    raise TimeslotNotEmpty if work_appointment.conflicts.size != 1
-    raise TimeslotNotEmpty if work_appointment.conflicts.first.service.mark_as != Appointment::FREE
+    # Note that with capacities we may have additional conflicts with work appointments, but we shouldn't have conflicts with more than one free appointment
+    raise TimeslotNotEmpty if work_appointment.free_conflicts.size != 1
+
+    # if options[:commit] == true, then carry out the capacity changes but don't commit them
+    commit = options.has_key?(:commit) ? options[:commit] : true
     
-    # split the free appointment into free/work appointments, and return the work appointment
-    # if options[:commit] == true, then split the appointments but don't commit them
-    free_appointment  = work_appointment.conflicts.first
-    work_start_at     = work_appointment.start_at
-    work_end_at       = work_appointment.end_at
-    commit            = options.has_key?(:commit) ? options[:commit] : true
-    new_appointments  = self.split_free_appointment(free_appointment, service, duration, work_start_at, work_end_at, :commit => commit, :customer => customer)
-    work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
+    if consume_capacity(work_appointment, sel_capacity_slot.free_appointment, sel_capacity_slot, commit)
+      work_appointment
+    else
+      raise AppointmentInvalid, "No capacity available"
+    end
+  end
+  
+  #
+  # Consume capacity from a capacity slot, with potential implications for other slots
+  # This is in the appointment_scheduler because we want to delete the chosen capacity slot if it goes to 0
+  # as a result we can't make it a method on the capacty slot
+  #
+  def self.consume_capacity(work_appointment, free_appointment, capacity_slot, commit)
+    # We want to consume capacity from the capacity slot for the work appointment
+    # First make sure that they are compatible for each other
+    raise ArgumentError, "Capacity slot duration is too short" if capacity_slot.duration < work_appointment.duration
+    raise ArgumentError, "Capacity slot start time is too late" if capacity_slot.start_at.utc > work_appointment.start_at.utc
+    raise ArgumentError, "Capacity slot end time is too early" if capacity_slot.end_at.utc < work_appointment.end_at.utc
+    raise ArgumentError, "Capacity slot capacity is too low" if capacity_slot.capacity < work_appointment.capacity
+    
+    orig_capacity = capacity_slot.capacity
+    changed_slots = []
+
+    if (capacity_slot.start_at.utc < work_appointment.start_at.utc)
+      # Create a new capacity slot, :start_at => capacity_slot.start_at, :end_at => work_appointment.start_at, :capacity => capacity_slot.capacity
+      # other options will be calculated. Changes will be committed below.
+      changed_slots += CapacitySlot.merge_or_add(capacity_slot.free_appointment, false, {:start_at => capacity_slot.start_at.utc,
+                                                  :end_at => work_appointment.start_at.utc, :capacity => capacity_slot.capacity})
+    end
+    
+    if (capacity_slot.end_at.utc > work_appointment.end_at.utc)
+      # Create a new capacity slot, :start_at => work_appointment.end_at, :end_at => capacity_slot.end_at, :capacity => capacity_slot.capacity
+      # Changes will be committed below.
+      changed_slots += CapacitySlot.merge_or_add(capacity_slot.free_appointment, false, {:start_at => work_appointment.end_at.utc,
+                                                                    :end_at => capacity_slot.end_at.utc, :capacity => capacity_slot.capacity})
+    end
+
+    # Adjust this capacity slot by reducing its capacity, to zero if appropriate
+    capacity_slot.capacity = capacity_slot.capacity - work_appointment.capacity
+    changed_slots << capacity_slot
+
+    #
+    # Find any capacity_slots overlapping this work_appointment with capacity > this new capacity. Reduce them to this new capacity
+    #
+    
+    # First get the overlapping slots
+    # overlapping = free_appointment.capacity_slots.overlap(work_appointment.start_at.utc, work_appointment.end_at.utc).capacity_gt(capacity_slot.capacity)
+    
+    # remove the slot we're working on already from the list of overlapping slots - the change above isn't necessarily visible here yet
+    # overlapping = overlapping.delete_if { |slot| slot.id == capacity_slot.id }
+    
+    # change the capacity of overlapping appointments
+    # overlapping.each do |slot|
+    #   if slot_capacity > capacity_slot.capacity
+    #     slot.capacity = capacity_slot.capacity
+    #     changed_slots << slot
+    #   end
+    # end
+
+    #
+    # commit the capacity slot changes in a single transaction if required
+    #
+    if commit
+      Appointment.transaction do
+        
+        # Save the appointments we were handed. This won't happen if they aren't new or dirty
+        # This allows the caller to have all of the changes commit in one txn
+        work_appointment.save
+        free_appointment.save
+        
+        # enumerate the changed slots
+        changed_slots.each do |slot|
+          if slot.capacity == 0
+            slot.destroy          # Delete those whose capacity is at 0
+          else
+            slot.save             # Save those with capacity > 0
+            if !slot.valid?
+              raise ActiveRecord::Rollback
+            end
+          end
+        end
+      end
+      free_appointment.reload
+    end
+    
+    true
   end
   
   # create a waitlist appointment
@@ -189,40 +292,30 @@ class AppointmentScheduler
     
     # find any free time that book-ends this work appointment
     company           = appointment.company
-    free_time_before  = company.appointments.free.all(:conditions => {:end_at => appointment.start_at})
-    free_time_after   = company.appointments.free.all(:conditions => {:start_at => appointment.end_at})
     
-    raise AppointmentInvalid, "Too many free times that overlap" if free_time_before.size > 1
-    raise AppointmentInvalid, "Too many free times that overlap" if free_time_after.size > 1
-    
-    # combine the work appointment and any free times before/after into a single free appointment
-    provider          = appointment.provider
-    free_start_at     = appointment.start_at
-    free_start_at     = free_time_before.first.start_at unless free_time_before.blank?
-    free_end_at       = appointment.end_at
-    free_end_at       = free_time_after.first.end_at unless free_time_after.blank?
-    
-    free_appointment  = nil
-    
+    free_appointment = appointment.free_appointment
+    if free_appointment.blank?
+      raise AppointmentInvalid, "No associated free appointment"
+    end
+
+    # Create capacity corresponding to the canceled work appointment. We'll commit the changes below.
+    changed_slots = CapacitySlot.merge_or_add(free_appointment, false, :work_appointment => appointment)
+        
     # commit the apointment changes
     Appointment.transaction do
+
       # cancel work appointment
       appointment.cancel
-      
-      # remove any existing free appointments
-      free_time_before.each do |appointment|
-        appointment.destroy
-      end
 
-      free_time_after.each do |appointment|
-        appointment.destroy
+      # update the changed capacity slots
+      changed_slots.each do |slot|
+        if slot.capacity == 0
+          slot.destroy
+        else
+          slot.save
+        end
       end
       
-      # add the new free appointment
-      free_appointment = create_free_appointment(company, provider, company.free_service, :start_at => free_start_at, :end_at => free_end_at)
-      if !free_appointment.valid?
-        raise ActiveRecord::Rollback
-      end
     end
     
     free_appointment
@@ -230,7 +323,7 @@ class AppointmentScheduler
 
   # cancel the wait appointment
   def self.cancel_wait_appointment(appointment)
-    raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
+    raise AppointmentInvalid, "Expected a waitlist appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
     appointment.cancel
   end
   
