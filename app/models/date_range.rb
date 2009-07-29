@@ -63,7 +63,7 @@ class DateRange
   end
   
   def self.today
-    Time.zone.today.utc
+    Time.zone.today
   end
   
   # return start_at and end_at dates as a date range (e.g. "20090101..20090201")
