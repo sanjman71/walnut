@@ -346,7 +346,7 @@ class AppointmentScheduler
       day_string        = date.to_s(:appt_schedule_day)
 
       # start with appointment for the entire day, in utc format
-      day_start_at_utc  = Time.parse(day_string).utc.beginning_of_day
+      day_start_at_utc  = Time.zone.parse(day_string).beginning_of_day.utc
       day_end_at_utc    = day_start_at_utc + 1.day
       day_appointment   = Appointment.new(:start_at => day_start_at_utc, :end_at => day_end_at_utc, :mark_as => Appointment::NONE)
       
