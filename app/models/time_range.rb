@@ -36,11 +36,11 @@ class TimeRange
       @end_at = Time.zone.parse(@end_day).end_of_day + 1.second
     end
     
-    @start_at = @start_at.utc
-    @end_at = @end_at.utc
+    @start_at = @start_at.utc unless @start_at.blank?
+    @end_at = @end_at.utc unless @end_at.blank?
     
     # initialize duration (in minutes)
-    @duration = (@end_at.to_i - @start_at.to_i) / 60
+    @duration = (@end_at.to_i - @start_at.to_i) / 60 unless (@start_at.blank? || @end_at.blank?)
   end
     
   def to_s
