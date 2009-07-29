@@ -15,7 +15,6 @@ class CalDavResource
   end
 
   def properties
-    debugger
     WEBDAV_PROPERTIES
   end 
 
@@ -36,7 +35,6 @@ class CalDavResource
   end
   
   def getcontenttype
-    debugger
     MIME::Types['text/calendar']
   end
 
