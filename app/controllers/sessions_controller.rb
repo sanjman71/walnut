@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
     user = User.authenticate(params[:email], params[:password])
     
     if user
-      redirect_path = session_initialize(@user)
+      redirect_path = session_initialize(user)
       redirect_back_or_default(redirect_path) and return
     else
       note_failed_signin
