@@ -8,8 +8,8 @@ class RpxController < ApplicationController
     @user = User.find_by_identifier(@data[:identifier])
     
     if @user.blank?
-      # only allow admins to use rpx
-      if !ADMIN_USER_EMAILS.include?(@data[:email])
+      # only allow certain users to login with rpx
+      if defined?(ADMIN_USER_EMAILS) and !ADMIN_USER_EMAILS.include?(@data[:email])
         flash[:error] = "This feature is coming soon"
         redirect_to("/") and return
       end
@@ -20,11 +20,6 @@ class RpxController < ApplicationController
       if @user.valid?
         # register user
         @user.register!
-
-        if ADMIN_USER_EMAILS.include?(@user.email)
-          # grant user the 'admin' role
-          @user.grant_role('admin')
-        end
 
         # create user session
         redirect_path = session_initialize(@user)
@@ -42,5 +37,5 @@ class RpxController < ApplicationController
       redirect_back_or_default(redirect_path) and return
     end
   end
-  
+
 end

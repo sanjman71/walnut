@@ -1,6 +1,7 @@
 class EventVenuesController < ApplicationController
-  privilege_required  'manage site', :only => [:country, :city]
   before_filter   :init_localities, :only => [:country, :city]
+
+  privilege_required  'manage site', :on => :current_user
 
   def country
     # @country initialized in before filter

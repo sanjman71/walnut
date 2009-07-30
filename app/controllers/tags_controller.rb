@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   
-  privilege_required 'read tags', :only => [:index], :on => :current_user
+  privilege_required 'manage site', :on => :current_user
   
   def index
     @search   = params[:search].to_s

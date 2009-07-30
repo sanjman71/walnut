@@ -28,6 +28,8 @@ class User < ActiveRecord::Base
   validates_uniqueness_of     :cal_dav_token
   before_validation_on_create :reset_cal_dav_token
 
+  after_create              :manage_user_roles
+
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
@@ -97,4 +99,10 @@ class User < ActiveRecord::Base
     self.phone.gsub!(/[^\d]/, '') unless self.phone.blank?
   end
   
+  def manage_user_roles
+    if defined?(ADMIN_USER_EMAILS) and ADMIN_USER_EMAILS.include?(self.email)
+      # grant user the 'admin' role
+      self.grant_role('admin')
+    end
+  end
 end
