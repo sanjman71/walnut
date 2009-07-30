@@ -65,6 +65,9 @@ class Company < ActiveRecord::Base
   named_scope :with_taggings,       { :conditions => ["taggings_count > 0"] }
   named_scope :no_taggings,         { :conditions => ["taggings_count = 0"] }
 
+  # find all companies with subscriptions
+  named_scope :with_subscriptions,  { :joins => :subscription, :conditions => ["subscriptions.id > 0"] }
+
   # find all subscriptions with billing errors
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
