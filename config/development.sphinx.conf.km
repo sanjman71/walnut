@@ -11,23 +11,24 @@ searchd
   max_matches = 200
 }
 
-source event_core_0
+source appointment_core_0
 {
   type = mysql
   sql_host = localhost
   sql_user = rails
   sql_pass = rails
-  sql_db = walnut_development
+  sql_db = walnut_development_small
   sql_port = 3306
   sql_query_pre = SET NAMES utf8
-  sql_query = SELECT `events`.`id` * 2 + 0 AS `id` , CAST(`events`.`name` AS CHAR) AS `name`, CAST(`locations`.`street_address` AS CHAR) AS `address`, CAST(GROUP_CONCAT(`tags`.`name` SEPARATOR ' ') AS CHAR) AS `tags`, UNIX_TIMESTAMP(`events`.`start_at`) AS `start_at`, `events`.`popularity` AS `popularity`, `events`.`location_id` AS `events`, `locations`.`country_id` AS `country_id`, `locations`.`state_id` AS `state_id`, `locations`.`city_id` AS `city_id`, `locations`.`zip_id` AS `zip_id`, GROUP_CONCAT(`neighborhoods`.`id` SEPARATOR ',') AS `neighborhood_ids`, GROUP_CONCAT(`event_categories`.`id` SEPARATOR ',') AS `event_category_ids`, GROUP_CONCAT(`tags`.`id` SEPARATOR ',') AS `tag_ids`, `events`.`id` AS `sphinx_internal_id`, 4201588131 AS `class_crc`, '4201588131' AS `subclass_crcs`, 0 AS `sphinx_deleted` FROM events    LEFT OUTER JOIN `locations` ON `locations`.id = `events`.location_id   LEFT OUTER JOIN `taggings` ON (`events`.`id` = `taggings`.`taggable_id` AND `taggings`.`taggable_type` = 'Event')  LEFT OUTER JOIN `tags` ON (`tags`.`id` = `taggings`.`tag_id`) AND context = 'event_tags'   LEFT OUTER JOIN `location_neighborhoods` ON (`locations`.`id` = `location_neighborhoods`.`location_id`)  LEFT OUTER JOIN `neighborhoods` ON (`neighborhoods`.`id` = `location_neighborhoods`.`neighborhood_id`)   LEFT OUTER JOIN `event_category_mappings` ON (`events`.`id` = `event_category_mappings`.`event_id`)  LEFT OUTER JOIN `event_categories` ON (`event_categories`.`id` = `event_category_mappings`.`event_category_id`)  WHERE `events`.`id` >= $start   AND `events`.`id` <= $end    GROUP BY `events`.`id`  ORDER BY NULL
-  sql_query_range = SELECT IFNULL(MIN(`id`), 1), IFNULL(MAX(`id`), 1) FROM `events` 
+  sql_query = SELECT `appointments`.`id` * 2 + 0 AS `id` , CAST(`appointments`.`name` AS CHAR) AS `name`, CAST(`locations`.`street_address` AS CHAR) AS `address`, CAST(GROUP_CONCAT(`tags`.`name` SEPARATOR ' ') AS CHAR) AS `tags`, CAST(`appointments`.`name` AS CHAR) AS `recur_tags`, UNIX_TIMESTAMP(`appointments`.`start_at`) AS `start_at`, `appointments`.`popularity` AS `popularity`, `appointments`.`location_id` AS `events`, `locations`.`country_id` AS `country_id`, `locations`.`state_id` AS `state_id`, `locations`.`city_id` AS `city_id`, `locations`.`zip_id` AS `zip_id`, GROUP_CONCAT(`neighborhoods`.`id` SEPARATOR ',') AS `neighborhood_ids`, GROUP_CONCAT(`event_categories`.`id` SEPARATOR ',') AS `event_category_ids`, GROUP_CONCAT(`tags`.`id` SEPARATOR ',') AS `tag_ids`, `appointments`.`id` AS `recur_tag_ids`, `appointments`.`id` AS `sphinx_internal_id`, 2024044435 AS `class_crc`, '2024044435' AS `subclass_crcs`, 0 AS `sphinx_deleted` FROM appointments    LEFT OUTER JOIN `locations` ON `locations`.id = `appointments`.location_id   LEFT OUTER JOIN `taggings` ON (`appointments`.`id` = `taggings`.`taggable_id` AND `taggings`.`taggable_type` = 'Appointment')  LEFT OUTER JOIN `tags` ON (`tags`.`id` = `taggings`.`tag_id`) AND context = 'tags'   LEFT OUTER JOIN `location_neighborhoods` ON (`locations`.`id` = `location_neighborhoods`.`location_id`)  LEFT OUTER JOIN `neighborhoods` ON (`neighborhoods`.`id` = `location_neighborhoods`.`neighborhood_id`)   LEFT OUTER JOIN `appointment_event_categories` ON (`appointments`.`id` = `appointment_event_categories`.`appointment_id`)  LEFT OUTER JOIN `event_categories` ON (`event_categories`.`id` = `appointment_event_categories`.`event_category_id`)  WHERE `appointments`.`id` >= $start   AND `appointments`.`id` <= $end    AND public = TRUE GROUP BY `appointments`.`id`  ORDER BY NULL
+  sql_query_range = SELECT IFNULL(MIN(`id`), 1), IFNULL(MAX(`id`), 1) FROM `appointments` 
   sql_attr_uint = popularity
   sql_attr_uint = events
   sql_attr_uint = country_id
   sql_attr_uint = state_id
   sql_attr_uint = city_id
   sql_attr_uint = zip_id
+  sql_attr_uint = recur_tag_ids
   sql_attr_uint = sphinx_internal_id
   sql_attr_uint = class_crc
   sql_attr_uint = sphinx_deleted
@@ -36,22 +37,22 @@ source event_core_0
   sql_attr_multi = uint event_category_ids from field
   sql_attr_multi = uint tag_ids from field
   sql_attr_multi = uint subclass_crcs from field
-  sql_query_info = SELECT * FROM `events` WHERE  `id` = (($id - 0) / 2)
+  sql_query_info = SELECT * FROM `appointments` WHERE  `id` = (($id - 0) / 2)
 }
 
-index event_core
+index appointment_core
 {
-  source = event_core_0
-  path = /Users/killian/development/walnut/db/sphinx/development/event_core
+  source = appointment_core_0
+  path = /Users/killian/development/walnut/db/sphinx/development/appointment_core
   morphology = stem_en
   charset_type = utf-8
   ignore_chars = U+0027
 }
 
-index event
+index appointment
 {
   type = distributed
-  local = event_core
+  local = appointment_core
 }
 
 source location_core_0
@@ -60,11 +61,11 @@ source location_core_0
   sql_host = localhost
   sql_user = rails
   sql_pass = rails
-  sql_db = walnut_development
+  sql_db = walnut_development_small
   sql_port = 3306
   sql_query_pre = UPDATE `locations` SET `delta` = 0
   sql_query_pre = SET NAMES utf8
-  sql_query = SELECT `locations`.`id` * 2 + 1 AS `id` , CAST(GROUP_CONCAT(`places`.`name` SEPARATOR ' ') AS CHAR) AS `name`, CAST(`locations`.`street_address` AS CHAR) AS `address`, CAST(GROUP_CONCAT(`tags`.`name` SEPARATOR ' ') AS CHAR) AS `tags`, GROUP_CONCAT(`tags`.`id` SEPARATOR ',') AS `tag_ids`, `locations`.`country_id` AS `country_id`, `locations`.`state_id` AS `state_id`, `locations`.`city_id` AS `city_id`, `locations`.`zip_id` AS `zip_id`, GROUP_CONCAT(`neighborhoods`.`id` SEPARATOR ',') AS `neighborhood_ids`, `locations`.`popularity` AS `popularity`, GROUP_CONCAT(`places`.`chain_id` SEPARATOR ',') AS `chain_ids`, `locations`.`recommendations_count` AS `recommendations`, `locations`.`events_count` AS `events`, RADIANS(locations.lat) AS `lat`, RADIANS(locations.lng) AS `lng`, `locations`.`id` AS `sphinx_internal_id`, 2817059741 AS `class_crc`, '2817059741' AS `subclass_crcs`, 0 AS `sphinx_deleted` FROM locations    LEFT OUTER JOIN `location_places` ON (`locations`.`id` = `location_places`.`location_id`)  LEFT OUTER JOIN `places` ON (`places`.`id` = `location_places`.`place_id`)   LEFT OUTER JOIN `taggings` ON (`places`.`id` = `taggings`.`taggable_id` AND `taggings`.`taggable_type` = 'Place')  LEFT OUTER JOIN `tags` ON (`tags`.`id` = `taggings`.`tag_id`) AND context = 'tags'   LEFT OUTER JOIN `location_neighborhoods` ON (`locations`.`id` = `location_neighborhoods`.`location_id`)  LEFT OUTER JOIN `neighborhoods` ON (`neighborhoods`.`id` = `location_neighborhoods`.`neighborhood_id`)  WHERE `locations`.`id` >= $start   AND `locations`.`id` <= $end    AND `locations`.`delta` = 0 AND status = 0 GROUP BY `locations`.`id`  ORDER BY NULL
+  sql_query = SELECT `locations`.`id` * 2 + 1 AS `id` , CAST(GROUP_CONCAT(`companies`.`name` SEPARATOR ' ') AS CHAR) AS `name`, CAST(`locations`.`street_address` AS CHAR) AS `address`, CAST(GROUP_CONCAT(`tags`.`name` SEPARATOR ' ') AS CHAR) AS `tags`, GROUP_CONCAT(`tags`.`id` SEPARATOR ',') AS `tag_ids`, `locations`.`country_id` AS `country_id`, `locations`.`state_id` AS `state_id`, `locations`.`city_id` AS `city_id`, `locations`.`zip_id` AS `zip_id`, GROUP_CONCAT(`neighborhoods`.`id` SEPARATOR ',') AS `neighborhood_ids`, `locations`.`popularity` AS `popularity`, GROUP_CONCAT(`companies`.`chain_id` SEPARATOR ',') AS `chain_ids`, `locations`.`recommendations_count` AS `recommendations`, `locations`.`events_count` AS `events`, RADIANS(locations.lat) AS `lat`, RADIANS(locations.lng) AS `lng`, `locations`.`id` AS `sphinx_internal_id`, 2817059741 AS `class_crc`, '2817059741' AS `subclass_crcs`, 0 AS `sphinx_deleted` FROM locations    LEFT OUTER JOIN `company_locations` ON (`locations`.`id` = `company_locations`.`location_id`)  LEFT OUTER JOIN `companies` ON (`companies`.`id` = `company_locations`.`company_id`)   LEFT OUTER JOIN `taggings` ON (`companies`.`id` = `taggings`.`taggable_id` AND `taggings`.`taggable_type` = 'Company')  LEFT OUTER JOIN `tags` ON (`tags`.`id` = `taggings`.`tag_id`) AND context = 'tags'   LEFT OUTER JOIN `location_neighborhoods` ON (`locations`.`id` = `location_neighborhoods`.`location_id`)  LEFT OUTER JOIN `neighborhoods` ON (`neighborhoods`.`id` = `location_neighborhoods`.`neighborhood_id`)  WHERE `locations`.`id` >= $start   AND `locations`.`id` <= $end    AND `locations`.`delta` = 0 AND status = 0 GROUP BY `locations`.`id`  ORDER BY NULL
   sql_query_range = SELECT IFNULL(MIN(`id`), 1), IFNULL(MAX(`id`), 1) FROM `locations` WHERE `locations`.`delta` = 0
   sql_attr_uint = country_id
   sql_attr_uint = state_id
@@ -100,11 +101,11 @@ source location_delta_0 : location_core_0
   sql_host = localhost
   sql_user = rails
   sql_pass = rails
-  sql_db = walnut_development
+  sql_db = walnut_development_small
   sql_port = 3306
   sql_query_pre = 
   sql_query_pre = SET NAMES utf8
-  sql_query = SELECT `locations`.`id` * 2 + 1 AS `id` , CAST(GROUP_CONCAT(`places`.`name` SEPARATOR ' ') AS CHAR) AS `name`, CAST(`locations`.`street_address` AS CHAR) AS `address`, CAST(GROUP_CONCAT(`tags`.`name` SEPARATOR ' ') AS CHAR) AS `tags`, GROUP_CONCAT(`tags`.`id` SEPARATOR ',') AS `tag_ids`, `locations`.`country_id` AS `country_id`, `locations`.`state_id` AS `state_id`, `locations`.`city_id` AS `city_id`, `locations`.`zip_id` AS `zip_id`, GROUP_CONCAT(`neighborhoods`.`id` SEPARATOR ',') AS `neighborhood_ids`, `locations`.`popularity` AS `popularity`, GROUP_CONCAT(`places`.`chain_id` SEPARATOR ',') AS `chain_ids`, `locations`.`recommendations_count` AS `recommendations`, `locations`.`events_count` AS `events`, RADIANS(locations.lat) AS `lat`, RADIANS(locations.lng) AS `lng`, `locations`.`id` AS `sphinx_internal_id`, 2817059741 AS `class_crc`, '2817059741' AS `subclass_crcs`, 0 AS `sphinx_deleted` FROM locations    LEFT OUTER JOIN `location_places` ON (`locations`.`id` = `location_places`.`location_id`)  LEFT OUTER JOIN `places` ON (`places`.`id` = `location_places`.`place_id`)   LEFT OUTER JOIN `taggings` ON (`places`.`id` = `taggings`.`taggable_id` AND `taggings`.`taggable_type` = 'Place')  LEFT OUTER JOIN `tags` ON (`tags`.`id` = `taggings`.`tag_id`) AND context = 'tags'   LEFT OUTER JOIN `location_neighborhoods` ON (`locations`.`id` = `location_neighborhoods`.`location_id`)  LEFT OUTER JOIN `neighborhoods` ON (`neighborhoods`.`id` = `location_neighborhoods`.`neighborhood_id`)  WHERE `locations`.`id` >= $start   AND `locations`.`id` <= $end    AND `locations`.`delta` = 1 AND status = 0 GROUP BY `locations`.`id`  ORDER BY NULL
+  sql_query = SELECT `locations`.`id` * 2 + 1 AS `id` , CAST(GROUP_CONCAT(`companies`.`name` SEPARATOR ' ') AS CHAR) AS `name`, CAST(`locations`.`street_address` AS CHAR) AS `address`, CAST(GROUP_CONCAT(`tags`.`name` SEPARATOR ' ') AS CHAR) AS `tags`, GROUP_CONCAT(`tags`.`id` SEPARATOR ',') AS `tag_ids`, `locations`.`country_id` AS `country_id`, `locations`.`state_id` AS `state_id`, `locations`.`city_id` AS `city_id`, `locations`.`zip_id` AS `zip_id`, GROUP_CONCAT(`neighborhoods`.`id` SEPARATOR ',') AS `neighborhood_ids`, `locations`.`popularity` AS `popularity`, GROUP_CONCAT(`companies`.`chain_id` SEPARATOR ',') AS `chain_ids`, `locations`.`recommendations_count` AS `recommendations`, `locations`.`events_count` AS `events`, RADIANS(locations.lat) AS `lat`, RADIANS(locations.lng) AS `lng`, `locations`.`id` AS `sphinx_internal_id`, 2817059741 AS `class_crc`, '2817059741' AS `subclass_crcs`, 0 AS `sphinx_deleted` FROM locations    LEFT OUTER JOIN `company_locations` ON (`locations`.`id` = `company_locations`.`location_id`)  LEFT OUTER JOIN `companies` ON (`companies`.`id` = `company_locations`.`company_id`)   LEFT OUTER JOIN `taggings` ON (`companies`.`id` = `taggings`.`taggable_id` AND `taggings`.`taggable_type` = 'Company')  LEFT OUTER JOIN `tags` ON (`tags`.`id` = `taggings`.`tag_id`) AND context = 'tags'   LEFT OUTER JOIN `location_neighborhoods` ON (`locations`.`id` = `location_neighborhoods`.`location_id`)  LEFT OUTER JOIN `neighborhoods` ON (`neighborhoods`.`id` = `location_neighborhoods`.`neighborhood_id`)  WHERE `locations`.`id` >= $start   AND `locations`.`id` <= $end    AND `locations`.`delta` = 1 AND status = 0 GROUP BY `locations`.`id`  ORDER BY NULL
   sql_query_range = SELECT IFNULL(MIN(`id`), 1), IFNULL(MAX(`id`), 1) FROM `locations` WHERE `locations`.`delta` = 1
   sql_attr_uint = country_id
   sql_attr_uint = state_id
