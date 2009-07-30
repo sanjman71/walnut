@@ -1,31 +1,36 @@
 .span-24
+  -# use absolute positioning here
+  = link_to image_tag("walnut.gif", :width => '220'), root_path, :class => 'logo', :style => 'position: absolute; top: 10px; left: 20px; z-index: 1;'
+  -#.span-4
+    -#= link_to "Walnut<br/>Places", root_path, :class => :company_name
+  -# use empty span to occupy space because of the absolute logo positioning used above
   .span-4
-    = link_to "Walnut<br/>Places", root_path, :class => :company_name
+    == &nbsp;
   .span-20.last#search_objects{:style => "visibility: visible;"}
     = render(:partial => 'shared/search_bar')
   .span-24.last#header_links{:style => 'text-align: right;'}
     -# show these links always
     = link_to 'Home', root_path, :class => 'header link'
-    == &nbsp;|&nbsp;
+    %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
     = link_to 'Chain Stores', chains_path, :class => 'header link'
 
     - if has_privilege?('manage site')
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Zip Finder', zips_path, :class => 'header link'
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Tag Groups', taggs_path, :class => 'header link'
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Tags', tags_path, :class => 'header link'
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Venues', country_venues_path(@country || Country.default), :class => 'header link'
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to('Bot Stats', url_for(:controller => 'bot_stats', :action => 'googlebot'), :class => 'header link')
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'header link')
 
     - if logged_in?
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to('Logout', logout_path, :class => 'header link')
     - else
-      == &nbsp;|&nbsp;
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to('Login', login_path, :class => 'header link')

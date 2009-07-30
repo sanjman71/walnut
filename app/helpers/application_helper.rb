@@ -46,15 +46,17 @@ module ApplicationHelper
   end
   
   def location_color(location)
-    color = "_purple"
+    color = "_brown"  # default color
     
     return color if location.blank?
     
     case location.events_count
     when 0
-      color = "_purple"
+      # location with no events
+      color = "_brown"
     else
-      color = "_green"
+      # location with events
+      color = "_orange"
     end
     color
   end

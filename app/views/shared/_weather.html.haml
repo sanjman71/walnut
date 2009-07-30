@@ -2,21 +2,21 @@
   = image_tag(weather.current_icon)
 
 .span-3.weather.current
-  %h2{:style => 'font-size: 1.1em;'}
+  %h2.weather.heading
     -# current conditions
     = weather.name
     %br
-    %span{:style => 'color: #FF6600; font-weight: bold;'}
+    %span.weather.current
       = weather.current_condition
       %br
       %span{:style => 'white-space: nowrap;'}== #{weather.current_temp} &deg
 
 .span-3.weather.forecast.last
-  %h2{:style => 'font-size: 1.1em;'}
+  %h2.weather.heading
     -# today's forecast
     == #{weather.forecast_today_day_of_week} Forecast
     %br
-    %span{:style => 'color: #FF6600; font-weight: bold;'}
+    %span.weather.forecast
       = weather.forecast_today_condition
       %br
       %span{:style => 'white-space: nowrap;'}== Low #{weather.forecast_today_temp_low} &deg - High #{weather.forecast_today_temp_high} &deg

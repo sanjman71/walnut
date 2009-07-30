@@ -1,8 +1,8 @@
 /* color palette */
 
-div#header                                        { background-color: #FF6600; }
+div#header                                        { background-color: #EA6F34; }
 
-div#tabs a                                        { border-color: #FF6600; background-color: #FF6600; border-bottom-color: #FF6600; }
+div#tabs a                                        { border-color: #EA6F34; background-color: #EA6F34; border-bottom-color: #EA6F34; }
 
 div#tabs a:hover                                  { background-color: #FF9900; }
 

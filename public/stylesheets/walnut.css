@@ -63,10 +63,9 @@ div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited,
 #location_switcher li ul                          { display: none; }
 #location_switcher li:hover ul                    { display: block; }
 
+div#header_links span.vertical.bar                { color: #FFFFFF; }
 
 /* body styles */
-
-div.container div.box                             { background: #EDF3FE; padding: 13px 0px 13px 40px; }
 
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 10px; }
@@ -95,22 +94,27 @@ a.admin:link, a.admin:visited                     { font-size: 11px; font-weight
 a.admin:hover                                     { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
 
 a.header.link:link, a.header.link:visited         { color: #FFFFFF; }
-a.header.link:hover                               { background-color: #5500BB; text-decoration: none; }
+a.header.link:hover                               { background-color: #3A2313; text-decoration: none; }
 
 /* signup styles */
 
 a.signup:link, a.signup:visited                   { font-size: 11px; font-weight: normal; color: #000000; }
 a.signup:hover                                    { color: #000000; background-color: #FFFFFF; text-decoration: none; }
 
+/* logo styles */
+
+a.logo                                            { outline: none; }
+a.logo:hover                                      { background-color: #FF6600; }
+
 /* tag link styles */
 
-a.tag.even, a.locality.even, a.chain.even         { color: #5500BB; font-size: 1.3em; }
-a.tag.even:hover, a.locality.even:hover, a.chain.even:hover           
-                                                  { color: #FFFFFF; background-color: #5500BB; }
+a.tag.even, a.locality.even, a.chain.even         { color: #0000BB; font-size: 1.3em; }
+a.tag.even:hover, a.locality.even:hover, a.chain.even:hover
+                                                  { color: #FFFFFF; background-color: #0000BB; }
 
-a.tag.odd, a.locality.odd, a.chain.odd            { color: #663333; font-size: 1.2em; }
-a.tag.odd:hover, a.locality.odd:hover, a.chain.odd:hover            
-                                                  { color: #FFFFFF; background-color: #663333; }
+a.tag.odd, a.locality.odd, a.chain.odd            { color: #3A2313; font-size: 1.2em; }
+a.tag.odd:hover, a.locality.odd:hover, a.chain.odd:hover
+                                                  { color: #FFFFFF; background-color: #3A2313; }
 
 a.tag.odd.one, a.tag.even.one, a.chain.even.one, a.chain.odd.one
                                                   { font-size: 1.3em; }
@@ -121,8 +125,8 @@ a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
 
 /* generic location link styles */
 
-a.location.name                                   { color: #5500BB; font-size: 1.1em; font-weight: bold; }
-a.location.name:hover                             { color: #FFFFFF; background-color: #5500BB; }
+a.location.name                                   { color: #3A2313; font-size: 1.1em; font-weight: bold; }
+a.location.name:hover                             { color: #FFFFFF; background-color: #3A2313; }
 
 /*
 .place.indicator                                  { text-align: center; width: 40px; height: 13px; border: 1px solid #DDDDDD; padding-bottom: 0; 
@@ -131,11 +135,11 @@ a.location.name:hover                             { color: #FFFFFF; background-c
 
 /* event location link styles */
 
-a.event.location                                  { color: #008800; font-size: 1.0em; }
-a.event.location:hover                            { color: #FFFFFF; background-color: #008800; }
+a.event.location                                  { color: #3A2313; font-size: 1.0em; font-weight: bold; }
+a.event.location:hover                            { color: #FFFFFF; background-color: #3A2313; }
 
-a.event.location.name                             { color: #006600; font-size: 1.1em; font-weight: bold; }
-a.event.location.name:hover                       { color: #FFFFFF; background-color: #006600; }
+a.event.location.name                             { color: #3A2313; font-size: 1.1em; font-weight: bold; }
+a.event.location.name:hover                       { color: #FFFFFF; background-color: #3A2313; }
 
 a.event.add                                       { color: #006600; font-weight: bold; }
 a.event.add:hover                                 { color: #FFFFFF; background-color: #006600; }
@@ -158,10 +162,19 @@ a.company_name:hover                              { color: #FFFFFF; background-c
 /* calendar styles */
 
 .calendar.date                                    { text-align: center; width: 40px; border: 1px solid #DDDDDD; padding-bottom: 0; }
-.calendar.date.week_day                           { background: #FF6600 none repeat scroll 0 0; color: #FFFFFF; display: block; font-size: 0.8em; 
+.calendar.date.week_day                           { background: #EA6F34 none repeat scroll 0 0; color: #FFFFFF; display: block; font-size: 0.8em; 
                                                     letter-spacing: 1px; margin: 0; padding: 0; text-transform: uppercase; }
 .calendar.date.month_day                          { background: #FFFFFF none repeat scroll 0 0; color: #111111; display: block; font-size: 1.5em; 
                                                     font-weight: bold; line-height: 1.25em; }
+
+/* weather styles */
+
+.weather.heading                                  { color: #3A2313; font-size: 1.1em; }
+span.weather.forecast, span.weather.current       { color: #0000BB; font-weight: bold; }
+
+/* phone styles */
+
+span.phone                                        { color: #3A2313; font-size: 1.2em;}
 
 /* sidebar styles */
 
@@ -200,9 +213,11 @@ div.instructions ul                               { font-size: 12px; }
   
 /* color styles */
 
+/*
 .red                                              { color: #FF0000; }
 .green                                            { color: #FF6600; }
 .grey                                             { color: #666666; }
+*/
 
 /* example styles */
 
@@ -216,10 +231,13 @@ span.example                                      { color: #666666; font-style: 
 #breadcrumbs span                                 { color: #555555; }
 
 
-/* location and event */
+/* location and event styles */
 
 div.location.search_result, div.appointment.search_result
                                                   { height: 70px; }
+
+.locations.featured.section, .events.featured.section
+                                                  { color: #3A2313; font-weight: bold; }
 
 /* locality styles */
 
@@ -241,8 +259,8 @@ a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.nearby.zip, a.rel
 
 span.neighborhood                                 { margin-right: 2px; }
 
-a.locality.search                                 { color: #5500BB; font-size: 1.1em; }
-a.locality.search:hover                           { color: #FFFFFF; background-color: #5500BB; }
+a.locality.search                                 { color: #3A2313; font-size: 1.1em; }
+a.locality.search:hover                           { color: #FFFFFF; background-color: #3A2313; }
 
 
 /* recommendations */
@@ -272,7 +290,7 @@ div#container                                     { padding-bottom: 8em; }
 
 /* place the footer after the main container, creating a body overflow */
 div#footer                                        { clear: both; position: relative; z-index: 10; height: 5em; margin-top: -5em;
-                                                    background-color: #444444; padding-top: 15px; min-width: 900px; text-align: left; }
+                                                    background-color: #3A2313; padding-top: 15px; min-width: 900px; text-align: left; }
 
 a.footer.link                                     { color: #FFFFFF; font-size: 1.1em; } 
 a.footer.link:hover                               { color: #FFFFFF; background-color: #5500BB; }
