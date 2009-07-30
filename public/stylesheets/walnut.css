@@ -116,6 +116,9 @@ a.tag.odd, a.locality.odd, a.chain.odd            { color: #3A2313; font-size: 1
 a.tag.odd:hover, a.locality.odd:hover, a.chain.odd:hover
                                                   { color: #FFFFFF; background-color: #3A2313; }
 
+a.tag.odd.big, a.tag.even.big, a.locality.even.big, a.locality.odd.big
+                                                  { font-size: 1.5em; }
+
 a.tag.odd.one, a.tag.even.one, a.chain.even.one, a.chain.odd.one
                                                   { font-size: 1.3em; }
 a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
@@ -123,10 +126,27 @@ a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
 a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
                                                   { font-size: 2.0em; }
 
-/* generic location link styles */
+/* generic location styles */
+
+div.location.search_result, div.appointment.search_result
+                                                  { height: 70px; }
+
+.locations.featured.section, .events.featured.section
+                                                  { color: #3A2313; font-weight: bold; }
+
+.location.tags.keywords, .location.tags.geography
+                                                  { color: #000099; }
+                                                  
+.location.nearby.places, .location.events         { color: #3A2313; }
 
 a.location.name                                   { color: #3A2313; font-size: 1.1em; font-weight: bold; }
 a.location.name:hover                             { color: #FFFFFF; background-color: #3A2313; }
+
+/* company name */
+
+a.company_name                                    { color: #333333; font-size: 2.5em; font-weight: bold; text-decoration:none; line-height: 100%; }
+a.company_name:hover                              { color: #FFFFFF; background-color: #FF6600; }
+
 
 /*
 .place.indicator                                  { text-align: center; width: 40px; height: 13px; border: 1px solid #DDDDDD; padding-bottom: 0; 
@@ -141,23 +161,16 @@ a.event.location:hover                            { color: #FFFFFF; background-c
 a.event.location.name                             { color: #3A2313; font-size: 1.1em; font-weight: bold; }
 a.event.location.name:hover                       { color: #FFFFFF; background-color: #3A2313; }
 
-a.event.add                                       { color: #006600; font-weight: bold; }
-a.event.add:hover                                 { color: #FFFFFF; background-color: #006600; }
+a.event.add                                       { color: #3A2313; font-weight: bold; }
+a.event.add:hover                                 { color: #FFFFFF; background-color: #3A2313; }
 
 /* event link styles */
-
-a.event.sort                                      { color: #5500BB; font-size: 1.1em; font-weight: bold; } 
-a.event.sort:hover                                { color: #FFFFFF; background-color: #5500BB; }
 
 a.event.category.even                             { color: #5500BB; font-size: 1.3em; }
 a.event.category.even:hover                       { color: #FFFFFF; background-color: #5500BB; }
 
 a.event.category.odd                              { color: #663333; font-size: 1.2em; }
 a.event.category.odd:hover                        { color: #FFFFFF; background-color: #663333; }
-
-/* company name */
-a.company_name                                    { color: #333333; font-size: 2.5em; font-weight: bold; text-decoration:none; line-height: 100%; }
-a.company_name:hover                              { color: #FFFFFF; background-color: #FF6600; }
 
 /* calendar styles */
 
@@ -230,14 +243,6 @@ span.example                                      { color: #666666; font-style: 
 #breadcrumbs a:hover                              { color: #FFFFFF; background-color: #5500BB; }
 #breadcrumbs span                                 { color: #555555; }
 
-
-/* location and event styles */
-
-div.location.search_result, div.appointment.search_result
-                                                  { height: 70px; }
-
-.locations.featured.section, .events.featured.section
-                                                  { color: #3A2313; font-weight: bold; }
 
 /* locality styles */
 

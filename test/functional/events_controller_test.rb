@@ -17,14 +17,25 @@ class EventsControllerTest < ActionController::TestCase
     
     @user     = Factory(:user, :name => "Event Creator")
 
+    BadgesInit.roles_privileges
+    
     @controller = EventsController.new
+  end
+
+  context "create event without 'manage site' privilege" do
+    setup do
+      @controller.stubs(:current_user).returns(@user)
+      post :create, {:location_id => @location.id}
+    end
+
+    should_respond_with :redirect
+    should_redirect_to('unauthorized') { unauthorized_path }
   end
 
   context "create one-time event" do
     setup do
-      # stub user privileges
+      @user.grant_role('admin')
       @controller.stubs(:current_user).returns(@user)
-      @controller.stubs(:current_privileges).returns(["manage site"])
       post :create,
            {:name => 'Wings Special', :location_id => @location.id, :dstart => "20090201", :tstart => "090000", :tend => "110000", :freq => ''}
       @location.reload
@@ -34,11 +45,11 @@ class EventsControllerTest < ActionController::TestCase
     should_not_change "Appointment.recurring.count"
     should_change "@location.updated_at"
     should_not_assign_to :recur_rule
-    
+  
     should "mark appointment as public" do
       assert_equal true, assigns(:appointment).public
     end
-        
+      
     should "increment location.events_count" do
       assert_equal 1, @location.reload.events_count
     end
@@ -50,7 +61,7 @@ class EventsControllerTest < ActionController::TestCase
     should "set appointment creator" do
       assert_equal @user, assigns(:appointment).creator
     end
-  
+
     should_respond_with :redirect
     should_redirect_to("location show") { location_path(@location) }
   end
@@ -58,7 +69,8 @@ class EventsControllerTest < ActionController::TestCase
   context "create recurrence event" do
     context "weekly that never ends" do
       setup do
-        @controller.stubs(:current_privileges).returns(["manage site"])
+        @user.grant_role('admin')
+        @controller.stubs(:current_user).returns(@user)
 
         @dstart = Time.now.to_s(:appt_schedule_day)
         post :create,
@@ -76,7 +88,8 @@ class EventsControllerTest < ActionController::TestCase
     
     context "daily that never ends" do
       setup do
-        @controller.stubs(:current_privileges).returns(["manage site"])
+        @user.grant_role('admin')
+        @controller.stubs(:current_user).returns(@user)
 
         @dstart = Time.now.to_s(:appt_schedule_day)
         post :create,

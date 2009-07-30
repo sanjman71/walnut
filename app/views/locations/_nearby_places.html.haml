@@ -1,7 +1,8 @@
-%h2= title
+%h2.location.nearby.places
+  = title
 - locations.each_with_geodist do |location, distance|
   .span-7.append-1.nearby[location]{:style => 'margin-bottom: 10px;'}
-    %span{:style => 'font-size: 1.3em;'}= link_to location.company_name, location_path(location)
+    %span{:style => 'font-size: 1.3em;'}= link_to location.company_name, location_path(location), :class => 'location name'
     %br
     = location.street_address
     = location.city

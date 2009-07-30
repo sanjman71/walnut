@@ -26,7 +26,7 @@
       %h2.events.featured.section
         = @featured_events_title
         - unless @featured_events_date.blank?
-          %span{:style => 'font-size: 0.6em; padding-left: 10px;'}= @featured_events_date
+          %em{:style => 'font-size: 0.6em; padding-left: 10px;'}= @featured_events_date
 
       - @featured_events.each_with_index do |object, i|
         .span-10.letterbox-5.border_bottom.search_result[object]

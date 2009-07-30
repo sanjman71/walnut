@@ -52,19 +52,23 @@
   -# company and locality tags
   .span-18#all_tags
     .span-7.colborder#tags
-      %h2== Keyword Tags
+      %h2.location.tags.keywords== Keyword Tags
       - tags = @company.tags
       - if tags.blank?
         -# add space to fill in column border
         == &nbsp;
       - else
         - tags.each do |tag|
-          %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.parameterize)
+          %span{:style => 'padding-right: 3px; white-space: nowrap;'}
+            - klasses = ["tag big"].push(cycle('even', 'odd'))
+            = link_to(tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.parameterize), :class => klasses.join(' '))
       
     .span-9.last#locality_tags
-      %h2== Geography Tags
+      %h2.location.tags.geography== Geography Tags
       - ([@state, @city, @zip].compact + @neighborhoods).each do |locality|
-        %span{:style => 'font-size: 13px; padding-right: 3px; white-space: nowrap;'}= link_to locality.name, infer_locality_route(locality.name, :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhoods => @neighborhoods)
+        %span{:style => 'padding-right: 3px; white-space: nowrap;'}
+          - klasses = ["locality big"].push(cycle('even', 'odd'))
+          = link_to locality.name, infer_locality_route(locality.name, :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhoods => @neighborhoods), :class => klasses.join(' ')
     
   %hr.space
   
