@@ -21,10 +21,9 @@ set :user,          'app'  # log into servers as
 set :group,         'app'
 
 # Load external recipe files
-load_paths << "config/database"
-load "database_tasks"
-load_paths << "config/sphinx"
-load "sphinx_tasks"
+load_paths << "config/recipes"
+load "database"
+load "sphinx"
 
 
 deploy.task :restart, :roles => :app do
