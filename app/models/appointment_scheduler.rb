@@ -114,15 +114,15 @@ class AppointmentScheduler
     work_hash         = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
     work_appointment  = Appointment.new(work_hash)
     
-    # Find a capacity slot to accomodate the work appointment
-    sel_capacity_slot = work_appointment.eligible_capacity_slot
+    # Determine if there is capacity to accomodate the work appointment. This will also find the appropriate free appointment for the work appointment.
+    el_capacity_slot = work_appointment.eligible_capacity_slot
 
     # If we can't find capacity, fail
-    if sel_capacity_slot.blank?
+    if el_capacity_slot.blank?
       raise AppointmentInvalid, "No capacity available"
     else
       # Otherwise update the work appointment with the corresponding free appointment
-      work_appointment.free_appointment = sel_capacity_slot.free_appointment
+      work_appointment.free_appointment = el_capacity_slot.free_appointment
     end
 
     raise AppointmentInvalid if !work_appointment.valid?
@@ -134,7 +134,7 @@ class AppointmentScheduler
     # if options[:commit] == true, then carry out the capacity changes but don't commit them
     commit = options.has_key?(:commit) ? options[:commit] : true
     
-    if consume_capacity(work_appointment, sel_capacity_slot.free_appointment, sel_capacity_slot, commit)
+    if consume_capacity(work_appointment, el_capacity_slot, commit)
       work_appointment
     else
       raise AppointmentInvalid, "No capacity available"
@@ -142,86 +142,57 @@ class AppointmentScheduler
   end
   
   #
-  # Consume capacity from a capacity slot, with potential implications for other slots
-  # This is in the appointment_scheduler because we want to delete the chosen capacity slot if it goes to 0
-  # as a result we can't make it a method on the capacty slot
+  # Consume capacity from a capacity slot, with knock-on implications for other slots
   #
-  def self.consume_capacity(work_appointment, free_appointment, capacity_slot, commit)
-    # We want to consume capacity from the capacity slot for the work appointment
-    # First make sure that they are compatible for each other
-    raise ArgumentError, "Capacity slot duration is too short" if capacity_slot.duration < work_appointment.duration
-    raise ArgumentError, "Capacity slot start time is too late" if capacity_slot.start_at.utc > work_appointment.start_at.utc
-    raise ArgumentError, "Capacity slot end time is too early" if capacity_slot.end_at.utc < work_appointment.end_at.utc
-    raise ArgumentError, "Capacity slot capacity is too low" if capacity_slot.capacity < work_appointment.capacity
+  def self.consume_capacity(work_appointment, el_capacity_slot, commit)
     
-    orig_capacity = capacity_slot.capacity
-    changed_slots = []
+    # Get all potentially affected capacity slots, and remove capacity from them as appropriate
+    affected_slots = work_appointment.affected_capacity_slots
 
-    if (capacity_slot.start_at.utc < work_appointment.start_at.utc)
-      # Create a new capacity slot, :start_at => capacity_slot.start_at, :end_at => work_appointment.start_at, :capacity => capacity_slot.capacity
-      # other options will be calculated. Changes will be committed below.
-      changed_slots += CapacitySlot.merge_or_add(capacity_slot.free_appointment, false, {:start_at => capacity_slot.start_at.utc,
-                                                  :end_at => work_appointment.start_at.utc, :capacity => capacity_slot.capacity})
+    # The timeslot we're scheduling
+    to_process = [{:start_at => work_appointment.start_at, :end_at => work_appointment.end_at}]
+
+    # If we were given an eligible slot, we won't get it again
+    el_capacity_slot = work_appointment.eligible_capacity_slot unless el_capacity_slot
+
+    if el_capacity_slot && el_capacity_slot.covers_incl?(work_appointment.start_at, work_appointment.end_at) && (el_capacity_slot.capacity > work_appointment.capacity)
+      # Reduce the capacity of this slot, and those impacted by this
+      el_capacity_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, changed_slots, to_process, false)
+      # Now defrag the capacity slots
+      defrag(affected_slots, false)
     end
     
-    if (capacity_slot.end_at.utc > work_appointment.end_at.utc)
-      # Create a new capacity slot, :start_at => work_appointment.end_at, :end_at => capacity_slot.end_at, :capacity => capacity_slot.capacity
-      # Changes will be committed below.
-      changed_slots += CapacitySlot.merge_or_add(capacity_slot.free_appointment, false, {:start_at => work_appointment.end_at.utc,
-                                                                    :end_at => capacity_slot.end_at.utc, :capacity => capacity_slot.capacity})
-    end
-
-    # Adjust this capacity slot by reducing its capacity, to zero if appropriate
-    capacity_slot.capacity = capacity_slot.capacity - work_appointment.capacity
-    changed_slots << capacity_slot
-
-    #
-    # Find any capacity_slots overlapping this work_appointment with capacity > this new capacity. Reduce them to this new capacity
-    #
-    
-    # First get the overlapping slots
-    # overlapping = free_appointment.capacity_slots.overlap(work_appointment.start_at.utc, work_appointment.end_at.utc).capacity_gt(capacity_slot.capacity)
-    
-    # remove the slot we're working on already from the list of overlapping slots - the change above isn't necessarily visible here yet
-    # overlapping = overlapping.delete_if { |slot| slot.id == capacity_slot.id }
-    
-    # change the capacity of overlapping appointments
-    # overlapping.each do |slot|
-    #   if slot_capacity > capacity_slot.capacity
-    #     slot.capacity = capacity_slot.capacity
-    #     changed_slots << slot
-    #   end
-    # end
-
     #
     # commit the capacity slot changes in a single transaction if required
     #
     if commit
       Appointment.transaction do
-        
+                
         # Save the appointments we were handed. This won't happen if they aren't new or dirty
         # This allows the caller to have all of the changes commit in one txn
         work_appointment.save
         free_appointment.save
         
         # enumerate the changed slots
-        changed_slots.each do |slot|
-          if slot.capacity == 0
-            slot.destroy          # Delete those whose capacity is at 0
-          else
-            slot.save             # Save those with capacity > 0
-            if !slot.valid?
-              raise ActiveRecord::Rollback
+        affected_slots.each do |slot|
+          if slot.changed?
+            if slot.capacity == 0
+              slot.destroy          # Delete those whose capacity is at 0
+            else
+              slot.save             # Save those with capacity > 0
+              if !slot.valid?
+                raise ActiveRecord::Rollback
+              end
             end
           end
         end
       end
       free_appointment.reload
     end
-    
+
     true
   end
-  
+
   # create a waitlist appointment
   # options:
   #  - commit => if true, commit the waitlist appointment; otherwise, create the object but don't save it; default is true

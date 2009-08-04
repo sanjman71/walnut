@@ -447,14 +447,21 @@ class Appointment < ActiveRecord::Base
     @conflicts ||= self.company.appointments.free.upcoming_completed.provider(provider).overlap(start_at, end_at)
   end
 
-  # Affected capacity slots include those overlapping a time range, not necessarily covering all of it
+  # Overlapping capacity slots include those overlapping a time range, not necessarily covering all of it. It doesn't include those that only touch, or abut, the time range
+  def overlapping_capacity_slots
+    self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gt(self.duration).order_capacity_desc
+  end
+
+  # Affected capacity slots include those overlapping or touching a time range, not necessarily covering all of it
   def affected_capacity_slots
-    @eligible_slots ||= self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gt(self.duration).order_capacity
+    self.company.capacity_slots.provider(self.provider).overlap_incl(self.start_at, self.end_at).duration_gt(self.duration).order_capacity_desc
   end
 
   # Eligible capacity slot which completely covers the time range and has enough capacity to satisfy the request
+  # If this call doesn't return a slot, there is not enough available capacity
+  # There may be several slots that can satisfy the request, if so this call returns the one with the most capacity
   def eligible_capacity_slot
-    @eligible_slot ||= self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).order_capacity.first
+    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).capacity_gteq(self.capacity).order_capacity_desc.first
   end
 
   # returns true if this appointment conflicts with any other
