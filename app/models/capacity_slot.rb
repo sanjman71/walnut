@@ -249,7 +249,9 @@ class CapacitySlot < ActiveRecord::Base
     raise AppointmentInvalid, "Not enough capacity available" if self.capacity < capacity_to_consume
 
     # Get the index of self in the affected slots array, assuming it's there. We'll update it at the end
-    self_index = affected_slots.index(self)
+    self_index      = affected_slots.index(self)
+    
+    new_before_slot = new_after_slot = nil
 
     if (self.start_at.utc < start_at.utc)
       # This slot covers part of a time range earlier than the request.
@@ -257,7 +259,6 @@ class CapacitySlot < ActiveRecord::Base
       # Changes will be committed below if required. This new slot will touch, but not overlap, the requested range
       new_before_slot = CapacitySlot.new(:free_appointment => self.free_appointment, :start_at => self.start_at.utc, :end_at => start_at.utc, :capacity => self.capacity)
       self.free_appointment.capacity_slots.push(new_before_slot)
-      affected_slots.push(new_before_slot) # Add the new slot to the affected slots, so that it will be defragged. No need to check uniq! as this is a new slot
     end
     
     if (self.end_at.utc > end_at.utc)
@@ -266,25 +267,28 @@ class CapacitySlot < ActiveRecord::Base
       # Changes will be committed below if required. This new slot will touch, but not overlap, the requested range
       new_after_slot = CapacitySlot.new(:free_appointment => self.free_appointment, :start_at => end_at.utc, :end_at => self.end_at.utc, :capacity => self.capacity)
       self.free_appointment.capacity_slots.push(new_after_slot)
-      affected_slots.push(new_after_slot) # Add the new slot to the affected slots, so that it will be defragged. No need to check uniq! as this is a new slot
     end
 
     # Adjust this capacity slot by reducing its capacity, to zero if appropriate
-    new_capacity  = self.capacity - capacity_to_consume    
-    self.capacity = new_capacity
+    new_capacity                        = self.capacity - capacity_to_consume    
+    self.capacity                       = new_capacity
     affected_slots[self_index].capacity = new_capacity unless self_index.nil?
 
-    # If any other capacity slots overlap this one they need to have their capacity reduced also. Note that these slots do not need to cover the full time range
+    # If any other capacity slots overlap this one they need to have their capacity reduced also. 
+    # Note that these impacted slots do not need to cover the full time range, but they need to cover some of it (i.e. don't use the incl form of the overlap test)
     # Overlapping slots should never go below the level of this slot. They should be reduced by the capacity, but never to less than this slot's capacity
-    ignored_time_gaps = []
     affected_slots.each do |slot|
       # We will commit the changes (or our caller will if this is recursive), so instruct the recursive call not to commit
-      if (slot != self) && (slot.overlaps_range_incl?(start_at, end_at)) && (slot.capacity > self.capacity)
+      if (slot != self) && (slot.overlaps_range?(start_at, end_at)) && (slot.capacity > self.capacity)
         slot.reduce_capacity(start_at, end_at, (slot.capacity - self.capacity < capacity_to_consume) ? (slot.capacity - self.capacity) : capacity_to_consume,
                               affected_slots, false)
       end
       
     end
+    
+    # We now add the earlier slots into the list for saving, if required
+    affected_slots.push(new_before_slot) unless new_before_slot.nil? # Add the new slot to the affected slots. No need to check uniq! as this is a new slot
+    affected_slots.push(new_after_slot) unless new_before_slot.nil? # Add the new slot to the affected slots. No need to check uniq! as this is a new slot    
     
     #
     # commit the capacity slot changes in a single transaction if required
@@ -341,8 +345,8 @@ class CapacitySlot < ActiveRecord::Base
             if (c_slot.capacity > 0) && (c_slot.capacity == a_slot.capacity) && (c_slot.overlaps_incl?(a_slot))
 
               # change the a_slot, remove the c_slot (by setting capacity to 0). The capacity doesn't change
-              a_slot.start_at = min(a_slot.start_at, c_slot.start_at)
-              a_slot.end_at = max(a_slot.end_at, c_slot.end_at)
+              a_slot.start_at = (a_slot.start_at <= c_slot.start_at) ? a_slot.start_at : c_slot.start_at
+              a_slot.end_at   = (a_slot.end_at >= c_slot.end_at) ? a_slot.end_at : c_slot.end_at
               c_slot.capacity = 0
 
               # Add both slots to the end of the passed in array
@@ -402,25 +406,26 @@ class CapacitySlot < ActiveRecord::Base
 
   end
   
-  # A slot is overlapping if its start time is between my start and end time, or if its end time is between my start and end time
+  # A slot overlaps another if it starts before the second finishes, and finishes after the second starts
   # This version includes appointments that touch this appointment
   def overlaps_incl?(slot)
-    (self.start_at >= slot.start_at && self.start_at <= slot.end_at) ||
-    (self.end_at >= slot.start_at && self.end_at <= slot.end_at)
+    (self.start_at <= slot.end_at) && (self.end_at >= slot.start_at)
   end
   
-  # A slot is overlapping if its start time is between my start and end time, or if its end time is between my start and end time
+  # A slot overlaps another if it starts before the second finishes, and finishes after the second starts
   # This version does not include appointments that touch this appointment
   def overlaps?(slot)
-    (self.start_at >= slot.start_at && self.start_at < slot.end_at) ||
-    (self.end_at > slot.start_at && self.end_at <= slot.end_at)
+    (self.start_at < slot.end_at) && (self.end_at > slot.start_at)
   end
   
   def overlaps_range_incl?(start_at, end_at)
-    (self.start_at >= start_at && self.start_at < end_at) ||
-    (self.end_at > start_at && self.end_at <= end_at)
+    (self.start_at <= end_at) && (self.end_at >= start_at)
   end
   
+  def overlaps_range?(start_at, end_at)
+    (self.start_at < end_at) && (self.end_at > start_at)
+  end
+
   # This slot covers another if its entire time period are between my start and end time
   # This version includes appointments that touch this appointment
   def covers_incl?(slot)
