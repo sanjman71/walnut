@@ -14,8 +14,9 @@ class CapacitySlot < ActiveRecord::Base
   belongs_to                  :free_appointment, :class_name => "Appointment"
   
   validates_presence_of       :start_at, :end_at, :duration  
-  
-  before_save                 :make_duration_time_start_end
+
+  # This must be before validation, as it makes attributes that are required
+  before_validation           :make_duration_time_start_end
 
 
   named_scope :future,        lambda { { :conditions => ["`capacity_slots`.start_at >= ?", Time.now.beginning_of_day.utc] } }
@@ -113,8 +114,9 @@ class CapacitySlot < ActiveRecord::Base
                
   # order by start_at
   named_scope :order_start_at, {:order => 'start_at'}
+  
   # order by capacity
-  named_scope :order_capacity, {:order => 'capacity DESC'}
+  named_scope :order_capacity_desc, {:order => 'capacity DESC'}
   
   
   
@@ -232,18 +234,228 @@ class CapacitySlot < ActiveRecord::Base
     changed_slots
   end
   
-  # Assign time_start_at and time_end_at
+  #
+  # Reduce the capacity of this slot by a requested amount during a specific timeframe.
+  # This function doesn't consider knock-on impacts on other slots. It this slot is larger than the required timeframe, it will create new slots
+  # with the current capacity before and/or after the current slot as appropriate, and reduce the current slot's capacity.
+  # The function returns an array of new or changed slots. Nothing is ever saved.
+  #
+  def reduce_capacity(start_at, end_at, capacity_to_consume, affected_slots, commit = false)
+
+    # If this timeslot isn't relevant to us, we just return an empty changeset. We shouldn't have been called
+    return if ((self.start_at.utc > end_at.utc) || (self.end_at.utc < start_at.utc))
+
+    # If we can't accomodate the capacity requested we raise an exception
+    raise AppointmentInvalid, "Not enough capacity available" if self.capacity < capacity_to_consume
+
+    # Get the index of self in the affected slots array, assuming it's there. We'll update it at the end
+    self_index = affected_slots.index(self)
+
+    if (self.start_at.utc < start_at.utc)
+      # This slot covers part of a time range earlier than the request.
+      # Create a new capacity slot starting at this slots start time, ending at the time range's start time, with the current capacity
+      # Changes will be committed below if required. This new slot will touch, but not overlap, the requested range
+      new_before_slot = CapacitySlot.new(:free_appointment => self.free_appointment, :start_at => self.start_at.utc, :end_at => start_at.utc, :capacity => self.capacity)
+      self.free_appointment.capacity_slots.push(new_before_slot)
+      affected_slots.push(new_before_slot) # Add the new slot to the affected slots, so that it will be defragged. No need to check uniq! as this is a new slot
+    end
+    
+    if (self.end_at.utc > end_at.utc)
+      # This slot covers part of a time range later than the request.
+      # Create a new capacity slot starting at the time range's end time, ending at this slots end time, with the current capacity
+      # Changes will be committed below if required. This new slot will touch, but not overlap, the requested range
+      new_after_slot = CapacitySlot.new(:free_appointment => self.free_appointment, :start_at => end_at.utc, :end_at => self.end_at.utc, :capacity => self.capacity)
+      self.free_appointment.capacity_slots.push(new_after_slot)
+      affected_slots.push(new_after_slot) # Add the new slot to the affected slots, so that it will be defragged. No need to check uniq! as this is a new slot
+    end
+
+    # Adjust this capacity slot by reducing its capacity, to zero if appropriate
+    new_capacity  = self.capacity - capacity_to_consume    
+    self.capacity = new_capacity
+    affected_slots[self_index].capacity = new_capacity unless self_index.nil?
+
+    # If any other capacity slots overlap this one they need to have their capacity reduced also. Note that these slots do not need to cover the full time range
+    # Overlapping slots should never go below the level of this slot. They should be reduced by the capacity, but never to less than this slot's capacity
+    ignored_time_gaps = []
+    affected_slots.each do |slot|
+      # We will commit the changes (or our caller will if this is recursive), so instruct the recursive call not to commit
+      if (slot != self) && (slot.overlaps_range_incl?(start_at, end_at)) && (slot.capacity > self.capacity)
+        slot.reduce_capacity(start_at, end_at, (slot.capacity - self.capacity < capacity_to_consume) ? (slot.capacity - self.capacity) : capacity_to_consume,
+                              affected_slots, false)
+      end
+      
+    end
+    
+    #
+    # commit the capacity slot changes in a single transaction if required
+    #
+    if commit
+      CapacitySlot.transaction do
+                
+        # enumerate the changed slots
+        affected_slots.each do |slot|
+          if slot.changed?
+            if slot.capacity == 0
+              slot.destroy          # Delete those whose capacity is at 0
+            else
+              slot.save             # Save those with capacity > 0
+              if !slot.valid?
+                raise ActiveRecord::Rollback
+              end
+            end
+          end
+        end
+      end
+      self.free_appointment.reload
+    end
+
+  end
+  
+  # Defrag an array of capacity slots
+  #
+  # If we assume that the array was defragged before a change is made, and then record all the changes, we can optimize by starting to check only the changed slots.
+  # There may be knock on impacts as a result of defragging this slot, but at least initially we can reduce the number of slots we check
+  #
+  def self.defrag(affected_slots, commit = false)
+    # Now defrag the capacity slots
+    # defragged_slots = []
+    
+    # We check each of the changed slots to see if any of them should be merged with an existing slot
+    # We keep going until no defrag operations happen, as one run through can lead to additional defrags. Initialize defrags to ensure we do the loop at least once
+    defrags = true
+    while (defrags)
+      
+      # No defrags done so far
+      defrags = false
+
+      # Check each of the potentially affected slots
+      affected_slots.each do |c_slot|
+
+        # Compare these with all other potentially affected slots
+        affected_slots.each do |a_slot| 
+
+          # Make sure we're not comparing a slot with itself
+          if c_slot != a_slot
+          
+            # If the two slots have the same capacity and they overlap in any way, including touching
+            if (c_slot.capacity > 0) && (c_slot.capacity == a_slot.capacity) && (c_slot.overlaps_incl?(a_slot))
+
+              # change the a_slot, remove the c_slot (by setting capacity to 0). The capacity doesn't change
+              a_slot.start_at = min(a_slot.start_at, c_slot.start_at)
+              a_slot.end_at = max(a_slot.end_at, c_slot.end_at)
+              c_slot.capacity = 0
+
+              # Add both slots to the end of the passed in array
+              # using concat here modifies the passed-in array
+              # defragged_slots.concat([a_slot, c_slot]).uniq!
+              defrags = true
+
+              # If the two slots have different capacities, and the smaller capacity is entirely covered by the larger capacity, we have no need of the smaller capacity slot
+            elsif (a_slot.capacity > 0) && (c_slot.capacity > a_slot.capacity) && (c_slot.covers_incl?(a_slot))
+
+              a_slot.capacity = 0
+              # Add it to the end of the passed in array
+              # using push here modifies the passed-in array
+              # defragged_slots.push(a_slot).uniq!
+              defrags = true
+
+              # If the two slots have different capacities, and the smaller capacity is entirely covered by the larger capacity, we have no need of the smaller capacity slot
+            elsif (c_slot.capacity > 0) && (c_slot.capacity < a_slot.capacity) && (a_slot.covers_incl?(c_slot))
+
+              c_slot.capacity = 0
+              # Add it to the end of the passed in array
+              # using push here modifies the passed-in array
+              # defragged_slots.push(c_slot).uniq!
+              defrags = true
+
+            end
+
+          end
+        
+        end
+        
+      end
+
+    end
+    
+    #
+    # commit the capacity slot changes in a single transaction if required
+    #
+    if commit
+      CapacitySlot.transaction do
+                
+        # enumerate the changed slots
+        affected_slots.each do |slot|
+          if slot.changed?
+            if slot.capacity == 0
+              slot.destroy          # Delete those whose capacity is at 0
+            else
+              slot.save             # Save those with capacity > 0
+              if !slot.valid?
+                raise ActiveRecord::Rollback
+              end
+            end
+          end
+        end
+      end
+    end
+
+  end
+  
+  # A slot is overlapping if its start time is between my start and end time, or if its end time is between my start and end time
+  # This version includes appointments that touch this appointment
+  def overlaps_incl?(slot)
+    (self.start_at >= slot.start_at && self.start_at <= slot.end_at) ||
+    (self.end_at >= slot.start_at && self.end_at <= slot.end_at)
+  end
+  
+  # A slot is overlapping if its start time is between my start and end time, or if its end time is between my start and end time
+  # This version does not include appointments that touch this appointment
+  def overlaps?(slot)
+    (self.start_at >= slot.start_at && self.start_at < slot.end_at) ||
+    (self.end_at > slot.start_at && self.end_at <= slot.end_at)
+  end
+  
+  def overlaps_range_incl?(start_at, end_at)
+    (self.start_at >= start_at && self.start_at < end_at) ||
+    (self.end_at > start_at && self.end_at <= end_at)
+  end
+  
+  # This slot covers another if its entire time period are between my start and end time
+  # This version includes appointments that touch this appointment
+  def covers_incl?(slot)
+    (self.start_at <= slot.start_at && self.end_at >= slot.end_at)
+  end
+
+  # This slot covers another if its entire time period are between my start and end time
+  # This version does not include appointments that touch this appointment
+  def covers?(slot)
+    (self.start_at < slot.start_at && self.end_at > slot.end_at)
+  end
+
+  # This version includes appointments that touch this appointment
+  def covers_range_incl?(start_at, end_at)
+    (self.start_at <= start_at && self.end_at >= end_at)
+  end
+
+  protected
+
+  # Assign duration, time_start_at and time_end_at if required
   def make_duration_time_start_end
+    # We can't do anything if we don't have a start and end time
     return if self.start_at.nil? || self.end_at.nil?
-    if self.start_at_changed? || self.end_at_changed?
-      # Mark these attributes as dirty
+
+    # We don't do any work unless the relevant attributes have changed or if it's a new record
+    if self.start_at_changed? || self.end_at_changed? || self.new_record?
+      # We're going to change time_start_at, time_end_at and duration. Mark these attributes as dirty
       time_start_at_will_change!
       time_end_at_will_change!
       duration_will_change!
+
       self.duration = (self.end_at.utc - self.start_at.utc) / 60
       self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
       self.time_end_at = self.time_start_at + (self.duration * 60)
     end
   end
-
+  
 end
