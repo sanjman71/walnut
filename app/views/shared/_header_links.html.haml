@@ -24,6 +24,8 @@
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Venues', country_venues_path(@country || Country.default), :class => 'header link'
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
+      = link_to 'Events', events_path, :class => 'header link'
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to('Bot Stats', url_for(:controller => 'bot_stats', :action => 'googlebot'), :class => 'header link')
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'header link')

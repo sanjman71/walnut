@@ -1,0 +1,17 @@
+- title("Events")
+
+.span-23.prepend-1.mat.padding-top-10.bottom
+  %h2== Event Cities
+  %h4= link_to 'Remove Past Events', remove_events_path, :class => 'event location'
+  
+%hr.space
+
+.prepend-1.span-14#flash
+  = display_flash(:notice)
+
+.span-23.prepend-1
+  - @event_cities.each do |city|
+    .last
+      %span{:style => 'font-size: 1.7em;'}= city.name
+      %span{:style => 'padding-left: 5px; font-size: 1.0em;'}= link_to 'Import', import_events_path(city.name.parameterize), :class => 'event location'
+    %br

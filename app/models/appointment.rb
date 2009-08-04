@@ -651,10 +651,10 @@ class Appointment < ActiveRecord::Base
     end
   end
 
-  # add the 'customer' role to a work/wait appointment's customer
+  # add the 'company customer' role to a work/wait appointment's customer
   def add_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
-    self.customer.grant_role('customer', self.company)
+    self.customer.grant_role('company customer', self.company)
   end
   
   def make_capacity_slot

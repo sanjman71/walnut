@@ -100,6 +100,11 @@ class User < ActiveRecord::Base
   end
   
   def manage_user_roles
+    unless self.has_role?('user manager', self)
+      # all users can manage themselves
+      self.grant_role('user manager', self)
+    end
+
     if defined?(ADMIN_USER_EMAILS) and ADMIN_USER_EMAILS.include?(self.email)
       # grant user the 'admin' role
       self.grant_role('admin')

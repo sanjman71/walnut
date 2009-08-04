@@ -55,6 +55,8 @@ class Location < ActiveRecord::Base
   named_scope :with_appointments,     { :conditions => ["appointments_count > 0"]}
   named_scope :with_events,           { :conditions => ["events_count > 0"]}
 
+  named_scope :with_delta,            { :conditions => ["delta = 1"]}
+
   named_scope :recommended,           { :conditions => ["recommendations_count > 0"] }
 
   define_index do
@@ -76,8 +78,6 @@ class Location < ActiveRecord::Base
     # convert degrees to radians for sphinx
     has 'RADIANS(locations.lat)', :as => :lat,  :type => :float
     has 'RADIANS(locations.lng)', :as => :lng,  :type => :float
-    # delta indexing using a delayed/background processing scheduler so its 'almost' real-time
-    set_property :delta => :delayed
     # only index valid locations
     where "status = 0"
   end

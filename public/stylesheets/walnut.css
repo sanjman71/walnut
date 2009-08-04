@@ -240,7 +240,7 @@ span.example                                      { color: #666666; font-style: 
 
 #breadcrumbs                                      { font-size: 11px; }
 #breadcrumbs a                                    { color: #000000; text-decoration: none; }
-#breadcrumbs a:hover                              { color: #FFFFFF; background-color: #5500BB; }
+#breadcrumbs a:hover                              { color: #FFFFFF; background-color: #660099; }
 #breadcrumbs span                                 { color: #555555; }
 
 
@@ -290,7 +290,7 @@ a.recommend:hover                                 { color: #FFFFFF; background-c
 html, body, #container                            { height: 100%; }
 body > #container                                 { height: auto; min-height: 100%; }
 
-/* adding padding to the main conainer, add more than the footer height */
+/* add padding to the main conainer; add more than the footer height */
 div#container                                     { padding-bottom: 8em; }
 
 /* place the footer after the main container, creating a body overflow */
@@ -298,4 +298,4 @@ div#footer                                        { clear: both; position: relat
                                                     background-color: #3A2313; padding-top: 15px; min-width: 900px; text-align: left; }
 
 a.footer.link                                     { color: #FFFFFF; font-size: 1.1em; } 
-a.footer.link:hover                               { color: #FFFFFF; background-color: #5500BB; }
+a.footer.link:hover                               { color: #FFFFFF; background-color: #EA6F34; }

@@ -1,7 +1,34 @@
 class EventsController < ApplicationController
-  before_filter :init_location
+  before_filter :init_location, :only => [:new, :create]
   
   privilege_required 'manage site', :on => :current_user
+
+  def index
+    # show event cities, assume they are the densest cities
+    @event_cities = City.min_density(City.popular_density).order_by_density(:include => :state).sort_by { |o| o.name }
+  end
+
+  def import
+    @city = City.find_by_name(params[:city].titleize, :include => :state)
+
+    if @city.blank?
+      flash[:error]  = "Could not find city #{params[:city]}"
+    else
+      # queue job
+      Delayed::Job.enqueue(EventJob.new(:method => 'import', :city => @city.name, :region => @city.state.name, :limit => 10), 3)
+      flash[:notice] = "Importing #{@city.name} events"
+    end
+
+    redirect_to events_path and return
+  end
+
+  def remove
+    # queue job
+    Delayed::Job.enqueue(EventJob.new(:method => 'remove_past'), 3)
+    flash[:notice] = "Removing past events"
+
+    redirect_to events_path and return
+  end
 
   def new
     # @location, @company initialized in before filter

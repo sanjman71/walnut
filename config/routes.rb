@@ -88,6 +88,10 @@ ActionController::Routing::Routes.draw do |map|
   map.create_event  '/locations/:location_id/events',           :controller => 'events', :action => 'create', :conditions => {:method => :post}
   map.show_event    '/locations/:location_id/event/:event_id',  :controller => 'events', :action => 'show'
 
+  map.import_events '/events/:city/import', :controller => 'events', :action => 'import'
+  map.remove_events '/events/remove', :controller => 'events', :action => 'remove'
+  map.events        '/events', :controller => 'events', :action => 'index'
+  
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
 

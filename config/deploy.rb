@@ -23,8 +23,8 @@ set :group,         'app'
 # Load external recipe files
 load_paths << "config/recipes"
 load "database"
+load "delayed_job"
 load "sphinx"
-
 
 deploy.task :restart, :roles => :app do
   run "touch #{current_release}/tmp/restart.txt"
