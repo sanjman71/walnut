@@ -26,6 +26,7 @@ class Company < ActiveRecord::Base
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location
 
   has_many                  :phone_numbers, :as => :callable
+  has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable # first phone number
 
   has_many                  :company_tag_groups
   has_many                  :tag_groups, :through => :company_tag_groups
@@ -73,17 +74,12 @@ class Company < ActiveRecord::Base
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
   def self.customer_role
-    Badges::Role.find_by_name('customer')
+    Badges::Role.find_by_name('company customer')
   end
 
   def primary_location
     return nil if locations_count == 0
     locations.first
-  end
-  
-  def primary_phone_number
-    return nil if phone_numbers_count == 0
-    phone_numbers.first
   end
 
   def chain?
