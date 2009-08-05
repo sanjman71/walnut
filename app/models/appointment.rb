@@ -682,17 +682,6 @@ class Appointment < ActiveRecord::Base
       CapacitySlot.merge_or_add(self, true)
     end
   end
-  
-  def make_capacity_slot
-    # All appointments should have capacity. If not specified, this is 1
-    self.capacity ||= 1
-    # Free appointments that are not public have associated capacity slots
-    # This is how we differentiate events from other appointments right now
-    # We commit the changes in this call, as the free appointment has already been created.
-    if (self.mark_as == FREE && !self.public)
-      CapacitySlot.merge_or_add(self, true)
-    end
-  end
 
   def update_recurrence
     # Check if anything changed
