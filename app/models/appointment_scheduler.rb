@@ -37,8 +37,8 @@ class AppointmentScheduler
     raise ArgumentError, "daterange is required" if daterange.blank?
     
     # use daterange to build start_at, end_at
-    start_at    = daterange.start_at
-    end_at      = daterange.end_at
+    start_at    = daterange.start_at.utc
+    end_at      = daterange.end_at.utc
     
     # use time range if it was specified
     time_range = options.has_key?(:time_range) ? options[:time_range] : nil
@@ -54,8 +54,8 @@ class AppointmentScheduler
       slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
     end
     
-    # remove slots that have ended (when compared to Time.now) or appointment providers that do not provide the requested service
-    slots.select { |slot| slot.end_at.utc > Time.now.utc and service.provided_by?(slot.free_appointment.provider) }
+    # remove slots that have ended (when compared to Time.zone.now) or appointment providers that do not provide the requested service
+    slots.select { |slot| slot.end_at.utc > Time.zone.now.utc and service.provided_by?(slot.free_appointment.provider) }
   end
   
   # create a free appointment in the specified timeslot
