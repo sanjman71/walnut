@@ -121,9 +121,8 @@ class CapacitySlot < ActiveRecord::Base
   
   
   # Class method to merge additional capacity, or create a new capacity slot, as appropriate
-  # TODO - don't create the slots, instead use new and commit in caller
   def self.merge_or_add(free_appointment, commit = nil, options = nil)
-    
+
     options ||= {}
 
     # We require the free appointment we're working with
