@@ -288,7 +288,10 @@ class CapacitySlot < ActiveRecord::Base
     
     # We now add the earlier slots into the list for saving, if required
     affected_slots.push(new_before_slot) unless new_before_slot.nil? # Add the new slot to the affected slots. No need to check uniq! as this is a new slot
-    affected_slots.push(new_after_slot) unless new_before_slot.nil? # Add the new slot to the affected slots. No need to check uniq! as this is a new slot    
+    affected_slots.push(new_after_slot) unless new_after_slot.nil? # Add the new slot to the affected slots. No need to check uniq! as this is a new slot    
+    
+    # Should be no nil entries here, but just in case
+    affected_slots.compact!
     
     #
     # commit the capacity slot changes in a single transaction if required
