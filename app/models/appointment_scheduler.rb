@@ -154,20 +154,23 @@ class AppointmentScheduler
 
     # If we were given an eligible slot, we won't get it again
     el_capacity_slot = work_appointment.eligible_capacity_slot unless el_capacity_slot
-
-    if el_capacity_slot && el_capacity_slot.covers_incl?(work_appointment.start_at, work_appointment.end_at) && (el_capacity_slot.capacity > work_appointment.capacity)
-      # Reduce the capacity of this slot, and those impacted by this
-      el_capacity_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, changed_slots, to_process, false)
-      # Now defrag the capacity slots
-      defrag(affected_slots, false)
-    end
     
+    free_appointment = work_appointment.free_appointment
+
     #
     # commit the capacity slot changes in a single transaction if required
     #
     if commit
       Appointment.transaction do
                 
+        if el_capacity_slot && el_capacity_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
+            (el_capacity_slot.capacity >= work_appointment.capacity)
+          # Reduce the capacity of this slot, and those impacted by this
+          el_capacity_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, false)
+          # Now defrag the capacity slots
+          CapacitySlot.defrag(affected_slots, false)
+        end
+    
         # Save the appointments we were handed. This won't happen if they aren't new or dirty
         # This allows the caller to have all of the changes commit in one txn
         work_appointment.save
@@ -188,6 +191,17 @@ class AppointmentScheduler
         end
       end
       free_appointment.reload
+      
+    else
+
+      if el_capacity_slot && el_capacity_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
+          (el_capacity_slot.capacity > work_appointment.capacity)
+        # Reduce the capacity of this slot, and those impacted by this
+        el_capacity_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, false)
+        # Now defrag the capacity slots
+        defrag(affected_slots, false)
+      end
+
     end
 
     true
