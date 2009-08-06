@@ -24,10 +24,15 @@ class RpxControllerTest < ActionController::TestCase
         @user = User.find_by_email("sanjay@walnutindustries.com")
         assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @user.identifier
       end
-      
-      should "assign admin role to user" do
+
+      should "assign 'admin' and 'user manager' roles" do
         @user = User.find_by_email("sanjay@walnutindustries.com")
-        assert_equal ['admin'], @user.roles.collect(&:name)
+        assert_equal ['admin', 'user manager'], @user.roles.collect(&:name).sort
+      end
+
+      should "assign 'user manager' role on user" do
+        @user = User.find_by_email("sanjay@walnutindustries.com")
+        assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
 
       should_set_session(:user_id) { User.find_by_email("sanjay@walnutindustries.com").id }
