@@ -8,6 +8,8 @@ production:
   max_matches: 200
   # Ignore single quotes
   ignore_chars: U+0027
+  searchd_file_path: "/usr/apps/walnut/shared/sphinx"
+  mem_limit: 128M
 test:
   port: 3312
   max_matches: 200
