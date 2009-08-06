@@ -37,14 +37,14 @@ class AppointmentScheduler
     raise ArgumentError, "daterange is required" if daterange.blank?
     
     # use daterange to build start_at, end_at
-    start_at    = daterange.start_at.utc
-    end_at      = daterange.end_at.utc
+    start_at     = daterange.start_at.utc
+    end_at       = daterange.end_at.utc
     
     # use time range if it was specified
-    time_range = options.has_key?(:time_range) ? options[:time_range] : nil
+    time_range   = options.has_key?(:time_range) ? options[:time_range] : nil
     
-    # use the capacity requested or the default
-    capacity_req = options[:capacity] || 1
+    # use the (absolute value of the) capacity requested or the default
+    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : 1
     
     if provider.anyone?
       # find free appointments for any provider, order by start times
@@ -111,18 +111,18 @@ class AppointmentScheduler
     raise AppointmentInvalid if !service.provided_by?(provider)
 
     # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
-    work_hash         = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
-    work_appointment  = Appointment.new(work_hash)
+    work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
+    work_appointment = Appointment.new(work_hash)
     
     # Determine if there is capacity to accomodate the work appointment. This will also find the appropriate free appointment for the work appointment.
-    el_capacity_slot = work_appointment.eligible_capacity_slot
+    max_slot         = work_appointment.max_capacity_slot
 
     # If we can't find capacity, fail
-    if el_capacity_slot.blank?
+    if max_slot.blank?
       raise AppointmentInvalid, "No capacity available"
     else
       # Otherwise update the work appointment with the corresponding free appointment
-      work_appointment.free_appointment = el_capacity_slot.free_appointment
+      work_appointment.free_appointment = max_slot.free_appointment
     end
 
     raise AppointmentInvalid if !work_appointment.valid?
@@ -134,7 +134,7 @@ class AppointmentScheduler
     # if options[:commit] == true, then carry out the capacity changes but don't commit them
     commit = options.has_key?(:commit) ? options[:commit] : true
     
-    if consume_capacity(work_appointment, el_capacity_slot, commit)
+    if consume_capacity(work_appointment, max_slot, commit)
       work_appointment
     else
       raise AppointmentInvalid, "No capacity available"
@@ -144,16 +144,16 @@ class AppointmentScheduler
   #
   # Consume capacity from a capacity slot, with knock-on implications for other slots
   #
-  def self.consume_capacity(work_appointment, el_capacity_slot, commit)
+  def self.consume_capacity(work_appointment, max_slot, commit)
     
     # Get all potentially affected capacity slots, and remove capacity from them as appropriate
-    affected_slots = work_appointment.affected_capacity_slots
+    affected_slots   = work_appointment.affected_capacity_slots
 
     # The timeslot we're scheduling
-    to_process = [{:start_at => work_appointment.start_at, :end_at => work_appointment.end_at}]
+    to_process       = [{:start_at => work_appointment.start_at, :end_at => work_appointment.end_at}]
 
     # If we were given an eligible slot, we won't get it again
-    el_capacity_slot = work_appointment.eligible_capacity_slot unless el_capacity_slot
+    max_slot         = work_appointment.max_capacity_slot unless max_slot
     
     free_appointment = work_appointment.free_appointment
 
@@ -163,10 +163,10 @@ class AppointmentScheduler
     if commit
       Appointment.transaction do
                 
-        if el_capacity_slot && el_capacity_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
-            (el_capacity_slot.capacity >= work_appointment.capacity)
+        if max_slot && max_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
+            (max_slot.capacity >= work_appointment.capacity)
           # Reduce the capacity of this slot, and those impacted by this
-          el_capacity_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, false)
+          max_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, {:commit => false})
           # Now defrag the capacity slots
           CapacitySlot.defrag(affected_slots, false)
         end
@@ -194,12 +194,12 @@ class AppointmentScheduler
       
     else
 
-      if el_capacity_slot && el_capacity_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
-          (el_capacity_slot.capacity > work_appointment.capacity)
+      if max_slot && max_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
+          (max_slot.capacity >= work_appointment.capacity)
         # Reduce the capacity of this slot, and those impacted by this
-        el_capacity_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, false)
+        max_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, {:commit => false})
         # Now defrag the capacity slots
-        defrag(affected_slots, false)
+        CapacitySlot.defrag(affected_slots, false)
       end
 
     end
@@ -300,37 +300,60 @@ class AppointmentScheduler
   end
   
   # cancel the work appointment, and reclaim the necessary free time
-  def self.cancel_work_appointment(appointment)
+  def self.cancel_work_appointment(appointment, options = {})
     raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WORK
-    
+
     # find any free time that book-ends this work appointment
-    company           = appointment.company
+    company          = appointment.company
     
     free_appointment = appointment.free_appointment
     if free_appointment.blank?
       raise AppointmentInvalid, "No associated free appointment"
     end
+    
+    commit = options.has_key?(:commit) ? options[:commit] : false
 
-    # Create capacity corresponding to the canceled work appointment. We'll commit the changes below.
-    changed_slots = CapacitySlot.merge_or_add(free_appointment, false, :work_appointment => appointment)
-        
-    # commit the apointment changes
-    Appointment.transaction do
+    if commit
+      Appointment.transaction do
+
+        # Create capacity corresponding to the canceled work appointment. We'll commit the changes below.
+        affected_slots = CapacitySlot.merge_or_add(free_appointment, false, :work_appointment => appointment)
+
+        # Defrag the capacity slots
+        CapacitySlot.defrag(affected_slots)
+
+        # cancel and save work appointment
+        appointment.cancel
+        appointment.save
+
+        # enumerate the changed slots
+        affected_slots.each do |slot|
+          if slot.changed?
+            if slot.capacity == 0
+              slot.destroy          # Delete those whose capacity is at 0
+            else
+              slot.save             # Save those with capacity > 0
+              if !slot.valid?
+                raise ActiveRecord::Rollback
+              end
+            end
+          end
+        end
+      end
+      free_appointment.reload
+    else
+      # Create capacity corresponding to the canceled work appointment. We'll commit the changes below.
+      affected_slots = CapacitySlot.merge_or_add(free_appointment, false, :work_appointment => appointment)
+
+      # Defrag the capacity slots
+      CapacitySlot.defrag(affected_slots)
 
       # cancel work appointment
       appointment.cancel
 
-      # update the changed capacity slots
-      changed_slots.each do |slot|
-        if slot.capacity == 0
-          slot.destroy
-        else
-          slot.save
-        end
-      end
-      
+      free_appointment.reload
     end
-    
+
     free_appointment
   end
 

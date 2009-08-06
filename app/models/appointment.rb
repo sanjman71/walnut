@@ -461,17 +461,28 @@ class Appointment < ActiveRecord::Base
     company.capacity_slots.provider(provider).overlap_incl(start_at, end_at).duration_gt(duration).order_capacity_desc
   end
 
-  # Eligible capacity slot which completely covers the time range and has enough capacity to satisfy the request
-  # If this call doesn't return a slot, there is not enough available capacity
+  # Capacity slot which has maximum capacity, completely covers the time range and has enough capacity to satisfy the request
+  # If this call doesn't return a slot, there is no capacity in this time range
   # There may be several slots that can satisfy the request, if so this call returns the one with the most capacity
-  def eligible_capacity_slot
+  def max_capacity_slot
     self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).capacity_gteq(self.capacity).order_capacity_desc.first
   end
   
-  def self.eligible_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
+  def self.max_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
     company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gt(duration).capacity_gteq(capacity).order_capacity_desc.first
   end
   
+  # Capacity slot which has minimum capacity, completely covers the time range and has more capacity than requested
+  # If this call doesn't return a slot, there is no capacity in this time range
+  # There may be several slots that can satisfy the request, if so this call returns the one with the least capacity
+  def min_capacity_slot
+    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).capacity_gteq(self.capacity).order_capacity_asc.first
+  end
+  
+  def self.min_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
+    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gt(duration).capacity_gteq(capacity).order_capacity_asc.first
+  end
+
   # returns true if this appointment conflicts with any other
   def conflicts?
     self.conflicts.size > 0
