@@ -674,6 +674,8 @@ class Appointment < ActiveRecord::Base
     unless self.uid
       # use a constant string
       self.uid  = "#{self.created_at.strftime("%Y%m%d%H%M%S")}-#{self.id}@walnutindustries.com"
+      # save the change
+      self.save
     end
   end
 
@@ -685,7 +687,11 @@ class Appointment < ActiveRecord::Base
   
   def make_capacity_slot
     # All appointments should have capacity. If not specified, this is 1
-    self.capacity ||= 1
+    unless self.capacity
+      self.capacity = 1
+      self.save
+    end
+    
     # Free appointments that are not public have associated capacity slots
     # This is how we differentiate events from other appointments right now
     # We commit the changes in this call, as the free appointment has already been created.
@@ -695,14 +701,14 @@ class Appointment < ActiveRecord::Base
   end
 
   def update_recurrence
-    # Check if anything changed
-    if (self.changed?)
+    # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
+    if (!self.recur_rule.blank?) && (self.recur_parent.nil?) && (!self.recur_expanded_to.nil?) && (self.changed?)
       # Check if any of the attributes changed that cause us to reexpand the recurring instances
       if ((self.changed & REEXPAND_INSTANCES_ATTRS).size > 0)
         # We need to rebuild all the instances
         self.recur_instances.each {|a| a.destroy}
         # Make sure we start expanding after the end of the original appointment
-        self.expand_recurrence(Time.now > self.end_at ? Time.now : self.end_at, self.recur_expanded_to)
+        self.expand_recurrence(Time.now.utc > self.end_at.utc ? Time.now.utc : self.end_at.utc, self.recur_expanded_to)
       else
         # We can update the existing instances
         # Build a hash of the changes, take out any attributes we don't want to update
