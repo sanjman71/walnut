@@ -70,7 +70,8 @@ class AppointmentScheduler
     raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
     
     # create a new appointment object
-    free_hash         = {:company => company, :service => service, :provider => provider}.merge(options)
+    # Make sure it has company, service, provider and capacity values. These will be overridden by the options parameter
+    free_hash         = {:company => company, :service => service, :provider => provider, :capacity => 1}.merge(options)
     free_appointment  = Appointment.new(free_hash)
                       
     # free appointments should not have conflicts

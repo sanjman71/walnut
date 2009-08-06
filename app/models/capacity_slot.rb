@@ -158,12 +158,11 @@ class CapacitySlot < ActiveRecord::Base
     # Calculate the duration for the new timeslot
     new_duration = (new_end_at.utc - new_start_at.utc) / 60
 
-    # Find the capacity slot with the most capacity covering the range.
-    # We look for the eligible slot for capacity of 0 - i.e. whatever slot is available
-    max_slot = Appointment.max_capacity_slot_range(free_appointment.company, new_start_at, new_end_at, new_duration, 0, free_appointment.provider)
+    # Find the capacity slot attached to this free appointment with the most capacity covering the range.
+    max_slot = free_appointment.capacity_slots.covers(new_start_at, new_end_at).order_capacity_desc.first
     affected_slots = free_appointment.capacity_slots
 
-    # If we didn't find a slot, create one - we will then increase it's capacity, along with knock-on impacts
+    # If we didn't find a slot, create one with zero capacity - we will then increase it's capacity, along with knock-on impacts
     if max_slot.nil?
       max_slot = free_appointment.capacity_slots.new(:free_appointment => free_appointment, 
                                           :start_at => new_start_at.utc, :end_at => new_end_at.utc,
@@ -212,7 +211,7 @@ class CapacitySlot < ActiveRecord::Base
   #
   def reduce_capacity(start_at, end_at, capacity_change, affected_slots, options = {})
 
-    # If this timeslot isn't relevant to us, or if there's not change in capacity, we just return. We shouldn't have been called, but we allow it to happen.
+    # If this timeslot isn't relevant to us, or if there's no change in capacity, we just return. We shouldn't have been called, but we allow it to happen.
     return if ((self.start_at.utc > end_at.utc) || (self.end_at.utc < start_at.utc)) || (capacity_change == 0)
 
     # If we're removing capacity and we can't accomodate the capacity requested we raise an exception
