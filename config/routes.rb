@@ -88,9 +88,14 @@ ActionController::Routing::Routes.draw do |map|
   map.create_event  '/locations/:location_id/events',           :controller => 'events', :action => 'create', :conditions => {:method => :post}
   map.show_event    '/locations/:location_id/event/:event_id',  :controller => 'events', :action => 'show'
 
-  map.import_events '/events/:city/import', :controller => 'events', :action => 'import'
-  map.remove_events '/events/remove', :controller => 'events', :action => 'remove'
-  map.events        '/events', :controller => 'events', :action => 'index'
+  map.import_events     '/events/import/:city', :controller => 'events', :action => 'import'
+  map.import_all_events '/events/import', :controller => 'events', :action => 'import'
+  map.remove_events     '/events/remove', :controller => 'events', :action => 'remove'
+  map.events            '/events', :controller => 'events', :action => 'index'
+  
+  # sphinx controller
+  map.resources       :sphinx, :only => [:index]
+  map.sphinx_reindex  '/sphinx/reindex/:index', :controller => 'sphinx', :action => 'reindex'
   
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}

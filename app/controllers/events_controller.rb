@@ -9,13 +9,19 @@ class EventsController < ApplicationController
   end
 
   def import
-    @city = City.find_by_name(params[:city].titleize, :include => :state)
+    @city = City.find_by_name(params[:city].titleize, :include => :state) unless params[:city].blank?
 
-    if @city.blank?
+    if params[:city].blank?
+      # queue jobs
+      Delayed::Job.enqueue(EventJob.new(:method => 'import_all', :limit => 100), EventJob.import_priority)
+      Delayed::Job.enqueue(SphinxJob.new(:index => 'appointments'), -1)
+      flash[:notice] = "Importing all city events"
+    elsif @city.blank?
       flash[:error]  = "Could not find city #{params[:city]}"
     else
-      # queue job
-      Delayed::Job.enqueue(EventJob.new(:method => 'import', :city => @city.name, :region => @city.state.name, :limit => 10), 3)
+      # queue jobs
+      Delayed::Job.enqueue(EventJob.new(:method => 'import_city', :city => @city.name, :region => @city.state.name, :limit => 10), EventJob.import_priority)
+      Delayed::Job.enqueue(SphinxJob.new(:index => 'appointments'), -1)
       flash[:notice] = "Importing #{@city.name} events"
     end
 

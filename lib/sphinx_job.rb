@@ -1,13 +1,21 @@
 class SphinxJob < Struct.new(:params)
   
   def perform
-    puts("*** sphinx job params: #{params.inspect}")
+    puts("*** sphinx job: #{params.inspect}")
 
     case params[:index]
-    when 'appointments', 'events'
-      index  = 'appointment_core'
+    when 'appointment', 'appointments', 'events'
+      index = 'appointment_core'
+    when 'location', 'locations'
+      index = 'location_core'
     else
-      puts "#{Time.now}: xxx invalid index #{params[:index]}"
+      if params[:index].match(/_core$/) || params[:index].match(/_delta$/)
+        # use index name as is
+        index = params[:index]
+      else
+        puts "#{Time.now}: xxx invalid index #{params[:index]}"
+        return
+      end
     end
 
     # rebuild index

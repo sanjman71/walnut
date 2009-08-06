@@ -1,0 +1,4 @@
+The thinking sphinx plugin includes a version of the delayed_job plugin.  In order to make sure they both use the same plugin,
+copy the delayed_job plugin files to the thinking_sphinx plugin:
+
+cp vendor/plugins/delayed_job/lib/delayed/*.rb vendor/plugins/thinking-sphinx/vendor/delayed_job/lib/delayed/

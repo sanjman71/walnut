@@ -1,28 +1,58 @@
 class EventJob < Struct.new(:params)
+  def self.import_priority
+    3
+  end
+  
+  def self.remove_prioriy
+    3
+  end
+  
   def perform
-    puts("*** event job params: #{params.inspect}")
+    puts("*** event job: #{params.inspect}")
     
     case params[:method]
+    when 'import_all'
+      import_all(params)
+    when 'import_city'
+      import_events(params)
     when 'remove_past'
       remove_past_events
-    when 'import'
-      import_events(params)
     else
       puts "#{Time.now}: xxx ignoring method #{params[:method]}"
     end
   end
 
   def remove_past_events
-    # find all past events
+    # find and remove all past events
     events = Appointment.public.past
     puts "#{Time.now}: removing all #{events.size} past events"
     events.each { |e| e.destroy }
     puts "#{Time.now}: completed"
   end
 
+  def import_all(params)
+    # find all event cities
+    event_cities  = City.min_density(City.popular_density).order_by_density(:include => :state).sort_by { |o| o.name }
+
+    # map certain cities to multiple states
+    event_states  = Hash['New York' => [State.find_by_name('New Jersey'), State.find_by_name('New York')]]
+    event_limit   = params[:limit] ? params[:limit].to_i : 10
+
+    event_cities.each do |city|
+      states = event_states[city.name] || Array(city.state)
+
+      states.each do |state|
+        # enqueue job
+        puts "*** adding event job: #{city.name}:#{state.name}"
+        Delayed::Job.enqueue(EventJob.new(:method => 'import_city', :city => city.name, :region => state.name, :limit => event_limit), EventJob.import_priority)
+      end
+    end
+  end
+
   def import_events(params)
     # build events search conditions
-    city      = params[:city] ? City.find_by_name(params[:city].to_s.titleize) : nil
+    city      = params[:city] ? City.find_by_name(params[:city].to_s.titleize, :include => :state) : nil
+    state     = city.state unless city.blank?
     region    = params[:region] ? params[:region] : ""
     limit     = params[:limit] ? params[:limit].to_i : 1
     max_pages = params[:max_pages] ? params[:max_pages].to_i : 3
@@ -31,8 +61,6 @@ class EventJob < Struct.new(:params)
       puts "#{Time.now}: xxx missing city"
       return 0
     end
-
-    state       = city.state
 
     page        = 1
     per_page    = 50

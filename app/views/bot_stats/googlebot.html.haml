@@ -23,27 +23,27 @@
     .span-4.prepend-1{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
       .span-3#date
         = stat1.date.strftime("%a %b %d %Y")
-      .span-1.last#count{:style => 'color: #008800; font-weight: bold;'}
+      .span-1.last#count{:style => 'color: #0000BB; font-weight: bold;'}
         = stat1.count
       
     - unless stat2.blank?
       .span-4.prepend-1{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
         .span-3#date
           = stat2.date.strftime("%a %b %d %Y")
-        .span-1.last#count{:style => 'color: #008800; font-weight: bold;'}
+        .span-1.last#count{:style => 'color: #0000BB; font-weight: bold;'}
           = stat2.count
 
     - unless stat3.blank?
       .span-4.prepend-1{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
         .span-3#date
           = stat3.date.strftime("%a %b %d %Y")
-        .span-1.last#count{:style => 'color: #008800; font-weight: bold;'}
+        .span-1.last#count{:style => 'color: #0000BB; font-weight: bold;'}
           = stat3.count
           
     - unless stat4.blank?
       .span-4.prepend-1.last{:style => 'font-size: 1.1em; font-weight: normal; color: #555555;'}
         .span-3#date
           = stat4.date.strftime("%a %b %d %Y")
-        .span-1.last#count{:style => 'color: #008800; font-weight: bold;'}
+        .span-1.last#count{:style => 'color: #0000BB; font-weight: bold;'}
           = stat4.count
     
