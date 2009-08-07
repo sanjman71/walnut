@@ -57,6 +57,9 @@ class Company < ActiveRecord::Base
   # LogEntry log
   has_many                  :log_entries
 
+  # Preferences
+  typed_serialize           :preferences, Hash
+
   acts_as_taggable_on       :tags
   
   named_scope :with_locations,      { :conditions => ["locations_count > 0"] }
