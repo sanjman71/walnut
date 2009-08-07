@@ -6,10 +6,19 @@ class EventJob < Struct.new(:params)
   def self.remove_prioriy
     3
   end
-  
+
+  def logger
+    case RAILS_ENV
+    when 'development'
+      @logger ||= Logger.new(STDOUT)
+    else
+      @logger ||= Logger.new("log/events.log")
+    end
+  end
+
   def perform
-    puts("*** event job: #{params.inspect}")
-    
+    logger.info "*** event job: #{params.inspect}"
+
     case params[:method]
     when 'import_all'
       import_all(params)
@@ -18,16 +27,16 @@ class EventJob < Struct.new(:params)
     when 'remove_past'
       remove_past_events
     else
-      puts "#{Time.now}: xxx ignoring method #{params[:method]}"
+      logger.error "#{Time.now}: xxx ignoring method #{params[:method]}"
     end
   end
 
   def remove_past_events
     # find and remove all past events
     events = Appointment.public.past
-    puts "#{Time.now}: removing all #{events.size} past events"
+    logger.info "#{Time.now}: removing all #{events.size} past events"
     events.each { |e| e.destroy }
-    puts "#{Time.now}: completed"
+    logger.info "#{Time.now}: completed"
   end
 
   def import_all(params)
@@ -43,7 +52,7 @@ class EventJob < Struct.new(:params)
 
       states.each do |state|
         # enqueue job
-        puts "*** adding event job: #{city.name}:#{state.name}"
+        logger.info "*** adding event job: #{city.name}:#{state.name}"
         Delayed::Job.enqueue(EventJob.new(:method => 'import_city', :city => city.name, :region => state.name, :limit => event_limit), EventJob.import_priority)
       end
     end
@@ -58,7 +67,7 @@ class EventJob < Struct.new(:params)
     max_pages = params[:max_pages] ? params[:max_pages].to_i : 3
     
     if city.blank?
-      puts "#{Time.now}: xxx missing city"
+      logger.error "#{Time.now}: xxx missing city"
       return 0
     end
 
@@ -72,7 +81,7 @@ class EventJob < Struct.new(:params)
     
     start_count = Appointment.public.count
 
-    puts "#{Time.now}: importing #{city.name} events, limit #{limit}, checking at most #{max_pages * per_page} events"
+    logger.info "#{Time.now}: importing #{city.name} events, limit #{limit}, checking at most #{max_pages * per_page} events"
 
     while imported < limit and page <= max_pages
       # find future events in the specified city
@@ -80,7 +89,7 @@ class EventJob < Struct.new(:params)
       results    = EventStream.search(conditions)
       events     = results['events'] ? results['events']['event'] : []
 
-      puts "#{Time.now}: *** processing #{events.size} events"
+      logger.info "#{Time.now}: *** processing #{events.size} events"
       
       events.each do |event_hash|
         checked += 1
@@ -98,7 +107,7 @@ class EventJob < Struct.new(:params)
         
         if venue.blank? and (city_name == city.name or region == region_name)
           # missing venue in the requested city, add it
-          puts "#{Time.now}: *** importing venue: #{event_hash['location_name']}:#{event_hash['venue_id']}"
+          logger.info "#{Time.now}: *** importing venue: #{event_hash['location_name']}:#{event_hash['venue_id']}"
           
           begin
             # get venue info
@@ -110,7 +119,7 @@ class EventJob < Struct.new(:params)
             # reload venue
             venue.reload
           rescue Exception => e
-            puts "#{Time.now}: xxx venue get exception, skipping: #{e.message}"
+            logger.error "#{Time.now}: xxx venue get exception, skipping: #{e.message}"
             errors += 1
             next
           end
@@ -118,7 +127,7 @@ class EventJob < Struct.new(:params)
         
         if venue.blank?
           # missing venue, but its not in the requested city
-          puts "#{Time.now}: xxx skipping venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
+          logger.info "#{Time.now}: xxx skipping venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
           missing += 1
           next
         end
@@ -135,13 +144,13 @@ class EventJob < Struct.new(:params)
         
         if !venue.mapped?
           # the venue could not be mapped to a location
-          puts "#{Time.now}: xxx unmapped venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
+          logger.info "#{Time.now}: xxx unmapped venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
           next
         end
       
         # check the location time zone
         if venue.location.timezone.blank?
-          puts "#{Time.now}: xxx location #{venue.location.id}:#{venue.location.company_name} does not have a timezone"
+          logger.info "#{Time.now}: xxx location #{venue.location.id}:#{venue.location.company_name} does not have a timezone"
           next
         end
         
@@ -165,7 +174,7 @@ class EventJob < Struct.new(:params)
     end_count     = Appointment.public.count
     import_count  = end_count - start_count
     
-    puts "#{Time.now}: completed, checked #{checked} events, imported #{import_count} events, #{exists} already exist, missing #{missing} venues, ended with #{end_count} events"
+    logger.info "#{Time.now}: completed, checked #{checked} events, imported #{import_count} events, #{exists} already exist, missing #{missing} venues, ended with #{end_count} events"
     
     return import_count
   end
