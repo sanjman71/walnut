@@ -8,7 +8,11 @@ production:
   max_matches: 200
   # Ignore single quotes
   ignore_chars: U+0027
-  searchd_file_path: "/usr/apps/walnut/shared/sphinx"
+  # File paths, ...
+  searchd_file_path: /usr/apps/walnut/shared/sphinx
+  searchd_log_file: /usr/apps/walnut/current/log/searchd.log
+  query_log_file: /usr/apps/walnut/current/log/searchd.query.log
+  pid_file:  /usr/apps/walnut/current/log/searchd.production.pid
   mem_limit: 128M
 test:
   port: 3312
