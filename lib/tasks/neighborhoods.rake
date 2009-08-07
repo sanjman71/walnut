@@ -241,6 +241,7 @@ namespace :neighborhoods do
   def add_neighborhoods_to_locations(locations, options={})
     limit = options[:limit] ? options[:limit].to_i : 2**30
     added = 0
+    hoods = 0
     
     locations.each do |location|
       # skip if location has already been mapped or has neighborhoods (i.e. mapped w/o using urban mapping)
@@ -250,7 +251,8 @@ namespace :neighborhoods do
 
       begin
         # add neighborhoods from urban mapping
-        added += add_urban_neighborhoods(location)
+        hoods += add_urban_neighborhoods(location)
+        added += 1
       rescue UrbanMapping::ExceededRateLimitError => e
         # we're done for today
         raise e
