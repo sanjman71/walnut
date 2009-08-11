@@ -28,6 +28,9 @@ class User < ActiveRecord::Base
   validates_uniqueness_of     :cal_dav_token
   before_validation_on_create :reset_cal_dav_token
 
+  # Preferences
+  typed_serialize           :preferences, Hash
+
   after_create              :manage_user_roles
 
   # HACK HACK HACK -- how to do attr_accessible from here?
