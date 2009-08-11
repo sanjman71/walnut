@@ -10,7 +10,7 @@ class SphinxJob < Struct.new(:params)
   end
   
   def perform
-    logger.info "*** sphinx job: #{params.inspect}"
+    logger.info "*** #{Time.now}: sphinx job: #{params.inspect}"
 
     case params[:index]
     when 'appointment', 'appointments', 'events'

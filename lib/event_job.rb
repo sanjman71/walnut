@@ -17,7 +17,7 @@ class EventJob < Struct.new(:params)
   end
 
   def perform
-    logger.info "*** event job: #{params.inspect}"
+    logger.info "*** #{Time.now}: event job: #{params.inspect}"
 
     case params[:method]
     when 'import_all'
