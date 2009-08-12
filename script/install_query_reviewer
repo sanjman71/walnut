@@ -1,0 +1,2 @@
+#
+git clone git://github.com/dsboulder/query_reviewer.git vendor/plugins/query_reviewer 
