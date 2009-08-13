@@ -225,4 +225,43 @@ namespace :init do
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
 
+  desc "Initialize city tag counts"
+  task :city_tag_counts do
+    puts "#{Time.now}: iniitalizing city tag counts"
+
+    added = 0
+    City.with_locations.order_by_density.each do |city|
+      city.set_tag_counts
+      added += 1
+    end
+
+    puts "#{Time.now}: completed, initialized #{added} cities' tag counts"
+  end
+
+  desc "Initialize neighborhood tag counts"
+  task :neighborhood_tag_counts do
+    puts "#{Time.now}: iniitalizing neighborhood tag counts"
+
+    added = 0
+    Neighborhood.with_locations.order_by_density.each do |hood|
+      hood.set_tag_counts
+      added += 1
+    end
+
+    puts "#{Time.now}: completed, initialized #{added} neighborhood tag counts"
+  end
+  
+  desc "Initialize city zips"
+  task :city_zips do
+    puts "#{Time.now}: initalizing city zips"
+
+    added = 0
+    # find cities with locations
+    City.with_locations.order_by_density.each do |city|
+      city.set_zips
+      added += 1
+    end
+
+    puts "#{Time.now}: completed, initialized #{added} cities' zips"
+  end
 end # init

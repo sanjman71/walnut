@@ -27,7 +27,7 @@ class LocationNeighbor < ActiveRecord::Base
   def self.get_neighbors(location, options={})
     return [] if location.blank?
     limit = options[:limit] ? options[:limit].to_i : self.default_limit
-    LocationNeighborCollection.new(LocationNeighbor.with_location(location).order_by_distance.all(:limit => limit))
+    LocationNeighborCollection.new(LocationNeighbor.with_location(location).order_by_distance.all(:limit => limit, :include => {:neighbor => :company}))
   end
   
   def self.partition_neighbors(location, options={})

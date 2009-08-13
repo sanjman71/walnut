@@ -26,17 +26,26 @@ class EventJob < Struct.new(:params)
       import_events(params)
     when 'remove_past'
       remove_past_events
+    when 'set_event_counts'
+      set_event_counts
     else
       logger.error "#{Time.now}: xxx ignoring method #{params[:method]}"
     end
   end
 
+  def set_event_counts
+    [City, Zip, Neighborhood].each do |klass|
+      logger.info "*** #{Time.now}: setting #{klass} event counts"
+      Locality.set_event_counts(klass)
+    end
+  end
+
   def remove_past_events
-    # find and remove all past events
+    # remove all past events
     events = Appointment.public.past
-    logger.info "#{Time.now}: removing all #{events.size} past events"
+    logger.info "*** #{Time.now}: removing all #{events.size} past events"
     events.each { |e| e.destroy }
-    logger.info "#{Time.now}: completed"
+    logger.info "*** #{Time.now}: completed"
   end
 
   def import_all(params)
@@ -174,7 +183,7 @@ class EventJob < Struct.new(:params)
     end_count     = Appointment.public.count
     import_count  = end_count - start_count
     
-    logger.info "#{Time.now}: completed, checked #{checked} events, imported #{import_count} events, #{exists} already exist, missing #{missing} venues, ended with #{end_count} events"
+    logger.info "*** #{Time.now}: completed, checked #{checked} events, imported #{import_count} events, #{exists} already exist, missing #{missing} venues, ended with #{end_count} events"
     
     return import_count
   end

@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
         self.class.benchmark("Benchmarking #{@state.name} cities with events") do
           # find city events
           city_limit  = 10
-          @facets     = Appointment.facets(:with => Search.attributes(@state), :facets => "city_id", :limit => city_limit, :max_matches => city_limit)
+          @facets     = Appointment.facets(:with => Search.attributes(@state), :facets => "city_id", :limit => city_limit)
           @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
         end
       when 'search'
@@ -138,24 +138,26 @@ class ApplicationController < ActionController::Base
       track_where_ga_event(params[:controller], @state)
     when 'city'
       # find city, and all city zips and neighborhoods
-      @city           = @state.cities.find_by_name(params[:city].to_s.titleize)
+      @city = @state.cities.find_by_name(params[:city].to_s.titleize)
 
       if @city.blank?
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
 
-      self.class.benchmark("Benchmarking #{@city.name} zips using facets") do
-        @zips = Rails.cache.fetch("#{@city.name.parameterize}:zips", :expires_in => CacheExpire.localities) do
-          zip_limit = 200
-          facets    = Location.facets(:with => Search.attributes(@city), :facets => ["zip_id"], :limit => zip_limit, :max_matches => zip_limit)
-          Search.load_from_facets(facets, Zip)
+      self.class.benchmark("Benchmarking #{@city.name} neighborhoods using database") do
+        @neighborhoods = @city.neighborhoods.with_locations.order_by_density(:limit => 100).sort_by { |o| o.name }
+      end
+
+      if @neighborhoods.blank?
+        # find city zips only if there are no neighborhoods
+        self.class.benchmark("Benchmarking #{@city.name} zips using database") do
+          @zips = @city.zips
         end
       end
 
-      self.class.benchmark("Benchmarking #{@city.name} neighborhoods using database") do
-        @neighborhoods  = @city.neighborhoods.with_locations.order_by_density(:limit => 100).sort_by { |o| o.name }
-      end
-      
+      # initialize city events count
+      @events_count = @city.events_count
+
       # track events
       track_where_ga_event(params[:controller], @city)
     when 'neighborhood'
@@ -173,6 +175,9 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'neighborhood') and return if @neighborhood.blank?
       end
 
+      # initialize city events count
+      @events_count = @neighborhood.events_count
+
       # track events
       track_where_ga_event(params[:controller], @neighborhood)
     when 'zip'
@@ -183,14 +188,15 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'zip') and return
       end
 
-      self.class.benchmark("Benchmarking #{@zip.name} cities using facets") do
-        @cities = Rails.cache.fetch("#{@zip.name}:cities", :expires_in => CacheExpire.localities) do
-          city_limit  = 20
-          facets      = Location.facets(:with => Search.attributes(@zip), :facets => ["city_id"], :limit => city_limit, :max_matches => city_limit)
-          Search.load_from_facets(facets, City)
-        end
+      self.class.benchmark("Benchmarking #{@zip.name} cities using database") do
+        @cities = @zip.cities
+        # use cities collection to use city with most locations as 'primary city' for this zip
+        @city   = @zip.cities.sort_by { |o| -o.locations_count }.first
       end
-      
+
+      # initialize zip events count
+      @events_count = @zip.events_count
+
       # track events
       track_where_ga_event(params[:controller], @zip)
     when 'index'
@@ -208,6 +214,15 @@ class ApplicationController < ActionController::Base
       if @city.blank? and @zip.blank?
         # invalid search
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'unknown') and return
+      end
+
+      # initialize geo events count
+      if @neighborhood
+        @events_count = @neighborhood.events_count
+      elsif @city
+        @events_count = @city.events_count
+      elsif @zip
+        @events_count = @zip.events_count
       end
 
       # track events

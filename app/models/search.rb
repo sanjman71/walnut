@@ -2,6 +2,10 @@ class Search
   
   @@anything_search = "anything"
   
+  def self.max_matches
+    ThinkingSphinx::Configuration.instance.configuration.searchd.max_matches  
+  end
+
   # normalize the string
   def self.normalize(s)
     # remove quotes, dashes, @

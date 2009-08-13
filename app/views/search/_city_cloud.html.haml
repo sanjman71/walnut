@@ -1,0 +1,5 @@
+.zip_cities= title
+
+- cities.each do |city|
+  - klasses = ["locality"].push(cycle('even', 'odd'))
+  %span.small[city]= link_to(city, build_city_route(params[:controller], country, state, city), :class => klasses.join(" "))

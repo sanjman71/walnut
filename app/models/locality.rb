@@ -138,6 +138,30 @@ class Locality
     end
   end
 
+  # set events count using sphinx facets for the specified locality klass
+  def self.set_event_counts(klass)
+    case klass.to_s.downcase
+    when 'city'
+      facet_string  = 'city_id'
+    when 'zip'
+      facet_string  = 'zip_id'
+    when 'neighborhood'
+      facet_string  = 'neighborhood_ids'
+    else
+      raise ArgumentError, "invalid klass #{klass}"
+    end
+
+    geo_event_hash = Appointment.facets(:facets => facet_string)[facet_string.to_sym]
+    geo_event_hash.each_pair do |klass_id, events_count|
+      next unless object = klass.find_by_id(klass_id)
+      object.events_count = events_count
+      object.save
+    end
+
+    # return the number of objects updated
+    geo_event_hash.keys.size
+  end
+
   protected
 
   # map special state codes

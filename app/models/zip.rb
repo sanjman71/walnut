@@ -5,8 +5,15 @@ class Zip < ActiveRecord::Base
   belongs_to                  :state, :counter_cache => true
   belongs_to                  :timezone
   has_many                    :locations
+  has_many                    :city_zips
+  has_many                    :cities, :through => :city_zips
+  has_one                     :city, :through => :city_zips, :order => "cities.locations_count DESC"
+  has_many                    :geo_tag_counts, :as => :geo
+  has_many                    :tags, :through => :geo_tag_counts
   
   acts_as_mappable
+
+  include GeoTagCountModule
 
   include NameParam
 

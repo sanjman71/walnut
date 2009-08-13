@@ -5,16 +5,22 @@ class City < ActiveRecord::Base
   belongs_to                  :timezone
   has_many                    :neighborhoods
   has_many                    :locations
-  
+  has_many                    :city_zips
+  has_many                    :zips, :through => :city_zips
+  has_many                    :geo_tag_counts, :as => :geo
+  has_many                    :tags, :through => :geo_tag_counts
+
   acts_as_mappable
-  
+
+  include GeoTagCountModule
+
   include NameParam
-  
+
   attr_accessible             :name, :state, :state_id, :lat, :lng
-  
+
   named_scope :exclude,       lambda { |city| {:conditions => ["id <> ?", city.is_a?(Integer) ? city : city.id] } }
   named_scope :within_state,  lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
-  
+
   # find cities with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
@@ -31,13 +37,14 @@ class City < ActiveRecord::Base
 
   named_scope :min_density,           lambda { |density| { :conditions => ["locations_count >= ?", density] }}
 
-  # order cities by location count
+  # order cities by locations, events
   named_scope :order_by_density,      { :order => "locations_count DESC" }
-  
+  named_scope :order_by_events,       { :order => "events_count DESC" }
+
   # order cities by name
   named_scope :order_by_name,         { :order => "name ASC" }
   named_scope :order_by_state_name,   { :order => "state_id ASC, name ASC" }
-  
+
   # the special anywhere object
   def self.anywhere(state=nil)
     City.new do |o|
@@ -46,7 +53,7 @@ class City < ActiveRecord::Base
       o.send(:id=, 0)
     end
   end
-  
+
   def self.popular_density
     25000
   end
@@ -76,6 +83,34 @@ class City < ActiveRecord::Base
   # convert city to a string of attributes separated by '|'
   def to_csv
     [self.name, self.state.code, self.lat, self.lng].join("|")
+  end
+
+  # set city zips using sphinx facets 
+  def set_zips(limit=nil)
+    limit       ||= ::Search.max_matches
+    facets      = Location.facets(:with => ::Search.attributes(self), :facets => ["zip_id"], :limit => limit)
+    search_zips = ::Search.load_from_facets(facets, Zip)
+
+    # build list of zips to add and delete
+
+    cur_zips  = self.zips
+    add_zips  = search_zips - cur_zips
+    del_zips  = cur_zips - search_zips
+    added     = 0
+    deleted   = 0
+
+    add_zips.each do |zip|
+      self.city_zips.create(:zip => zip)
+      added += 1
+    end
+
+    del_zips.each do |zip|
+      o = self.city_zips.find_by_zip_id(zip.id)
+      self.city_zips.delete(o)
+      deleted += 1
+    end
+
+    [added, deleted]
   end
   
   # import cities

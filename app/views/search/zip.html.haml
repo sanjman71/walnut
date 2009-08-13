@@ -14,3 +14,10 @@
   - unless @popular_tags.blank?
     - cache("#{@zip.name}:tag_cloud", :expires_in => CacheExpire.tags) do
       = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'zip', :locality_params => {:country => @country, :state => @state, :zip => @zip}})
+
+%hr.space
+
+%h3.span-23.prepend-1#cities
+  - unless @cities.blank?
+    - cache("#{@zip.name}:cities", :expires_in => CacheExpire.localities) do
+      = render(:partial => 'search/city_cloud', :locals => {:title => "#{@zip.name} Cities", :cities => @cities, :country => @country, :state => @state})

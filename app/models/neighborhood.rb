@@ -4,7 +4,11 @@ class Neighborhood < ActiveRecord::Base
   belongs_to                  :city, :counter_cache => :neighborhoods_count
   has_many                    :location_neighborhoods
   has_many                    :locations, :through => :location_neighborhoods
-  
+  has_many                    :geo_tag_counts, :as => :geo
+  has_many                    :tags, :through => :geo_tag_counts
+
+  include GeoTagCountModule
+
   include NameParam
 
   # find neighborhoods named with characters such as [', -]
@@ -13,8 +17,9 @@ class Neighborhood < ActiveRecord::Base
   # find neighborhoods with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
 
-  # order neighborhoods by location count
-  named_scope :order_by_density,      {:order => "locations_count DESC"}
+  # order neighborhoods by locations, events
+  named_scope :order_by_density,      { :order => "locations_count DESC" }
+  named_scope :order_by_events,       { :order => "events_count DESC" }
   
 
   # max distance where locations are considered to be in the same neighborhood
