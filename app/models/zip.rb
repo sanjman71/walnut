@@ -21,6 +21,8 @@ class Zip < ActiveRecord::Base
 
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }
+  named_scope :with_tags,             { :conditions => ["tags_count > 0"] }
+  named_scope :no_tags,               { :conditions => ["tags_count = 0"] }
 
   named_scope :no_latlng,             { :conditions => ["lat IS NULL and lng IS NULL"] }
 

@@ -35,6 +35,10 @@ module GeoTagCountModule
       deleted += 1
     end
 
+    if self.respond_to?(:tags_count)
+      self.update_attribute(:tags_count, tags.size)
+    end
+
     [added, deleted]
   end
 

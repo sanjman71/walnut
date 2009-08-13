@@ -16,6 +16,8 @@ class Neighborhood < ActiveRecord::Base
 
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }
+  named_scope :with_tags,             { :conditions => ["tags_count > 0"] }
+  named_scope :no_tags,               { :conditions => ["tags_count = 0"] }
 
   # order neighborhoods by locations, events
   named_scope :order_by_density,      { :order => "locations_count DESC" }
