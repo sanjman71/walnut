@@ -225,30 +225,41 @@ namespace :init do
     puts "#{Time.now}: completed, ended with #{klass.count} objects" 
   end
 
-  desc "Initialize city tag counts"
-  task :city_tag_counts do
-    puts "#{Time.now}: iniitalizing city tag counts"
+  desc "Initialize city tags"
+  task :city_tags do
+    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    sleeps  = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 1
+    added   = 0
 
-    added = 0
-    City.with_locations.order_by_density.each do |city|
-      city.set_tag_counts
+    puts "#{Time.now}: initalizing city tags, limit: #{limit}, sleep: #{sleeps}"
+
+    City.with_locations.no_tags.order_by_density.each do |city|
+      city.set_tags
       added += 1
+      break if added >= limit
+      sleep(sleeps)
     end
 
-    puts "#{Time.now}: completed, initialized #{added} cities' tag counts"
+    puts "#{Time.now}: completed, initialized #{added} city tags"
   end
 
-  desc "Initialize neighborhood tag counts"
-  task :neighborhood_tag_counts do
-    puts "#{Time.now}: iniitalizing neighborhood tag counts"
+  desc "Initialize neighborhood tags"
+  task :neighborhood_tags do
+    limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    sleeps  = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 1
+    added   = 0
+
+    puts "#{Time.now}: iniitalizing neighborhood tags, limit: #{limit}, sleep: #{sleeps}"
 
     added = 0
     Neighborhood.with_locations.order_by_density.each do |hood|
-      hood.set_tag_counts
+      hood.set_tags
       added += 1
+      break if added >= limit
+      sleep(sleeps)
     end
 
-    puts "#{Time.now}: completed, initialized #{added} neighborhood tag counts"
+    puts "#{Time.now}: completed, initialized #{added} neighborhood tags"
   end
   
   desc "Initialize city zips"

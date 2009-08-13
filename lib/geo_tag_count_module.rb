@@ -1,7 +1,7 @@
 module GeoTagCountModule
   
-  # set geo tag counts using sphinx facets
-  def set_tag_counts(tag_limit=nil)
+  # set geo tags using sphinx facets
+  def set_tags(tag_limit=nil)
     tag_limit ||= ::Search.max_matches
     
     # build location tag counts
