@@ -2,7 +2,7 @@ class AddSearchOptimizations < ActiveRecord::Migration
   def self.up
     create_table :geo_tag_counts do |t|
       t.integer     :geo_id   # polymorphic type, with a string limit
-      t.integer     :geo_type, :limit => 50
+      t.string      :geo_type, :limit => 50
       t.references  :tag
       t.integer     :taggings_count
     end
