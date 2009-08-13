@@ -19,10 +19,10 @@ class Zip < ActiveRecord::Base
 
   attr_accessible             :name, :state, :state_id, :lat, :lng
 
-  # find zips with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
+  named_scope :with_events,           { :conditions => ["events_count > 0"] }
 
-  named_scope :no_latlng,            { :conditions => ["lat IS NULL and lng IS NULL"] }
+  named_scope :no_latlng,             { :conditions => ["lat IS NULL and lng IS NULL"] }
 
   named_scope :exclude,               lambda { |zip| {:conditions => ["id <> ?", zip.is_a?(Integer) ? zip : zip.id] } }
   named_scope :within_state,          lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }

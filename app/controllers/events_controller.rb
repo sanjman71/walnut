@@ -6,6 +6,7 @@ class EventsController < ApplicationController
   def index
     # show event cities, assume they are the densest cities
     @event_cities = City.min_density(City.popular_density).order_by_density(:include => :state).sort_by { |o| o.name }
+    # @event_cities = City.with_events.order_by_density(:include => :state).sort_by { |o| o.name }
   end
 
   def import
@@ -15,6 +16,7 @@ class EventsController < ApplicationController
       # queue jobs
       Delayed::Job.enqueue(EventJob.new(:method => 'import_all', :limit => 100), EventJob.import_priority)
       Delayed::Job.enqueue(SphinxJob.new(:index => 'appointments'), -1)
+      Delayed::Job.enqueue(EventJob.new(:method => 'set_event_counts'), -1)
       flash[:notice] = "Importing all city events"
     elsif @city.blank?
       flash[:error]  = "Could not find city #{params[:city]}"
@@ -22,6 +24,7 @@ class EventsController < ApplicationController
       # queue jobs
       Delayed::Job.enqueue(EventJob.new(:method => 'import_city', :city => @city.name, :region => @city.state.name, :limit => 10), EventJob.import_priority)
       Delayed::Job.enqueue(SphinxJob.new(:index => 'appointments'), -1)
+      Delayed::Job.enqueue(EventJob.new(:method => 'set_event_counts'), -1)
       flash[:notice] = "Importing #{@city.name} events"
     end
 
@@ -31,6 +34,8 @@ class EventsController < ApplicationController
   def remove
     # queue job
     Delayed::Job.enqueue(EventJob.new(:method => 'remove_past'), 3)
+    Delayed::Job.enqueue(SphinxJob.new(:index => 'appointments'), -1)
+    Delayed::Job.enqueue(EventJob.new(:method => 'set_event_counts'), -1)
     flash[:notice] = "Removing past events"
 
     redirect_to events_path and return

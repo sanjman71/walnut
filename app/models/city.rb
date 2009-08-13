@@ -21,11 +21,9 @@ class City < ActiveRecord::Base
   named_scope :exclude,       lambda { |city| {:conditions => ["id <> ?", city.is_a?(Integer) ? city : city.id] } }
   named_scope :within_state,  lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
 
-  # find cities with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
-
-  # find cities with neighborhoods
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
+  named_scope :with_events,           { :conditions => ["events_count > 0"] }
 
   # find cities with/without lat/lng
   named_scope :with_latlng,           { :conditions => ["lat IS NOT NULL AND lng IS NOT NULL"] }

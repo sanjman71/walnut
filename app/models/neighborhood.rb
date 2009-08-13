@@ -14,8 +14,8 @@ class Neighborhood < ActiveRecord::Base
   # find neighborhoods named with characters such as [', -]
   named_scope :find_like,             lambda { |s| {:conditions => ["name LIKE ?", s]} }
 
-  # find neighborhoods with locations
   named_scope :with_locations,        { :conditions => ["locations_count > 0"] }
+  named_scope :with_events,           { :conditions => ["events_count > 0"] }
 
   # order neighborhoods by locations, events
   named_scope :order_by_density,      { :order => "locations_count DESC" }
