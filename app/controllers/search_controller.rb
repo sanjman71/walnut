@@ -26,7 +26,7 @@ class SearchController < ApplicationController
     # @country, @state, @city, @zips and @neighborhoods all initialized in before filter
     
     self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
-      @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
+      @popular_tags = Rails.cache.fetch("#{@state.code}:#{@city.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud from (cached) geo tag counts in the database
         tags = @city.tags
         # return sorted, unique tags collection
@@ -42,7 +42,7 @@ class SearchController < ApplicationController
     # @country, @state, @city, @neighborhood all initialized in before filter
 
     self.class.benchmark("Benchmarking #{@neighborhood.name} tag cloud") do
-      @popular_tags = Rails.cache.fetch("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
+      @popular_tags = Rails.cache.fetch("#{@state.code}:#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud from (cached) geo tag counts in the database
         tags = @neighborhood.tags
         # use city tags if there are no neighborhood tags
@@ -60,7 +60,7 @@ class SearchController < ApplicationController
     # @country, @state, @zip, @cities, and @city all initialized in before filter
 
     self.class.benchmark("Benchmarking #{@zip.name} tag cloud") do
-      @popular_tags = Rails.cache.fetch("#{@zip.name}:tag_cloud", :expires_in => CacheExpire.tags) do
+      @popular_tags = Rails.cache.fetch("#{@state.code}:#{@zip.name}:tag_cloud", :expires_in => CacheExpire.tags) do
         # build tag cloud from (cached) geo tag counts in the database
         tags = @zip.tags
         # use city tags if there are no zip tags
@@ -183,7 +183,7 @@ class SearchController < ApplicationController
         # find (and cache) nearby cities, where nearby is defined with a mile radius range
         nearby_miles    = 20
         nearby_limit    = 5
-        @nearby_cities  = Rails.cache.fetch("#{@city.name.parameterize}:nearby:cities", :expires_in => CacheExpire.localities) do
+        @nearby_cities  = Rails.cache.fetch("#{@state.code}:#{@city.name.parameterize}:nearby:cities", :expires_in => CacheExpire.localities) do
           City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
         end
       end
