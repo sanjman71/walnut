@@ -1,5 +1,5 @@
-class ActiveRecord::Base 
-  def self.typed_serialize(attr_name, class_name)
+class ActiveRecord::Base
+  def self.typed_serialize(attr_name, class_name, *args)
     serialize(attr_name, class_name)
 
     define_method(attr_name) do
@@ -10,5 +10,19 @@ class ActiveRecord::Base
         send("#{attr_name}=", expected_class.new)
       end
     end
+    
+    args.each do |method_name|
+      method_declarations = <<END_OF_CODE
+        def #{attr_name}_#{method_name}
+          self.#{attr_name}[:#{method_name}]
+        end
+        def #{attr_name}_#{method_name}=(value)
+          self.#{attr_name}[:#{method_name}] = value
+        end
+END_OF_CODE
+      eval method_declarations
+    end
+    
   end
+
 end
