@@ -210,7 +210,7 @@ div.instructions ul                               { font-size: 12px; }
 .pagination span.current                          { background: #0099FF; color: #111111; }
 
 .pagination a.prev_page, .pagination a.next_page, .pagination span.prev_page, .pagination span.next_page  
-                                                  { width: 65px; }
+                                                  { width: 53px; }
 
 .pagination span.disabled                         { display: none; }
 
