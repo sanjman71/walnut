@@ -1,0 +1,13 @@
+Search performance issues
+-------------------------
+
+- City page
+  - calculating city events count is expensive (~300 ms)
+    * added city/neighborhoods/zip events_count fields
+  - city/zip/neighborhood tag cloud requires a full scan search (~300 ms * 2)
+    * added geo_tag_counts table mapping geo objects to tags
+    * 114 minutes to populate 2639 cities
+    * 33 minutes to populate 940 neighborhoods
+  - city zips using facets requires a full scan search (~300 ms)
+    * added city_zips table mapping city to zips
+    * 15 minutes to populate 2639 cities

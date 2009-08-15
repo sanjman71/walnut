@@ -18,3 +18,9 @@ The msyql data directory (/usr/local/mysql/data) was taking up a lot of space.  
 5. Start mysqld
   - sudo /Library/StartupItems/MySQLCOM/MySQLCOM start
 
+
+== MySQL Configuration
+
+- Sample configuration files are in: /usr/share/doc/mysql-server-5.0/examples/
+
+- The existing configuration in /etc/mysql/my.cnf is for a pretty small machine.
