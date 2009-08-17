@@ -56,7 +56,11 @@ class Message < ActiveRecord::Base
 
   # use delayed job to send messages to remote recipients
   def send_remote_messages
-    Delayed::Job.enqueue(MessageJob.new(:message_id => self.id))
+    if !self.send_at.blank?
+      Delayed::Job.enqueue(MessageJob.new(:message_id => self.id), MessageJob.priority, self.send_at)
+    else
+      Delayed::Job.enqueue(MessageJob.new(:message_id => self.id), MessageJob.priority)
+    end
   end
 
   protected

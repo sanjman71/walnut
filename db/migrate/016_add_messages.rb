@@ -4,7 +4,8 @@ class AddMessages < ActiveRecord::Migration
       t.integer   :sender_id  # user
       t.string    :subject, :limit => 200
       t.text      :body
-      t.integer   :priority
+      t.integer   :priority, :default => 0
+      t.datetime  :send_at  # time to send message at
       t.timestamps
     end
     
@@ -72,6 +73,7 @@ class AddMessages < ActiveRecord::Migration
       t.rename  :address, :phone
     end
 
-    remove_index :phone_numbers, :callable_type
+    remove_column :phone_numbers, :priority
+    remove_index  :phone_numbers, :callable_type
   end
 end

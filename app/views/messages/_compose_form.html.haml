@@ -23,5 +23,12 @@
       .span-17.last
         = f.text_area 'body', :class => 'title', :style => 'width: 500px; height: 100px;'
 
+    .span-20.last.padding-bottom-20
+      .span-3.text-align-right.padding-top-5
+        %h3.bottom{:style => 'padding-left: 5px; color: #888888;'}== Send At:
+      .span-17.last
+        = text_field_tag 'send_at', '', :style => "width: 100px; font-size: 1.4em; padding-left: 3px;", :class => 'timepicker'
+        %em{:style => 'padding-left: 5px; font-size: 1.1em; color: #999999;'}== Defaults to sending right away
+
     .span-19.prepend-1.last
       = submit_tag "Send", :clase => 'title big', :id => 'send_message_button', :style => 'font-size: 1.2em;'

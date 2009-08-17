@@ -17,6 +17,11 @@ $.fn.init_send_message_form = function() {
   })
 }
 
+$.fn.init_timepicker = function() {
+  $(".timepicker").timepickr({convention:12});
+}
+
 $(document).ready(function() {
+  $(document).init_timepicker();
   $(document).init_send_message_form();
 })

@@ -128,6 +128,33 @@ $.fn.init_autocomplete_search_where = function() {
   $("#search_where").autocomplete('/autocomplete/search/where', {matchContains:false, minChars:1, max:50});
 }
 
+// convert mm/dd/yyyy date to yyyymmdd string
+$.fn.convert_date_to_string = function(s) {
+  re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/
+  match = s.match(re);
+  s     = match[3] + match[1] + match[2]
+  return s
+}
+
+// convert '03:00 pm' time format to 'hhmmss' 24 hour time format
+$.fn.convert_time_ampm_to_string = function(s) {
+  re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
+  match   = s.match(re);
+
+  // convert hour to integer, leave minute as string
+  hour    = parseInt(match[1], 10); 
+  minute  = match[2];
+
+  if (match[3] == 'pm') {
+    // add 12 for pm
+    hour += 12;
+  }
+
+  value = hour < 10 ? "0" + hour.toString() : hour.toString()
+  value += minute + "00";
+  return value
+}
+
 $(document).ready(function() {
   $(document).init_input_hints();
   $(document).init_search_objects_form();
