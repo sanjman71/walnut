@@ -22,4 +22,4 @@
           = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
       .span-3.last.phone
         - unless location.phone_numbers_count == 0
-          %span.phone{:style => "margin-left: 17px;"}= number_to_phone(location.primary_phone_number.number, :delimiter => ".")
+          %span.phone{:style => "margin-left: 17px;"}= number_to_phone(location.primary_phone_number.address, :delimiter => ".")

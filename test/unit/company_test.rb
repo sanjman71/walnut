@@ -88,24 +88,25 @@ class CompanyTest < ActiveSupport::TestCase
   
   context "company phone number" do
     setup do
-      @company  = Company.create(:name => "Company 1", :time_zone => "UTC")
-      @company.phone_numbers.push(PhoneNumber.new(:name => "Home", :number => "9991234567"))
+      @company = Company.create(:name => "Company 1", :time_zone => "UTC")
+      @company.phone_numbers.push(PhoneNumber.new(:name => "Mobile", :address => "9995551234"))
+      @company.phone_numbers.push(PhoneNumber.new(:name => "Home", :address => "9991234567", :priority => 3))
       @company.reload
     end
   
     should_change "Company.count", :by => 1
-    should_change "PhoneNumber.count", :by => 1
+    should_change "PhoneNumber.count", :by => 2
     
-    should "have 1 phone number" do
-      assert_equal ["9991234567"], @company.phone_numbers.collect(&:number)
+    should "have 2 phone numbers" do
+      assert_equal ["9995551234", "9991234567"], @company.phone_numbers.collect(&:address)
     end
     
-    should "have phone_numbers_count == 1" do
-      assert_equal 1, @company.phone_numbers_count
+    should "have phone_numbers_count == 2" do
+      assert_equal 2, @company.phone_numbers_count
     end
 
-    should "have a primary phone number" do
-      assert_equal "9991234567", @company.primary_phone_number.number
+    should "have primary phone number" do
+      assert_equal "9995551234", @company.primary_phone_number.address
     end
   end
   

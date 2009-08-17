@@ -1,0 +1,13 @@
+- title("Messages")
+
+.span-23.prepend-1.mat.padding-top-10.bottom
+  %h2== Messages
+  %h4
+    = link_to 'New Email', new_email_path, :class => 'admin color'
+    == &nbsp;|&nbsp;
+    = link_to 'New Sms', new_sms_path, :class => 'admin color'
+
+%hr.space
+
+.span-14.prepend-1
+  = display_flash(:all)

@@ -22,7 +22,10 @@ class User < ActiveRecord::Base
   
   before_validation         :format_phone
   belongs_to                :mobile_carrier
-  
+
+  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
+  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
+
   validates_presence_of       :cal_dav_token
   validates_length_of         :cal_dav_token,   :within => 10..150
   validates_uniqueness_of     :cal_dav_token
@@ -31,12 +34,22 @@ class User < ActiveRecord::Base
   # Preferences
   typed_serialize           :preferences, Hash
 
+  # messages sent
+  has_many                  :outbox, :class_name => "Message", :foreign_key => "sender_id"
+  # messages received with 'local' protocol
+  has_many                  :inbox_deliveries, :class_name => "MessageRecipient", :as => :messagable, :conditions => {:protocol => 'local'}, 
+                            :include => {:message => :sender}
+  has_many                  :inbox, :through => :inbox_deliveries, :source => :message
+
   after_create              :manage_user_roles
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id, :identifier
+
+  named_scope               :with_emails, lambda { |s| { :conditions => ["email_addresses_count > 0"] }}
+  named_scope               :with_phones, lambda { |s| { :conditions => ["phone_numbers_count > 0"] }}
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => 'users.name' }
@@ -45,7 +58,7 @@ class User < ActiveRecord::Base
   include UserSubscription
   include UserAppointment
   include UserInvitation
-  
+
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
   # uff.  this is really an authorization, not authentication routine.  

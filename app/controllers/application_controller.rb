@@ -144,13 +144,13 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
 
-      self.class.benchmark("Benchmarking #{@city.name} neighborhoods using database") do
+      self.class.benchmark("*** Benchmarking #{@city.name} neighborhoods using database", Logger::INFO) do
         @neighborhoods = @city.neighborhoods.with_locations.order_by_density(:limit => 100).sort_by { |o| o.name }
       end
 
       if @neighborhoods.blank?
         # find city zips only if there are no neighborhoods
-        self.class.benchmark("Benchmarking #{@city.name} zips using database") do
+        self.class.benchmark("*** Benchmarking #{@city.name} zips using database", Logger::INFO) do
           @zips = @city.zips
         end
       end
@@ -242,14 +242,14 @@ class ApplicationController < ActionController::Base
     if RAILS_ENV == 'development'
     case
     when @city
-      self.class.benchmark("Benchmarking city weather") do
+      self.class.benchmark("*** Benchmarking city weather", Logger::INFO) do
         # initialize city weather
         @weather = Rails.cache.fetch("weather:#{@city.name.parameterize}", :expires_in => 2.hours) do
           Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
         end
       end
     when @zip
-      self.class.benchmark("Benchmarking zip weather") do
+      self.class.benchmark("*** Benchmarking zip weather") do
         # initialize zip weather
         @weather = Rails.cache.fetch("weather:#{@zip.name}", :expires_in => 2.hours) do
           Weather.get("#{@zip.name}", "#{@zip.name} Weather")
@@ -328,7 +328,7 @@ class ApplicationController < ActionController::Base
 
     if location.phone_numbers_count > 0
       # add phone number
-      tuple.push(number_to_phone(location.primary_phone_number.number, :delimiter => " "))
+      tuple.push(number_to_phone(location.primary_phone_number.address, :delimiter => " "))
     end
 
     tuple.join(" - ")

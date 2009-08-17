@@ -28,7 +28,7 @@ class LocationHelper
       
       # merge location phone numbers
       remove_location.phone_numbers.each do |lp|
-        location.phone_numbers.push(PhoneNumber.new(:name => lp.name, :number => lp.number))
+        location.phone_numbers.push(PhoneNumber.new(:name => lp.name, :address => lp.address))
         lp.destroy
       end
       

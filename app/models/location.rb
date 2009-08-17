@@ -11,9 +11,9 @@ class Location < ActiveRecord::Base
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
   has_many                :company_locations
   has_many                :companies, :through => :company_locations
-  has_one                 :company, :through => :company_locations # first company
-  has_many                :phone_numbers, :as => :callable
-  has_one                 :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable # first phone number
+  has_one                 :company, :through => :company_locations, :order => 'id asc'
+  has_many                :phone_numbers, :as => :callable, :dependent => :destroy
+  has_one                 :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
   has_one                 :event_venue
   has_many                :location_neighbors
   has_many                :neighbors, :through => :location_neighbors

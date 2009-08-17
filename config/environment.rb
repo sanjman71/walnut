@@ -45,7 +45,7 @@ Rails::Initializer.run do |config|
   # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
 
   # Add additional load paths for your own custom dirs
-  # config.load_paths += %W( #{RAILS_ROOT}/extras )
+  config.load_paths += %W( #{RAILS_ROOT}/lib/jobs )
 
   # Prevent the lib directory from being reloaded
   # Avoid the problem: A copy of AuthenticatedSystem has been removed from the module tree but is still active!

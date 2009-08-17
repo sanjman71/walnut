@@ -1,0 +1,27 @@
+.span-24#send_message_form.padding-bottom-10
+  - form_for(Message.new, :url => messages_path, :method => :post, :html => {:id => 'new_message'}) do |f|
+    = hidden_field_tag :recipient_type, recipient_type
+    = hidden_field_tag :protocol, protocol
+
+    .span-20.last.padding-bottom-20#message_to
+      .span-3.text-align-right.padding-top-10
+        %h3.bottom{:style => 'padding-left: 5px; color: #888888;'}== To:
+      .span-17.last
+        = select_tag('recipient_id', options_for_select(collection.collect{ |messagable, addressable| ["#{messagable.name} - #{addressable.address}", addressable.id]}), :style => 'font-size: 1.5em')
+
+    - subject_klasses = (subject == :required) ? ['required'] : ['hide']
+    
+    .span-20.last.padding-bottom-20#message_subject{:class => subject_klasses.join('')}
+      .span-3.text-align-right.padding-top-5
+        %h3.bottom{:style => 'padding-left: 5px; color: #888888;'}== Subject:
+      .span-17.last
+        = f.text_field 'subject', :class => 'title', :style => 'width: 500px; margin: 0px;'
+
+    .span-20.last.padding-bottom-20#message_body.required
+      .span-3.text-align-right.padding-top-5
+        %h3.bottom{:style => 'padding-left: 5px; color: #888888;'}== Body:
+      .span-17.last
+        = f.text_area 'body', :class => 'title', :style => 'width: 500px; height: 100px;'
+
+    .span-19.prepend-1.last
+      = submit_tag "Send", :clase => 'title big', :id => 'send_message_button', :style => 'font-size: 1.2em;'

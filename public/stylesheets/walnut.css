@@ -90,8 +90,11 @@ label.big                                         { font-size: 16px; }
 
 /* admin styles */
 
-a.admin:link, a.admin:visited                     { font-size: 11px; font-weight: normal; color: #0000FF; }
+a.admin:link, a.admin:visited                     { font-size: 0.9em; font-weight: normal; color: #0000FF; }
 a.admin:hover                                     { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
+
+a.admin.color, a.admin.color:visited              { color: #3A2313; font-size: 0.9em; font-weight: bold; }
+a.admin.color:hover                               { color: #FFFFFF; background-color: #3A2313; }
 
 a.header.link:link, a.header.link:visited         { color: #FFFFFF; }
 a.header.link:hover                               { background-color: #3A2313; text-decoration: none; }
@@ -204,13 +207,13 @@ div.instructions ul                               { font-size: 12px; }
 .pagination a                                     { background: #EEEEEE; color: #111111; }
 .pagination a:hover                               { background: #3300BB; color: #0099FF; }
 
-.pagination span, .pagination a                   { display: block; width: 15px; text-align: center; margin-right: 0px; padding: 0.2em 0.2em; 
+.pagination span, .pagination a                   { display: block; width: 15px; text-align: center; margin-right: 0px; padding: 0.1em 0.1em; 
                                                     float: left; text-decoration: none; }
 
 .pagination span.current                          { background: #0099FF; color: #111111; }
 
 .pagination a.prev_page, .pagination a.next_page, .pagination span.prev_page, .pagination span.next_page  
-                                                  { width: 53px; }
+                                                  { width: 50px; }
 
 .pagination span.disabled                         { display: none; }
 

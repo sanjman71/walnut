@@ -1,0 +1,16 @@
+- title("Compose Email")
+- javascript('messages')
+
+.span-23.prepend-1.mat.padding-top-10.bottom
+  %h2== Compose Email
+  %h4= link_to 'Cancel', messages_path, :class => 'admin color'
+  
+%hr.space
+
+.span-14.prepend-1
+  = display_flash(:all)
+
+%hr.space
+
+= render(:partial => 'compose_form', :locals => {:collection => @email_collection, :protocol => @protocol, :recipient_type => @recipient_type, :subject => :required})
+

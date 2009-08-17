@@ -116,7 +116,7 @@ class SearchController < ApplicationController
       @sort_mode      = :asc
     end
 
-    self.class.benchmark("Benchmarking sphinx query '#{@query_or}'") do
+    self.class.benchmark("*** Benchmarking sphinx query '#{@query_or}'", Logger::INFO, false) do
       @objects = ThinkingSphinx::Search.search(@query_or, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                                :match_mode => :extended2, :rank_mode => :bm25, :page => params[:page], :per_page => 5,
                                                :order => @sort_order, :sort_mode => @sort_mode,
@@ -129,17 +129,19 @@ class SearchController < ApplicationController
       @search_filters[object.class.to_s] += [object]
     end if @search_klass == 'search'
     
-    self.class.benchmark("Benchmarking faceted search tags for '#{@query_and}'") do
+    self.class.benchmark("*** Benchmarking sphinx facets tags for '#{@query_and}'", Logger::INFO, false) do
       # find related tags by class; build tag facets for each klass
       related_size    = 11
       @related_tags   = @klasses.inject([]) do |array, klass|
         facets  = klass.facets(@query_and, :with => @attributes, :facets => ["tag_ids"], :match_mode => :extended2, :limit => related_size)
-        array  += Search.load_from_facets(facets, Tag).collect(&:name).sort - [@query_raw]
+        self.class.benchmark("*** benchmarking ... tag database load", Logger::INFO) do
+          array  += Search.load_from_facets(facets, Tag).collect(&:name).sort - [@query_raw]
+        end
       end
     end
 
     if @neighborhood
-      self.class.benchmark("Benchmarking faceted #{@neighborhood.name} neighborhoods for '#{@query_and}'") do
+      self.class.benchmark("** Benchmarking sphinx facets #{@neighborhood.name} neighborhoods for '#{@query_and}'", Logger::INFO, false) do
         @geo_type       = 'neighborhood'
 
         # build neighborhood cities
@@ -160,7 +162,7 @@ class SearchController < ApplicationController
         @neighborhoods  = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
       end
     elsif @city
-      self.class.benchmark("Benchmarking faceted #{@city.name} neighborhoods for '#{@query_and}'") do
+      self.class.benchmark("*** Benchmarking sphinx facets #{@city.name} neighborhoods for '#{@query_and}'", Logger::INFO, false) do
         @geo_type       = 'city'
 
         # SK: comment out zip facets for city searches
@@ -169,9 +171,12 @@ class SearchController < ApplicationController
         # facet_ids       = @city.neighborhoods_count > 0 ? ["zip_id", "neighborhood_ids"] : ["zip_id"]
         facet_ids       = @city.neighborhoods_count > 0 ? ["neighborhood_ids"] : []
         facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => facet_ids, :match_mode => :extended2, :limit => limit)
-        @zips           = Search.load_from_facets(facets, Zip) if facet_ids.include?("zip_id")
-        @neighborhoods  = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name } if facet_ids.include?("neighborhood_ids")
-
+        
+        self.class.benchmark("*** benchmarking ... neighborhood database load", Logger::INFO) do
+          @zips           = Search.load_from_facets(facets, Zip) if facet_ids.include?("zip_id")
+          @neighborhoods  = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name } if facet_ids.include?("neighborhood_ids")
+        end
+        
         # SK: this is an optimization to cache zip and neighborhood facets for a specific search, but requires more testing
         # @zips, @neighborhoods = Rails.cache.fetch("#{@city.name.parameterize}:#{@facet_klass.to_s.parameterize}:#{@query_raw.parameterize}:facets:zips:neighborhoods", :expires_in => CacheExpire.facets) do
         #   facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit)
@@ -180,15 +185,17 @@ class SearchController < ApplicationController
         #   [zips, neighborhoods]
         # end
 
-        # find (and cache) nearby cities, where nearby is defined with a mile radius range
-        nearby_miles    = 20
-        nearby_limit    = 5
-        @nearby_cities  = Rails.cache.fetch("#{@state.code}:#{@city.name.parameterize}:nearby:cities", :expires_in => CacheExpire.localities) do
-          City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
+        self.class.benchmark("*** Benchmarking #{@city.name} nearby cities", Logger::INFO, false) do
+          # find (and cache) nearby cities, where nearby is defined with a mile radius range
+          nearby_miles    = 20
+          nearby_limit    = 5
+          @nearby_cities  = Rails.cache.fetch("#{@state.code}:#{@city.name.parameterize}:nearby:cities", :expires_in => CacheExpire.localities) do
+            City.exclude(@city).within_state(@state).all(:origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
+          end
         end
       end
     elsif @zip
-      self.class.benchmark("Benchmarking faceted #{@zip.name} cities for '#{@query_and}'") do
+      self.class.benchmark("Benchmarking sphinx facets #{@zip.name} cities for '#{@query_and}'", Logger::INFO, false) do
         @geo_type   = 'zip'
 
         # build city facets

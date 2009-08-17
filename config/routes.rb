@@ -56,7 +56,12 @@ ActionController::Routing::Routes.draw do |map|
 
   # tag routes
   map.resources   :tags
-  
+
+  # messages routes
+  map.resources       :messages, :only => [:index, :create]
+  map.new_email       '/messages/new/email', :controller => 'messages', :action => 'new_email'
+  map.new_sms         '/messages/new/sms', :controller => 'messages', :action => 'new_sms'
+
   # event venue routes
   map.filtered_city_venues  '/venues/:country/:state/:city/:filter', :controller => 'event_venues', :action => 'city', :city => /[a-z-]+/,
                             :filter => /all|mapped|unmapped/

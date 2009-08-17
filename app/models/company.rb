@@ -25,8 +25,8 @@ class Company < ActiveRecord::Base
   has_many                  :company_locations
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location
 
-  has_many                  :phone_numbers, :as => :callable
-  has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable # first phone number
+  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
+  has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
 
   has_many                  :company_tag_groups
   has_many                  :tag_groups, :through => :company_tag_groups

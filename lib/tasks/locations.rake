@@ -36,7 +36,7 @@ namespace :locations do
   #       location  = callable.locations.first
   #       
   #       # move number from place to location
-  #       location.phone_numbers.push(PhoneNumber.new(:name => phone_number.name, :number => phone_number.number))
+  #       location.phone_numbers.push(PhoneNumber.new(:name => phone_number.name, :number => phone_number.address))
   #       callable.phone_numbers.destroy(phone_number)
   #       
   #       moved += 1

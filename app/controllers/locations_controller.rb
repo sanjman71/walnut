@@ -23,15 +23,14 @@ class LocationsController < ApplicationController
 
     if @location.events_count > 0
       # find upcoming events at this event venue
-      self.class.benchmark("Benchmarking upcoming events at event venue") do
+      self.class.benchmark("*** Benchmarking upcoming events at event venue", Logger::INFO) do
         @event_limit      = LocationNeighbor.default_limit
         @location_events  = @location.appointments.public.future.all(:order => 'start_at asc')
-        # logger.debug("*** location events: #{@location_events.size}")
       end
     end
 
     if @location.mappable?
-      self.class.benchmark("Benchmarking nearby locations and event venues") do
+      self.class.benchmark("*** Benchmarking nearby locations and event venues", Logger::INFO) do
         @nearby_locations, @nearby_event_venues = Rails.cache.fetch("#{@location.cache_key}:nearby", :expires_in => CacheExpire.locations) do
 
           # partition neighbors into regular and event venue locations
