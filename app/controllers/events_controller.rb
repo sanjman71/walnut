@@ -1,7 +1,7 @@
 class EventsController < ApplicationController
   before_filter :init_location, :only => [:new, :create]
   
-  privilege_required 'manage site', :on => :current_user
+  privilege_required 'manage site', :on => :current_user, :unless => :auth_token?
 
   def index
     # show event cities, assume they are the densest cities

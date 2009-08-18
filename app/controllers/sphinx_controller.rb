@@ -1,11 +1,11 @@
 class SphinxController < ApplicationController
-  
-  privilege_required 'manage site', :on => :current_user
+
+  privilege_required 'manage site', :on => :current_user, :unless => :auth_token?
 
   # GET /sphinx
   def index
     # show all sphinx indexes and their last updated_at timestamp
-    
+
     config    = ThinkingSphinx::Configuration.instance
     files     = (Dir.glob(config.searchd_file_path + "/*_core.spa") + Dir.glob(config.searchd_file_path + "/*_delta.spa")).sort
 

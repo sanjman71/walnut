@@ -43,13 +43,17 @@ class ApplicationController < ActionController::Base
     return false if current_privileges.blank?
     return current_privileges.include?(p)
   end
-  
+
   # check if current user has the specified role, on the optional authorizable object
   def has_role?(role_name, authorizable=nil)
     logger.debug("*** checking role #{role_name}, on authorizable #{authorizable ? authorizable.name : ""}, for user #{current_user ? current_user.name : ""}")
     current_roles.include?(role_name)
   end
-  
+
+  def auth_token?
+    AuthToken.instance.token == params[:token].to_s
+  end
+
   def current_privileges
     @current_privileges ||= []
   end
