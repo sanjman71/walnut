@@ -35,8 +35,8 @@ Rails::Initializer.run do |config|
   config.gem "json"
   config.gem 'unicode', :version => '~> 0.1'
   config.gem 'ri_cal'
+  config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   # config.gem 'geoip_city', :version => '~> 0.2', :lib => 'geoip_city'
-  # config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   # config.gem "eventfulapi", :source => "remote"  # this doesn't work
   
   # Only load the plugins named here, in the order given. By default, all plugins 
