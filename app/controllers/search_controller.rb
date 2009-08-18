@@ -101,16 +101,19 @@ class SearchController < ApplicationController
     when 'search'
       # search Appointment class only if there are events
       @klasses        = @events_count > 0 ? [Appointment, Location] : [Location]
+      @eager_loads    = @events_count > 0 ? [] : [:company, :city, :state, :zip, :primary_phone_number]
       @facet_klass    = Location
       @sort_order     = :popularity
       @sort_mode      = :desc
     when 'locations'
       @klasses        = [Location]
+      @eager_loads    = [:company, :city, :state, :zip, :primary_phone_number]
       @facet_klass    = Location
       @sort_order     = :popularity
       @sort_mode      = :desc
     when 'events'
       @klasses        = [Appointment]
+      @eager_loads    = [{:location => :company}]
       @facet_klass    = Appointment
       @sort_order     = :start_at
       @sort_mode      = :asc
@@ -119,8 +122,7 @@ class SearchController < ApplicationController
     self.class.benchmark("*** Benchmarking sphinx query '#{@query_or}'", Logger::INFO, false) do
       @objects = ThinkingSphinx::Search.search(@query_or, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                                :match_mode => :extended2, :rank_mode => :bm25, :page => params[:page], :per_page => 5,
-                                               :order => @sort_order, :sort_mode => @sort_mode,
-                                               :include => [:company, :city, :state, :zip, :primary_phone_number])
+                                               :order => @sort_order, :sort_mode => @sort_mode, :include => @eager_loads)
     end
 
     # filter objects by class if this was a generic search
