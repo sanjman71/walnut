@@ -19,17 +19,21 @@ class EventJob < Struct.new(:params)
   def perform
     logger.info "*** #{Time.now}: event job: #{params.inspect}"
 
-    case params[:method]
-    when 'import_all'
-      import_all(params)
-    when 'import_city'
-      import_events(params)
-    when 'remove_past'
-      remove_past_events
-    when 'set_event_counts'
-      set_event_counts
-    else
-      logger.error "#{Time.now}: xxx ignoring method #{params[:method]}"
+    begin
+      case params[:method]
+      when 'import_all'
+        import_all(params)
+      when 'import_city'
+        import_events(params)
+      when 'remove_past'
+        remove_past_events
+      when 'set_event_counts'
+        set_event_counts
+      else
+        logger.error "#{Time.now}: xxx ignoring method #{params[:method]}"
+      end
+    rescue Exception => e
+      logger.info "xxx #{Time.now}: #{e.message}, #{e.backtrace}"
     end
   end
 
@@ -90,7 +94,7 @@ class EventJob < Struct.new(:params)
     
     start_count = Appointment.public.count
 
-    logger.info "#{Time.now}: importing #{city.name} events, limit #{limit}, checking at most #{max_pages * per_page} events"
+    logger.info "*** #{Time.now}: importing #{city.name} events, limit #{limit}, checking at most #{max_pages * per_page} events"
 
     while imported < limit and page <= max_pages
       # find future events in the specified city
@@ -98,7 +102,7 @@ class EventJob < Struct.new(:params)
       results    = EventStream.search(conditions)
       events     = results['events'] ? results['events']['event'] : []
 
-      logger.info "#{Time.now}: *** processing #{events.size} events"
+      logger.info "*** #{Time.now}: processing #{events.size} events"
       
       events.each do |event_hash|
         checked += 1
@@ -116,7 +120,7 @@ class EventJob < Struct.new(:params)
         
         if venue.blank? and (city_name == city.name or region == region_name)
           # missing venue in the requested city, add it
-          logger.info "#{Time.now}: *** importing venue: #{event_hash['location_name']}:#{event_hash['venue_id']}"
+          logger.info "*** #{Time.now}: importing venue: #{event_hash['location_name']}:#{event_hash['venue_id']}"
           
           begin
             # get venue info
@@ -128,7 +132,7 @@ class EventJob < Struct.new(:params)
             # reload venue
             venue.reload
           rescue Exception => e
-            logger.error "#{Time.now}: xxx venue get exception, skipping: #{e.message}"
+            logger.error "xxx #{Time.now}: venue get exception, skipping: #{e.message}"
             errors += 1
             next
           end
@@ -136,30 +140,37 @@ class EventJob < Struct.new(:params)
         
         if venue.blank?
           # missing venue, but its not in the requested city
-          logger.info "#{Time.now}: xxx skipping venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
+          logger.info "xxx #{Time.now}: skipping venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}:#{event_hash['venue_display']}"
           missing += 1
           next
         end
 
         if !venue.mapped?
           # map the venue to a location
-          venue.map_to_location(:log => true)
+          begin
+            logger.info "*** #{Time.now}: mapping venue - name: #{venue.name}, city: #{venue.city}, address: #{venue.address}"
 
-          # if its still not mapped, and the confidence value says the location probably doesn't exist, add the venue as a new place
-          if !venue.mapped? and venue.confidence == 0
-            venue.add_company(:log => true)
+            venue.map_to_location(:log => true)
+
+            # if its still not mapped, and the confidence value says the location probably doesn't exist, add the venue as a new place
+            if !venue.mapped? and venue.confidence == 0
+              venue.add_company(:log => true)
+            end
+          rescue Exception => e
+            logger.info "xxx #{Time.now}: mapping exception - #{e.message}"
+            next
           end
         end
         
         if !venue.mapped?
           # the venue could not be mapped to a location
-          logger.info "#{Time.now}: xxx unmapped venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
+          logger.info "xxx #{Time.now}: unmapped venue: #{event_hash['location_name']}:#{event_hash['city_name']}:#{event_hash['region_name']}:#{event_hash['address']}"
           next
         end
       
         # check the location time zone
         if venue.location.timezone.blank?
-          logger.info "#{Time.now}: xxx location #{venue.location.id}:#{venue.location.company_name} does not have a timezone"
+          logger.info "xxx #{Time.now}: location #{venue.location.id}:#{venue.location.company_name} does not have a timezone"
           next
         end
         
