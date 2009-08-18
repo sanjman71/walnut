@@ -236,12 +236,21 @@ class AppointmentTest < ActiveSupport::TestCase
       @start_at_utc = Time.now.utc.beginning_of_day
       @end_at_utc   = @start_at_utc + 2.hours
       @recur_rule   = "FREQ=DAILY";
-      @recurrence   = Appointment.create(:company => @company, :location_id => @location.id, :name => "Happy Hour",
-                                         :start_at => @start_at_utc, :end_at => @end_at_utc,
-                                         :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
+      @recurrence   = @location.appointments.create(:company => @company, :name => "Happy Hour",
+                                                    :start_at => @start_at_utc, :end_at => @end_at_utc,
+                                                    :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
     end
     
+    should_change "Appointment.count", :by => 1
     should_change "Appointment.recurring.count", :by => 1
+    
+    should "should increment location.appointments_count" do
+      assert_equal 1, @location.reload.appointments_count 
+    end
+    
+    should "should increment location.events_count" do
+      assert_equal 1, @location.reload.events_count 
+    end
     
     context "expand 1 instance" do
       setup do
@@ -249,6 +258,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
       
       should_change "Appointment.count", :by => 1
+      should_not_change "Appointment.recurring.count"
       
       should "return 1 appointment" do
         assert_equal 1, @appointments.size
@@ -267,11 +277,11 @@ class AppointmentTest < ActiveSupport::TestCase
       end
       
       should "should increment location.appointments_count" do
-        assert_equal 1, @location.reload.appointments_count 
+        assert_equal 2, @location.reload.appointments_count 
       end
       
       should "should increment location.events_count" do
-        assert_equal 1, @location.reload.events_count 
+        assert_equal 2, @location.reload.events_count 
       end
     end
   end

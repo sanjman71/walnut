@@ -68,12 +68,12 @@ class Appointment < ActiveRecord::Base
 
   acts_as_taggable_on       :tags
 
-  # delegate                  :country, :to => '(location or return nil)'
-  # delegate                  :state, :to => '(location or return nil)'
-  # delegate                  :city, :to => '(location or return nil)'
-  # delegate                  :zip, :to => '(location or return nil)'
-  # delegate                  :neighborhoods, :to => '(location or return nil)'
-  # delegate                  :street_address, :to => '(location or return nil)'
+  delegate                  :country, :to => '(location or return nil)'
+  # delegate                  :state, :to => '(location or return nil)' # conflicts with aasm state machine
+  delegate                  :city, :to => '(location or return nil)'
+  delegate                  :zip, :to => '(location or return nil)'
+  delegate                  :neighborhoods, :to => '(location or return nil)'
+  delegate                  :street_address, :to => '(location or return nil)'
   delegate                  :lat, :to => '(location or return nil)'
   delegate                  :lng, :to => '(location or return nil)'
 
