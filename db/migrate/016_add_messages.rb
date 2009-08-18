@@ -53,11 +53,12 @@ class AddMessages < ActiveRecord::Migration
     end
 
     change_table :phone_numbers do |t|
-      t.rename  :phone, :address
+      t.rename  :number, :address
       t.integer :priority, :default => 1
     end
-
+    
     add_index :phone_numbers, :callable_type
+    add_index :phone_numbers, [:callable_type, :callable_id, :priority], :name => "index_phone_on_callable_and_priority"
   end
 
   def self.down
@@ -70,7 +71,7 @@ class AddMessages < ActiveRecord::Migration
     remove_column :users, :email_addresses_count
 
     change_table :phone_numbers do |t|
-      t.rename  :address, :phone
+      t.rename  :address, :number
     end
 
     remove_column :phone_numbers, :priority
