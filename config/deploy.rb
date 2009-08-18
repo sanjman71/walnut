@@ -22,6 +22,7 @@ set :group,         'app'
 
 # Load external recipe files
 load_paths << "config/recipes"
+load "crontab"
 load "database"
 load "delayed_job"
 load "sphinx"

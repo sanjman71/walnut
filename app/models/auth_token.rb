@@ -2,6 +2,6 @@ class AuthToken
   include Singleton
 
   def token
-    "12345"
+    AUTH_TOKEN_INSTANCE
   end
 end
