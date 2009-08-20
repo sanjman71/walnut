@@ -21,8 +21,9 @@ class SearchTest < ActiveSupport::TestCase
       @hash = Search.query("hair salon")
     end
 
-    should "have query" do
-      assert_equal Hash[:query_raw => "hair salon", :query_and => "hair salon", :query_or => "hair | salon"], @hash
+    should "have query hash" do
+      assert_equal Hash[:query_raw => "hair salon", :query_and => "hair salon", :query_or => "hair | salon", :query_quorum => "\"hair salon\"/1"], 
+                   @hash
     end
   end
 
@@ -32,7 +33,7 @@ class SearchTest < ActiveSupport::TestCase
     end
 
     should "have attributes hash" do
-      assert_equal Hash[:query_raw => "events:1", :query_and => '', :query_or => '', :attributes => {:events => 1..2**30}], @hash
+      assert_equal Hash[:query_raw => "events:1", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:events => 1..2**30}], @hash
     end
   end
 
@@ -42,7 +43,7 @@ class SearchTest < ActiveSupport::TestCase
     end
 
     should "have attributes hash" do
-      assert_equal Hash[:query_raw => "events:0", :query_and => '', :query_or => '', :attributes => {:events => 0}], @hash
+      assert_equal Hash[:query_raw => "events:0", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:events => 0}], @hash
     end
   end
 
@@ -52,7 +53,8 @@ class SearchTest < ActiveSupport::TestCase
     end
 
     should "have fields hash" do
-      assert_equal Hash[:query_raw => "address:'200 grand'", :query_and => '', :query_or => '', :fields => {:address => '200 grand'}], @hash
+      assert_equal Hash[:query_raw => "address:'200 grand'", :query_and => '', :query_or => '', :query_quorum => '', 
+                        :fields => {:address => '200 grand'}], @hash
     end
   end
 
@@ -62,7 +64,8 @@ class SearchTest < ActiveSupport::TestCase
     end
 
     should "have fields hash" do
-      assert_equal Hash[:query_raw => "address:'200 Grand Ave'", :query_and => '', :query_or => '', :fields => {:address => '200 Grand Ave'}], @hash
+      assert_equal Hash[:query_raw => "address:'200 Grand Ave'", :query_and => '', :query_or => '', :query_quorum => '', 
+                        :fields => {:address => '200 Grand Ave'}], @hash
     end
   end
 
@@ -72,7 +75,8 @@ class SearchTest < ActiveSupport::TestCase
     end
     
     should "have attributes hash" do
-      assert_equal Hash[:query_raw => "music events:1", :query_and => 'music', :query_or => 'music', :attributes => {:events => 1..2**30}], @hash
+      assert_equal Hash[:query_raw => "music events:1", :query_and => 'music', :query_quorum => "\"music\"/1",
+                        :query_or => 'music', :attributes => {:events => 1..2**30}], @hash
     end
   end
   
@@ -82,7 +86,8 @@ class SearchTest < ActiveSupport::TestCase
     end
     
     should "have attributes hash" do
-      assert_equal Hash[:query_raw => "bar popularity:50", :query_and => 'bar', :query_or => 'bar', :attributes => {:popularity => 50..2**30}], @hash
+      assert_equal Hash[:query_raw => "bar popularity:50", :query_and => 'bar', :query_or => 'bar', :query_quorum => "\"bar\"/1",
+                        :attributes => {:popularity => 50..2**30}], @hash
     end
   end
   
@@ -92,7 +97,8 @@ class SearchTest < ActiveSupport::TestCase
     end
     
     should "have fields hash" do
-      assert_equal Hash[:query_raw => "music address:'200 grand'", :query_and => 'music', :query_or => 'music', :fields => {:address => '200 grand'}], @hash
+      assert_equal Hash[:query_raw => "music address:'200 grand'", :query_and => 'music', :query_or => 'music', :query_quorum => "\"music\"/1",
+                        :fields => {:address => '200 grand'}], @hash
     end
   end
   
@@ -102,7 +108,8 @@ class SearchTest < ActiveSupport::TestCase
     end
     
     should "have fields hash" do
-      assert_equal Hash[:query_raw => "name:'pizza' address:'200 grand'", :query_and => '', :query_or => '', :fields => {:name => 'pizza', :address => '200 grand'}], @hash
+      assert_equal Hash[:query_raw => "name:'pizza' address:'200 grand'", :query_and => '', :query_or => '', :query_quorum => '',
+                        :fields => {:name => 'pizza', :address => '200 grand'}], @hash
     end
   end
   
@@ -112,7 +119,8 @@ class SearchTest < ActiveSupport::TestCase
     end
     
     should "have attributes and fields hash" do
-      assert_equal Hash[:query_raw => "music concerts events:1 address:'200 grand'", :query_and => 'music concerts', :query_or => 'music | concerts',
+      assert_equal Hash[:query_raw => "music concerts events:1 address:'200 grand'", :query_and => 'music concerts', 
+                        :query_or => 'music | concerts', :query_quorum => "\"music concerts\"/1",
                         :attributes => {:events => 1..2**30}, :fields => {:address => '200 grand'}], @hash
     end
   end

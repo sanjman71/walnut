@@ -73,11 +73,12 @@ class Search
     # check for special anything search
     s = s.gsub(@@anything_search, '')
 
-    # add query, both as default with implicity 'and' operator and explicit 'or' operator
+    # add query, as default with implicity 'and' operator, as explicit 'or' operator, and as quorum
     tokenized           = normalize(s).strip.split#.map{ |s| s = normalize(s) }.compact
     hash[:query_and]    = tokenized.join(" ")
     hash[:query_or]     = tokenized.join(" | ")
-    
+    hash[:query_quorum] = tokenized.empty? ? "" : "\"#{tokenized.join(" ")}\"/1"
+
     # add fields and attribuutes
     hash[:attributes]   = attributes unless attributes.empty?
     hash[:fields]       = fields unless fields.blank?
