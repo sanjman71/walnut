@@ -57,6 +57,10 @@ class Company < ActiveRecord::Base
   # LogEntry log
   has_many                  :log_entries
 
+  # Logo
+  has_one                   :logo, :dependent => :destroy
+  accepts_nested_attributes_for :logo, :allow_destroy => true
+
   # Preferences
   typed_serialize           :preferences, Hash
 
