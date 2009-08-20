@@ -19,6 +19,23 @@
 
 # Learn more: http://github.com/javan/whenever
 
-every 10.minutes do
-  rake "ts:index"
+if RAILS_ENV == 'development'
+
+every 1.day, :at => "2am" do
+  command "curl http://www.walnutplaces.dev:3000/sphinx?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
 end
+
+end # development
+
+if RAILS_ENV == 'production'
+
+every 1.day, :at => "2am" do
+  command "curl http://www.walnutplaces.com/events/remove?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+  command "curl http://www.walnutplaces.com/events/import?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+end
+
+every :reboot do
+  command "cd /usr/apps/walnut/current && RAILS_ENV=production /usr/bin/env rake ts:start"
+end
+
+end # production
