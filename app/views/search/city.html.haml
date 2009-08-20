@@ -4,16 +4,16 @@
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
   %h1{:style => 'font-size: 2.0em;'}= @h1
   %h5
-    = link_to("Search #{pluralize(@city.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :tag => 'anything'), :class => 'locality search')
+    -#= link_to("Search #{pluralize(@city.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :tag => 'anything'), :class => 'locality search')
     - if @events_count > 0
-      == &nbsp;|&nbsp;
+      -#== &nbsp;|&nbsp;
       = link_to("Search #{pluralize(@city.name, 'Events')}", url_for(:action => 'index', :klass => 'events', :tag => 'anything'), :class => 'locality search')
-    - if has_privilege?("manage site")
-      == &nbsp;|&nbsp;
-      = link_to("Venues", city_venues_path(@country, @city.state, @city), :class => 'locality search')
-      
+
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city})
+    
+  - if has_privilege?('manage site')
+    %h5#stats{:style => 'font-size: 0.9em;'}= pluralize(@city.locations_count, "location")
 
 %hr.space
 

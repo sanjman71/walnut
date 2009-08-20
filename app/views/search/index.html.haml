@@ -50,7 +50,7 @@
         -# filter search results by type
         - @search_filters.keys.each do |klass|
           %span{:style => 'font-weight: bold; font-size: 1.1em;'}
-            = link_to("Search #{klass_to_word(klass.pluralize).titleize} only", build_search_route(klass, @geo_type, @geo_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
+            = link_to("Search #{klass_to_word(klass.pluralize).titleize} only", build_search_route(klass, @geo_search, @geo_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
             = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
     
     .span-10

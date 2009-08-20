@@ -77,6 +77,8 @@ class SearchControllerTest < ActionController::TestCase
       setup do
         # ThinkingSphinx::Collection takes 4 arguments: page, per_page, entries, total_entries
         ThinkingSphinx::Search.stubs(:search).returns(ThinkingSphinx::Collection.new(1, 1, 0, 0))
+        # stub tag facets
+        Search.stubs(:load_from_facets).returns([])
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
       end
     
@@ -86,12 +88,15 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:country) { @us }
       should_assign_to(:state) { @il }
       should_assign_to(:city) { @chicago }
-      should_assign_to :query, :tag
+      should_assign_to(:geo_search) { 'city' }
+      should_assign_to(:query) { '' }
+      should_assign_to(:tag) { 'food' }
       should_assign_to(:query_or) { "food" }
       should_assign_to(:query_and) { "food" }
+      should_assign_to(:query_quorum) { "\"food\"/1" }
       should_assign_to(:query_raw) { "food" }
       should_not_assign_to(:fields)
-      should_assign_to(:attributes) { Hash[:city_id => @chicago.id, :state_id => @il.id, :country_id => @us.id] }
+      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
       should_assign_to(:title) { "Food near Chicago, IL" }
       should_assign_to(:h1) { "Food near Chicago, IL" }
       
@@ -133,9 +138,9 @@ class SearchControllerTest < ActionController::TestCase
       assert_tag :tag => "h1", :content => "Search Places and Events in Chicago, Illinois"
     end
     
-    should "have search anything link" do
-      assert_tag :tag => "h5", :descendant => {:tag => 'a', :attributes => {:href => '/search/us/il/chicago/tag/anything'}}
-    end
+    # should "have search anything link" do
+    #   assert_tag :tag => "h5", :descendant => {:tag => 'a', :attributes => {:href => '/search/us/il/chicago/tag/anything'}}
+    # end
     
     should "have breadcrumbs link 'United States'" do
       assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
