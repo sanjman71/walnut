@@ -87,7 +87,7 @@ class SearchController < ApplicationController
     end
 
     # handle special case of 'something' to find a random tag
-    @tag            = Tag.all(:order => 'rand()', :limit => 1).first.name if @tag == 'something'
+    @tag            = find_random_tag if @tag == 'something'
 
     @hash           = Search.query(!@tag.blank? ? @tag : @query)
     @query_raw      = @hash[:query_raw]
@@ -280,5 +280,18 @@ class SearchController < ApplicationController
   def error
     @title  = "Search Error"
   end
-  
+
+  protected
+
+  def find_random_tag
+    self.class.benchmark("*** Benchmarking find random tag", Logger::DEBUG, false) do
+      tag_size  = 300
+      tag_ids   = Rails.cache.fetch("tags:random", :expires_in => CacheExpire.tags) do
+        Tag.find(:all, :limit => tag_size, :order => 'taggings_count desc', :select => 'id').collect(&:id)
+      end
+      tag_id    = tag_ids[rand(tag_size)]
+      Tag.find(tag_id).name
+    end
+  end
+
 end
