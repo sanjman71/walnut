@@ -5,15 +5,17 @@
 - klasses   = []
 - klasses.push("mappable") if location.mappable?
 
-- cache("#{location.cache_key}:index:#{index}") do
-
-  .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+.unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+  -# cache location google marker
+  - cache("google:marker:#{color}:#{index}") do
     .span-1.icon-div
       - if location.mappable?
         %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
       - else
         == &nbsp;
-      
+
+  -# cache location info, independent of its list index
+  - cache("#{location.cache_key}") do
     .span-9.last.info
       %h4.name.margin-bottom-5
         = link_to location.company_name, location_path(location), :class => "#{features.join(" ")} name"
