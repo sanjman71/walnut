@@ -106,9 +106,10 @@ class DateRange
       when 'this week'
         # ends on sunday at midnight
         end_at    = now.end_of_week
-        start_at  = now.beginning_of_day
         if options[:include] == :today
-          start_at -= 1.day if now.yday > Time.zone.now.yday
+          start_at  = now.beginning_of_day
+        else
+          start_at  = now.tomorrow.beginning_of_day
         end
       when 'next week'
         # next week starts on monday, and end on sunday at midnight
