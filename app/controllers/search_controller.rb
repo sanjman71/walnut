@@ -113,9 +113,13 @@ class SearchController < ApplicationController
     case @search_klass
     when 'search'
       # search Appointment class iff there are events
-      @klasses        = @events_count > 0 ? [Appointment, Location] : [Location]
+      # @klasses        = @events_count > 0 ? [Appointment, Location] : [Location]
       # only eager load if we know the klass type
-      @eager_loads    = @events_count > 0 ? [] : [:company, :city, :state, :zip, :primary_phone_number]
+      # @eager_loads    = @events_count > 0 ? [] : [:company, :city, :state, :zip, :primary_phone_number]
+
+      # search returns location results until the eager loading performance issue is addressed
+      @klasses        = [Location]
+      @eager_loads    = [:company, :city, :state, :zip, :primary_phone_number]
       @facet_klass    = Location
       @tag_klasses    = [Location]
       @sort_order     = "popularity desc, @relevance desc"
