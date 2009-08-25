@@ -62,6 +62,22 @@ class AppointmentTest < ActiveSupport::TestCase
     should "have nil location" do
       assert_equal nil, @appointment.location
     end
+
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or associated models" do
+        assert_equal 0, Company.count
+        assert_equal 0, Appointment.count
+        assert_equal 0, Subscription.count
+        assert_equal 0, CompanyService.count
+        assert_equal 0, CompanyProvider.count
+        assert_equal 0, CapacitySlot.count
+      end
+    end
+
   end
 
   context "create event venue mapped to a location with a localeze location source" do
@@ -209,6 +225,22 @@ class AppointmentTest < ActiveSupport::TestCase
           assert_equal [], @company.tag_list
         end
       end
+
+      context "then remove company" do
+        setup do
+          @company.destroy
+        end
+
+        should "have no Companies or associated models" do
+          assert_equal 0, Company.count
+          assert_equal 0, Appointment.count
+          assert_equal 0, Subscription.count
+          assert_equal 0, CompanyService.count
+          assert_equal 0, CompanyProvider.count
+          assert_equal 0, CapacitySlot.count
+        end
+      end
+
     end
 
     context "then add event category with no tags" do
@@ -284,6 +316,22 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 2, @location.reload.events_count 
       end
     end
+
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or associated models" do
+        assert_equal 0, Company.count
+        assert_equal 0, Appointment.count
+        assert_equal 0, Subscription.count
+        assert_equal 0, CompanyService.count
+        assert_equal 0, CompanyProvider.count
+        assert_equal 0, CapacitySlot.count
+      end
+    end
+
   end
   
 end

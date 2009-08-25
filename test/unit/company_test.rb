@@ -33,8 +33,8 @@ class CompanyTest < ActiveSupport::TestCase
       @company.reload
     end
     
-    should_change "Company.count", :by => 1
-    should_change "Location.count", :by => 1
+    should_change("Company.count", :by => 1) { Company.count }
+    should_change("Location.count", :by => 1) { Location.count }
     
     should "have 1 location" do
       assert_equal [@location], @company.locations
@@ -54,8 +54,8 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload
       end
       
-      should_not_change "Company.count"
-      should_not_change "Location.count"
+      should_not_change("Company.count") { Company.count }
+      should_not_change("Location.count") { Location.count }
 
       should "have no locations" do
         assert_equal [], @company.locations
@@ -66,6 +66,17 @@ class CompanyTest < ActiveSupport::TestCase
       end
     end
     
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or CompanyLocations" do
+        assert_equal 0, Company.count
+        assert_equal 0, CompanyLocation.count
+      end
+    end
+
     context "then add a location" do
       setup do
         @location2  = Location.create(:city => @toronto, :country => @us)
@@ -73,8 +84,8 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload
       end
     
-      should_not_change "Company.count"
-      should_change "Location.count", :by => 1
+      should_not_change("Company.count") { Company.count }
+      should_change("Location.count", :by => 1) { Location.count }
     
       should "have 2 locations" do
         assert_equal [@location, @location2], @company.locations
@@ -83,6 +94,18 @@ class CompanyTest < ActiveSupport::TestCase
       should "have locations_count of 2" do
         assert_equal 2, @company.locations_count
       end
+
+      context "then remove company" do
+        setup do
+          @company.destroy
+        end
+
+        should "have no Companies or CompanyLocations" do
+          assert_equal 0, Company.count
+          assert_equal 0, CompanyLocation.count
+        end
+      end
+
     end
   end
   
@@ -94,8 +117,8 @@ class CompanyTest < ActiveSupport::TestCase
       @company.reload
     end
   
-    should_change "Company.count", :by => 1
-    should_change "PhoneNumber.count", :by => 2
+    should_change("Company.count", :by => 1) { Company.count }
+    should_change("PhoneNumber.count", :by => 2) { PhoneNumber.count }
     
     should "have 2 phone numbers" do
       assert_equal ["9995551234", "9991234567"], @company.phone_numbers.collect(&:address)
@@ -108,6 +131,18 @@ class CompanyTest < ActiveSupport::TestCase
     should "have primary phone number" do
       assert_equal "9995551234", @company.primary_phone_number.address
     end
+
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or PhoneNumbers" do
+        assert_equal 0, Company.count
+        assert_equal 0, PhoneNumber.count
+      end
+    end
+
   end
   
   context "company tags" do
@@ -118,9 +153,9 @@ class CompanyTest < ActiveSupport::TestCase
       @company.reload
     end
     
-    should_change "Company.count", :by => 1
-    should_change "Tag.count", :by => 2
-    should_change "Tagging.count", :by => 2
+    should_change("Company.count", :by => 1) { Company.count }
+    should_change("Tag.count", :by => 2) { Tag.count }
+    should_change("Tagging.count", :by => 2) { Tagging.count }
     
     should "increment tag.taggings count to 1" do
       assert_equal 1, Tag.find_by_name("pizza").taggings.count
@@ -143,7 +178,7 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload
       end
 
-      should_change "Tagging.count", :by => -1
+      should_change("Tagging.count", :by => -1) { Tagging.count }
       
       should "decrement tag.taggings count to 0" do
         assert_equal 0, Tag.find_by_name("pizza").taggings.count
@@ -165,8 +200,8 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload 
       end
 
-      should_change "Tag.count", :by => 1
-      should_change "Tagging.count", :by => 1
+      should_change("Tag.count", :by => 1) { Tag.count }
+      should_change("Tagging.count", :by => 1) { Tagging.count }
 
       should "set tag.taggings_count to 1" do
         assert_equal 1, Tag.find_by_name("beer").taggings.count
