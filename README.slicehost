@@ -19,6 +19,10 @@
 4. sudo make
 5. sudo make install
 
+# Memcached
+
+1. sudo aptitude install memcached
+
 # Mongrel, Nginx
 
 1. http://articles.slicehost.com/2008/5/9/ubuntu-hardy-mongrel-and-mongrel-clusters
