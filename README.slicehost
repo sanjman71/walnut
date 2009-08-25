@@ -1,0 +1,27 @@
+# Slice installation process
+
+# The basic steps:
+
+1. http://articles.slicehost.com/2008/4/25/ubuntu-hardy-setup-page-1
+2. http://articles.slicehost.com/2008/4/25/ubuntu-hardy-setup-page-2
+3. http://articles.slicehost.com/2008/7/8/ubuntu-hardy-installing-mysql-with-rails-and-php-options
+4. http://articles.slicehost.com/2008/4/30/ubuntu-hardy-ruby-on-rails
+
+# Mongrel, Nginx
+
+1. http://articles.slicehost.com/2008/5/9/ubuntu-hardy-mongrel-and-mongrel-clusters
+2. http://articles.slicehost.com/2008/5/13/ubuntu-hardy-installing-nginx-from-source
+3. http://articles.slicehost.com/2008/5/13/ubuntu-hardy-adding-an-nginx-init-script
+
+...
+
+4. http://articles.slicehost.com/2008/5/15/ubuntu-hardy-nginx-from-source-layout
+
+5. http://articles.slicehost.com/2008/5/27/ubuntu-hardy-nginx-rails-and-mongrels
+
+
+
+# Git
+
+1. sudo aptitude install curl libcurl4-openssl-dev libexpart1-dev gettext
+2. sudo aptitude install git-core
