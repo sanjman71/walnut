@@ -27,16 +27,15 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "sqlite3-ruby", :lib => "sqlite3"
   # config.gem "aws-s3", :lib => "aws/s3"
-  config.gem "haml", :version => '~> 2.0.6'
+  config.gem "haml", :version => '~> 2.2.2'
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'rubyist-aasm', :version => '~> 2.0.5', :lib => 'aasm', :source => "http://gems.github.com"
+  config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem "geokit" # required by geokit-rails plugin
-  config.gem "curb" # curl api
+  config.gem "curb" # curl api, adding to vendor/gems causes errors
   config.gem "json"
-  config.gem 'unicode', :version => '~> 0.1'
+  # config.gem 'unicode', :version => '~> 0.1'
   config.gem 'ri_cal'
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
-  # config.gem 'geoip_city', :version => '~> 0.2', :lib => 'geoip_city'
   # config.gem "eventfulapi", :source => "remote"  # this doesn't work
   
   # Only load the plugins named here, in the order given. By default, all plugins 
