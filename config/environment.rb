@@ -31,9 +31,10 @@ Rails::Initializer.run do |config|
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem "geokit" # required by geokit-rails plugin
-  config.gem "curb" # curl api, adding to vendor/gems causes errors
+  config.gem "curb" # curl api; adding to vendor/gems causes errors
+  config.gem "httparty" # used by google weather plugin
   config.gem "json"
-  # config.gem 'unicode', :version => '~> 0.1'
+  # config.gem 'unicode', :version => '~> 0.1'  # uncommenting causes errors when its in vendor/gems
   config.gem 'ri_cal'
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   # config.gem "eventfulapi", :source => "remote"  # this doesn't work
