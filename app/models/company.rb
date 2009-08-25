@@ -22,6 +22,7 @@ class Company < ActiveRecord::Base
 
   # validates_presence_of     :time_zone
 
+  # We don't destroy the locations associated with a company if it's destroyed as they might be associated with another.
   has_many                  :company_locations, :dependent => :destroy
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location
 
@@ -45,7 +46,7 @@ class Company < ActiveRecord::Base
   has_many                  :services, :through => :company_services, :after_add => :after_add_service, :after_remove => :after_remove_service
   has_many                  :products, :dependent => :destroy
   has_many                  :appointments, :dependent => :destroy
-  has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id, :dependent => :destroy
+  has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id
   has_many                  :customers, :through => :appointments, :uniq => true
   has_many                  :invitations, :dependent => :destroy
 
