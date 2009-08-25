@@ -26,14 +26,12 @@ class ApplicationController < ActionController::Base
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
   filter_parameter_logging :password
-  
+
   # Load and cache all user privileges on each call so we don't have to keep checking the database
   before_filter :init_current_privileges
-  
+
   # Default application layout
   layout 'home'
-  
-  has_sms_fu
 
   # check user privileges against the pre-loaded memory collection instead of using the database
   def has_privilege?(p, *args)
