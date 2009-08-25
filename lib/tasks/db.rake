@@ -8,12 +8,12 @@ namespace :db do
     password            = ActiveRecord::Base.configurations[RAILS_ENV]['password']
     host                = ActiveRecord::Base.configurations[RAILS_ENV]['host']
     database_name       = ENV["DB"]
-    
+
     if database_name.blank?
-      puts "missing DB argument"
+      puts "no DB specified"
       exit
     end
-    
+
     timestamp           = Time.now.strftime("%Y%m%d%H%M%S")
     backup_dir          = "#{RAILS_ROOT}/backups"
     backup_file         = "#{database_name}_#{timestamp}.sql.gz"
@@ -55,8 +55,13 @@ namespace :db do
     username            = ActiveRecord::Base.configurations[RAILS_ENV]['username']
     password            = ActiveRecord::Base.configurations[RAILS_ENV]['password']
     host                = ActiveRecord::Base.configurations[RAILS_ENV]['host']
-    database_name       = ActiveRecord::Base.configurations[RAILS_ENV]['database']
-    
+    database_name       = ENV["DB"]
+
+    if database_name.blank?
+      puts "no DB specified"
+      exit
+    end
+
     if load_file.match(/.gz$/)
       # unzip, then reset load file name
       cmd = "gunzip #{load_file}"
