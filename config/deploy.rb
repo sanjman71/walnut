@@ -1,5 +1,5 @@
 # Be explicit about our different environments
-set :stages, %w(staging production)
+set :stages, %w(mosso production)
 require 'capistrano/ext/multistage'
 
 # Set application name
@@ -29,6 +29,14 @@ load "sphinx"
 
 deploy.task :restart, :roles => :app do
   run "touch #{current_release}/tmp/restart.txt"
+end
+
+deploy.task :init, :roles => :app do
+  # first time initialization
+  run "mkdir -p #{deploy_to}/releases"
+  run "mkdir -p #{deploy_to}/shared/log"
+  run "mkdir -p #{deploy_to}/shared/pids"
+  run "mkdir -p #{deploy_to}/shared/sphinx"
 end
 
 after "deploy:stop",    "delayed_job:stop"

@@ -7,6 +7,18 @@
 3. http://articles.slicehost.com/2008/7/8/ubuntu-hardy-installing-mysql-with-rails-and-php-options
 4. http://articles.slicehost.com/2008/4/30/ubuntu-hardy-ruby-on-rails
 
+# Passenger + Nginx
+
+1. http://blog.phusion.nl/2009/04/16/phusions-one-year-anniversary-gift-phusion-passenger-220/
+
+# Sphinx
+
+1. sudo wget http://www.sphinxsearch.com/downloads/sphinx-0.9.9-rc2.tar.gz
+2. unzip, untar
+3. sudo ./configure
+4. sudo make
+5. sudo make install
+
 # Mongrel, Nginx
 
 1. http://articles.slicehost.com/2008/5/9/ubuntu-hardy-mongrel-and-mongrel-clusters

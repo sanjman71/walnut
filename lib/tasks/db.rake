@@ -7,7 +7,12 @@ namespace :db do
     username            = ActiveRecord::Base.configurations[RAILS_ENV]['username']
     password            = ActiveRecord::Base.configurations[RAILS_ENV]['password']
     host                = ActiveRecord::Base.configurations[RAILS_ENV]['host']
-    database_name       = ActiveRecord::Base.configurations[RAILS_ENV]['database']
+    database_name       = ENV["DB"]
+    
+    if database_name.blank?
+      puts "missing DB argument"
+      exit
+    end
     
     timestamp           = Time.now.strftime("%Y%m%d%H%M%S")
     backup_dir          = "#{RAILS_ROOT}/backups"
