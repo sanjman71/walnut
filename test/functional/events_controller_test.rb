@@ -41,7 +41,7 @@ class EventsControllerTest < ActionController::TestCase
       @location.reload
     end
 
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     should_not_change "Appointment.recurring.count"
     should_change "@location.updated_at"
     should_not_assign_to :recur_rule
@@ -82,8 +82,8 @@ class EventsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "#{@dstart}T110000" }
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO" }
 
-      should_change "Appointment.recurring.count", :by => 1
-      should_change "Appointment.count", :by => 1 
+      should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
+      should_change("Appointment.count", :by => 1 ) { Appointment.count }
     end
     
     context "daily that never ends" do
@@ -101,8 +101,8 @@ class EventsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "#{@dstart}T110000" }
       should_assign_to(:recur_rule) { "FREQ=DAILY" }
 
-      should_change "Appointment.recurring.count", :by => 1
-      should_change "Appointment.count", :by => 1 
+      should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
+      should_change("Appointment.count", :by => 1 ) { Appointment.count }
     end
   end
 end

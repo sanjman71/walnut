@@ -20,7 +20,7 @@ class CityTest < ActiveSupport::TestCase
         @chicago = City.create(:name => "Chicago", :state => @il)
       end
       
-      should_change "City.count", :by => 1
+      should_change("City.count", :by => 1) { City.count }
       
       should "have to_param method return chicago" do
         assert_equal "chicago", @chicago.to_param
@@ -36,7 +36,7 @@ class CityTest < ActiveSupport::TestCase
         @new_york = City.create(:name => "New York", :state => @ny)
       end
 
-      should_change "City.count", :by => 1
+      should_change("City.count", :by => 1) { City.count }
       
       should "have to_param method return new-york" do
         assert_equal "new-york", @new_york.to_param

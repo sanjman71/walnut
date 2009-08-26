@@ -57,7 +57,7 @@ class AppointmentTest < ActiveSupport::TestCase
                                          :mark_as => Appointment::FREE, :public => true)
     end
 
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
 
     should "have nil location" do
       assert_equal nil, @appointment.location
@@ -87,7 +87,7 @@ class AppointmentTest < ActiveSupport::TestCase
       assert @new_venue.valid?
     end
 
-    should_change "LocationSource.count", :by => 1
+    should_change("LocationSource.count", :by => 1) { LocationSource.count }
     
     should "have location_source_type with localeze value" do
       assert_match /Localeze::BaseRecord/, @new_venue.location_source_type
@@ -109,7 +109,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @chicago.reload
     end
     
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
     should "add event to location.appointments collection" do
       assert_equal [@appointment], @location.appointments
@@ -146,7 +146,7 @@ class AppointmentTest < ActiveSupport::TestCase
         @appointment.reload
       end
       
-      should_change "AppointmentEventCategory.count", :by => 1
+      should_change("AppointmentEventCategory.count", :by => 1) { AppointmentEventCategory.count }
       
       should "apply category tags to event" do
         assert_equal ["music", "concert"], @appointment.tags.collect(&:name)
@@ -167,7 +167,7 @@ class AppointmentTest < ActiveSupport::TestCase
           @appointment.reload
         end
 
-        should_change "AppointmentEventCategory.count", :by => -1
+        should_change("AppointmentEventCategory.count", :by => -1) { AppointmentEventCategory.count }
 
         should "remove category tags from event" do
           assert_equal [], @appointment.tags.collect(&:name)
@@ -191,7 +191,7 @@ class AppointmentTest < ActiveSupport::TestCase
           @chicago.reload
         end
         
-        should_change "AppointmentEventCategory.count", :by => -1
+        should_change("AppointmentEventCategory.count", :by => -1) { AppointmentEventCategory.count }
 
         should "remove category tags from event" do
           assert_equal [], @appointment.tags.collect(&:name)
@@ -251,7 +251,7 @@ class AppointmentTest < ActiveSupport::TestCase
         @event_category2.reload
       end
 
-      should_change "AppointmentEventCategory.count", :by => 1
+      should_change("AppointmentEventCategory.count", :by => 1) { AppointmentEventCategory.count }
       
       should "have no tags" do
         assert_equal [], @appointment.tags
@@ -273,8 +273,8 @@ class AppointmentTest < ActiveSupport::TestCase
                                                     :recur_rule => @recur_rule, :mark_as => Appointment::FREE, :public => true)
     end
     
-    should_change "Appointment.count", :by => 1
-    should_change "Appointment.recurring.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
+    should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
     
     should "should increment location.appointments_count" do
       assert_equal 1, @location.reload.appointments_count 
@@ -289,7 +289,7 @@ class AppointmentTest < ActiveSupport::TestCase
         @appointments = @recurrence.expand_recurrence(Time.now, Time.now + 3.months, 1)
       end
       
-      should_change "Appointment.count", :by => 1
+      should_change("Appointment.count", :by => 1) { Appointment.count }
       should_not_change "Appointment.recurring.count"
       
       should "return 1 appointment" do

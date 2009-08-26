@@ -164,7 +164,7 @@ class TagGroupTest < ActiveSupport::TestCase
         @company.reload
       end
       
-      should_change "CompanyTagGroup.count", :by => 1
+      should_change("CompanyTagGroup.count", :by => 1) { CompanyTagGroup.count }
       
       should "add company tags ['diesel', 'jeans']" do
         assert_equal ["diesel", "jeans"], @company.tag_list
@@ -181,7 +181,7 @@ class TagGroupTest < ActiveSupport::TestCase
           @company.reload
         end
         
-        should_change "CompanyTagGroup.count", :by => -1
+        should_change("CompanyTagGroup.count", :by => -1) { CompanyTagGroup.count }
         
         should "remove company tags" do
           assert_equal [], @company.tag_list

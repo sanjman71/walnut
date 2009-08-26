@@ -34,8 +34,8 @@ class LocationTest < ActiveSupport::TestCase
       @company.reload
     end
 
-    should_change "Location.count", :by => 1
-    should_change "CompanyLocation.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
+    should_change("CompanyLocation.count", :by => 1) { CompanyLocation.count }
     
     should "increment company.locations_count" do
       assert_equal 1, @company.locations_count
@@ -52,7 +52,7 @@ class LocationTest < ActiveSupport::TestCase
         @company2.reload
       end
 
-      should_change "CompanyLocation.count", :by => 1
+      should_change("CompanyLocation.count", :by => 1) { CompanyLocation.count }
 
       should "increment company2.locations_count" do
         assert_equal 1, @company2.locations_count
@@ -71,7 +71,7 @@ class LocationTest < ActiveSupport::TestCase
           @company.locations.delete(@location)
         end
 
-        should_change "CompanyLocation.count", :by => -1
+        should_change("CompanyLocation.count", :by => -1) { CompanyLocation.count }
         
         should "have 1 company in location.companies" do
           assert_equal [@company2], @location.companies
@@ -88,7 +88,7 @@ class LocationTest < ActiveSupport::TestCase
         @company.locations.delete(@location)
       end
       
-      should_change "CompanyLocation.count", :by => -1
+      should_change("CompanyLocation.count", :by => -1) { CompanyLocation.count }
       
       context "then destroy company and location" do
         setup do
@@ -96,8 +96,8 @@ class LocationTest < ActiveSupport::TestCase
           @location.destroy
         end
 
-        should_change "Location.count", :by => -1
-        should_change "Company.count", :by => -1
+        should_change("Location.count", :by => -1) { Location.count }
+        should_change("Company.count", :by => -1) { Company.count }
         
         should "decrement us.locations_count" do
           assert_equal 0, @us.reload.locations_count
@@ -112,7 +112,7 @@ class LocationTest < ActiveSupport::TestCase
       @us.reload
     end
     
-    should_change "Location.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
     
     should "have us as locality" do
       assert_equal [@us], @location.localities
@@ -150,7 +150,7 @@ class LocationTest < ActiveSupport::TestCase
       @il.reload
     end
     
-    should_change "Location.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
 
     should "have state's country" do
       assert_equal @location.country, @il.country
@@ -213,7 +213,7 @@ class LocationTest < ActiveSupport::TestCase
       @us.reload
     end
     
-    should_change "Location.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
 
     should "increment chicago locations_count" do
       assert_equal 1, @chicago.locations_count
@@ -306,7 +306,7 @@ class LocationTest < ActiveSupport::TestCase
   #     @location = Location.create(:city => @chicago, :state => @il, :country => @us)
   #   end
   # 
-  #   should_change "Location.count", :by => 1
+  #   should_change("Location.count", :by => 1) { Location.count }
   # 
   #   should "increment city locations_count" do
   #     assert_equal 1, @chicago.reload.locations_count
@@ -329,7 +329,7 @@ class LocationTest < ActiveSupport::TestCase
       @us.reload
     end
     
-    should_change "Location.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
 
     should "increment zip locations_count" do
       assert_equal 1, @zip.locations_count
@@ -387,7 +387,7 @@ class LocationTest < ActiveSupport::TestCase
       @river_north.reload
     end
     
-    should_change "Location.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
   
     should "have neighborhood locality" do
       assert_contains @location.localities, @river_north
@@ -446,8 +446,8 @@ class LocationTest < ActiveSupport::TestCase
       @location.reload
     end
   
-    should_change "Location.count", :by => 1
-    should_change "PhoneNumber.count", :by => 1
+    should_change("Location.count", :by => 1) { Location.count }
+    should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
     
     should "have 1 phone number" do
       assert_equal ["9991234567"], @location.phone_numbers.collect(&:address)
@@ -468,7 +468,7 @@ class LocationTest < ActiveSupport::TestCase
         @location.reload
       end
       
-      should_change "PhoneNumber.count", :by => -1
+      should_change("PhoneNumber.count", :by => -1) { PhoneNumber.count }
 
       should "have no phone number" do
         assert_equal [], @location.phone_numbers
@@ -555,10 +555,10 @@ class LocationTest < ActiveSupport::TestCase
       @company2.save
     end
     
-    should_change "Location.count", :by => 2
-    should_change "Company.count", :by => 2
-    should_change "PhoneNumber.count", :by => 2
-    should_change "LocationSource.count", :by => 2
+    should_change("Location.count", :by => 2) { Location.count }
+    should_change("Company.count", :by => 2) { Company.count }
+    should_change("PhoneNumber.count", :by => 2) { PhoneNumber.count }
+    should_change("LocationSource.count", :by => 2) { LocationSource.count }
     
     context "and then merge locations" do
       setup do
@@ -566,8 +566,8 @@ class LocationTest < ActiveSupport::TestCase
         @location1.reload
       end
       
-      should_change "Location.count", :by => -1
-      should_change "Company.count", :by => -1
+      should_change("Location.count", :by => -1) { Location.count }
+      should_change("Company.count", :by => -1) { Company.count }
       should_not_change "PhoneNumber.count"
       should_not_change "LocationSource.count"
       

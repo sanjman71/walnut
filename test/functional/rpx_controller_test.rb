@@ -16,7 +16,7 @@ class RpxControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to("root path") { "/" }
       
-      should_change "User.count", :by => 1
+      should_change("User.count", :by => 1) { User.count }
 
       should_assign_to :data
       
@@ -66,7 +66,7 @@ class RpxControllerTest < ActionController::TestCase
     #   should_respond_with :redirect
     #   should_redirect_to("root path") { "/" }
     #   
-    #   should_change "User.count", :by => 1
+    #   should_change("User.count", :by => 1) { User.count }
     # 
     #   should_assign_to :data
     #   
@@ -98,7 +98,8 @@ class RpxControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to("root path") { "/" }
 
-      should_change "User.count", :by => 1 # for the factory user, which is the same as the session user
+      # for the factory user, which is the same as the session user
+      should_change("User.count", :by => 1) { User.count }
 
       should_assign_to :data
       

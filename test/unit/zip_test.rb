@@ -19,7 +19,7 @@ class ZipTest < ActiveSupport::TestCase
         @zip = Zip.create(:name => "60654", :state => @il)
       end
       
-      should_change "Zip.count", :by => 1
+      should_change("Zip.count", :by => 1) { Zip.count }
 
       should "have to_s method return 60654" do
         assert_equal "60654", @zip.to_s
