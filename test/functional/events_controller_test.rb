@@ -42,8 +42,8 @@ class EventsControllerTest < ActionController::TestCase
     end
 
     should_change("Appointment.count", :by => 1) { Appointment.count }
-    should_not_change "Appointment.recurring.count"
-    should_change "@location.updated_at"
+    should_not_change("Appointment.recurring.count") { Appointment.recurring.count }
+    should_change("@location.updated_at") { @location.updated_at }
     should_not_assign_to :recur_rule
   
     should "mark appointment as public" do

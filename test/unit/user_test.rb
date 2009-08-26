@@ -31,7 +31,7 @@ class UserTest < ActiveSupport::TestCase
         @user1 = User.create(:name => "User 1", :email => "user1@jarna.com")
       end
 
-      should_not_change "User.count"
+      should_not_change("User.count") { User.count }
 
       should "require password" do
         assert !@user1.errors.on(:password).empty?

@@ -10,7 +10,7 @@ class EmailAddressTest < ActiveSupport::TestCase
         @email = EmailAddress.create(:address => "a@b.com")
       end
       
-      should_not_change "EmailAddress.count"
+      should_not_change("EmailAddress.count") { EmailAddress.count }
       
       should "be invalid" do
         assert_equal false, @email.valid?
@@ -27,7 +27,7 @@ class EmailAddressTest < ActiveSupport::TestCase
         @email  = @user.email_addresses.create(:address => "a@b.com")
       end
 
-      should_change "EmailAddress.count"
+      should_change("EmailAddress.count") { EmailAddress.count }
       
       should "have priority of 1" do
         assert_equal 1, @email.priority

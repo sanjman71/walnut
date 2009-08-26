@@ -35,7 +35,7 @@ class ZipTest < ActiveSupport::TestCase
         @zip = Zip.create(:name => "1111", :state => @il)
       end
       
-      should_not_change "Zip.count"
+      should_not_change("Zip.count") { Zip.count }
     end
   end
   

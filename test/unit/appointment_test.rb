@@ -290,7 +290,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
       
       should_change("Appointment.count", :by => 1) { Appointment.count }
-      should_not_change "Appointment.recurring.count"
+      should_not_change("Appointment.recurring.count") { Appointment.recurring.count }
       
       should "return 1 appointment" do
         assert_equal 1, @appointments.size

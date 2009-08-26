@@ -11,7 +11,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
         @phone = PhoneNumber.create(:name => "Work", :address => "5551234")
       end
 
-      should_not_change "PhoneNumber.count"
+      should_not_change("PhoneNumber.count") { PhoneNumber.count }
 
       should "have number marked as invalid" do
         assert_equal false, @phone.valid?
@@ -23,7 +23,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
         @phone = PhoneNumber.create(:name => "Work", :address => "5559999999")
       end
 
-      should_not_change "PhoneNumber.count"
+      should_not_change("PhoneNumber.count") { PhoneNumber.count }
 
       should "have error on callable" do
         assert_true @phone.errors.on(:callable)
@@ -36,7 +36,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
         @phone = @user.phone_numbers.create(:name => "Work", :address => "5559999999")
       end
 
-      should_change "PhoneNumber.count"
+      should_change("PhoneNumber.count") { PhoneNumber.count }
 
       should "increment user.phone_numbers_count" do
         @user.reload
