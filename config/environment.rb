@@ -32,9 +32,9 @@ Rails::Initializer.run do |config|
   config.gem "haml", :version => '~> 2.2.2'
   config.gem "httparty" # used by google weather plugin
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
-  config.gem "json"
+  config.gem "json", :version => '~> 1.1.7'
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'ri_cal'
+  config.gem 'ri_cal', :version => '~> 0.8.1'
   config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'unicode', :lib => false, :version => '~> 0.1'
   
