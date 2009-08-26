@@ -14,7 +14,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/local/sbin/nginx
 NAME=nginx
 DESC=nginx
-LOG_DIR=/usr/local/nginx-passenger/logs
+LOG_DIR=/usr/local/nginx/logs
 
 test -x $DAEMON || exit 0
 
