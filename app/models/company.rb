@@ -81,6 +81,32 @@ class Company < ActiveRecord::Base
   # find all subscriptions with billing errors
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
+  def destroy(options = {})
+    if (options[:all] || options[:services])
+      services = self.services
+      services.each do |service|
+        if service.companies.count == 1 && service.companies == [self]
+          service.destroy
+        end
+      end
+    end
+    if (options[:all] || options[:providers])
+      providers = self.providers
+      providers.each do |provider|
+        if provider.companies_provided.count == 1 && provider.companies_provided == [self]
+          provider.destroy
+        end
+      end
+    end
+    # KILLIAN - can't get this to work
+    # if (options[:all] || options[:owner])
+    #   if self.owner && self.owner.companies_owned.count == 1
+    #     self.owner.destroy
+    #   end
+    # end
+    super()
+  end
+  
   def self.customer_role
     Badges::Role.find_by_name('company customer')
   end
@@ -168,4 +194,5 @@ class Company < ActiveRecord::Base
       Company.decrement_counter(:work_services_count, self.id)
     end
   end
+  
 end
