@@ -568,8 +568,8 @@ class LocationTest < ActiveSupport::TestCase
       
       should_change("Location.count", :by => -1) { Location.count }
       should_change("Company.count", :by => -1) { Company.count }
-      should_not_change "PhoneNumber.count"
-      should_not_change "LocationSource.count"
+      should_not_change("PhoneNumber.count") { PhoneNumber.count }
+      should_not_change("LocationSource.count") { LocationSource.count }
       
       should "add tags to location1" do
         assert_equal ["tag1", "tag2"], @location1.company.tag_list

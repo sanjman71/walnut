@@ -13,7 +13,7 @@ class TagGroupTest < ActiveSupport::TestCase
         @tagg = TagGroup.create(:name => "fashion")
       end
 
-      should_change "TagGroup.count"
+      should_change("TagGroup.count") { TagGroup.count }
     
       should "have name Fashion" do
         assert_equal 'Fashion', @tagg.name
@@ -30,7 +30,7 @@ class TagGroupTest < ActiveSupport::TestCase
         @tagg = TagGroup.create(:name => "LAW - criminal")
       end
 
-      should_change "TagGroup.count"
+      should_change("TagGroup.count") { TagGroup.count }
 
       should "have name Law - Criminal" do
         assert_equal 'Law - Criminal', @tagg.name
@@ -42,7 +42,7 @@ class TagGroupTest < ActiveSupport::TestCase
         @tagg = TagGroup.create(:name => "Pizza and beer")
       end
       
-      should_change "TagGroup.count"
+      should_change("TagGroup.count") { TagGroup.count }
 
       should "have name Pizza and Beer" do
         assert_equal 'Pizza and Beer', @tagg.name
@@ -54,7 +54,7 @@ class TagGroupTest < ActiveSupport::TestCase
         @tagg = TagGroup.create(:name => "fashion")
       end
 
-      should_change "TagGroup.count"
+      should_change("TagGroup.count") { TagGroup.count }
 
       should "have no tags" do
         assert_equal [], @tagg.tag_list
@@ -67,7 +67,7 @@ class TagGroupTest < ActiveSupport::TestCase
         @tagg = TagGroup.create(:name => "fashion", :tags => ["JEANS", "Diesel"])
       end
 
-      should_change "TagGroup.count"
+      should_change("TagGroup.count") { TagGroup.count }
     
       should "have lowercase tag list" do
         assert_equal ["diesel", "jeans"], @tagg.tag_list
@@ -80,7 +80,7 @@ class TagGroupTest < ActiveSupport::TestCase
       @tagg = TagGroup.create(:name => "fashion", :tags => "jeans, tag is too long")
     end
 
-    should_change "TagGroup.count"
+    should_change("TagGroup.count") { TagGroup.count }
     
     should "have tag list ['jeans']" do
       assert_equal ['jeans'], @tagg.tag_list
@@ -93,7 +93,7 @@ class TagGroupTest < ActiveSupport::TestCase
       @tagg = TagGroup.create(:name => "fashion", :tags => "jeans, diesel")
     end
 
-    should_change "TagGroup.count"
+    should_change("TagGroup.count") { TagGroup.count }
     
     should "have tag list ['diesel', 'jeans']" do
       assert_equal ['diesel', 'jeans'], @tagg.tag_list

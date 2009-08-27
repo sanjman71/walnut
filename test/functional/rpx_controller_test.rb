@@ -50,7 +50,7 @@ class RpxControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to("root path") { "/" }
       
-      should_not_change "User.count"
+      should_not_change("User.count") { User.count }
 
       should_set_the_flash_to /This feature is coming soon/i
     end

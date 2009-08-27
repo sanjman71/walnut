@@ -43,7 +43,7 @@ class NeighborhoodTest < ActiveSupport::TestCase
           @suburbia.reload
         end
         
-        should_not_change "Neighborhood.count"
+        should_not_change("Neighborhood.count") { Neighborhood.count }
 
         should "decrement chicago neighborhoods count" do
           assert_equal 0, @chicago.neighborhoods_count
