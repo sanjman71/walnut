@@ -8,6 +8,22 @@ class PromotionTest < ActiveSupport::TestCase
   should_validate_presence_of     :discount
   should_validate_presence_of     :units
 
+  context "create with dollars" do
+    setup do
+      @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'dollars')
+    end
+
+    should_change("Promotion.count", :by => 1) { Promotion.count }
+    
+    should "change units to cents" do
+      assert_equal 'cents', @promotion.units
+    end
+    
+    should "multiply discount by 100" do
+      assert_equal 500.0, @promotion.discount
+    end
+  end
+
   context "uses remaining" do
     context "not empty" do
       setup do
@@ -147,50 +163,52 @@ class PromotionTest < ActiveSupport::TestCase
     end
   end
   
-  context "dollar discount" do
+  context "cents discount" do
     context "with no minimum" do
       context "and discount < price" do
         setup do
-          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 2.5, :units => 'dollars')
-          @prices     = @promotion.calculate(5)
+          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 250, :units => 'cents')
+          @prices     = @promotion.calculate(500)
         end
 
-        should "calculate discount" do
-          assert_equal [5.0, 2.5, 2.5], @prices
+        should "allow discount" do
+          assert_equal [500.0, 250.0, 250.0], @prices
         end
       end
 
       context "and discount = price" do
         setup do
-          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 5.0, :units => 'dollars')
-          @prices     = @promotion.calculate(5)
+          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 500, :units => 'cents')
+          @prices     = @promotion.calculate(500)
         end
 
-        should "calculate discount" do
-          assert_equal [5.0, 5.0, 0.0], @prices
+        should "allow discount" do
+          assert_equal [500.0, 500.0, 0.0], @prices
         end
       end
 
       context "and discount > price" do
         setup do
-          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 2.5, :units => 'dollars')
-          @prices     = @promotion.calculate(2)
+          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 250, :units => 'cents')
+          @prices     = @promotion.calculate(200)
         end
 
-        should "calculate discount" do
-          assert_equal [2.0, 2.0, 0], @prices
+        should "allow discount" do
+          assert_equal [200.0, 200.0, 0], @prices
         end
       end
     end
 
     context "with minimum" do
-      setup do
-        @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 2.5, :units => 'dollars', :minimum => 10)
-        @prices     = @promotion.calculate(5)
-      end
+      context "and price < minimum" do
+        setup do
+          @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 250, :units => 'cents', :minimum => 1000)
+          @prices     = @promotion.calculate(500)
+        end
 
-      should "calculate discount" do
-        assert_equal [5.0, 0, 5.0], @prices
+        should "not allow discount" do
+          assert_equal [500.0, 0, 500.0], @prices
+        end
       end
     end
   end

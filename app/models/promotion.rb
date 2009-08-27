@@ -3,6 +3,7 @@ class PromotionEmptyError < StandardError; end
 
 class Promotion < ActiveRecord::Base
   validates_presence_of     :code, :uses_allowed, :discount, :units
+  validates_inclusion_of    :units, :in => %w(cents percent)
   has_many                  :promotion_redemptions, :dependent => :destroy
 
   def before_validation_on_create
@@ -10,9 +11,15 @@ class Promotion < ActiveRecord::Base
       self.minimum = 0.0
     end
     
+    if self.units == 'dollars'
+      # convert dollars to cents
+      self.units    = 'cents'
+      self.discount = self.discount * 100.0
+    end
+
     self.redemptions_count = 0
   end
-  
+
   def remaining
     self.uses_allowed - self.redemptions_count
   end
@@ -20,7 +27,7 @@ class Promotion < ActiveRecord::Base
   def calculate(price)
     # use floats
     price_float = price.to_f
-    
+
     # check minimum
     unless self.minimum.blank?
       if price_float < self.minimum
@@ -28,13 +35,13 @@ class Promotion < ActiveRecord::Base
         return [price_float, 0, price_float]
       end
     end
-    
+
     case self.units
     when 'percent'
       # caculate percentage discount
       price_subtract  = price_float * self.discount/100
-    when 'dollars'
-      # calculate dollars discount
+    when 'cents'
+      # calculate cents discount
       price_subtract  = (price_float > self.discount) ? price_float - self.discount : price_float
     else
       price_subtract  = 0

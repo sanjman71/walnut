@@ -7,6 +7,11 @@
 3. http://articles.slicehost.com/2008/7/8/ubuntu-hardy-installing-mysql-with-rails-and-php-options
 4. http://articles.slicehost.com/2008/4/30/ubuntu-hardy-ruby-on-rails
 
+# Libraries
+
+1. sudo aptitude install libcurl4-gnutls-dev  # libcurl, used by curb
+2. sudo aptitude install libxslt-dev          # used by feedzirra
+
 # Passenger + Nginx
 
 1. http://blog.phusion.nl/2009/04/16/phusions-one-year-anniversary-gift-phusion-passenger-220/
