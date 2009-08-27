@@ -6,7 +6,7 @@ class Subscription < ActiveRecord::Base
   belongs_to              :user
   belongs_to              :company
   belongs_to              :plan
-  has_many                :payments
+  has_many                :payments, :dependent => :nullify
   
   after_create            :after_subcription_create
   

@@ -10,7 +10,7 @@ class CountryTest < ActiveSupport::TestCase
         @us = Country.create(:name => "United States", :code => "US")
       end
       
-      should_change "Country.count", :by => 1
+      should_change("Country.count", :by => 1) { Country.count }
   
       should "have to_s method return United States" do
         assert_equal "United States", @us.to_s

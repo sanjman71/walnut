@@ -15,7 +15,7 @@ class StateTest < ActiveSupport::TestCase
         @il = State.create(:name => "Illinois", :code => "IL", :country => @us)
       end
       
-      should_change "State.count", :by => 1
+      should_change("State.count", :by => 1) { State.count }
   
       should "have to_s method return Illinois" do
         assert_equal "Illinois", @il.to_s

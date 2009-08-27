@@ -22,13 +22,14 @@ class Company < ActiveRecord::Base
 
   # validates_presence_of     :time_zone
 
-  has_many                  :company_locations
+  # We don't destroy the locations associated with a company if it's destroyed as they might be associated with another.
+  has_many                  :company_locations, :dependent => :destroy
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location
 
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
 
-  has_many                  :company_tag_groups
+  has_many                  :company_tag_groups, :dependent => :destroy
   has_many                  :tag_groups, :through => :company_tag_groups
 
   has_many                  :states, :through => :locations
@@ -39,23 +40,23 @@ class Company < ActiveRecord::Base
   belongs_to                :chain, :counter_cache => true
 
   # Appointment-related info
-  has_many                  :company_providers
+  has_many                  :company_providers, :dependent => :destroy
   has_many_polymorphs       :providers, :from => [:users, :resources], :through => :company_providers
-  has_many                  :company_services
+  has_many                  :company_services, :dependent => :destroy
   has_many                  :services, :through => :company_services, :after_add => :after_add_service, :after_remove => :after_remove_service
-  has_many                  :products
-  has_many                  :appointments
+  has_many                  :products, :dependent => :destroy
+  has_many                  :appointments, :dependent => :destroy
   has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id
   has_many                  :customers, :through => :appointments, :uniq => true
-  has_many                  :invitations
+  has_many                  :invitations, :dependent => :destroy
 
   # Accounting info
-  has_one                   :subscription
+  has_one                   :subscription, :dependent => :destroy
   has_one                   :owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
 
   # LogEntry log
-  has_many                  :log_entries
+  has_many                  :log_entries, :dependent => :destroy
 
   # Logo
   has_one                   :logo, :dependent => :destroy
@@ -80,6 +81,32 @@ class Company < ActiveRecord::Base
   # find all subscriptions with billing errors
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
+  def destroy(options = {})
+    if (options[:all] || options[:services])
+      services = self.services
+      services.each do |service|
+        if service.companies.count == 1 && service.companies == [self]
+          service.destroy
+        end
+      end
+    end
+    if (options[:all] || options[:providers])
+      providers = self.providers
+      providers.each do |provider|
+        if provider.companies_provided.count == 1 && provider.companies_provided == [self]
+          provider.destroy
+        end
+      end
+    end
+    # KILLIAN - can't get this to work
+    # if (options[:all] || options[:owner])
+    #   if self.owner && self.owner.companies_owned.count == 1
+    #     self.owner.destroy
+    #   end
+    # end
+    super()
+  end
+  
   def self.customer_role
     Badges::Role.find_by_name('company customer')
   end
@@ -167,4 +194,5 @@ class Company < ActiveRecord::Base
       Company.decrement_counter(:work_services_count, self.id)
     end
   end
+  
 end

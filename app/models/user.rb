@@ -26,6 +26,12 @@ class User < ActiveRecord::Base
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
 
+  has_many                  :subscriptions, :dependent => :destroy
+  has_many                  :companies_owned, :through => :subscriptions, :source => :company
+  
+  has_many                  :company_providers, :as => :provider, :dependent => :destroy
+  has_many                  :companies_provided, :through => :company_providers, :source => :company
+
   validates_presence_of       :cal_dav_token
   validates_length_of         :cal_dav_token,   :within => 10..150
   validates_uniqueness_of     :cal_dav_token

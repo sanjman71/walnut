@@ -12,7 +12,7 @@ class MessageTest < ActiveSupport::TestCase
       @message  = Message.create(:sender => @sender, :subject => "Message subject", :body => "Message body")
     end
 
-    should_change "Message.count", :by => 1
+    should_change("Message.count", :by => 1) { Message.count }
 
     context "add message recipient" do
       setup do
@@ -20,7 +20,7 @@ class MessageTest < ActiveSupport::TestCase
         @message_recipient  = @message.message_recipients.create(:messagable => @recipient, :protocol => "local")
       end
 
-      should_change "MessageRecipient.count", :by => 1
+      should_change("MessageRecipient.count", :by => 1) { MessageRecipient.count }
 
       should "start in 'created' state" do
         @message.reload
@@ -69,7 +69,7 @@ class MessageTest < ActiveSupport::TestCase
         @message.send!
       end
 
-      should_change "MessageRecipient.count", :by => 1
+      should_change("MessageRecipient.count", :by => 1) { MessageRecipient.count }
 
       should "delete message when recipient is deleted" do
         @message_recipient1.destroy
@@ -86,7 +86,7 @@ class MessageTest < ActiveSupport::TestCase
         @message.send!
       end
 
-      should_change "MessageRecipient.count", :by => 2
+      should_change("MessageRecipient.count", :by => 2) { MessageRecipient.count }
 
       should "not delete message when recipient is deleted" do
         @message_recipient1.destroy
@@ -115,8 +115,8 @@ class MessageTest < ActiveSupport::TestCase
         @message_reply  = @message.reply(:sender => @user, :subject => "Reply to your message", :body => "Reply body")
       end
 
-      should_change "Message.count", :by => 1
-      should_change "MessageThread.count", :by => 2
+      should_change("Message.count", :by => 1) { Message.count }
+      should_change("MessageThread.count", :by => 2) { MessageThread.count }
 
       should "set reply thread == original message thread" do
         assert_equal @message_reply.message_thread.thread, @message.message_thread.thread
@@ -131,8 +131,8 @@ class MessageTest < ActiveSupport::TestCase
           @message_reply2 = @message.reply(:sender => @user, :subject => "Reply again", :body => "Reply body")
         end
 
-        should_change "Message.count", :by => 1
-        should_change "MessageThread.count", :by => 1
+        should_change("Message.count", :by => 1) { Message.count }
+        should_change("MessageThread.count", :by => 1) { MessageThread.count }
 
         should "have 3 messages in thread" do
           assert_equal 3, MessageThread.with_thread(@message.message_thread.thread).count

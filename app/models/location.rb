@@ -7,21 +7,22 @@ class Location < ActiveRecord::Base
   belongs_to              :city, :counter_cache => :locations_count
   belongs_to              :zip, :counter_cache => :locations_count
   belongs_to              :timezone
-  has_many                :location_neighborhoods
+  has_many                :location_neighborhoods, :dependent => :destroy
   has_many                :neighborhoods, :through => :location_neighborhoods, :after_add => :after_add_neighborhood, :before_remove => :before_remove_neighborhood
-  has_many                :company_locations
+  has_many                :company_locations, :dependent => :destroy
   has_many                :companies, :through => :company_locations
   has_one                 :company, :through => :company_locations, :order => 'id asc'
   has_many                :phone_numbers, :as => :callable, :dependent => :destroy
   has_one                 :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
-  has_one                 :event_venue
-  has_many                :location_neighbors
+  has_one                 :event_venue, :dependent => :destroy
+  has_many                :location_neighbors, :dependent => :destroy
   has_many                :neighbors, :through => :location_neighbors
   
-  has_many                :location_sources
+  has_many                :location_sources, :dependent => :destroy
   has_many                :sources, :through => :location_sources
 
-  has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment
+  # When we delete a location, we don't delete all it's appointments - we nullify them, so they don't refer to any location.
+  has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment, :dependent => :nullify
   
   # Note: the after_save_callback is deprecated, but its left here commented out for now for documentation purposes
   # after_save              :after_save_callback

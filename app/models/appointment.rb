@@ -13,9 +13,11 @@ class Appointment < ActiveRecord::Base
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
   # Relationships between free and work appointments, and between appointments and capacity
-  has_many                    :work_appointments, :class_name => "Appointment", :foreign_key => :free_appointment_id # Free appointments have 
+  has_many                    :work_appointments, :class_name => "Appointment", :foreign_key => :free_appointment_id # Free appointments have associated work appts
   belongs_to                  :free_appointment, :class_name => "Appointment"       # Work appointments refer to their corresponding free appointment
-  has_many                    :capacity_slots, :foreign_key => :free_appointment_id # free appointments refer to their corresponding capacity_slots
+
+  # free appointments refer to their corresponding capacity_slots
+  has_many                    :capacity_slots, :foreign_key => :free_appointment_id, :dependent => :destroy
 
   # Recurrences - an appointment might have a recurrence rule
   # If so, the appointment may have multiple recurrence instances

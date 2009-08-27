@@ -14,7 +14,7 @@ class PromotionTest < ActiveSupport::TestCase
         @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'percent')
       end
 
-      should_change "Promotion.count", :by => 1
+      should_change("Promotion.count", :by => 1) { Promotion.count }
 
       should "have remaining == uses_allowed" do
         assert_equal 5, @promotion.remaining
@@ -34,7 +34,7 @@ class PromotionTest < ActiveSupport::TestCase
         @promotion = Promotion.create(:code => "abc", :uses_allowed => 0, :discount => 5, :units => 'percent')
       end
 
-      should_change "Promotion.count", :by => 1
+      should_change("Promotion.count", :by => 1) { Promotion.count }
 
       should "have remaining == uses_allowed" do
         assert_equal 0, @promotion.remaining
@@ -56,7 +56,7 @@ class PromotionTest < ActiveSupport::TestCase
         @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'percent')
       end
 
-      should_change "Promotion.count", :by => 1
+      should_change("Promotion.count", :by => 1) { Promotion.count }
 
       should "have no expiration" do
         assert_nil @promotion.expires_at
@@ -76,7 +76,7 @@ class PromotionTest < ActiveSupport::TestCase
         @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'percent', :expires_at => Time.now + 3.days)
       end
 
-      should_change "Promotion.count", :by => 1
+      should_change("Promotion.count", :by => 1) { Promotion.count }
 
       should "have an expiration" do
         assert_not_nil @promotion.expires_at
@@ -96,7 +96,7 @@ class PromotionTest < ActiveSupport::TestCase
         @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'percent', :expires_at => Time.now - 3.days)
       end
 
-      should_change "Promotion.count", :by => 1
+      should_change("Promotion.count", :by => 1) { Promotion.count }
 
       should "have an expiration" do
         assert_not_nil @promotion.expires_at
@@ -201,7 +201,7 @@ class PromotionTest < ActiveSupport::TestCase
       @promotion  = Promotion.create(:code => 'abc', :uses_allowed => 5,  :discount => 10, :units => 'percent', :minimum => 5)
     end
 
-    should_change "Promotion.count", :by => 1
+    should_change("Promotion.count", :by => 1) { Promotion.count }
 
     context "redeem" do
       setup do
@@ -209,7 +209,7 @@ class PromotionTest < ActiveSupport::TestCase
         @promotion.reload
       end
 
-      should_change "PromotionRedemption.count", :by => 1
+      should_change("PromotionRedemption.count", :by => 1) { PromotionRedemption.count }
 
       should "increment promotion redemptions_count" do
         assert_equal 1, @promotion.redemptions_count

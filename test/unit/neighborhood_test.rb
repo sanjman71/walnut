@@ -20,7 +20,7 @@ class NeighborhoodTest < ActiveSupport::TestCase
         @chicago.reload
       end
       
-      should_change "Neighborhood.count", :by => 1
+      should_change("Neighborhood.count", :by => 1) { Neighborhood.count }
       
       should "have to_param method return river-north" do
         assert_equal "river-north", @river_north.to_param
