@@ -32,11 +32,11 @@ class Subscription < ActiveRecord::Base
   end
 
   aasm_event :active do
-    transitions :to => :active, :from => [:authorized, :active]
+    transitions :to => :active, :from => [:authorized, :active, :frozen]
   end
 
   aasm_event :frozen do
-    transitions :to => :frozen, :from => [:authorized, :active, :frozen]
+    transitions :to => :frozen, :from => [:initialized, :authorized, :active, :frozen]
   end
   # END acts_as_state_machine
 

@@ -55,6 +55,9 @@ class Company < ActiveRecord::Base
   has_one                   :owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
 
+  # Delegate state to subscription
+  delegate                  :state, :to => '(subscription or return nil)'
+
   # LogEntry log
   has_many                  :log_entries, :dependent => :destroy
 
