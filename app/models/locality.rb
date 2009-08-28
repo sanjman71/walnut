@@ -55,8 +55,9 @@ class Locality
     return nil
   end
   
-  # validate the specified city or zip
-  def self.validate(state, type, name)
+  # check the specified city/zip in the specified state
+  # throws a LocalityError exception if the city/zip does not exist in the specified state
+  def self.check(state, type, name)
     raise ArgumentError, "state required" if state.blank? or !state.is_a?(State)
     
     case type.to_s.titleize

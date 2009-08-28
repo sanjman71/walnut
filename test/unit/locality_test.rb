@@ -90,16 +90,29 @@ class LocalityTest < ActiveSupport::TestCase
     end
   end
 
-  context "validate city" do
+  context "check city" do
     context "mis-spelled city la grange pk" do
       setup do
         @il         = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
         @la_grange  = Factory(:city, :name => "La Grange Park", :state => @il)
-        @object     = Locality.validate(@il, 'city', "La Grange Pk")
+        @object     = Locality.check(@il, 'city', "La Grange Pk")
       end
 
       should "normalize and validate to la grange city object" do
         assert_equal @la_grange, @object
+      end
+    end
+    
+    context "wrong city in state" do
+      setup do
+        @il         = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
+        @ca         = Factory(:state, :name => "California", :code => "CA", :country => @us)
+        @chicago    = Factory(:city, :name => "Chicago", :state => @ca)
+        @exception  = assert_raise(LocalityError) { Locality.check(@ca, 'city', "Chicago") }
+      end
+
+      should "thrown an invalid city exception" do
+        assert_match(/invalid city/i, @exception.message)
       end
     end
   end
@@ -124,7 +137,7 @@ class LocalityTest < ActiveSupport::TestCase
         @object   = Locality.resolve("28212")
       end
 
-      should "resolve to north carlonia zip object" do
+      should "resolve to north carolina zip object" do
         assert_equal @zip, @object
       end
     end
