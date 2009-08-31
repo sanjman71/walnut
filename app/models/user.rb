@@ -21,8 +21,10 @@ class User < ActiveRecord::Base
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
+  accepts_nested_attributes_for :email_addresses, :allow_destroy => true
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
+  accepts_nested_attributes_for :phone_numbers, :allow_destroy => true
 
   has_many                  :subscriptions, :dependent => :destroy
   has_many                  :ownerships, :through => :subscriptions, :source => :company
@@ -50,7 +52,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :email, :name, :password, :password_confirmation, :identifier
+  attr_accessible :email, :name, :password, :password_confirmation, :identifier, :email_addresses_attributes, :phone_numbers_attributes
 
   named_scope               :with_emails, lambda { |s| { :conditions => ["email_addresses_count > 0"] }}
   named_scope               :with_phones, lambda { |s| { :conditions => ["phone_numbers_count > 0"] }}

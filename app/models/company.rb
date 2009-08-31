@@ -45,7 +45,7 @@ class Company < ActiveRecord::Base
                             :after_add => :after_add_provider, :after_remove => :after_remove_provider
   has_many                  :resource_providers, :through => :company_providers, :source => :provider, :source_type => 'Resource',
                             :after_add => :after_add_provider, :after_remove => :after_remove_provider
-  has_many                  :services, :after_add => :after_add_service, :after_remove => :after_remove_service, :dependent => :destroy
+  has_many                  :services, :dependent => :destroy, :after_add => :after_add_service, :after_remove => :after_remove_service
   has_many                  :products, :dependent => :destroy
   has_many                  :appointments, :dependent => :destroy
   has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id
@@ -111,7 +111,7 @@ class Company < ActiveRecord::Base
   
   # return the company free service
   def free_service
-    @free_service ||= (services.free.first || services.create(:name => Service::AVAILABLE, :mark_as => "free", :price => 0.00))
+    @free_service ||= (self.services.free.first || self.services.create(:name => Service::AVAILABLE, :mark_as => "free", :price => 0.00))
   end
   
   # check if the company plan allows more locations

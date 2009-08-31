@@ -140,6 +140,6 @@ class Subscription < ActiveRecord::Base
 
   def after_subcription_create
     # create company free service
-    self.company.free_service
+    # self.company.free_service # this doesn't work as a callback, but the service is created the first time it is asked for
   end
 end
