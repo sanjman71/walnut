@@ -32,7 +32,7 @@ class Subscription < ActiveRecord::Base
   end
 
   aasm_event :active do
-    transitions :to => :active, :from => [:authorized, :active, :frozen]
+    transitions :to => :active, :from => [:initialized, :authorized, :active, :frozen]
   end
 
   aasm_event :frozen do

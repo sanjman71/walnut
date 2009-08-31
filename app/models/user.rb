@@ -19,18 +19,16 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 6..100 #r@a.wk
   validates_uniqueness_of   :email,    :case_sensitive => false
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
-  
-  before_validation         :format_phone
-  belongs_to                :mobile_carrier
 
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
+  has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
 
   has_many                  :subscriptions, :dependent => :destroy
-  has_many                  :companies_owned, :through => :subscriptions, :source => :company
+  has_many                  :ownerships, :through => :subscriptions, :source => :company
   
   has_many                  :company_providers, :as => :provider, :dependent => :destroy
-  has_many                  :companies_provided, :through => :company_providers, :source => :company
+  has_many                  :companies, :through => :company_providers, :source => :company
 
   validates_presence_of       :cal_dav_token
   validates_length_of         :cal_dav_token,   :within => 10..150
@@ -52,7 +50,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id, :identifier
+  attr_accessible :email, :name, :password, :password_confirmation, :identifier
 
   named_scope               :with_emails, lambda { |s| { :conditions => ["email_addresses_count > 0"] }}
   named_scope               :with_phones, lambda { |s| { :conditions => ["phone_numbers_count > 0"] }}
@@ -79,11 +77,6 @@ class User < ActiveRecord::Base
   
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
-  end
-
-  # returns true if the user has a valid sms address
-  def sms?
-    !mobile_carrier.blank?
   end
 
   # the special user 'anyone'

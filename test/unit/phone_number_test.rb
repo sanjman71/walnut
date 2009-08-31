@@ -36,11 +36,29 @@ class PhoneNumberTest < ActiveSupport::TestCase
         @phone = @user.phone_numbers.create(:name => "Work", :address => "5559999999")
       end
 
-      should_change("PhoneNumber.count") { PhoneNumber.count }
+      should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
 
       should "increment user.phone_numbers_count" do
         @user.reload
         assert_equal 1, @user.phone_numbers_count
+      end
+    end
+    
+    context "with callable and number with extra chars" do
+      setup do
+        @user  = Factory(:user)
+        @phone = @user.phone_numbers.create(:name => "Work", :address => "555-999-9999")
+      end
+
+      should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+      should "increment user.phone_numbers_count" do
+        @user.reload
+        assert_equal 1, @user.phone_numbers_count
+      end
+
+      should "normalize phone number" do
+        assert_equal "5559999999", @phone.address
       end
     end
   end

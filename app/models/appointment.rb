@@ -325,7 +325,7 @@ class Appointment < ActiveRecord::Base
     end
     
     if self.provider and self.company
-      # provider must belong to this same company
+      # provider must belong to this company
       if !self.company.has_provider?(self.provider)
         errors.add_to_base("Provider is not associated to this company")
       end
@@ -333,7 +333,7 @@ class Appointment < ActiveRecord::Base
     
     if self.service
       # service must be provided by this company
-      if !self.service.companies.include?(self.company)
+      if !self.service.company == self.company
         errors.add_to_base("Service is not offered by this company")
       end
     end

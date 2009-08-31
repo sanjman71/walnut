@@ -41,9 +41,11 @@ class Company < ActiveRecord::Base
 
   # Appointment-related info
   has_many                  :company_providers, :dependent => :destroy
-  has_many_polymorphs       :providers, :from => [:users, :resources], :through => :company_providers
-  has_many                  :company_services, :dependent => :destroy
-  has_many                  :services, :through => :company_services, :after_add => :after_add_service, :after_remove => :after_remove_service
+  has_many                  :user_providers, :through => :company_providers, :source => :provider, :source_type => 'User',
+                            :after_add => :after_add_provider, :after_remove => :after_remove_provider
+  has_many                  :resource_providers, :through => :company_providers, :source => :provider, :source_type => 'Resource',
+                            :after_add => :after_add_provider, :after_remove => :after_remove_provider
+  has_many                  :services, :after_add => :after_add_service, :after_remove => :after_remove_service, :dependent => :destroy
   has_many                  :products, :dependent => :destroy
   has_many                  :appointments, :dependent => :destroy
   has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id
@@ -84,34 +86,13 @@ class Company < ActiveRecord::Base
   # find all subscriptions with billing errors
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
-  def destroy(options = {})
-    if (options[:all] || options[:services])
-      services = self.services
-      services.each do |service|
-        if service.companies.count == 1 && service.companies == [self]
-          service.destroy
-        end
-      end
-    end
-    if (options[:all] || options[:providers])
-      providers = self.providers
-      providers.each do |provider|
-        if provider.companies_provided.count == 1 && provider.companies_provided == [self]
-          provider.destroy
-        end
-      end
-    end
-    # KILLIAN - can't get this to work
-    # if (options[:all] || options[:owner])
-    #   if self.owner && self.owner.companies_owned.count == 1
-    #     self.owner.destroy
-    #   end
-    # end
-    super()
-  end
-  
   def self.customer_role
     Badges::Role.find_by_name('company customer')
+  end
+
+  # find all polymorphic providers through the company_providers collection
+  def providers
+    self.company_providers(:include => :provider).collect(&:provider)
   end
 
   def primary_location
@@ -125,8 +106,7 @@ class Company < ActiveRecord::Base
   
   # return true if the company contains the specified provider
   def has_provider?(object)
-    # can't use providers.include?(object) here, not sure why but possibly because its polymorphic
-    providers.any? { |o| o == object }
+    self.user_providers.include?(object)
   end
   
   # return the company free service
@@ -193,8 +173,26 @@ class Company < ActiveRecord::Base
   def after_remove_service(service)
     Company.decrement_counter(:services_count, self.id)
     if service.mark_as == Appointment::WORK
-      # increment company work services count
+      # decrement company work services count
       Company.decrement_counter(:work_services_count, self.id)
+    end
+  end
+  
+  def after_add_provider(provider)
+    if provider.respond_to?(:has_role?) and !provider.has_role?('company provider', self)
+      # assign company roles to provider
+      provider.grant_role('company provider', self)
+    end
+  end
+
+  def after_remove_provider(provider)
+    # the decrement counter cache doesn't work, so decrement here
+    Company.decrement_counter(:providers_count, self.id) if provider
+    
+    # check provider to see if they provide any services to this company
+    if provider.respond_to?(:has_role?) and provider.has_role?('company provider', self) and !provider.companies.include?(self)
+      # revoke company roles from provider
+      provider.revoke_role('company provider', self)
     end
   end
   

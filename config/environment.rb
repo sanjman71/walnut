@@ -28,11 +28,13 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem "curb" # curl api; adding to vendor/gems causes errors
   config.gem "eventfulapi", :lib => false
+  config.gem "fastercsv"
   config.gem "geokit" # required by geokit-rails plugin
   config.gem "haml", :version => '~> 2.2.2'
   config.gem "httparty" # used by google weather plugin
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   config.gem "json", :version => '~> 1.1.7'
+  config.gem "mime-types", :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'ri_cal', :version => '~> 0.8.1'
   config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"

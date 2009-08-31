@@ -72,7 +72,6 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 0, Company.count
         assert_equal 0, Appointment.count
         assert_equal 0, Subscription.count
-        assert_equal 0, CompanyService.count
         assert_equal 0, CompanyProvider.count
         assert_equal 0, CapacitySlot.count
       end
@@ -235,7 +234,6 @@ class AppointmentTest < ActiveSupport::TestCase
           assert_equal 0, Company.count
           assert_equal 0, Appointment.count
           assert_equal 0, Subscription.count
-          assert_equal 0, CompanyService.count
           assert_equal 0, CompanyProvider.count
           assert_equal 0, CapacitySlot.count
         end
@@ -326,7 +324,6 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 0, Company.count
         assert_equal 0, Appointment.count
         assert_equal 0, Subscription.count
-        assert_equal 0, CompanyService.count
         assert_equal 0, CompanyProvider.count
         assert_equal 0, CapacitySlot.count
       end
