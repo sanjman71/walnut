@@ -34,7 +34,7 @@ class Appointment < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
-  after_create                :add_customer_role, :make_uid, :make_capacity_slot
+  after_create                :add_customer_role, :make_uid, :make_capacity_slot, :expand_recurrence_after_create, :send_confirmation
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -702,6 +702,12 @@ class Appointment < ActiveRecord::Base
     end
   end
 
+  # expand recurrence appointments by some default value
+  def expand_recurrence_after_create
+    return if recur_rule.blank?
+    self.send_later(:expand_recurrence, self.end_at, self.start_at + 2.weeks - 1.hour)
+  end
+
   def update_recurrence
     # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
     if (!self.recur_rule.blank?) && (self.recur_parent.nil?) && (!self.recur_expanded_to.nil?) && (self.changed?)
@@ -720,4 +726,10 @@ class Appointment < ActiveRecord::Base
     end
   end
 
+  def send_confirmation
+    case self.mark_as
+    when WORK
+      Delayed::Job.enqueue(AppointmentJob.new(:id => self.id))
+    end
+  end
 end
