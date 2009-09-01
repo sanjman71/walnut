@@ -48,7 +48,7 @@ class Service < ActiveRecord::Base
 
   # return true if the service is provided by the specfied provider
   def provided_by?(o)
-    self.user_providers.include?(o)
+    self.providers.include?(o)
   end
 
   def free?

@@ -106,7 +106,7 @@ class Company < ActiveRecord::Base
   
   # return true if the company contains the specified provider
   def has_provider?(object)
-    self.user_providers.include?(object)
+    self.providers.include?(object)
   end
   
   # return the company free service
