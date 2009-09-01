@@ -41,6 +41,11 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should_change("User.count", :by => 1) { User.count }
+      should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+      should "add to user.email_addresses" do
+        assert_equal ["user1@jarna.com"], @user1.email_addresses.collect(&:address)
+      end
 
       context "create another user" do
         setup do
@@ -48,6 +53,11 @@ class UserTest < ActiveSupport::TestCase
         end
 
         should_change("User.count", :by => 1) { User.count }
+        should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+        should "add to user.email_addresses" do
+          assert_equal ["user2@jarna.com"], @user2.email_addresses.collect(&:address)
+        end
       end
     end
 
@@ -57,6 +67,11 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should_change("User.count", :by => 1) { User.count }
+      should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+      should "add to user.email_addresses" do
+        assert_equal ["user1@jarna.com"], @user1.email_addresses.collect(&:address)
+      end
     end
     
   end

@@ -34,7 +34,8 @@ class Appointment < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free work wait)
 
   before_save                 :make_confirmation_code
-  after_create                :add_customer_role, :make_uid, :make_capacity_slot, :expand_recurrence_after_create, :send_confirmation
+  after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
+                              :expand_recurrence_after_create, :send_confirmation
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -681,10 +682,23 @@ class Appointment < ActiveRecord::Base
     end
   end
 
-  # add the 'company customer' role to a work/wait appointment's customer
-  def add_customer_role
+  # add 'company customer' role to a work/wait appointment's customer
+  def grant_company_customer_role
     return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
     self.customer.grant_role('company customer', self.company)
+  end
+  
+  # add 'appointment manager' role to work appointments
+  def grant_appointment_manager_role
+    return if ![WORK].include?(self.mark_as)
+
+    if self.customer
+      self.customer.grant_role('appointment manager', self) unless self.customer.has_role?('appointment manager', self)
+    end
+
+    if self.provider
+      self.provider.grant_role('appointment manager', self) unless self.provider.has_role?('appointment manager', self)
+    end
   end
   
   def make_capacity_slot
@@ -729,7 +743,7 @@ class Appointment < ActiveRecord::Base
   def send_confirmation
     case self.mark_as
     when WORK
-      Delayed::Job.enqueue(AppointmentJob.new(:id => self.id))
+      Delayed::Job.enqueue(AppointmentJob.new(:id => self.id, :method => 'send_confirmation'))
     end
   end
 end

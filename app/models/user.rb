@@ -21,6 +21,7 @@ class User < ActiveRecord::Base
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
+  has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
   accepts_nested_attributes_for :email_addresses, :allow_destroy => true
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
@@ -47,7 +48,7 @@ class User < ActiveRecord::Base
                             :include => {:message => :sender}
   has_many                  :inbox, :through => :inbox_deliveries, :source => :message
 
-  after_create              :manage_user_roles
+  after_create              :manage_user_roles, :add_email_address
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
@@ -126,5 +127,11 @@ class User < ActiveRecord::Base
       # grant user the 'admin' role
       self.grant_role('admin')
     end
+  end
+
+  # add email address object
+  def add_email_address
+    return if self.email.blank?
+    self.email_addresses.create(:address => self.email, :priority => 1)
   end
 end
