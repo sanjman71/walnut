@@ -22,10 +22,10 @@ class User < ActiveRecord::Base
 
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
   has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
-  accepts_nested_attributes_for :email_addresses, :allow_destroy => true
+  accepts_nested_attributes_for :email_addresses, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
-  accepts_nested_attributes_for :phone_numbers, :allow_destroy => true
+  accepts_nested_attributes_for :phone_numbers, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
 
   has_many                  :subscriptions, :dependent => :destroy
   has_many                  :ownerships, :through => :subscriptions, :source => :company
@@ -77,7 +77,38 @@ class User < ActiveRecord::Base
     u = find_in_state :first, :active, :conditions => {:email => email} # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
-  
+
+  def self.create_or_reset_with_random_password(email, options={})
+    user      = self.find_by_email(email)
+    password  = options[:password] ? options[:password].to_s : User.generate_password(10)
+
+    if user
+      # reset password
+      user.password = password
+      user.password_confirmation = password
+      user.save
+      # send user password reset
+      Delayed::Job.enqueue(UserJob.new(:id => user.id, :password => password, :method => 'send_password_reset'))
+    else
+      # create user in active state
+      name = options[:name]
+      user = self.create(:name => name, :email => email, :password => password, :password_confirmation => password)
+      user.register!
+      user.activate!
+      # send user account created
+      Delayed::Job.enqueue(UserJob.new(:id => user.id, :password => password, :method => 'send_account_created'))
+    end
+    
+    user
+  end
+
+  def self.generate_password(length=6)
+    chars    = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ23456789'
+    password = ''
+    length.times { |i| password << chars[rand(chars.length)] }
+    password
+  end
+
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
   end

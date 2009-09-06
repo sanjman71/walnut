@@ -8,6 +8,8 @@ class EmailAddress < ActiveRecord::Base
   belongs_to                :emailable, :polymorphic => true, :counter_cache => :email_addresses_count
   
   named_scope               :with_emailable_type, lambda { |t| { :conditions => {:emailable_type => t} } }
+  named_scope               :with_emailable_user, {:conditions => {:emailable_type => 'User'}}
+  named_scope               :with_address, lambda { |t| { :conditions => {:address => t} } }
 
   def before_validation_on_create
     # set default priority

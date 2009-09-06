@@ -654,7 +654,14 @@ class Appointment < ActiveRecord::Base
   
   # customers are required for work and waitlist appointments
   def customer_required?
+    # allow work appointments to have the anyone customer
+    return false if work? and customer_anyone?
     return true if work? or wait?
+    false
+  end
+
+  def customer_anyone?
+    return true if (self.customer and self.customer.id == User.anyone.id)
     false
   end
 
