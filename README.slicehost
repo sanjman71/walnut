@@ -16,6 +16,11 @@
 
 1. http://blog.phusion.nl/2009/04/16/phusions-one-year-anniversary-gift-phusion-passenger-220/
 
+  [ Very useful instructions here:
+    http://github.com/jnstq/rails-nginx-passenger-ubuntu/tree/master
+    If using Ruby EE, need to install some libs, in particular the openssl development headers etc. 
+    sudo aptitude install zlib1g-dev libssl-dev libreadline5-dev ]
+
 # Sphinx
 
 1. sudo wget http://www.sphinxsearch.com/downloads/sphinx-0.9.9-rc2.tar.gz
