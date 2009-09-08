@@ -1,3 +1,4 @@
+require 'serialized_hash'
 class Company < ActiveRecord::Base
   extend ActiveSupport::Memoizable
   
@@ -68,7 +69,8 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :logo, :allow_destroy => true
 
   # Preferences
-  typed_serialize           :preferences, Hash
+  # typed_serialize           :preferences, Hash, {:time_horizon => 28}
+  serialized_hash           :preferences, {:time_horizon => 28}
 
   acts_as_taggable_on       :tags
   
