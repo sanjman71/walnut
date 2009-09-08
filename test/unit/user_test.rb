@@ -3,29 +3,10 @@ require 'test/factories'
 
 class UserTest < ActiveSupport::TestCase
 
-  # context "create user with extra phone characters" do
-  #   setup do
-  #     @user = User.create(:name => "User 1", :email => "user1@jarna.com", 
-  #                         :password => "secret", :password_confirmation => "secret", :phone => "(650) 387-6818")
-  #   end
-  #   
-  #   should_change("User.count", :by => 1) { User.count }
-  # 
-  #   should "remove non-digits from phone" do
-  #     assert_equal "6503876818", @user.phone
-  #   end
-  #   
-  #   should "remove non-digits from phone after an update" do
-  #     @user.update_attributes(:phone => "650-387-6818")
-  #     @user.reload
-  #     assert_equal "6503876818", @user.phone
-  #   end
-  # end
-  
   context "create user" do
-    context "without a password or identifier" do
+    context "without a password or rpx" do
       setup do
-        @user1 = User.create(:name => "User 1", :email => "user1@jarna.com")
+        @user1 = User.create(:name => "User 1")
       end
 
       should_not_change("User.count") { User.count }
@@ -35,42 +16,91 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    context "with a password" do
+    context "with a password and email" do
       setup do
-        @user1 = User.create(:name => "User 1", :email => "user1@jarna.com", :password => "secret", :password_confirmation => "secret")
+        options = Hash[:password => 'secret', :password_confirmation => 'secret', :email => "user1@walnut.com"]
+        @user1  = User.create_or_reset(options)
       end
 
       should_change("User.count", :by => 1) { User.count }
       should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
 
-      should "add to user.email_addresses" do
-        assert_equal ["user1@jarna.com"], @user1.email_addresses.collect(&:address)
+      should "not set user rpx flag" do
+        assert_equal 0, @user1.rpx
       end
 
-      context "create another user" do
-        setup do
-          @user2 = User.create(:name => "User 2", :email => "user2@jarna.com", :password => "secret", :password_confirmation => "secret")
-        end
+      should "increment user.email_addresses_count" do
+        assert_equal 0, @user1.email_addresses_count
+      end
 
-        should_change("User.count", :by => 1) { User.count }
-        should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+      should "add to user.email_addresses collection" do
+        assert_equal ["user1@walnut.com"], @user1.email_addresses.collect(&:address)
+      end
 
-        should "add to user.email_addresses" do
-          assert_equal ["user2@jarna.com"], @user2.email_addresses.collect(&:address)
-        end
+      should "have user.email_address" do
+        assert_equal "user1@walnut.com", @user1.reload.email_address
+      end
+
+      should "create user in active state" do
+        assert_equal "active", @user1.state
+      end
+
+      should "create email in unverified state" do
+        @email = @user1.primary_email_address
+        assert_equal "unverified", @email.state
       end
     end
 
-    context "with an identifier" do
+    context "with a password and email_addresses_attributes" do
       setup do
-        @user1 = User.create(:name => "User 1", :email => "user1@jarna.com", :identifier => "https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM")
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret', :email_addresses_attributes => [{:address => "user1@walnut.com"}]]
+        @user1  = User.create_or_reset(options)
       end
 
       should_change("User.count", :by => 1) { User.count }
       should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
 
-      should "add to user.email_addresses" do
-        assert_equal ["user1@jarna.com"], @user1.email_addresses.collect(&:address)
+      should "increment user.email_addresses_count" do
+        assert_equal 0, @user1.email_addresses_count
+      end
+
+      should "add to user.email_addresses collection" do
+        assert_equal ["user1@walnut.com"], @user1.email_addresses.collect(&:address)
+      end
+
+      should "have user.email_address" do
+        assert_equal "user1@walnut.com", @user1.reload.email_address
+      end
+    end
+
+    context "with rpx" do
+      setup do
+        @user1 = User.create_rpx("User 1", "user1@walnut.com", "https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM")
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+      should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+      should "set user rpx flag" do
+        assert_equal 1, @user1.rpx
+      end
+
+      should "add to user.email_addresses collection" do
+        assert_equal ["user1@walnut.com"], @user1.email_addresses.collect(&:address)
+        assert_equal ["https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM"], @user1.email_addresses.collect(&:identifier)
+      end
+
+      should "have user.email_address" do
+        assert_equal "user1@walnut.com", @user1.reload.email_address
+      end
+      
+      should "create user in active state" do
+        assert_equal "passive", @user1.state
+      end
+      
+      should "create email in verfied state" do
+        @email = @user1.primary_email_address
+        assert_equal "verified", @email.state
       end
     end
     
@@ -78,7 +108,7 @@ class UserTest < ActiveSupport::TestCase
   
   context "caldav token" do
     setup do
-      @user2 = User.create(:name => "User 2", :email => "user2@jarna.com", :password => "secret", :password_confirmation => "secret")
+      @user2 = User.create(:name => "User 2", :password => "secret", :password_confirmation => "secret")
     end
     
     should "assign a cal_dav_token" do

@@ -37,6 +37,10 @@ class EmailAddressTest < ActiveSupport::TestCase
         @user.reload
         assert_equal 1, @user.email_addresses_count
       end
+
+      should "have state 'unverified'" do
+        assert_equal 'unverified', @email.state
+      end
     end
   end
 

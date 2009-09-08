@@ -11,14 +11,9 @@ class User < ActiveRecord::Base
   # Badges for authorization
   badges_authorized_user
 
-  validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
-  validates_length_of       :name,     :maximum => 100
+  validates_format_of       :name, :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
+  validates_length_of       :name, :maximum => 100
   validates_presence_of     :name
-
-  validates_presence_of     :email
-  validates_length_of       :email,    :within => 6..100 #r@a.wk
-  validates_uniqueness_of   :email,    :case_sensitive => false
-  validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
   has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
@@ -29,7 +24,7 @@ class User < ActiveRecord::Base
 
   has_many                  :subscriptions, :dependent => :destroy
   has_many                  :ownerships, :through => :subscriptions, :source => :company
-  
+
   has_many                  :company_providers, :as => :provider, :dependent => :destroy
   has_many                  :companies, :through => :company_providers, :source => :company
 
@@ -48,14 +43,16 @@ class User < ActiveRecord::Base
                             :include => {:message => :sender}
   has_many                  :inbox, :through => :inbox_deliveries, :source => :message
 
-  after_create              :manage_user_roles, :add_email_address
+  after_create              :manage_user_roles
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :email, :name, :password, :password_confirmation, :identifier, :email_addresses_attributes, :phone_numbers_attributes
+  attr_accessible           :name, :password, :password_confirmation, :rpx, :email_addresses_attributes, :phone_numbers_attributes
 
-  named_scope               :with_emails, lambda { |s| { :conditions => ["email_addresses_count > 0"] }}
+  named_scope               :with_emails, { :conditions => ["email_addresses_count > 0"] }
+  named_scope               :with_email, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.address = ?", s] } }
+  named_scope               :with_identifier, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.identifier = ?", s] } }
   named_scope               :with_phones, lambda { |s| { :conditions => ["phone_numbers_count > 0"] }}
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
@@ -74,13 +71,25 @@ class User < ActiveRecord::Base
   #
   def self.authenticate(email, password, options={})
     return nil if email.blank? || password.blank?
-    u = find_in_state :first, :active, :conditions => {:email => email} # need to get the salt
+    u = self.with_email(email).find_in_state(:first, :active) # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
 
-  def self.create_or_reset_with_random_password(email, options={})
-    user      = self.find_by_email(email)
-    password  = options[:password] ? options[:password].to_s : User.generate_password(10)
+  # create new user or reset user's password
+  def self.create_or_reset(options={})
+    if !options[:email].blank?
+      email = options.delete(:email)
+      user  = self.with_email(email).first
+    elsif !options[:email_addresses_attributes].blank?
+      email_addresses_attributes = options.delete(:email_addresses_attributes)
+    end
+
+    case options[:password]
+    when :random
+      password = User.generate_password(10)
+    else
+      password = options[:password].to_s
+    end
 
     if user
       # reset password
@@ -90,18 +99,42 @@ class User < ActiveRecord::Base
       # send user password reset
       Delayed::Job.enqueue(UserJob.new(:id => user.id, :password => password, :method => 'send_password_reset'))
     else
-      # create user in active state
-      name = options[:name]
-      user = self.create(:name => name, :email => email, :password => password, :password_confirmation => password)
-      user.register!
-      user.activate!
+      User.transaction do
+        # create user in active state
+        name = options[:name]
+        user = self.create(:name => name, :password => password, :password_confirmation => password)
+        user.register!
+        user.activate!
+        
+        case
+        when email
+          # add email address
+          email = user.email_addresses.create(:address => email)
+        when email_addresses_attributes
+          # add email addresses attributes
+          user.email_addresses_attributes = email_addresses_attributes
+          user.save
+        end
+      end
       # send user account created
       Delayed::Job.enqueue(UserJob.new(:id => user.id, :password => password, :method => 'send_account_created'))
     end
-    
+
     user
   end
 
+  def self.create_rpx(name, email, identifier)
+    User.transaction do
+      # create user in passive state
+      user  = self.create(:name => name, :rpx => 1)
+      # add email address with rpx identifier
+      email = user.email_addresses.create(:address => email, :identifier => identifier)
+      # change email state to verfied
+      email.verify!
+      user
+    end
+  end
+  
   def self.generate_password(length=6)
     chars    = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ23456789'
     password = ''
@@ -109,9 +142,9 @@ class User < ActiveRecord::Base
     password
   end
 
-  def email=(value)
-    write_attribute :email, (value ? value.downcase : nil)
-  end
+  # def email=(value)
+  #   write_attribute :email, (value ? value.downcase : nil)
+  # end
 
   # the special user 'anyone'
   def self.anyone
@@ -124,6 +157,14 @@ class User < ActiveRecord::Base
   # return true if its the special user 'anyone'
   def anyone?
     self.id == 0
+  end
+  
+  def email_address
+    @email_address ||= self.email_addresses_count > 0 ? self.primary_email_address.address : ''
+  end
+
+  def phone_number
+    @phone_number ||= self.phone_numbers_count > 0 ? self.primary_phone_number.address : ''
   end
 
   def tableize
@@ -143,26 +184,11 @@ class User < ActiveRecord::Base
     self.activation_code = self.class.make_token
   end
 
-  # format phone by removing all non-digits
-  def format_phone
-    self.phone.gsub!(/[^\d]/, '') unless self.phone.blank?
-  end
-  
   def manage_user_roles
     unless self.has_role?('user manager', self)
       # all users can manage themselves
       self.grant_role('user manager', self)
     end
-
-    if defined?(ADMIN_USER_EMAILS) and ADMIN_USER_EMAILS.include?(self.email)
-      # grant user the 'admin' role
-      self.grant_role('admin')
-    end
   end
 
-  # add email address object
-  def add_email_address
-    return if self.email.blank?
-    self.email_addresses.create(:address => self.email, :priority => 1)
-  end
 end

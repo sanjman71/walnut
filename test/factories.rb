@@ -66,7 +66,6 @@ end
 
 Factory.define :user do |u|
   u.name                  { |s| Factory.next :user_name }
-  u.email                 { |s| Factory.next :user_email }
   u.password              "secret"
   u.password_confirmation "secret"
   u.state                 "active"    # always create users in active state

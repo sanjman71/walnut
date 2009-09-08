@@ -48,13 +48,13 @@ class CalDavResource
     cal = RiCal.Calendar do |cal|
       @appointments.each do |app|
         cal.event do |ev|
-          ev.add_attendee "#{app.provider.email}"
+          ev.add_attendee "#{app.provider.email_address}"
           # No customer if this is available time
           if app.service.mark_as == "free"
             ev.summary = "#{app.provider.name}: Available"
           else
             ev.summary = "#{app.provider.name}: #{app.service.name} for #{app.customer.name}"
-            ev.add_attendee "#{app.customer.email}"
+            ev.add_attendee "#{app.customer.email_address}"
           end
           ev.dtstart = app.start_at
           ev.dtend = app.end_at

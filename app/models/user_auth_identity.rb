@@ -11,8 +11,8 @@ module UserAuthIdentity
 
   module InstanceMethods
     def password_required?
-      # no password required if there is an identifier
-      return false if !self.identifier.blank?
+      # no password required if using rpx
+      return false if self.rpx == 1
       super
     end
   end # instance methods

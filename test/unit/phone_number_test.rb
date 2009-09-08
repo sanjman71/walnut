@@ -42,6 +42,10 @@ class PhoneNumberTest < ActiveSupport::TestCase
         @user.reload
         assert_equal 1, @user.phone_numbers_count
       end
+
+      should "have state 'unverified'" do
+        assert_equal 'unverified', @phone.state
+      end
     end
     
     context "with callable and number with extra chars" do
