@@ -70,7 +70,7 @@ class Company < ActiveRecord::Base
 
   # Preferences
   # typed_serialize           :preferences, Hash, {:time_horizon => 28}
-  serialized_hash           :preferences, {:time_horizon => 28}
+  serialized_hash           :preferences, {:time_horizon => 28.days}
 
   acts_as_taggable_on       :tags
   
