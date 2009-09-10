@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'serialized_hash'
 
 class User < ActiveRecord::Base
   include Authentication
@@ -34,7 +35,7 @@ class User < ActiveRecord::Base
   before_validation_on_create :reset_cal_dav_token
 
   # Preferences
-  typed_serialize           :preferences, Hash
+  serialized_hash           :preferences
 
   # messages sent
   has_many                  :outbox, :class_name => "Message", :foreign_key => "sender_id"
