@@ -1,6 +1,10 @@
 // Place your application-specific JavaScript functions and classes here
 // This file is automatically included by javascript_include_tag :defaults
 
+jQuery.ajaxSetup({
+  'beforeSend': function(xhr) {xhr.setRequestHeader("Accept", "text/javascript")}
+})
+
 // prevent a method from being called too often, e.g. live search requests
 Function.prototype.sleep = function (millisecond_delay) {
   if(window.sleep_delay != undefined) clearTimeout(window.sleep_delay);
