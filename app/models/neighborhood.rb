@@ -34,7 +34,7 @@ class Neighborhood < ActiveRecord::Base
   end
   
   def to_param
-    self.name.parameterize.to_s
+    self.name.to_url_param
   end
 
 end

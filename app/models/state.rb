@@ -27,7 +27,11 @@ class State < ActiveRecord::Base
 
   # order states by location count
   named_scope :order_by_density,  { :order => "locations_count DESC" }
-  
+
+  def to_param
+    self.code.to_url_param
+  end
+
   def geocode_latlng(options={})
     force = options.has_key?(:force) ? options[:force] : false
     return true if self.lat and self.lng and !force
