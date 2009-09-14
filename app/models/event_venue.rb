@@ -411,7 +411,7 @@ class EventVenue < ActiveRecord::Base
       categories_hash = results['categories']['category']
     rescue Exception => e
       puts "xxx exception: #{e.message}"
-      next
+      return
     end
 
     # map eventful category id to an event category object
