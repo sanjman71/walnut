@@ -716,7 +716,7 @@ class Appointment < ActiveRecord::Base
       self.customer.grant_role('appointment manager', self) unless self.customer.has_role?('appointment manager', self)
     end
 
-    if self.provider && (self.provider.class == "User")
+    if self.provider && (self.provider.class == User)
       self.provider.grant_role('appointment manager', self) unless self.provider.has_role?('appointment manager', self)
     end
   end
