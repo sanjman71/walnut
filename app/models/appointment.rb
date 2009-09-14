@@ -262,15 +262,15 @@ class Appointment < ActiveRecord::Base
 
     # for free and work appointments, force end_at to be start_at + duration (converted to seconds)
     if [FREE, WORK].include?(self.mark_as) and self.start_at and self.duration
-      self.end_at = self.start_at + self.duration*60
+      self.end_at = self.start_at + self.duration
     end
 
-    # initialize duration (in minutes)
+    # initialize duration (in seconds)
     if (self.start_at.nil? || self.end_at.nil?)
       self.duration = 0
     elsif (self.service.nil? || self.service.free?) and self.duration.blank?
       # initialize duration based on start and end times
-      self.duration = (self.end_at - self.start_at) / 60
+      self.duration = self.end_at - self.start_at
     elsif self.service and self.duration.blank?
       # initialize duration based on service duration
       self.duration = self.service.duration
@@ -302,7 +302,7 @@ class Appointment < ActiveRecord::Base
       if self.start_at
         self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
         if self.duration
-          self.time_end_at = self.time_start_at + (duration * 60)
+          self.time_end_at = self.time_start_at + duration
         end
       end
 
@@ -321,14 +321,14 @@ class Appointment < ActiveRecord::Base
     if self.start_at and self.end_at
       # start_at must be before end_at
       if !(start_at < end_at)
-        errors.add_to_base("Appointment start time must be earlier than the apointment end time")
+        errors.add_to_base("Appointment must start before it ends")
       end
     end
     
     if self.provider and self.company
       # provider must belong to this company
       if !self.company.has_provider?(self.provider)
-        errors.add_to_base("Provider is not associated to this company")
+        errors.add_to_base("Provider is not associated with this company")
       end
     end
     
@@ -603,7 +603,7 @@ class Appointment < ActiveRecord::Base
       attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
       # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
-                            :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time ) / 60,
+                            :duration => ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time,
                             :recur_parent_id => self.id})
       # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
       if self.location_id

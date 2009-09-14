@@ -39,8 +39,8 @@ class TimeRange
     @start_at = @start_at.utc unless @start_at.blank?
     @end_at = @end_at.utc unless @end_at.blank?
     
-    # initialize duration (in minutes)
-    @duration = (@end_at.to_i - @start_at.to_i) / 60 unless (@start_at.blank? || @end_at.blank?)
+    # initialize duration (in seconds)
+    @duration = (@end_at - @start_at).to_i unless (@start_at.blank? || @end_at.blank?)
   end
     
   def to_s
@@ -53,22 +53,22 @@ class TimeRange
   # However, we do not want to have time_start_at > 24 hours, in this case both should have 24 hours subtracted.
   # This is done by reducing time_start_at as required. This should only be necessary for the _utc form.
   def time_start_at
-    @time_start_at ||= self.start_at.in_time_zone.hour * 3600 + self.start_at.in_time_zone.min * 60
-    @time_start_at -= (24 * 3600) unless (@time_start_at < 24 * 3600)
+    @time_start_at ||= (self.start_at.in_time_zone.hour.hours + self.start_at.in_time_zone.min.minutes).to_i
+    @time_start_at = (@time_start_at - 24.hours).to_i unless (@time_start_at < 24.hours)
     @time_start_at
   end
   
   def time_end_at
-    @time_end_at ||= self.time_start_at + (@duration * 60)
+    @time_end_at ||= (self.time_start_at + @duration).to_i
   end
   
   def time_start_at_utc
-    @time_start_at_utc ||= self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
-    @time_start_at_utc -= (24 * 3600) unless (@time_start_at_utc < 24 * 3600)
+    @time_start_at_utc ||= (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes).to_i
+    @time_start_at_utc = (@time_start_at_utc - 24.hours).to_i unless (@time_start_at_utc < 24.hours)
     @time_start_at_utc
   end
   
   def time_end_at_utc
-    @time_end_at_utc ||= self.time_start_at_utc + (@duration * 60)
+    @time_end_at_utc ||= (self.time_start_at_utc + @duration).to_i
   end
 end

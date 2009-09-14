@@ -13,7 +13,7 @@ class CapacitySlot < ActiveRecord::Base
   
   belongs_to                  :free_appointment, :class_name => "Appointment"
   
-  validates_presence_of       :start_at, :end_at, :duration  
+  validates_presence_of       :start_at, :end_at, :duration
 
   # This must be before validation, as it makes attributes that are required
   before_validation           :make_duration_time_start_end
@@ -58,9 +58,9 @@ class CapacitySlot < ActiveRecord::Base
                                                       { :conditions => ["(`capacity_slots`.time_start_at < ? AND `capacity_slots`.time_end_at > ?) OR
                                                                          (`capacity_slots`.time_start_at < ? AND `capacity_slots`.time_end_at > ?) OR
                                                                          (`capacity_slots`.time_start_at >= ? AND `capacity_slots`.time_end_at <= ?)",
-                                                                         time_range.time_start_at_utc, time_range.time_start_at_utc,
-                                                                         time_range.time_end_at_utc, time_range.time_end_at_utc,
-                                                                         time_range.time_start_at_utc, time_range.time_end_at_utc] }
+                                                                         time_range.time_start_at_utc.to_i, time_range.time_start_at_utc.to_i,
+                                                                         time_range.time_end_at_utc.to_i, time_range.time_end_at_utc.to_i,
+                                                                         time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i] }
                                                     end
                                      }
                                      
@@ -70,7 +70,7 @@ class CapacitySlot < ActiveRecord::Base
                                                      {}
                                                    else
                                                      { :conditions => ["(`capacity_slots`.time_start_at <= ? AND `capacity_slots`.time_end_at >= ?)",
-                                                                        time_range.time_start_at_utc, time_range.time_end_at_utc] }
+                                                                        time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i] }
                                                    end
                                     }
 
@@ -156,7 +156,7 @@ class CapacitySlot < ActiveRecord::Base
     end
 
     # Calculate the duration for the new timeslot
-    new_duration = (new_end_at.utc - new_start_at.utc) / 60
+    new_duration = new_end_at.utc - new_start_at.utc
 
     # Find the capacity slot attached to this free appointment with the most capacity covering the range.
     max_slot = free_appointment.capacity_slots.covers(new_start_at, new_end_at).order_capacity_desc.first
@@ -551,9 +551,9 @@ class CapacitySlot < ActiveRecord::Base
       time_end_at_will_change!
       duration_will_change!
 
-      self.duration = (self.end_at.utc - self.start_at.utc) / 60
-      self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
-      self.time_end_at = self.time_start_at + (self.duration * 60)
+      self.duration = self.end_at - self.start_at
+      self.time_start_at = self.start_at.utc.hour.hours + self.start_at.utc.min.minutes
+      self.time_end_at = self.time_start_at + self.duration
     end
   end
   

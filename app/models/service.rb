@@ -2,7 +2,7 @@ class Service < ActiveRecord::Base
   belongs_to                  :company
   validates_presence_of       :name, :company_id, :price_in_cents
   validates_presence_of       :duration, :if => :duration_required?
-  validates_inclusion_of      :duration, :in => 1..24*60*7, :message => "must be a non-zero reasonable value", :if => :duration_required?
+  validates_inclusion_of      :duration, :in => 1..(7.days), :message => "must be a non-zero reasonable value", :if => :duration_required?
   validates_inclusion_of      :mark_as, :in => %w(free work), :message => "can only be scheduled as free or work"
   validates_uniqueness_of     :name, :scope => :company_id
   has_many                    :appointments
@@ -36,11 +36,17 @@ class Service < ActiveRecord::Base
   def nothing?
     self.id == 0
   end
-  
-  def duration_to_seconds
-    self.duration * 60
+
+  # Virtual attribute for use in the UI - entering the lenght of the service is done in minutes rather than seconds. This converts in both directions
+  def duration_in_minutes
+    (self.duration / 60).to_i
   end
   
+  def duration_in_minutes=(duration_in_minutes)
+    duration_will_change!
+    self.duration = duration_in_minutes.minutes
+  end
+
   # find all polymorphic providers through the company_providers collection
   def providers
     self.service_providers(:include => :provider).collect(&:provider)
