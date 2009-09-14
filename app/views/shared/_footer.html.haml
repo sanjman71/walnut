@@ -1,14 +1,15 @@
-.span-12.prepend-1
-  = link_to('About', about_path, :class => 'footer link')
-  == &nbsp&nbsp;&nbsp;
-  = link_to('Contact Us', contactus_path, :class => 'footer link')
-  == &nbsp&nbsp;&nbsp;
-  = link_to('Search by State', url_for(:controller => 'search', :action => 'country', :country => @country || Country.default), :class => 'footer link')
+- cache("footer") do
+  .span-12.prepend-1
+    = link_to('About', about_path, :class => 'footer link')
+    == &nbsp&nbsp;&nbsp;
+    = link_to('Contact Us', contactus_path, :class => 'footer link')
+    == &nbsp&nbsp;&nbsp;
+    = link_to('Search by State', url_for(:controller => 'search', :action => 'country', :country => @country || Country.default), :class => 'footer link')
 
-.span-11.last
-  .span-3
-    = render(:partial => 'shared/eventful_attribution')
-  .span-5
-    = render(:partial => 'shared/urbanmapping_attribution')
-  .span-3.last
-    = render(:partial => 'shared/localeze_attribution')
+  .span-11.last
+    .span-3
+      = render(:partial => 'shared/eventful_attribution')
+    .span-5
+      = render(:partial => 'shared/urbanmapping_attribution')
+    .span-3.last
+      = render(:partial => 'shared/localeze_attribution')
