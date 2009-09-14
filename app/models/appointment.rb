@@ -525,6 +525,19 @@ class Appointment < ActiveRecord::Base
     !self.recur_rule.blank?
   end
     
+  def recurrence_parent
+    # There is no recurrence parent if this isn't a recurrence
+    if (!recurrence?)
+      nil
+    elsif (self.recur_parent.blank?)
+      # If this is a recurrence, and it doesn't have a parent, then it is the parent
+      self
+    else
+      # If this is a recurrence and it has a parent, then return that
+      self.recur_parent
+    end
+  end
+
   def popular!
     # popularity value decreases the further away it is
     max_pop_value = 100
@@ -703,7 +716,7 @@ class Appointment < ActiveRecord::Base
       self.customer.grant_role('appointment manager', self) unless self.customer.has_role?('appointment manager', self)
     end
 
-    if self.provider
+    if self.provider && (self.provider.class == "User")
       self.provider.grant_role('appointment manager', self) unless self.provider.has_role?('appointment manager', self)
     end
   end
