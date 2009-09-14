@@ -119,6 +119,20 @@ class DateRange
         # should start after 'next week', and continue for 2 weeks, ending on sunday at midnight
         start_at  = now.next_week + 1.week
         end_at    = (start_at + 1.week).end_of_week
+      when 'this month'
+        end_at    = now.end_of_month
+        if options[:include] == :today
+          start_at  = now.beginning_of_day
+        else
+          start_at  = now.tomorrow.beginning_of_day
+        end
+      when 'next month'
+        end_at    = now.end_of_month
+        if options[:include] == :today
+          start_at  = now.beginning_of_day
+        else
+          start_at  = now.tomorrow.beginning_of_day
+        end
       when 'past week'
         end_at    = now.end_of_day
         start_at  = end_at - 1.week + 1.second
@@ -191,13 +205,13 @@ class DateRange
   
   # adjust end_at based on end_on day
   def self.adjust_end_day_to_end_on(end_at, options)
-    # if end_on was specified, adjust it 1 day because we really want the beginning of the next day
+    # if end_on was specified, use it.
     end_on = options[:end_on] ? options[:end_on] : end_at.wday
     
     if end_on != end_at.in_time_zone.wday
       # add x days if the end on day is greater than the current day of the week, always end at midnight the previous day
       add_days    = end_on > end_at.in_time_zone.wday ? end_on - end_at.in_time_zone.wday + 1 : 7 - (end_at.in_time_zone.wday - end_on)
-      end_at     += add_days.days - 1.second
+      end_at     += add_days.days
     end
     
     end_at

@@ -526,14 +526,11 @@ class Appointment < ActiveRecord::Base
   end
     
   def recurrence_parent
-    # There is no recurrence parent if this isn't a recurrence
-    if (!recurrence?)
-      nil
-    elsif (self.recur_parent.blank?)
-      # If this is a recurrence, and it doesn't have a parent, then it is the parent
+    if (recurrence?)
+      # If this is a recurrence then it is its own parent
       self
     else
-      # If this is a recurrence and it has a parent, then return that
+      # If it has no recurrence parent this will be nil, else the recurrence parent
       self.recur_parent
     end
   end
