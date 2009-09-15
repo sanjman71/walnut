@@ -124,7 +124,7 @@ class ApplicationController < ActionController::Base
         self.class.benchmark("Benchmarking #{@state.name} cities with events") do
           # find city events
           city_limit  = 10
-          @facets     = Appointment.facets(:with => Search.attributes(@state), :facets => "city_id", :limit => city_limit)
+          @facets     = Appointment.facets(:with => Search.attributes(@state), :facets => :city_id, :group_clause => "@count desc", :limit => city_limit)
           @cities     = Search.load_from_facets(@facets, City).sort_by { |o| o.name }
         end
       when 'search'
@@ -146,7 +146,7 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'city') and return
       end
 
-      self.class.benchmark("*** Benchmarking #{@city.name} neighborhoods using database", Logger::INFO) do
+      self.class.benchmark("*** Benchmarking #{@city.name} neighborhoods using database", Logger::INFO, false) do
         @neighborhoods = @city.neighborhoods.with_locations.order_by_density(:limit => 100).sort_by { |o| o.name }
       end
 
@@ -208,11 +208,11 @@ class ApplicationController < ActionController::Base
       @zip            = @state.zips.find_by_name(params[:zip].to_s) unless params[:zip].blank?
       @neighborhood   = @city.neighborhoods.find_by_name(params[:neighborhood].to_s.titleize) unless @city.blank? or params[:neighborhood].blank?
 
-      if @city and !params[:neighborhood].blank?
+      if @city and @neighborhood.blank? and !params[:neighborhood].blank?
         # neighborhoods can have non-letter characters; try resolving again
         @neighborhood = @city.neighborhoods.find_like(params[:neighborhood].gsub('-','%')).first
       end
-      
+
       if @city.blank? and @zip.blank?
         # invalid search
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'unknown') and return
@@ -241,19 +241,19 @@ class ApplicationController < ActionController::Base
   end
   
   def init_weather
-    if RAILS_ENV == 'development'
+    if WEATHER_ENVS.include?(RAILS_ENV)
     case
     when @city
-      self.class.benchmark("*** Benchmarking city weather", Logger::INFO) do
+      self.class.benchmark("*** Benchmarking city weather", Logger::INFO, false) do
         # initialize city weather
-        @weather = Rails.cache.fetch("weather:#{@city.name.parameterize}", :expires_in => 2.hours) do
+        @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@city.name.to_url_param}", :expires_in => 2.hours) do
           Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
         end
       end
     when @zip
-      self.class.benchmark("*** Benchmarking zip weather") do
+      self.class.benchmark("*** Benchmarking zip weather", Logger::INFO, false) do
         # initialize zip weather
-        @weather = Rails.cache.fetch("weather:#{@zip.name}", :expires_in => 2.hours) do
+        @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@zip.name}", :expires_in => 2.hours) do
           Weather.get("#{@zip.name}", "#{@zip.name} Weather")
         end
       end

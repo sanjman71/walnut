@@ -75,9 +75,8 @@ class SearchControllerTest < ActionController::TestCase
   context "city search tag page" do
     context "with no locations" do
       setup do
-        # ThinkingSphinx::Collection takes 4 arguments: page, per_page, entries, total_entries
-        ThinkingSphinx::Search.stubs(:search).returns(ThinkingSphinx::Collection.new(1, 1, 0, 0))
-        # stub tag facets
+        # stub search resutls and tag facets
+        ThinkingSphinx.stubs(:search).returns([])
         Search.stubs(:load_from_facets).returns([])
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
       end

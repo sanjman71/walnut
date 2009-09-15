@@ -7,7 +7,7 @@
   -# cache event google marker
   - cache("google:marker:#{color}:#{index}") do
     .span-1
-      %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
+      %img{:src => "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png", :class => 'icon'}
 
   -# cache event info, independent of its list index
   - cache("#{event.cache_key}") do

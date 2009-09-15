@@ -61,7 +61,7 @@
         - tags.each do |tag|
           %span{:style => 'padding-right: 3px; white-space: nowrap;'}
             - klasses = ["tag big"].push(cycle('even', 'odd'))
-            = link_to(tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.parameterize), :class => klasses.join(' '))
+            = link_to(tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.to_url_param), :class => klasses.join(' '))
       
     .span-9.last#locality_tags
       %h2.location.tags.geography== Geography Tags

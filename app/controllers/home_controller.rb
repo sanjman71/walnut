@@ -12,29 +12,29 @@ class HomeController < ApplicationController
     # find featured city objects
     featured_limit = 5
 
-    self.class.benchmark("Benchmarking #{@featured_city.name} featured places") do
-      @featured_places = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured:places", :expires_in => CacheExpire.locations) do
-        ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Location],
-                                      :include => [:company, :state, :city, :zip, :primary_phone_number], 
-                                      :page => 1, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+    self.class.benchmark("Benchmarking #{@featured_city.name} featured places", Logger::INFO, false) do
+      @featured_places = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:places", :expires_in => CacheExpire.locations) do
+        ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Location],
+                              :include => [:company, :state, :city, :zip, :primary_phone_number], 
+                              :page => 1, :per_page => featured_limit, :order => "popularity desc")
       end
       # @featured_places.map { |o| o.lat = nil; o.lng = nil; o.freeze }
       @featured_places_title = "#{@featured_city.name} Places"
     end
 
-    self.class.benchmark("Benchmarking #{@featured_city.name} featured events") do
-      @featured_events = Rails.cache.fetch("#{@featured_city.name.parameterize}:featured:events", :expires_in => CacheExpire.locations) do
-        ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Appointment], :include => {:location => :company}, 
-                                      :page => 1, :per_page => featured_limit, :order => :start_at, :sort_mode => :asc)
+    self.class.benchmark("Benchmarking #{@featured_city.name} featured events", Logger::INFO, false) do
+      @featured_events = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:events", :expires_in => CacheExpire.locations) do
+        ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Appointment], :include => {:location => :company}, 
+                              :page => 1, :per_page => featured_limit, :order => "start_at asc")
       end
       @featured_events_title  = "#{@featured_city.name} Events"
-      @featured_events_date   = "Today is #{Time.now.to_s(:appt_day_short)}"
+      @featured_events_date   = "Today is #{Time.zone.now.to_s(:appt_day_short)}"
       @featured_events_more   = "More #{@featured_city.name} Events"
 
       # use places if there are no events
       if @featured_events.blank?
-        @featured_events = ThinkingSphinx::Search.search(:with => Search.attributes(@featured_city), :classes => [Location], 
-                                                         :page => 2, :per_page => featured_limit, :order => :popularity, :sort_mode => :desc)
+        @featured_events = ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Location], 
+                                                 :page => 2, :per_page => featured_limit, :order => "popularity desc")
         @featured_events_title  = "#{@featured_city.name} Places"
         @featured_events_date   = nil
         @featured_events_more   = nil
@@ -42,7 +42,7 @@ class HomeController < ApplicationController
     end
 
     # find popular cities based on city density
-    self.class.benchmark("Benchmarking popular cities using database") do
+    self.class.benchmark("Benchmarking popular cities using database", Logger::INFO, false) do
       city_limit      = 10
       city_density    = City.popular_density
       @cities         = Rails.cache.fetch("popular_cities:#{city_limit}:#{city_density}", :expires_in => CacheExpire.localities) do
@@ -104,7 +104,7 @@ class HomeController < ApplicationController
       
       # find closest city, with constraint that city must have a minimum density
       # city  = City.find_closest(:origin => [hash[:latitude], hash[:longitude]], :conditions => ["locations_count > ?", City.popular_density])
-      city  = City.find_closest(:origin => ip, :conditions => ["locations_count > ?", City.popular_density])
+      city  = City.find_closest(:origin => ip, :conditions => ["locations_count > ?", City.popular_density], :include => :state)
       # raise Exception, "skipping"
     rescue Exception => e
       logger.debug("xxx find closest city exception: #{e.message}")

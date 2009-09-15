@@ -10,7 +10,7 @@
   - cache("google:marker:#{color}:#{index}") do
     .span-1.icon-div
       - if location.mappable?
-        %img{:src => "http://www.google.com/mapfiles/marker" + color + ('A'..'Z').to_a[index] + ".png", :class => 'icon'}
+        %img{:src => "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png", :class => 'icon'}
       - else
         == &nbsp;
 

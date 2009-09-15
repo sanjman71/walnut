@@ -163,9 +163,9 @@ module ApplicationHelper
 
   def build_what_route_path(options)
     if options[:tag]
-      "/tag/#{options[:tag].parameterize}"
+      "/tag/#{options[:tag].to_url_param}"
     elsif options[:query]
-      "/q/#{options[:query].parameterize}"
+      "/q/#{options[:query].to_url_param}"
     else
       ""
     end

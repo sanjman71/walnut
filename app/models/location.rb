@@ -63,7 +63,8 @@ class Location < ActiveRecord::Base
   define_index do
     indexes companies.name, :as => :name
     indexes street_address, :as => :address
-    indexes companies.tags.name, :as => :tags
+    # this doesn't work; don't think mva string attributes are supported
+    # indexes companies.tags(:name), :as => :tags, :type => :multi, :facet => true
     has companies.tags(:id), :as => :tag_ids, :facet => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
@@ -71,6 +72,9 @@ class Location < ActiveRecord::Base
     has city_id, :type => :integer, :as => :city_id, :facet => true
     has zip_id, :type => :integer, :as => :zip_id, :facet => true
     has neighborhoods(:id), :as => :neighborhood_ids, :facet => true
+    # locality strings, faceted
+    # indexes zip.name, :as => :zip, :type => :string, :facet => true
+    # indexes city.name, :as => :city, :type => :string, :facet => true
     # other attributes
     has popularity, :type => :integer, :as => :popularity
     has companies.chain_id, :type => :integer, :as => :chain_ids

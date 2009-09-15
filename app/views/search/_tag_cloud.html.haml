@@ -8,4 +8,4 @@
   - tags.each do |tag|
     - tag_class = tag_cloud_class(tag, count_method, max_count, tag_classes)
     - klasses   = ["tag"].push(cycle('even', 'odd')).push(tag_class)
-    %span.small[tag]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(tag, build_search_route(params[:controller], locality_type, locality_params.merge(:tag => tag.name.parameterize)), :class => klasses.join(" "))
+    %span.small[tag]{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(tag, build_search_route(params[:controller], locality_type, locality_params.merge(:tag => tag.name.to_url_param)), :class => klasses.join(" "))

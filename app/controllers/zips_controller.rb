@@ -27,7 +27,7 @@ class ZipsController < ApplicationController
     nearby_miles    = 10
     nearby_limit    = 10
     @nearby_zips    = Zip.exclude(@zip).within_state(@state).all(:origin => @zip, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
-    # @nearby_zips    = Rails.cache.fetch("#{@zip.name.parameterize}:nearby:zips", :expires_in => CacheExpire.localities) do
+    # @nearby_zips    = Rails.cache.fetch("#{@zip.name.to_url_param}:nearby:zips", :expires_in => CacheExpire.localities) do
     #   Zip.exclude(@zip).within_state(@state).all(:origin => @zip, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
     # end
     

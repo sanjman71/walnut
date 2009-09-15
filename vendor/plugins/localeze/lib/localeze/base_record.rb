@@ -1,6 +1,6 @@
 module Localeze
   
-  require 'fastercsv'
+  # require 'fastercsv'
   
   class BaseRecord < ActiveRecord::Base
     establish_connection("localeze_#{RAILS_ENV}")

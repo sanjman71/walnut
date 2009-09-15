@@ -18,5 +18,5 @@
 
 %h3.span-23.prepend-1#tags
   - unless @popular_tags.blank?
-    - cache("#{@city.name.parameterize}:#{@neighborhood.name.parameterize}:tag_cloud", :expires_in => CacheExpire.tags) do
+    - cache("#{@city.name.to_url_param}:#{@neighborhood.name.to_url_param}:tag_cloud", :expires_in => CacheExpire.tags) do
       = render(:partial => 'search/tag_cloud', :locals => {:tags => @popular_tags, :locality_type => 'neighborhood', :locality_params => {:country => @country, :state => @state, :city => @city, :neighborhood => @neighborhood}})

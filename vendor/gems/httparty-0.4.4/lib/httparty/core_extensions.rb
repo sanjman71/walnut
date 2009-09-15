@@ -3,7 +3,8 @@ if RUBY_VERSION.to_f == 1.8
     instance_methods.each { |m| undef_method m unless m =~ /^__|instance_eval|object_id/ }
   end
 else
-  class BlankSlate < BasicObject; end
+  # class BlankSlate < BasicObject; end
+  # BlankSlate already defined in ruby 1.9
 end
  
 # 1.8.6 has mistyping of transitive in if statement

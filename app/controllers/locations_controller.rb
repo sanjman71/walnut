@@ -61,7 +61,7 @@ class LocationsController < ApplicationController
     raise ArgumentError, "invalid city" if @city.blank?
 
     self.class.benchmark("Benchmarking find #{@city.name} location ids") do
-      @location_ids = Rails.cache.fetch("#{@city.name.parameterize}:location_ids") do
+      @location_ids = Rails.cache.fetch("#{@city.name.to_url_param}:location_ids") do
         Location.with_city(@city).all(:select => 'id', :limit => 5000).collect(&:id)
       end
     end

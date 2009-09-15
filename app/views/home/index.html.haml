@@ -59,7 +59,7 @@
     -# show popular neighborhoods for each popular city
     .popular.neighborhoods
       == Browse Popular #{city.name} Neighborhoods
-    - cache("#{city.name.parameterize}:neighborhoods:popular", :expires_in => CacheExpire.localities) do
+    - cache("#{city.name.to_url_param}:neighborhoods:popular", :expires_in => CacheExpire.localities) do
       - @hoods = city.neighborhoods.with_locations.order_by_density.all(:limit => @hood_city_limit)
       - @hoods.each do |hood|
         - klasses = ["locality"].push(cycle('even', 'odd'))

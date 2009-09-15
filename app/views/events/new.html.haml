@@ -39,7 +39,7 @@
   .span-3.text-align-right{:style => 'padding-top: 8px;'}
     %h3= label_tag "select_repeats", "Repeats:", :class => 'big'
   .span-20.last
-    = select_tag('select_repeats', options_for_select(@repeat_options.collect{ |o| [o, "#{o.parameterize.underscore}"] }), :class => 'text', :style => 'font-size: 1.3em;')
+    = select_tag('select_repeats', options_for_select(@repeat_options.collect{ |o| [o, "#{o.to_url_param.underscore}"] }), :class => 'text', :style => 'font-size: 1.3em;')
 
 .span-23.prepend-1.last.hide.bottom.repeat.every#repeats_every_daily
   .span-3.padding-top-5.text-align-right

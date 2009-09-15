@@ -1,5 +1,5 @@
 require "#{RAILS_ROOT}/config/environment"
-require 'fastercsv'
+# require 'fastercsv'
 require 'ar-extensions'
 
 namespace :localeze do

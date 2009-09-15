@@ -53,10 +53,14 @@ class LogEntry < ActiveRecord::Base
 
   def etype_to_s
     case self.etype
-    when URGENT: "urgent"
-    when APPROVAL: "approval"
-    when INFORMATIONAL: "informational"
-    else ""
+    when URGENT
+      "urgent"
+    when APPROVAL 
+      "approval"
+    when INFORMATIONAL
+      "informational"
+    else 
+      ""
     end
   end
 

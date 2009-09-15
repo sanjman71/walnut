@@ -4,8 +4,10 @@ development:
   max_children: 5   # default is unlimited
   read_timeout: 5   # default is 5 seconds
   mlock: 0          # set mlock = 1 to keep .spa and .spi files in ram
+  pid_file: log/searchd.development.pid
   # ignore single quotes
   ignore_chars: U+0027
+  morphology: stem_en
 production:
   port: 3312
   max_matches: 200
@@ -18,8 +20,11 @@ production:
   pid_file:  /usr/apps/walnut/current/log/searchd.production.pid
   # indexer memory limit
   mem_limit: 128M
+  morphology: stem_en
 test:
   port: 3312
   max_matches: 200
+  pid_file: log/searchd.test.pid
   # ignore single quotes
   ignore_chars: U+0027
+  morphology: stem_en

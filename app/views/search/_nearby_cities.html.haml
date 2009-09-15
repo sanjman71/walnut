@@ -1,6 +1,6 @@
 - url_options = Hash[:action => 'index', :neighborhood => nil, :zip => nil]
-- url_options.update(:tag => tag.parameterize) unless tag.blank?
-- url_options.update(:query => query.parameterize) unless query.blank?
+- url_options.update(:tag => tag.to_url_param) unless tag.blank?
+- url_options.update(:query => query.to_url_param) unless query.blank?
 
 %h4.city.nearby.bottom== Nearby Cities
 %ul

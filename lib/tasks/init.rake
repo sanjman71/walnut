@@ -1,4 +1,4 @@
-require 'fastercsv'
+#require 'fastercsv'
 require 'ar-extensions'
 
 namespace :init do
