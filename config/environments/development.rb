@@ -23,8 +23,8 @@ config.action_mailer.raise_delivery_errors = false
 # config.cache_store = :file_store, "#{RAILS_ROOT}/tmp/cache"
 config.cache_store = :mem_cache_store
 
-# Google maps api key - http://www.walnut.dev
-GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBTc9FRQxpBdXNBfmqDixmvtqLMfHRQSYxSyW9ESCg9dmtHb_MLOUEL5MQ"
+# Google maps api key - http://www.walnutplaces.dev
+GOOGLE_MAPS_API_KEY = "ABQIAAAAomTSMjVMlOfQaldkZBqMBBQNWpUeAeXueOed84FQGA3CqZsXRhSWvW3azi6g_0qNcWnewc7A71C47g"
 GOOGLE_MAPS_API_URL = "http://maps.google.com/maps?file=api&amp;v=2&amp;key=#{GOOGLE_MAPS_API_KEY}"
 
 # Blueprint grid only in development environment
