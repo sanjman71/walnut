@@ -19,7 +19,7 @@ class LocationsControllerTest < ActionController::TestCase
       @location = Factory(:location, :country => @us, :state => @il, :city => @chicago, :zip => @zip)
       @company  = Factory(:company, :name => "Chicago Pizza")
       @company.locations.push(@location)
-      ThinkingSphinx::Search.stubs(:search).returns([@location])
+      ThinkingSphinx.stubs(:search).returns([@location])
       get :show, :id => @location.to_param
     end
     

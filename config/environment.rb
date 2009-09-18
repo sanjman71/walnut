@@ -5,7 +5,8 @@
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.3' unless defined? RAILS_GEM_VERSION
+# Note: use 2.3.3 with ruby 1.9 - https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/3144-undefined-method-for-string-ror-234
+RAILS_GEM_VERSION = '2.3.3' unless defined? RAILS_GEM_VERSION  
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -24,14 +25,16 @@ Rails::Initializer.run do |config|
   # They can then be installed with "rake gems:install" on new installations.
   # You have to specify the :lib option for libraries, where the Gem name (sqlite3-ruby) differs from the file itself (sqlite3)
   config.gem "ar-extensions", :version => "0.9.2"
-  config.gem "crack", :version => "0.1.4" # used by google weather plugin
+  config.gem "chronic", :version => '0.2.3' # required by javan-whenever
+  config.gem "crack", :version => "0.1.4" # required by google weather
   config.gem "curb", :version => "~> 0.5.1" # curl api; requires native components
+  config.gem "daemons", :version => '1.0.10'
   config.gem "eventfulapi", :lib => false
   # config.gem "fastercsv"  # built into ruby 1.9
   config.gem "geokit" # required by geokit-rails plugin
   config.gem "haml", :version => '2.2.4'
   config.gem "httparty", :lib => false # used by google weather plugin
-  config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
+  config.gem 'javan-whenever', :version => '0.3.7', :lib => false, :source => 'http://gems.github.com'
   config.gem "json", :version => '~> 1.1.7' # requires native components
   config.gem "mime-types", :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
