@@ -14,23 +14,27 @@ class HomeController < ApplicationController
 
     self.class.benchmark("Benchmarking #{@featured_city.name} featured places", Logger::INFO, false) do
       @featured_places = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:places", :expires_in => CacheExpire.locations) do
-        ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Location],
-                              :include => [:company, :state, :city, :zip, :primary_phone_number], 
-                              :page => 1, :per_page => featured_limit, :order => "popularity desc")
+        # ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
+        ids = ThinkingSphinx.search_for_ids(:with => Search.attributes(@featured_city), :classes => [Location],
+                                            :include => [:company, :state, :city, :zip, :primary_phone_number],
+                                            :page => 1, :per_page => featured_limit, :order => "popularity desc")
+        Location.find(ids)
       end
-      # @featured_places.map { |o| o.lat = nil; o.lng = nil; o.freeze }
       @featured_places_title = "#{@featured_city.name} Places"
     end
 
     self.class.benchmark("Benchmarking #{@featured_city.name} featured events", Logger::INFO, false) do
       @featured_events = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:events", :expires_in => CacheExpire.locations) do
-        ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Appointment], :include => {:location => :company}, 
-                              :page => 1, :per_page => featured_limit, :order => "start_at asc")
+        # ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
+        ids = ThinkingSphinx.search_for_ids(:with => Search.attributes(@featured_city), :classes => [Appointment],
+                                            :include => {:location => :company},
+                                            :page => 1, :per_page => featured_limit, :order => "start_at asc")
+        Appointment.find(ids)
       end
       @featured_events_title  = "#{@featured_city.name} Events"
       @featured_events_date   = "Today is #{Time.zone.now.to_s(:appt_day_short)}"
       @featured_events_more   = "More #{@featured_city.name} Events"
-
+    
       # use places if there are no events
       if @featured_events.blank?
         @featured_events = ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Location], 
