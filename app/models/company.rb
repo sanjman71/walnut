@@ -69,7 +69,7 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :logo, :allow_destroy => true
 
   # Preferences
-  serialized_hash           :preferences, {:time_horizon => 28.days}
+  serialized_hash           :preferences, {:time_horizon => 28.days, :start_wday => 0}
 
   acts_as_taggable_on       :tags
   
