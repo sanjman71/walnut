@@ -39,7 +39,10 @@ every 1.day, :at => "2am" do
 end
 
 every :reboot do
+  # start sphinx searchd
   command "cd /usr/apps/walnut/current && RAILS_ENV=production /usr/bin/env rake ts:start"
+  # start delayed job daemon
+  command "cd /usr/apps/walnut/current; script/delayed_job -e production start"
 end
 
 end # production
