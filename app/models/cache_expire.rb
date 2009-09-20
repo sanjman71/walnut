@@ -1,24 +1,21 @@
 class CacheExpire
-  
-  # cache expiry constants
-  
+
+  # cache expiration constants
+
   def self.localities
-    5.minutes
+    4.hours
   end
   
   def self.tags
-    5.minutes
+    4.hours
   end
 
   def self.locations
-    5.minutes
+    4.hours
   end
   
   def self.events
-    5.minutes
+    4.hours
   end
   
-  def self.facets
-    5.minutes
-  end
 end
