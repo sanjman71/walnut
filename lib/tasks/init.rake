@@ -1,5 +1,5 @@
-#require 'fastercsv'
 require 'ar-extensions'
+require 'csv'
 
 namespace :init do
 
@@ -23,7 +23,7 @@ namespace :init do
     options = { :validate => false }
 
     puts "#{Time.now}: importing states ... parsing file #{file}" 
-    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => ',') do |row|
+    CSV.foreach(file, :row_sep => "\n", :col_sep => ',') do |row|
       id, name, code, lat, lng = row
       value = [id, name, code, @us.id, lat, lng]
       values << value
@@ -79,7 +79,7 @@ namespace :init do
     options = { :validate => false }
 
     puts "#{Time.now}: importing timezones ... parsing file #{file}" 
-    # use File.open here instead of FasterCSV because FasterCSV doesn't like the file format
+    # use File.open here instead of CSV because CSV doesn't like the file format
     File.open(file).each do |row|
       name, utc_offset, utc_dst_offset = row.split(" ")
       
@@ -156,7 +156,7 @@ namespace :init do
     options = { :validate => false }
 
     puts "#{Time.now}: importing tag groups ... parsing file #{file}" 
-    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+    CSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       id, name, tags = row
       
       # skip if tag group already exists
@@ -181,7 +181,7 @@ namespace :init do
     options = { :validate => false }
     
     puts "#{Time.now}: importing state zips ... parsing file #{file}" 
-    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+    CSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       name, state_code, lat, lng = row
 
       # validate state

@@ -118,7 +118,7 @@ class City < ActiveRecord::Base
     imported  = 0
     file      = options[:file] ? options[:file] : "#{RAILS_ROOT}/data/cities.txt"
     
-    FasterCSV.foreach(file, :col_sep => '|') do |row|
+    CSV.foreach(file, :col_sep => '|') do |row|
       city_name, state_code, lat, lng = row
 
       # validate state

@@ -1,4 +1,5 @@
 require 'eventful/api'
+require 'csv'
 
 class EventVenue < ActiveRecord::Base
   validates_presence_of     :name, :source_id, :source_type, :city
@@ -381,7 +382,7 @@ class EventVenue < ActiveRecord::Base
     file  = "#{RAILS_ROOT}/data/event_venues.txt"
     count = 0
     
-    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+    CSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       city_name, name, type, id = row
 
       # apply city filter

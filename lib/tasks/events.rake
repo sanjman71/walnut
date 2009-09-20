@@ -1,3 +1,5 @@
+require 'csv'
+
 namespace :events do
   
   @@max_per_page  = 100
@@ -22,7 +24,7 @@ namespace :events do
     imported  = 0
     
     puts "#{Time.now}: adding category tags ... parsing file #{file}" 
-    FasterCSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
+    CSV.foreach(file, :row_sep => "\n", :col_sep => '|') do |row|
       name, tags = row
       
       # find event category by name
