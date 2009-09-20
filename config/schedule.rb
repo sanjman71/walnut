@@ -19,6 +19,10 @@
 
 # Learn more: http://github.com/javan/whenever
 
+# update, write crontab:
+# whenever --update-crontab walnut_places
+# whenever --write-crontab walnut_places
+
 if RAILS_ENV == 'development'
 
 every 1.day, :at => "2am" do

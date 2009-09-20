@@ -143,11 +143,11 @@ class Locality
   def self.set_event_counts(klass)
     case klass.to_s.downcase
     when 'city'
-      facet_string  = 'city_id'
+      facet_string  = :city_id
     when 'zip'
-      facet_string  = 'zip_id'
+      facet_string  = :zip_id
     when 'neighborhood'
-      facet_string  = 'neighborhood_ids'
+      facet_string  = :neighborhood_ids
     else
       raise ArgumentError, "invalid klass #{klass}"
     end
