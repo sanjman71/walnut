@@ -126,4 +126,4 @@ DATA_ERROR_LOGGER         = Logger.new("log/data.error.log")
 DATA_TAGS_LOGGER          = Logger.new("log/data.tags.log")
 
 # Pull in the serialized_hash functionality
-require "#{RAILS_ROOT}/lib/shared/serialized_hash"
+require "#{RAILS_ROOT}/lib/serialized_hash"
