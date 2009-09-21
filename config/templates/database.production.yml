@@ -5,7 +5,7 @@ production:
   port: 3306
   database: walnut_production
   username: rails
-  password: rails
+  password: 1ndus7ry!
   
 localeze_production:
   encoding: utf8
@@ -14,14 +14,5 @@ localeze_production:
   port: 3306
   database: localeze_production
   username: rails
-  password: rails
-
-shared_authentication_production:
-  encoding: utf8
-  adapter: mysql
-  host: localhost
-  port: 3306
-  database: peanut_production
-  username: rails
-  password: rails
+  password: 1ndus7ry!
 

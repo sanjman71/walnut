@@ -1,6 +1,6 @@
 # Create hosts hash, especially useful when there is more than 1 host
 hosts               = Hash.new
-hosts[:mosso]       = '174.143.204.171:30001'
+hosts[:mosso]       = '174.143.204.214:30001'
 
 # Set roles
 role :app,          hosts[:mosso]
