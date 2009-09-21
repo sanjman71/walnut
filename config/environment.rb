@@ -24,17 +24,17 @@ Rails::Initializer.run do |config|
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
   # You have to specify the :lib option for libraries, where the Gem name (sqlite3-ruby) differs from the file itself (sqlite3)
-  config.gem "ar-extensions", :version => "0.9.2"
-  config.gem "chronic", :version => '0.2.3' # required by javan-whenever
-  config.gem "crack", :version => "0.1.4" # required by google weather
+  config.gem "ar-extensions", :version => "~> 0.9.2"
+  config.gem "chronic", :version => '~> 0.2.3' # required by javan-whenever
+  config.gem "crack", :version => "~> 0.1.4" # required by google weather
   config.gem "curb", :version => "~> 0.5.1" # curl api; requires native components
-  config.gem "daemons", :version => '1.0.10'
+  config.gem "daemons", :version => '~> 1.0.10'
   config.gem "eventfulapi", :lib => false
   # config.gem "fastercsv"  # built into ruby 1.9
   config.gem "geokit" # required by geokit-rails plugin
-  config.gem "haml", :version => '2.2.4'
+  config.gem "haml", :version => '~> 2.2.4'
   config.gem "httparty", :lib => false # used by google weather plugin
-  config.gem 'javan-whenever', :version => '0.3.7', :lib => false, :source => 'http://gems.github.com'
+  config.gem 'javan-whenever', :version => '~> 0.3.7', :lib => false, :source => 'http://gems.github.com'
   config.gem "json", :version => '~> 1.1.7' # requires native components
   config.gem "mime-types", :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
@@ -124,3 +124,6 @@ WEATHER_ENVS = []
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
 DATA_ERROR_LOGGER         = Logger.new("log/data.error.log")
 DATA_TAGS_LOGGER          = Logger.new("log/data.tags.log")
+
+# Pull in the serialized_hash functionality
+require "#{RAILS_ROOT}/lib/shared/serialized_hash"

@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'serialized_hash'
 
 class User < ActiveRecord::Base
   include Authentication
