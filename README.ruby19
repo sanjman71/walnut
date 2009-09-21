@@ -1,0 +1,51 @@
+1. Install ruby 1.9
+  - Ubuntu Hardy installation
+    - http://extralogical.net/2009/07/ruby-one-niner/
+    - http://www.taylorluk.com/articles/2009/08/12/ruby-19-and-passenger
+
+    - monkey patch /usr/local/lib/ruby/1.9.1/tempfile.rb
+    
+    - rm config/new_relic.yml
+    - rm vendor/plugins/newrelic_rpm
+    
+    - unlink /usr/bin/ruby
+    - unlink /usr/bin/ri
+    - unlink /usr/bin/rdoc
+    - unlink /usr/bin/irb
+    - edit /usr/local/nginx/conf/nginx.conf
+      - change ruby path
+
+2. Install gems
+  
+  - sudo gem19 install rails
+  - sudo gem19 install mysql
+  - sudo gem19 install daemons
+  - sudo gem19 install curb # native components
+  - sudo gem19 install json # native components
+  - sudo gem19 install javan-whenever
+  - sudo gem19 install ar-extensions
+  - sudo gem19 install populator
+  - sudo gem19 install faker
+  - sudo gem19 install thoughtbot-factory_girl
+  - sudo gem19 install thoughtbot-shoulda
+
+  - sudo gem install passenger
+  - sudo passenger-install-nginx-module
+
+  x sudo gem19 install unicode
+  
+3. Create scripts
+
+  - /opt/local/bin/rg => /opt/local/bin/rg19
+  
+*** Open issues
+
+  - BlankState error in httparty gem, /vendor/gems/httparty-0.4.4/lib/httparty/core_extensions.rb
+    - BlankState already defined in 1.9
+  - unicode gem not supported
+    - sudo gem19 install unicode_utils
+  - undefined method `^' for "9":String
+    - revert to rails 2.3.3
+  - query_reviewer plugin
+  - activesupport parameterize method
+    - use string to_url_param instead
