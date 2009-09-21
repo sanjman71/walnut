@@ -44,4 +44,5 @@ after "deploy:start",   "delayed_job:start"
 after "deploy:restart", "delayed_job:restart"
 
 after "deploy", "database:configure"
+after "deploy", "sphinx:configure"
 after "deploy", "sphinx:restart"

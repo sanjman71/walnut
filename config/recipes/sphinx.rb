@@ -1,9 +1,14 @@
 namespace :sphinx do
   
-  desc "Configure sphinx, e.g. shared index directory"
-  task :configure, :roles => :app do
+  desc "Create the sphinx shared index directory"
+  task :shared, :roles => :app do
     puts "creating sphinx index directory"
     run "mkdir #{shared_path}/sphinx"
+  end
+
+  desc "Create the sphinx config file"
+  task :configure, :roles => :app do
+    run "cd #{current_path}; rake ts:config RAILS_ENV=#{rails_env}"
   end
 
   desc "Stop the sphinx searchd daemon"
