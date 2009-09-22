@@ -3,7 +3,7 @@ class ActiveRecord::Base
     serialize(attr_name, Hash)
 
     define_method(attr_name) do
-      value = super # Get the current value of the serialized attribute by calling the model's attribute accessor. This should be the full Hash
+      value = self.read_attribute(attr_name.to_sym) # Get the current value of the serialized attribute by calling the model's attribute accessor. This should be the full Hash
       if value.is_a?(Hash)
         # If the Hash value is defined return it, merging the defaults with these results so the the model's values override the defaults
         value.merge!(prefs_and_defaults) {|k,o,n| o}
