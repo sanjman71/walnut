@@ -1,3 +1,5 @@
+require 'serialized_hash'
+
 class Company < ActiveRecord::Base
   extend ActiveSupport::Memoizable
   

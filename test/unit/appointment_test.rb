@@ -303,7 +303,7 @@ class AppointmentTest < ActiveSupport::TestCase
         @appointment = @appointments.first
         assert_equal 0, @appointment.start_at.utc.hour
         assert_equal 2, @appointment.end_at.utc.hour
-        assert_equal 120, @appointment.duration
+        assert_equal 2.hours, @appointment.duration
       end
       
       should "should increment location.appointments_count" do
