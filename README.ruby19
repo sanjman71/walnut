@@ -34,18 +34,18 @@
 
   x sudo gem19 install unicode
   
-3. Create scripts
-
-  - /opt/local/bin/rg => /opt/local/bin/rg19
-  
 *** Open issues
 
+  * undefined method `^' for "9":String
+    - revert to rails 2.3.3
+
+  * filter_parameter_logging broken
+    - https://rails.lighthouseapp.com/projects/8994/tickets/2999-filter_parameter_logging-throws-exception-with-ruby-191
+    
   - BlankState error in httparty gem, /vendor/gems/httparty-0.4.4/lib/httparty/core_extensions.rb
     - BlankState already defined in 1.9
   - unicode gem not supported
     - sudo gem19 install unicode_utils
-  - undefined method `^' for "9":String
-    - revert to rails 2.3.3
-  - query_reviewer plugin
+  - query_reviewer plugin doesn't work
   - activesupport parameterize method
     - use string to_url_param instead
