@@ -116,6 +116,10 @@ class DateRange
         start_at  = now.tomorrow.beginning_of_day
         end_at    = start_at.end_of_day
         range_type = 'daily'
+      when 'next 7 days'
+        end_at    = now + 7.days
+        start_at  = now
+        range_type = 'weekly'
       when 'this week'
         # ends on sunday at midnight
         end_at    = now.end_of_week

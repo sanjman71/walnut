@@ -13,16 +13,18 @@ class Appointment < ActiveRecord::Base
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
   # Relationships between free and work appointments, and between appointments and capacity
-  has_many                    :work_appointments, :class_name => "Appointment", :foreign_key => :free_appointment_id # Free appointments have associated work appts
+  # Free appointments have associated work appts. A free appointment may be deleted, in which case it's associated work appointments are orphaned.
+  # This might happen if a work appointment is canceled, and then the corresponding free appointment is destroyed.
+  has_many                    :work_appointments, :class_name => "Appointment", :foreign_key => :free_appointment_id, :dependent => :nullify
   belongs_to                  :free_appointment, :class_name => "Appointment"       # Work appointments refer to their corresponding free appointment
 
   # free appointments refer to their corresponding capacity_slots
   has_many                    :capacity_slots, :foreign_key => :free_appointment_id, :dependent => :destroy
 
-  # Recurrences - an appointment might have a recurrence rule
-  # If so, the appointment may have multiple recurrence instances
-  has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id"
-  belongs_to                  :recur_parent, :class_name => "Appointment", :foreign_key => "recur_parent_id"
+  # Recurrences - an appointment might have a recurrence rule. If so, the appointment may have multiple recurrence instances.
+  # These recurrence instances refer back to their parent. If their parent is destroyed, the instance refererences are nullified
+  has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :nullify
+  belongs_to                  :recur_parent, :class_name => "Appointment"
 
   # validates_presence_of       :name
   validates_presence_of       :company_id
@@ -129,6 +131,8 @@ class Appointment < ActiveRecord::Base
   # add special named scopes for special state queries
   named_scope :upcoming_completed, { :conditions => ["state = ? or state = ?", 'upcoming', 'completed'] }
   
+  named_scope :upcoming, { :conditions => ["state = ?", 'upcoming'] }
+  
   # order by start_at
   named_scope :order_start_at, {:order => 'start_at'}
   
@@ -169,12 +173,19 @@ class Appointment < ActiveRecord::Base
   named_scope :not_recurrence_instances,  { :conditions => ["recur_parent_id IS NULL"] }
 
   # valid when values
+  WHEN_TODAY                = 'today'
+  WHEN_TOMORROW             = 'tomorrow'
+  WHEN_7_DAYS               = 'next 7 days'
   WHEN_THIS_WEEK            = 'this week'
+  WHEN_NEXT_WEEK            = 'next week'
   WHEN_PAST_WEEK            = 'past week'
-  WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
-  WHEN_WEEKS                = [WHEN_THIS_WEEK, 'next week', 'later']
-  WHENS_EXTENDED            = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'next 2 weeks', 'next 4 weeks', 'this month', 'later']
-  WHENS_PAST                = ['past week', 'past 2 weeks', 'past month']
+  WHEN_THIS_MONTH           = 'this month'
+  WHEN_NEXT_MONTH           = 'next month'
+
+  WHENS                     = [WHEN_TODAY, WHEN_TOMORROW, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, 'later']
+  WHEN_WEEKS                = [WHEN_7_DAYS, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, 'later']
+  WHENS_EXTENDED            = [WHEN_TODAY, WHEN_TOMORROW, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, 'next 2 weeks', 'next 4 weeks', WHEN_THIS_MONTH, 'later']
+  WHENS_PAST                = [WHEN_PAST_WEEK, 'past 2 weeks', 'past month']
   
   # valid time of day values
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
