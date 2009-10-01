@@ -18,10 +18,10 @@ class AppointmentScheduler
 
     if provider.anyone?
       # find free appointments for any provider, order by start times
-      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
     else
       # find free appointments for a specific provider, order by start times
-      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
     end
 
     # remove appointments that have ended (when compared to Time.now) or appointment providers that do not provide the requested service

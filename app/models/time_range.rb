@@ -4,8 +4,9 @@ class TimeRange
   
   # valid day formats
   #  - '20090101'
-  #  - note: 'today', 'tomorrow' are unsupported
-  # end_day is optional, same format as day. If not provided, assumes end_day is same as day
+  #  - 'today', 'tomorrow' are not valid
+  #
+  # end_day is optional, and uses the same format as day; defaults to day
   #
   # valid start/end time formats
   #  - '0300', '1 pm' 
