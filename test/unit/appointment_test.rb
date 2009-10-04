@@ -1,8 +1,6 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
-  
 
   should_belong_to              :company
   should_belong_to              :service
@@ -17,7 +15,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_validate_presence_of   :start_at
   should_validate_presence_of   :end_at
   should_validate_presence_of   :duration
-  should_allow_values_for       :mark_as, "free", "work", "wait"
+  should_allow_values_for       :mark_as, "free", "work"
   
   def setup
     @us             = Factory(:us)

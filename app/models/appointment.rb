@@ -33,7 +33,7 @@ class Appointment < ActiveRecord::Base
   validates_presence_of       :provider_id, :if => :provider_required?
   validates_presence_of       :provider_type, :if => :provider_required?
   validates_presence_of       :customer_id, :if => :customer_required?
-  validates_inclusion_of      :mark_as, :in => %w(free work wait)
+  validates_inclusion_of      :mark_as, :in => %w(free work)
 
   before_save                 :make_confirmation_code
   after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
@@ -42,9 +42,8 @@ class Appointment < ActiveRecord::Base
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   WORK                    = 'work'      # work appointments can be scheduled in free timeslots
-  WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
 
-  MARK_AS_TYPES           = [FREE, WORK, WAIT]
+  MARK_AS_TYPES           = [FREE, WORK]
 
   NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
 
@@ -123,10 +122,9 @@ class Appointment < ActiveRecord::Base
 
   # find appointments by mark_as type
   MARK_AS_TYPES.each { |s| named_scope s, :conditions => {:mark_as => s} }
-  
+
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
-  named_scope :wait_work,   { :conditions => ["mark_as = ? OR mark_as = ?", WAIT, WORK]}
-  
+
   # find appointments by state is part of the AASM plugin
   # add special named scopes for special state queries
   named_scope :upcoming_completed, { :conditions => ["state = ? or state = ?", 'upcoming', 'completed'] }
@@ -298,25 +296,13 @@ class Appointment < ActiveRecord::Base
     end
     
     # initialize time of day attributes
-    
-    if self.mark_as == WAIT
-      # set time to anytime for wait appointments
-      self.time           = TIME_ANYTIME
-      
-      # set time of day values based on time value
-      time_range          = Appointment.time_range(self.time)
-      self.time_start_at  = time_range.first
-      self.time_end_at    = time_range.last
-    else
-      # set time of day values based on appointment start and duration in utc format
-      # Note that the end time can be > 24 hours, if the appointment (in UTC time) crosses a day boundary
-      if self.start_at
-        self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
-        if self.duration
-          self.time_end_at = self.time_start_at + duration
-        end
+    # set time of day values based on appointment start and duration in utc format
+    # Note that the end time can be > 24 hours, if the appointment (in UTC time) crosses a day boundary
+    if self.start_at
+      self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
+      if self.duration
+        self.time_end_at = self.time_start_at + duration
       end
-
     end
   end
   
@@ -510,19 +496,13 @@ class Appointment < ActiveRecord::Base
     self.mark_as == WORK
   end
   
-  def wait?
-    self.mark_as == WAIT
-  end
-  
-  alias :waitlist? :wait?
-  
   # return the collection of waitlist appointments that overlap with this free appointment
-  def waitlist
-    # check that this is a free appointment
-    return [] if self.mark_as != FREE
-    # find wait appointments that overlap in both date and time ranges
-    @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
-  end
+  # def waitlist
+  #   # check that this is a free appointment
+  #   return [] if self.mark_as != FREE
+  #   # find wait appointments that overlap in both date and time ranges
+  #   @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
+  # end
   
   def public?
     self.public
@@ -673,11 +653,11 @@ class Appointment < ActiveRecord::Base
     false
   end
   
-  # customers are required for work and waitlist appointments
+  # customers are required for work and appointments
   def customer_required?
     # allow work appointments to have the anyone customer
     return false if work? and customer_anyone?
-    return true if work? or wait?
+    return true if work?
     false
   end
 
@@ -688,7 +668,7 @@ class Appointment < ActiveRecord::Base
 
   def make_confirmation_code
     unless self.confirmation_code
-      if [WORK, WAIT].include?(self.mark_as)
+      if [WORK].include?(self.mark_as)
         # create a random string
         possible_values         = Array('A'..'Z') + Array(0..9)
         code_length             = 5
@@ -710,10 +690,10 @@ class Appointment < ActiveRecord::Base
     end
   end
 
-  # add 'company customer' role to a work/wait appointment's customer
+  # add 'company customer' role to a work appointment's customer
   def grant_company_customer_role
-    return if ![WORK, WAIT].include?(self.mark_as) or self.customer.blank?
-    self.customer.grant_role('company customer', self.company)
+    return if ![WORK].include?(self.mark_as) or self.customer.blank?
+    self.customer.grant_role('company customer', self.company) unless self.customer.has_role?('company customer', self.company)
   end
   
   # add 'appointment manager' role to work appointments

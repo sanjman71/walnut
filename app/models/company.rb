@@ -53,6 +53,7 @@ class Company < ActiveRecord::Base
   has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id
   has_many                  :customers, :through => :appointments, :uniq => true
   has_many                  :invitations, :dependent => :destroy
+  has_many                  :waitlists
 
   # Accounting info
   has_one                   :subscription, :dependent => :destroy
