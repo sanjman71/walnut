@@ -101,8 +101,8 @@ class Appointment < ActiveRecord::Base
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
   # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
-  named_scope :future,        lambda { { :conditions => ["start_at >= ?", Time.now] } }
-  named_scope :past,          lambda { { :conditions => ["end_at <= ?", Time.now] } }
+  named_scope :future,        lambda { { :conditions => ["start_at >= ?", Time.zone.now] } }
+  named_scope :past,          lambda { { :conditions => ["end_at <= ?", Time.zone.now] } }
   
   # find appointments overlapping a time range
   named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
@@ -512,13 +512,25 @@ class Appointment < ActiveRecord::Base
     !self.public
   end
 
-  def recurrence?
+  # Is this appointment an instance of a recurrence (includes the parent instance)
+  def recurrence_instance?
+    !self.recur_parent.blank? || recurrence_parent?
+  end
+
+  # Is this appointment the parent instance of a recurrence
+  def recurrence_parent?
     !self.recur_rule.blank?
   end
-    
+
+  # Is this appointment a member of a recurrence - either instance or parent
+  def recurrence?
+    recurrence_instance? || recurrence_parent?
+  end
+
+  # If this appointment is an instance of a recurrence, returns the recurrence parent instance
   def recurrence_parent
-    if (recurrence?)
-      # If this is a recurrence then it is its own parent
+    if (recurrence_parent?)
+      # If this instance is a recurrence parent then it is its own parent
       self
     else
       # If it has no recurrence parent this will be nil, else the recurrence parent
@@ -727,7 +739,7 @@ class Appointment < ActiveRecord::Base
   # expand recurrence appointments by some default value
   def expand_recurrence_after_create
     return if recur_rule.blank?
-    time_horizon = self.company.preferences[:time_horizon] || 28.days
+    time_horizon = self.company.preferences[:time_horizon].to_i || 28.days
     if (Time.zone.now + time_horizon) > self.end_at
       self.send_later(:expand_recurrence, self.end_at, Time.zone.now + time_horizon)
     end
