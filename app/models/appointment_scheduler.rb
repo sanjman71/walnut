@@ -211,23 +211,23 @@ class AppointmentScheduler
   # create a waitlist appointment
   # options:
   #  - commit => if true, commit the waitlist appointment; otherwise, create the object but don't save it; default is true
-  def self.create_waitlist_appointment(company, provider, service, customer, date_time_options, options={})
-    # should be a service that is not marked as work
-    raise AppointmentInvalid if service.mark_as != Appointment::WORK
-    
-    wait_commit       = options.has_key?(:commit) ? options[:commit] : true
-    wait_hash         = {:company => company, :service => service, :provider => provider, :customer => customer, :mark_as => Appointment::WAIT}.merge(date_time_options)
-    wait_appointment  = Appointment.new(wait_hash)
-
-    raise AppointmentInvalid if !wait_appointment.valid?
-    
-    if wait_commit
-      # save appointment
-      wait_appointment.save
-    end
-    
-    wait_appointment
-  end
+  # def self.create_waitlist_appointment(company, provider, service, customer, date_time_options, options={})
+  #   # should be a service that is not marked as work
+  #   raise AppointmentInvalid if service.mark_as != Appointment::WORK
+  #   
+  #   wait_commit       = options.has_key?(:commit) ? options[:commit] : true
+  #   wait_hash         = {:company => company, :service => service, :provider => provider, :customer => customer, :mark_as => Appointment::WAIT}.merge(date_time_options)
+  #   wait_appointment  = Appointment.new(wait_hash)
+  # 
+  #   raise AppointmentInvalid if !wait_appointment.valid?
+  #   
+  #   if wait_commit
+  #     # save appointment
+  #     wait_appointment.save
+  #   end
+  #   
+  #   wait_appointment
+  # end
   
   # split a free appointment into multiple appointments using the specified service and time
   def self.split_free_appointment(appointment, service, duration, service_start_at, service_end_at, options={})
@@ -359,10 +359,10 @@ class AppointmentScheduler
   end
 
   # cancel the wait appointment
-  def self.cancel_wait_appointment(appointment)
-    raise AppointmentInvalid, "Expected a waitlist appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
-    appointment.cancel
-  end
+  # def self.cancel_wait_appointment(appointment)
+  #   raise AppointmentInvalid, "Expected a waitlist appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
+  #   appointment.cancel
+  # end
   
   # build collection of all free and work appointments that have not been canceled over the specified date range
   def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
@@ -446,7 +446,7 @@ class AppointmentScheduler
     if email
       begin
         case appointment.mark_as
-        when Appointment::WORK, Appointment::WAIT
+        when Appointment::WORK
           MailWorker.async_send_appointment_confirmation(:id => appointment.id)
         end
         confirmations_sent += 1
@@ -459,7 +459,7 @@ class AppointmentScheduler
     if sms
       begin
         case appointment.mark_as
-        when Appointment::WORK, Appointment::WAIT
+        when Appointment::WORK
           SmsWorker.async_send_appointment_confirmation(:id => appointment.id)
         end
         confirmations_sent += 1

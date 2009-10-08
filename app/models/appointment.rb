@@ -26,6 +26,8 @@ class Appointment < ActiveRecord::Base
   has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :nullify
   belongs_to                  :recur_parent, :class_name => "Appointment"
 
+  has_many                    :appointment_waitlists, :dependent => :destroy
+
   # validates_presence_of       :name
   validates_presence_of       :company_id
   validates_presence_of       :start_at, :end_at, :duration
@@ -121,20 +123,17 @@ class Appointment < ActiveRecord::Base
                                                                        time_range.first, time_range.last] }}
 
   # find appointments by mark_as type
-  MARK_AS_TYPES.each { |s| named_scope s, :conditions => {:mark_as => s} }
-
-  named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
+  MARK_AS_TYPES.each                  { |s| named_scope s, :conditions => {:mark_as => s} }
+  named_scope :free_work,             { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
 
   # find appointments by state is part of the AASM plugin
   # add special named scopes for special state queries
-  named_scope :upcoming_completed, { :conditions => ["state = ? or state = ?", 'upcoming', 'completed'] }
-  
-  named_scope :upcoming, { :conditions => ["state = ?", 'upcoming'] }
-  
+  named_scope :upcoming_completed,    { :conditions => ["state = ? or state = ?", 'upcoming', 'completed'] }
+  named_scope :upcoming,              { :conditions => ["state = ?", 'upcoming'] }
+
   # order by start_at
-  named_scope :order_start_at, {:order => 'start_at'}
-  
-  
+  named_scope :order_start_at,        {:order => 'start_at'}
+
   # scope appointment search by a location
   
   # general_location is used for broad searches, where a search for appointments in Chicago includes appointments assigned to anywhere
@@ -497,12 +496,13 @@ class Appointment < ActiveRecord::Base
   end
   
   # return the collection of waitlist appointments that overlap with this free appointment
-  # def waitlist
-  #   # check that this is a free appointment
-  #   return [] if self.mark_as != FREE
-  #   # find wait appointments that overlap in both date and time ranges
-  #   @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
-  # end
+  def waitlist
+    # check that this is a free appointment
+    return [] if self.mark_as != FREE
+    # find wait appointments that overlap in both date and time ranges
+    time_range  = self.time_range
+    @waitlist ||= company.waitlists.date_overlap(start_at, end_at).time_overlap(time_range.first, time_range.last).provider(provider)
+  end
   
   def public?
     self.public

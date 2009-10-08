@@ -7,6 +7,7 @@ class AddWaitlist < ActiveRecord::Migration
       t.references  :provider,  :polymorphic => true    # e.g. users
       t.references  :customer             # user who booked the waitlist
       t.references  :creator              # user who created the waitlist
+      t.integer     :appointment_waitlists_count, :default => 0
       t.timestamps
     end
 
@@ -25,10 +26,26 @@ class AddWaitlist < ActiveRecord::Migration
       t.integer     :end_time     # time of day to end
       t.timestamps
     end
+    
+    create_table :appointment_waitlists do |t|
+      t.references  :appointment
+      t.references  :waitlist
+      t.timestamps
+    end
+
+    add_index :appointment_waitlists, :appointment_id
+    add_index :appointment_waitlists, :waitlist_id
+    
+    # add counter cache to appointments table
+    change_table :appointments do |t|
+      t.integer     :appointment_waitlists_count, :default => 0
+    end
   end
 
   def self.down
     drop_table :waitlists
     drop_table :waitlist_time_ranges
+    drop_table :appointment_waitlists
+    remove_column :appointments, :appointment_waitlists_count
   end
 end

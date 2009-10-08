@@ -29,6 +29,8 @@ class User < ActiveRecord::Base
   has_many                  :company_providers, :as => :provider, :dependent => :destroy
   has_many                  :companies, :through => :company_providers, :source => :company
 
+  has_many                  :waitlists, :foreign_key => :customer_id
+
   validates_presence_of       :cal_dav_token
   validates_length_of         :cal_dav_token,   :within => 10..150
   validates_uniqueness_of     :cal_dav_token
