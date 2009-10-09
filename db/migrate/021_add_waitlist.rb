@@ -26,7 +26,9 @@ class AddWaitlist < ActiveRecord::Migration
       t.integer     :end_time     # time of day to end
       t.timestamps
     end
-    
+
+    add_index :waitlist_time_ranges, :waitlist_id
+
     create_table :appointment_waitlists do |t|
       t.references  :appointment
       t.references  :waitlist
