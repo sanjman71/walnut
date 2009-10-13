@@ -1,5 +1,5 @@
 # Be explicit about our different environments
-set :stages, %w(mosso production)
+set :stages, %w(staging production)
 require 'capistrano/ext/multistage'
 
 # Set application name
