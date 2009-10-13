@@ -109,11 +109,6 @@ class Appointment < ActiveRecord::Base
                                                                              (start_at >= ? AND end_at <= ?)", 
                                                                              start_at, start_at, end_at, end_at, start_at, end_at] }}
 
-  # find appointments overlapping a time range
-  named_scope :overlap_incl,  lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
-                                                                            (start_at >= ? AND end_at <= ?)", 
-                                                                            start_at, start_at, end_at, end_at, start_at, end_at] }}
-
   # find appointments overlapping a time of day range
   named_scope :time_overlap,  lambda { |time_range| { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
                                                                        (time_start_at < ? AND time_end_at > ?) OR 
