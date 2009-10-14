@@ -44,6 +44,15 @@ class Waitlist < ActiveRecord::Base
                                                                                  (waitlist_time_ranges.start_time >= ? AND waitlist_time_ranges.end_time <= ?)", 
                                                                                  start_time, start_time, end_time, end_time, start_time, end_time] }}
 
+
+  # order by start_at
+  named_scope :order_start_at,  {:order => 'waitlist_time_ranges.start_time'}
+
+  def self.find_matching(company, location, provider, daterange)
+    # company.waitlists.provider(provider).date_overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+    company.waitlists.provider(provider).date_overlap(daterange.start_at, daterange.end_at).all(:include => :waitlist_time_ranges)
+  end
+
   # find all available free time
   def available_free_time
     duration      = service.duration
