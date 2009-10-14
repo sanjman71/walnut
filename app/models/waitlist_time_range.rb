@@ -72,8 +72,8 @@ class WaitlistTimeRange < ActiveRecord::Base
     case
     when s.length == 4 || s.length == 6 # e.g "0930", "093000"
       # create time object in local time zone, and convert to utc
-      date  = Time.now.to_s(:appt_schedule_day)
-      time  = Time.parse(date + s).utc
+      date  = Time.zone.now.to_s(:appt_schedule_day)
+      time  = Time.zone.parse(date + s)
       time.utc.hour * 3600 + time.utc.min * 60
     else
       raise Exception, "invalid time"
