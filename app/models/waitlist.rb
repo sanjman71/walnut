@@ -48,6 +48,7 @@ class Waitlist < ActiveRecord::Base
   # order by start_at
   named_scope :order_start_at,  {:order => 'waitlist_time_ranges.start_time'}
 
+  # find matching waitlists for the specified range
   def self.find_matching(company, location, provider, daterange)
     # company.waitlists.provider(provider).date_overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
     company.waitlists.provider(provider).date_overlap(daterange.start_at, daterange.end_at).all(:include => :waitlist_time_ranges)
@@ -63,8 +64,35 @@ class Waitlist < ActiveRecord::Base
       time_range    = [waitlist_time_range.start_time, waitlist_time_range.end_time]
       array         += company.appointments.free.provider(provider).overlap(start_date, end_date).time_overlap(time_range).duration_gt(duration).order_start_at
     end
-
     appointments
+  end
+
+  # expand over all days in the waitlist
+  def expand_days(options={})
+    @start_day = options[:start_day].to_s(:appt_schedule_day) unless options[:start_day].blank?
+    @end_day   = options[:end_day].to_s(:appt_schedule_day) unless options[:end_day].blank?
+    @days      = []
+
+    waitlist_time_ranges.each do |time_range|
+      # expand time range start date to end date
+      @time_range_start_day = time_range.start_date.to_s(:appt_schedule_day)
+      @time_range_end_day   = time_range.end_date.to_s(:appt_schedule_day)
+
+      # adjust date range based on constraints
+      if @start_day and @time_range_start_day < @start_day
+        @time_range_start_day = @start_day
+      end
+
+      if @end_day and @time_range_end_day > @end_day
+        @time_range_end_day = @end_day
+      end
+
+      Range.new(Date.parse(@time_range_start_day), Date.parse(@time_range_end_day)).collect do |date|
+        # return date as a datetime object in the local time zone
+        @days.push([self, date.to_time.in_time_zone.beginning_of_day, time_range])
+      end
+    end
+    @days
   end
 
   protected
