@@ -34,6 +34,10 @@ class EmailAddress < ActiveRecord::Base
     self.state == 'verified'
   end
   
+  def protocol
+    'email'
+  end
+  
   protected
   
   def manage_user_roles

@@ -27,6 +27,7 @@ class Appointment < ActiveRecord::Base
   belongs_to                  :recur_parent, :class_name => "Appointment"
 
   has_many                    :appointment_waitlists, :dependent => :destroy
+  has_many                    :waitlists, :through => :appointment_waitlists
 
   # validates_presence_of       :name
   validates_presence_of       :company_id
@@ -39,7 +40,7 @@ class Appointment < ActiveRecord::Base
 
   before_save                 :make_confirmation_code
   after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
-                              :expand_recurrence_after_create, :send_confirmation
+                              :expand_recurrence_after_create, :create_appointment_waitlist, :send_confirmation
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -748,6 +749,12 @@ class Appointment < ActiveRecord::Base
         instance_updates = self.changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }
         self.recur_instances.each { |a| a.update_attributes(instance_updates) }
       end
+    end
+  end
+
+  def create_appointment_waitlist
+    if RAILS_ENV == 'development'
+      AppointmentWaitlist.create_waitlist(self)
     end
   end
 

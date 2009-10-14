@@ -12,9 +12,9 @@ class Waitlist < ActiveRecord::Base
   # validates_presence_of       :provider_id, :if => :provider_required?
   # validates_presence_of       :provider_type, :if => :provider_required?
 
-  after_create                :grant_company_customer_role, :create_appointment_waitlist
+  after_create                :grant_company_customer_role
 
-  has_many                      :waitlist_time_ranges, :dependent => :destroy
+  has_many                      :waitlist_time_ranges, :dependent => :destroy, :after_add => :after_add_waitlist_time_range
   accepts_nested_attributes_for :waitlist_time_ranges, :allow_destroy => true
 
   has_many                    :appointment_waitlists, :dependent => :destroy
@@ -26,6 +26,9 @@ class Waitlist < ActiveRecord::Base
                                                     {}
                                                   end
                                       }
+                                      
+  # find waitlists with at least 1 past waitlist time range
+  named_scope :past,          lambda { { :include => :waitlist_time_ranges, :conditions => ["waitlist_time_ranges.end_date < ?", Time.zone.now] } }
 
   # find appointments overlapping a time range
   named_scope :date_overlap,  lambda { |start_date, end_date| { :joins => :waitlist_time_ranges,
@@ -62,7 +65,11 @@ class Waitlist < ActiveRecord::Base
     self.customer.grant_role('company customer', self.company) unless self.customer.has_role?('company customer', self.company)
   end
 
-  def create_appointment_waitlist
-    AppointmentWaitlist.create_waitlist(self)
+  def after_add_waitlist_time_range(waitlist_time_range)
+    # the callback can be invoked on new records
+    return if self.new_record?
+    if RAILS_ENV == 'development'
+      AppointmentWaitlist.create_waitlist(self)
+    end
   end
 end

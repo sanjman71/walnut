@@ -7,6 +7,24 @@ class MessageTest < ActiveSupport::TestCase
   should_have_many              :message_recipients
 
   context "create" do
+    context "with nested attributes" do
+      setup do
+        @recipient  = Factory(:user, :name => "Recipient")
+        @email      = @recipient.email_addresses.create(:address => "a@b.com")
+        @attrs      = Hash["0" => {:messagable_id => @email.id, :messagable_type => 'EmailAddress', :protocol => 'email'}]
+        @sender     = Factory(:user, :name => "Sender") 
+        @message    = Message.create(:sender => @sender, :subject => "Message subject", :body => "Message body",
+                                     :message_recipients_attributes => @attrs)
+      end
+
+      should_change("Message.count", :by => 1) { Message.count }
+      should_change("MessageRecipient.count", :by => 1) { MessageRecipient.count }
+      
+      should "set recipient to email address" do
+        assert_equal [@email], @message.message_recipients.collect(&:messagable)
+      end
+    end
+
     setup do
       @sender   = Factory(:user, :name => "Sender") 
       @message  = Message.create(:sender => @sender, :subject => "Message subject", :body => "Message body")

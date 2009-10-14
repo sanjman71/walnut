@@ -2,9 +2,10 @@ class Message < ActiveRecord::Base
   belongs_to              :sender, :class_name => "User"
   validates_presence_of   :body, :sender_id
   has_many                :message_recipients, :dependent => :destroy
+  accepts_nested_attributes_for :message_recipients, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
   has_many                :message_threads
   has_one                 :message_thread, :order => 'id DESC'
-    
+
   before_destroy          :before_destroy_message
 
   # send message
