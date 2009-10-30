@@ -309,7 +309,12 @@ class SearchController < ApplicationController
 
   def find_tag(s)
     return nil if s.blank?
-    Tag.find_by_name(s)
+    if ['anything', 'something'].include?(s)
+      find_random_tag
+    else
+      # find specified tag
+      Tag.find_by_name(s)
+    end
   end
 
   def find_random_tag
