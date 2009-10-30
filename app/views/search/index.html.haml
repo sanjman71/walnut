@@ -21,13 +21,13 @@
     #related_tags
       = render(:partial => 'search/related_tags', :locals => {:title => "Related Searches", :tags => @related_tags}) unless @related_tags.blank?
     #neighborhoods
-      = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag, :query => @query}) unless @neighborhoods.blank?
+      = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag.to_s, :query => @query}) unless @neighborhoods.blank?
     #zips
-      = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag, :query => @query}) unless @zips.blank?
+      = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag.to_s, :query => @query}) unless @zips.blank?
     #cities
-      = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag, :query => @query}) unless @cities.blank?
+      = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag.to_s, :query => @query}) unless @cities.blank?
     #nearby_cities
-      = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag, :query => @query}) unless @nearby_cities.blank?
+      = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag.to_s, :query => @query}) unless @nearby_cities.blank?
 
     -# google ad - search index left side vertical banner
     = render :partial => 'adsense/search_index_left_verticalbanner'
@@ -50,7 +50,7 @@
         -# filter search results by type
         - @search_filters.keys.each do |klass|
           %span{:style => 'font-weight: bold; font-size: 1.1em;'}
-            = link_to("Search #{klass_to_word(klass.pluralize).titleize} only", build_search_route(klass, @geo_search, @geo_params.merge(:tag => @tag, :query => @query).compact), :style => 'color: #0099FF;')
+            = link_to("Search #{klass_to_word(klass.pluralize).titleize} only", build_search_route(klass, @geo_search, @geo_params.merge(:tag => @tag.to_s, :query => @query).compact), :style => 'color: #0099FF;')
             = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
     
     .span-10

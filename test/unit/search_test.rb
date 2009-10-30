@@ -27,45 +27,70 @@ class SearchTest < ActiveSupport::TestCase
     end
   end
 
-  context "search query with no query string and events attribute" do
-    setup do
-      @hash = Search.query("events:1")
+  context "search query with attributes" do
+    context "with tag_ids attribute" do
+      setup do
+        @hash = Search.query("tag_ids:131")
+      end
+
+      should "have attributes hash" do
+        assert_equal Hash[:query_raw => "tag_ids:131", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:tag_ids => 131}], @hash
+      end
+    end
+    
+    context "with events attribute" do
+      setup do
+        @hash = Search.query("events:1")
+      end
+
+      should "have attributes hash" do
+        assert_equal Hash[:query_raw => "events:1", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:events => 1..2**30}], @hash
+      end
+    end
+    
+    context "with no events attribute" do
+      setup do
+        @hash = Search.query("events:0")
+      end
+
+      should "have attributes hash" do
+        assert_equal Hash[:query_raw => "events:0", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:events => 0}], @hash
+      end
     end
 
-    should "have attributes hash" do
-      assert_equal Hash[:query_raw => "events:1", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:events => 1..2**30}], @hash
+    context "with popularity attribute" do
+      setup do
+        @hash = Search.query("popularity:50")
+      end
+
+      should "have attributes hash" do
+        assert_equal Hash[:query_raw => "popularity:50", :query_and => '', :query_or => '', :query_quorum => '', 
+                          :attributes => {:popularity => 50..2**30}], @hash
+      end
     end
   end
+  
+  context "search query with fields" do
+    context "with address field" do
+      setup do
+        @hash = Search.query("address:'200 grand'")
+      end
 
-  context "search query with no query string and no events attribute" do
-    setup do
-      @hash = Search.query("events:0")
+      should "have fields hash" do
+        assert_equal Hash[:query_raw => "address:'200 grand'", :query_and => '', :query_or => '', :query_quorum => '', 
+                          :fields => {:address => '200 grand'}], @hash
+      end
     end
+    
+    context "with address fields in caps" do
+      setup do
+        @hash = Search.query("address:'200 Grand Ave'")
+      end
 
-    should "have attributes hash" do
-      assert_equal Hash[:query_raw => "events:0", :query_and => '', :query_or => '', :query_quorum => '', :attributes => {:events => 0}], @hash
-    end
-  end
-
-  context "search query with no query string and address field" do
-    setup do
-      @hash = Search.query("address:'200 grand'")
-    end
-
-    should "have fields hash" do
-      assert_equal Hash[:query_raw => "address:'200 grand'", :query_and => '', :query_or => '', :query_quorum => '', 
-                        :fields => {:address => '200 grand'}], @hash
-    end
-  end
-
-  context "search query with no query string and address field with caps" do
-    setup do
-      @hash = Search.query("address:'200 Grand Ave'")
-    end
-
-    should "have fields hash" do
-      assert_equal Hash[:query_raw => "address:'200 Grand Ave'", :query_and => '', :query_or => '', :query_quorum => '', 
-                        :fields => {:address => '200 Grand Ave'}], @hash
+      should "have fields hash" do
+        assert_equal Hash[:query_raw => "address:'200 Grand Ave'", :query_and => '', :query_or => '', :query_quorum => '', 
+                          :fields => {:address => '200 Grand Ave'}], @hash
+      end
     end
   end
 

@@ -70,12 +70,40 @@ class SearchControllerTest < ActionController::TestCase
     @il       = Factory(:state, :name => "Illinois", :code => "IL", :country => @us)
     @chicago  = Factory(:city, :name => "Chicago", :state => @il)
     @z60610   = Factory(:zip, :name => "60610", :state => @il)
+    @tag      = Tag.create(:name => 'food')
   end
 
-  context "city search tag page" do
-    context "with no locations" do
+  context "city search page" do
+    context "with query and no locations" do
       setup do
-        # stub search resutls and tag facets
+        # stub search results and tag facets
+        ThinkingSphinx.stubs(:search).returns([])
+        Search.stubs(:load_from_facets).returns([])
+        get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food'
+      end
+
+      should_respond_with :success
+      should_render_template 'search/no_results.html.haml'
+      should_assign_to(:klasses) { [Location] }
+      should_assign_to(:country) { @us }
+      should_assign_to(:state) { @il }
+      should_assign_to(:city) { @chicago }
+      should_assign_to(:geo_search) { 'city' }
+      should_assign_to(:query) { 'food' }
+      should_not_assign_to(:tag)
+      should_assign_to(:query_or) { "food" }
+      should_assign_to(:query_and) { "food" }
+      should_assign_to(:query_quorum) { "\"food\"/1" }
+      should_assign_to(:query_raw) { "food" }
+      should_not_assign_to(:fields)
+      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
+      should_assign_to(:title) { "Food near Chicago, IL" }
+      should_assign_to(:h1) { "Food near Chicago, IL" }
+    end
+
+    context "with tag and no locations" do
+      setup do
+        # stub search results and tag facets
         ThinkingSphinx.stubs(:search).returns([])
         Search.stubs(:load_from_facets).returns([])
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
@@ -89,13 +117,13 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:city) { @chicago }
       should_assign_to(:geo_search) { 'city' }
       should_assign_to(:query) { '' }
-      should_assign_to(:tag) { 'food' }
-      should_assign_to(:query_or) { "food" }
-      should_assign_to(:query_and) { "food" }
-      should_assign_to(:query_quorum) { "\"food\"/1" }
-      should_assign_to(:query_raw) { "food" }
+      should_assign_to(:tag) { @tag }
+      should_assign_to(:query_or) { "" }
+      should_assign_to(:query_and) { "" }
+      should_assign_to(:query_quorum) { "" }
+      should_assign_to(:query_raw) { "tag_ids:#{@tag.id}" }
       should_not_assign_to(:fields)
-      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
+      should_assign_to(:attributes) { Hash[:city_id => @chicago.id, :tag_ids => @tag.id] }
       should_assign_to(:title) { "Food near Chicago, IL" }
       should_assign_to(:h1) { "Food near Chicago, IL" }
       
@@ -103,12 +131,12 @@ class SearchControllerTest < ActionController::TestCase
         assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
                                  :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
       end
-
+    
       should "have breadcrumbs link 'Illinois'" do
         assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
                                  :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
       end
-
+    
       should "have breadcrumbs link 'Chicago'" do
         assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
                                  :descendant => {:tag => 'a', :attributes => {:class => 'city', :href => '/search/us/il/chicago'}}

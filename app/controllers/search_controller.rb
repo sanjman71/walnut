@@ -78,8 +78,8 @@ class SearchController < ApplicationController
     # @country, @state, @city, @zip, @neighborhood all initialized in before filter
     
     @search_klass   = params[:klass]
-    @tag            = params[:tag].to_s.from_url_param
-    @query          = params[:query] ? session[:query] : ''
+    @tag            = find_tag(params[:tag].to_s.from_url_param)
+    @query          = params[:query] ? (session[:query] || params[:query]) : ''
 
     if @tag.blank? and @query.blank?
       # default to tag 'anything'
@@ -89,7 +89,7 @@ class SearchController < ApplicationController
     # handle special case of 'something' to find a random tag
     @tag            = find_random_tag if @tag == 'something'
 
-    @hash           = Search.query(!@tag.blank? ? @tag : @query)
+    @hash           = Search.query(!@tag.blank? ? "tag_ids:#{@tag.id}" : @query)
     @query_raw      = @hash[:query_raw]
     @query_or       = @hash[:query_or]
     @query_and      = @hash[:query_and]
@@ -242,7 +242,7 @@ class SearchController < ApplicationController
     @geo_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
     
     # build search title based on query, city, neighborhood, zip search
-    @title  = build_search_title(:tag => @tag, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @title  = build_search_title(:tag => @tag.to_s, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
 
     # enable/disable robots
@@ -253,7 +253,7 @@ class SearchController < ApplicationController
     end
 
     # track what event
-    track_what_ga_event(@search_klass, :tag => @tag, :query => @query)
+    track_what_ga_event(@search_klass, :tag => @tag.to_s, :query => @query)
 
     if @objects.blank?
       # no search results
@@ -307,14 +307,19 @@ class SearchController < ApplicationController
 
   protected
 
+  def find_tag(s)
+    return nil if s.blank?
+    Tag.find_by_name(s)
+  end
+
   def find_random_tag
     self.class.benchmark("*** Benchmarking find random tag", Logger::DEBUG, false) do
       tag_size  = 300
       tag_ids   = Rails.cache.fetch("tags:random", :expires_in => CacheExpire.tags) do
         Tag.find(:all, :limit => tag_size, :order => 'taggings_count desc', :select => 'id').collect(&:id)
       end
-      tag_id    = tag_ids[rand(tag_size)]
-      Tag.find(tag_id).name
+      # find tag object
+      Tag.find(tag_ids[rand(tag_size)])
     end
   end
 

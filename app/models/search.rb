@@ -28,11 +28,11 @@ class Search
     
     # valid fields and attributes
     all_fields          = [:address, :name, :tags, :*]
-    all_attributes      = [:events, :popularity]
+    all_attributes      = [:events, :popularity, :tag_ids]
     
     # valid patterns
-    match_field_token   = "([a-zA-Z]+):([0-9a-zA-Z]+)"
-    match_field_quotes  = "([a-zA-Z]+):'([0-9a-zA-Z ]+)'"
+    match_field_token   = "([a-zA-Z_]+):([0-9a-zA-Z]+)"
+    match_field_quotes  = "([a-zA-Z_]+):'([0-9a-zA-Z ]+)'"
     match_quoted_phrase = "([ ]*)'([0-9a-zA-Z ]+)'"
 
     # find all field matches, with or without quotes
@@ -57,7 +57,8 @@ class Search
             end
             attributes[key] = value
           else
-            attributes[key] = value
+            # attribute values are integers
+            attributes[key] = value.to_i
           end
         elsif all_fields.include?(key.to_sym)
           # fields are usually strings
