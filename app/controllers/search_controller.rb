@@ -166,7 +166,7 @@ class SearchController < ApplicationController
       related_size   = 10
       @related_tags  = @objects.collect{ |o| o.company.tags }.flatten.compact.uniq.sort_by{ |o| -o.taggings_count }
       # sort and filter number of tags shown
-      @related_tags  = (@related_tags.collect(&:name) - [@query_raw]).slice(0, related_size)
+      @related_tags  = (@related_tags.collect(&:name) - [@tag ? @tag.name : @query_raw]).slice(0, related_size)
     end
 
     case @geo_search
