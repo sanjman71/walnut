@@ -171,53 +171,57 @@ class SearchController < ApplicationController
 
     case @geo_search
     when 'neighborhood'
-      self.class.benchmark("*** Benchmarking #{@neighborhood.name.downcase} neighborhoods sphinx facets for '#{@query_and}'", Logger::INFO, false) do
-        # use neighborhood cities as nearby cities
-        @cities         = Array(@neighborhood.city)
+      # self.class.benchmark("*** Benchmarking related #{@neighborhood.name.downcase} neighborhoods from sphinx facets for '#{@query_and}'", Logger::INFO, false) do
+      #   # use neighborhood cities as nearby cities
+      #   @cities         = Array(@neighborhood.city)
+      # 
+      #   # SK: comment out zip facets for neighborhood searches
+      #   # build zip facets using all geo constraints
+      #   # limit           = 10
+      #   # facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => [:zip_id], :group_clause => "@count desc", :match_mode => :extended2, :limit => limit)
+      #   # @zips           = Search.load_from_facets(facets, Zip)
+      # 
+      #   # build neighborhood facets using city constraint
+      #   limit           = 11
+      #   attr_city       = Search.attributes(@city)
+      #   facets          = @facet_klass.facets(@query_and, :with => attr_city, :facets => [:neighborhood_ids], :group_clause => "@count desc",
+      #                                         :match_mode => :extended2, :limit => limit)
+      #   @neighborhoods  = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
+      # end
 
-        # SK: comment out zip facets for neighborhood searches
-        # build zip facets using all geo constraints
-        # limit           = 10
-        # facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => [:zip_id], :group_clause => "@count desc", :match_mode => :extended2, :limit => limit)
-        # @zips           = Search.load_from_facets(facets, Zip)
-
-        # build neighborhood facets using city constraint
-        limit           = 11
-        attr_city       = Search.attributes(@city)
-        facets          = @facet_klass.facets(@query_and, :with => attr_city, :facets => [:neighborhood_ids], :group_clause => "@count desc",
-                                              :match_mode => :extended2, :limit => limit)
-        @neighborhoods  = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
+      self.class.benchmark("*** Benchmarking related #{@neighborhood.name.downcase} neighborhoods from database", Logger::INFO, false) do
+        @neighborhoods = (@objects.collect(&:neighborhoods).flatten.uniq - [@neighborhood])
       end
     when 'city'
-      self.class.benchmark("*** Benchmarking #{@city.name.downcase} neighborhoods from sphinx facets for '#{@query_and}'", Logger::INFO, false) do
-        # SK: comment out zip facets for city searches
-        # build neighborhood facets iff city has neighborhoods
-        if @city.neighborhoods_count > 0
-          limit     = 20
-          facets    = @facet_klass.facets(@query_and, :with => @attributes, :facets => [:neighborhood_ids], :group_clause => "@count desc", 
-                                          :match_mode => :extended2, :limit => limit)
-      
-          self.class.benchmark("*** benchmarking ... neighborhood database load", Logger::INFO) do
-            @neighborhoods = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
-          end
-        end
-
-        # SK: this is an optimization to cache zip and neighborhood facets for a specific search, but requires more testing
-        # @zips, @neighborhoods = Rails.cache.fetch("#{@city.name.to_url_param}:#{@facet_klass.to_s.to_url_param}:#{@query_raw.to_url_param}:facets:zips:neighborhoods", :expires_in => CacheExpire.facets) do
-        #   facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit)
-        #   zips            = Search.load_from_facets(facets, Zip)
-        #   neighborhoods   = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
-        #   [zips, neighborhoods]
-        # end
-      end
-      
-      # self.class.benchmark("*** Benchmarking #{@city.name} neighborhoods from database", Logger::INFO, false) do
-      #   unless @city.neighborhoods_count == 0
-      #     # SK - can we eager join here like this?
-      #     # @neighborhoods = Location.find(@objects.collect(&:id), :include => :neighborhoods)
-      #     @neighborhoods = @objects.collect(&:neighborhoods).flatten.uniq
+      # self.class.benchmark("*** Benchmarking #{@city.name.downcase} neighborhoods from sphinx facets for '#{@query_and}'", Logger::INFO, false) do
+      #   # SK: comment out zip facets for city searches
+      #   # build neighborhood facets iff city has neighborhoods
+      #   if @city.neighborhoods_count > 0
+      #     limit     = 20
+      #     facets    = @facet_klass.facets(@query_and, :with => @attributes, :facets => [:neighborhood_ids], :group_clause => "@count desc", 
+      #                                     :match_mode => :extended2, :limit => limit)
+      # 
+      #     self.class.benchmark("*** benchmarking ... neighborhood database load", Logger::INFO) do
+      #       @neighborhoods = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
+      #     end
       #   end
+      # 
+      #   # SK: this is an optimization to cache zip and neighborhood facets for a specific search, but requires more testing
+      #   # @zips, @neighborhoods = Rails.cache.fetch("#{@city.name.to_url_param}:#{@facet_klass.to_s.to_url_param}:#{@query_raw.to_url_param}:facets:zips:neighborhoods", :expires_in => CacheExpire.facets) do
+      #   #   facets          = @facet_klass.facets(@query_and, :with => @attributes, :facets => ["zip_id", "neighborhood_ids"], :limit => limit)
+      #   #   zips            = Search.load_from_facets(facets, Zip)
+      #   #   neighborhoods   = Search.load_from_facets(facets, Neighborhood).sort_by{ |o| o.name }
+      #   #   [zips, neighborhoods]
+      #   # end
       # end
+
+      self.class.benchmark("*** Benchmarking #{@city.name.downcase} neighborhoods from database", Logger::INFO, false) do
+        unless @city.neighborhoods_count == 0
+          # SK - can we eager join here like this?
+          # @neighborhoods = Location.find(@objects.collect(&:id), :include => :neighborhoods)
+          @neighborhoods = @objects.collect(&:neighborhoods).flatten.uniq
+        end
+      end
 
       self.class.benchmark("*** Benchmarking #{@city.name.to_url_param} nearby cities", Logger::INFO, false) do
         if @neighborhoods.blank?
