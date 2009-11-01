@@ -234,12 +234,17 @@ class SearchController < ApplicationController
         end
       end
     when 'zip'
-      self.class.benchmark("Benchmarking sphinx #{@zip.name} cities facets for '#{@query_and}'", Logger::INFO, false) do
-        # build city facets
-        limit       = 5
-        facets      = @facet_klass.facets(@query_and, :with => @attributes, :facets => [:city_id], :group_clause => "@count desc", :limit => limit,
-                                          :match_mode => :extended2)
-        @cities     = Search.load_from_facets(facets, City)
+      # self.class.benchmark("*** Benchmarking #{@zip.name} cities from sphinx facets", Logger::INFO, false) do
+      #   # build city facets
+      #   limit       = 5
+      #   facets      = @facet_klass.facets(@query_and, :with => @attributes, :facets => [:city_id], :group_clause => "@count desc", :limit => limit,
+      #                                     :match_mode => :extended2)
+      #   @cities     = Search.load_from_facets(facets, City)
+      # end
+
+      self.class.benchmark("*** Benchmarking #{@zip.name} cities from database", Logger::INFO, false) do
+        @city_ids = @objects.collect(&:city_id).flatten.uniq
+        @cities   = City.find(@city_ids)
       end
     end
 
