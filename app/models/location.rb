@@ -65,6 +65,7 @@ class Location < ActiveRecord::Base
     indexes street_address, :as => :address
     # this doesn't work; don't think mva string attributes are supported
     # indexes companies.tags(:name), :as => :tags, :type => :multi, :facet => true
+    indexes companies.tags(:name), :as => :tags
     has companies.tags(:id), :as => :tag_ids, :facet => true
     # locality attributes, all faceted
     has country_id, :type => :integer, :as => :country_id, :facet => true
