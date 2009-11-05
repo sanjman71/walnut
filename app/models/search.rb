@@ -21,6 +21,16 @@ class Search
     hash
   end
   
+  # build field query string
+  def self.build_field_query(field, query)
+    if query.match(/\s/)
+      # use quotes for a multi-word query
+      "#{field}:'#{query}'"
+    else
+      "#{field}:#{query}"
+    end
+  end
+
   def self.query(s)
     hash        = Hash[:query_raw => s]
     fields      = Hash.new
