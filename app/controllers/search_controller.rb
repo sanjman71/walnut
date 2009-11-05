@@ -137,10 +137,12 @@ class SearchController < ApplicationController
       @sort_order     = "start_at asc"
     end
 
-    self.class.benchmark("*** Benchmarking sphinx query '#{@query_quorum}'", Logger::INFO, false) do
+    self.class.benchmark("*** Benchmarking sphinx query", APP_LOGGER_LEVEL, false) do
       @objects = ThinkingSphinx.search(@query_quorum, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                        :match_mode => :extended2, :rank_mode => :bm25, :order => @sort_order, :include => @eager_loads, 
                                        :page => params[:page], :per_page => 5)
+      # the first reference to 'objects' does the actual sphinx query 
+      logger.debug("*** [sphinx] objects: #{@objects.size}")
     end
 
     # filter objects by class if this was a generic search
@@ -161,7 +163,7 @@ class SearchController < ApplicationController
     #   end
     # end
 
-    self.class.benchmark("*** Benchmarking related tags from database", Logger::INFO, false) do
+    self.class.benchmark("*** Benchmarking related tags from database", APP_LOGGER_LEVEL, false) do
       # find related tags by collecting all company tags from the search results, sort by tag popularity
       related_size   = 10
       @related_tags  = @objects.collect{ |o| o.company.tags }.flatten.compact.uniq.sort_by{ |o| -o.taggings_count }
@@ -189,8 +191,12 @@ class SearchController < ApplicationController
       #   @neighborhoods  = (Search.load_from_facets(facets, Neighborhood) - Array[@neighborhood]).sort_by{ |o| o.name }
       # end
 
-      self.class.benchmark("*** Benchmarking related #{@neighborhood.name.downcase} neighborhoods from database", Logger::INFO, false) do
+      self.class.benchmark("*** Benchmarking related #{@neighborhood.name.downcase} neighborhoods from database", APP_LOGGER_LEVEL, false) do
         @neighborhoods = (@objects.collect(&:neighborhoods).flatten.uniq - [@neighborhood])
+      end
+
+      self.class.benchmark("*** Benchmarking nearby #{@neighborhood.name.downcase} cities from database", APP_LOGGER_LEVEL, false) do
+        @cities = Array(@neighborhood.city)
       end
     when 'city'
       # self.class.benchmark("*** Benchmarking #{@city.name.downcase} neighborhoods from sphinx facets for '#{@query_and}'", Logger::INFO, false) do
@@ -215,7 +221,7 @@ class SearchController < ApplicationController
       #   # end
       # end
 
-      self.class.benchmark("*** Benchmarking #{@city.name.downcase} neighborhoods from database", Logger::INFO, false) do
+      self.class.benchmark("*** Benchmarking #{@city.name.downcase} neighborhoods from database", APP_LOGGER_LEVEL, false) do
         unless @city.neighborhoods_count == 0
           # SK - can we eager join here like this?
           # @neighborhoods = Location.find(@objects.collect(&:id), :include => :neighborhoods)
@@ -223,7 +229,11 @@ class SearchController < ApplicationController
         end
       end
 
-      self.class.benchmark("*** Benchmarking #{@city.name.to_url_param} nearby cities", Logger::INFO, false) do
+      self.class.benchmark("*** Benchmarking #{@city.name.downcase} zips from database", APP_LOGGER_LEVEL, false) do
+        @zips = @objects.collect(&:zip).flatten.compact.uniq
+      end
+
+      self.class.benchmark("*** Benchmarking #{@city.name.downcase} nearby cities", APP_LOGGER_LEVEL, false) do
         if @neighborhoods.blank?
           # find (and cache) nearby cities, where nearby is defined with a mile radius range, iff there are no neighborhoods
           nearby_miles    = 20
@@ -242,20 +252,21 @@ class SearchController < ApplicationController
       #   @cities     = Search.load_from_facets(facets, City)
       # end
 
-      self.class.benchmark("*** Benchmarking #{@zip.name} cities from database", Logger::INFO, false) do
-        @city_ids = @objects.collect(&:city_id).flatten.uniq
+      self.class.benchmark("*** Benchmarking #{@zip.name} cities from database", APP_LOGGER_LEVEL, false) do
+        @city_ids = @objects.collect(&:city_id).flatten.compact.uniq
         @cities   = City.find(@city_ids)
       end
     end
 
     @geo_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
-    
+
     # build search title based on query, city, neighborhood, zip search
     @title  = build_search_title(:tag => @tag.to_s, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
 
     # enable/disable robots
-    if @search_klass == 'search' and params[:page].to_i == 0 and !@tag.blank?
+    if @search_klass == 'search' and params[:page].to_i == 0 and !@tag.blank? and !@objects.blank?
+      # its a tag search, with at least 1 location, and the first first page of results
       @robots = true
     else
       @robots = false
@@ -327,7 +338,7 @@ class SearchController < ApplicationController
   end
 
   def find_random_tag
-    self.class.benchmark("*** Benchmarking find random tag", Logger::DEBUG, false) do
+    self.class.benchmark("*** Benchmarking find random tag", APP_LOGGER_LEVEL, false) do
       tag_size  = 300
       tag_ids   = Rails.cache.fetch("tags:random", :expires_in => CacheExpire.tags) do
         Tag.find(:all, :limit => tag_size, :order => 'taggings_count desc', :select => 'id').collect(&:id)

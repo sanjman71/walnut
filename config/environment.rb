@@ -113,6 +113,9 @@ ADMIN_USER_EMAILS  = %w(sanjay@walnutindustries.com killian@walnutindustries.com
 # Auth token
 AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
 
+#
+APP_LOGGER_LEVEL  = ActiveRecord::Base.logger.level
+
 # Initialize exception notifier
 ExceptionNotifier.exception_recipients  = %w(exceptions@walnutindustries.com)
 ExceptionNotifier.sender_address        = %("Walnut Places Exception" <app@walnutindustries.com>)
@@ -123,5 +126,6 @@ WEATHER_ENVS = []
 
 # create special localeze loggers
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
+LOCALEZE_DELTA_LOGGER     = Logger.new("log/localeze.delta.log")
 DATA_ERROR_LOGGER         = Logger.new("log/data.error.log")
 DATA_TAGS_LOGGER          = Logger.new("log/data.tags.log")
