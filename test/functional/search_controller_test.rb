@@ -71,14 +71,16 @@ class SearchControllerTest < ActionController::TestCase
     @chicago  = Factory(:city, :name => "Chicago", :state => @il)
     @z60610   = Factory(:zip, :name => "60610", :state => @il)
     @tag      = Tag.create(:name => 'food')
+    @company  = Company.create(:name => "My Company", :time_zone => "UTC")
+    @location = Location.create(:name => "Home", :country => @us, :state => @il, :city => @chicago)
+    @company.locations.push(@location)
   end
 
   context "city search page" do
     context "with query and no locations" do
       setup do
-        # stub search results and tag facets
+        # stub search results
         ThinkingSphinx.stubs(:search).returns([])
-        Search.stubs(:load_from_facets).returns([])
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food'
       end
 
@@ -99,13 +101,16 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
       should_assign_to(:title) { "Food near Chicago, IL" }
       should_assign_to(:h1) { "Food near Chicago, IL" }
+
+      should "disallow robots (query, no locations)" do
+        assert_false assigns(:robots)
+      end
     end
 
     context "with tag and no locations" do
       setup do
-        # stub search results and tag facets
+        # stub search results
         ThinkingSphinx.stubs(:search).returns([])
-        Search.stubs(:load_from_facets).returns([])
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
       end
     
@@ -121,12 +126,64 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:query_or) { "" }
       should_assign_to(:query_and) { "" }
       should_assign_to(:query_quorum) { "" }
-      should_assign_to(:query_raw) { "tag_ids:#{@tag.id}" }
-      should_not_assign_to(:fields)
-      should_assign_to(:attributes) { Hash[:city_id => @chicago.id, :tag_ids => @tag.id] }
+      should_assign_to(:query_raw) { "tags:food" }
+      should_assign_to(:fields) { Hash[:tags => 'food'] }
+      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
       should_assign_to(:title) { "Food near Chicago, IL" }
       should_assign_to(:h1) { "Food near Chicago, IL" }
-      
+
+      should "disallow robots (no locations)" do
+        assert_false assigns(:robots)
+      end
+
+      should "have breadcrumbs link 'United States'" do
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                                 :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
+      end
+    
+      should "have breadcrumbs link 'Illinois'" do
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                                 :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
+      end
+    
+      should "have breadcrumbs link 'Chicago'" do
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+                                 :descendant => {:tag => 'a', :attributes => {:class => 'city', :href => '/search/us/il/chicago'}}
+      end
+    end
+    
+    context "with tag and 1 location" do
+      setup do
+        # stub search results
+        @results = [@location]
+        ThinkingSphinx.stubs(:search).returns(@results)
+        @results.stubs(:total_pages).returns(1)
+        get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
+      end
+
+      should_respond_with :success
+      should_render_template 'search/index.html.haml'
+      should_assign_to(:objects) { [@location] }
+      should_assign_to(:klasses) { [Location] }
+      should_assign_to(:country) { @us }
+      should_assign_to(:state) { @il }
+      should_assign_to(:city) { @chicago }
+      should_assign_to(:geo_search) { 'city' }
+      should_assign_to(:query) { '' }
+      should_assign_to(:tag) { @tag }
+      should_assign_to(:query_or) { "" }
+      should_assign_to(:query_and) { "" }
+      should_assign_to(:query_quorum) { "" }
+      should_assign_to(:query_raw) { "tags:food" }
+      should_assign_to(:fields) { Hash[:tags => 'food'] }
+      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
+      should_assign_to(:title) { "Food near Chicago, IL" }
+      should_assign_to(:h1) { "Food near Chicago, IL" }
+
+      should "allow robots" do
+        assert_true assigns(:robots)
+      end
+
       should "have breadcrumbs link 'United States'" do
         assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
                                  :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
@@ -146,8 +203,6 @@ class SearchControllerTest < ActionController::TestCase
 
   context "city page with no zips or neighborhoods" do
     setup do
-      # stub zip, tags facet search
-      Search.stubs(:load_from_facets).returns([])
       get :city, :country => 'us', :state => 'il', :city => 'chicago'
     end
 
@@ -188,8 +243,6 @@ class SearchControllerTest < ActionController::TestCase
   context "neighborhood page" do
     setup do
       @river_north = Factory(:neighborhood, :name => "River North", :city => @chicago)
-      # stub tags facet search
-      Search.stubs(:load_from_facets).returns([])
       get :neighborhood, :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north'
     end
 
@@ -229,8 +282,6 @@ class SearchControllerTest < ActionController::TestCase
 
   context "zip page" do
     setup do
-      # stub cities, tags facet search
-      Search.stubs(:load_from_facets).returns([])
       get :zip, :country => 'us', :state => 'il', :zip => '60610'
     end
     

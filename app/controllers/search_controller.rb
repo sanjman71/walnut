@@ -89,7 +89,7 @@ class SearchController < ApplicationController
     # handle special case of 'something' to find a random tag
     @tag            = find_random_tag if @tag == 'something'
 
-    @hash           = Search.query(!@tag.blank? ? "tag_ids:#{@tag.id}" : @query)
+    @hash           = Search.query(!@tag.blank? ? Search.build_field_query("tags", @tag.name) : @query)
     @query_raw      = @hash[:query_raw]
     @query_or       = @hash[:query_or]
     @query_and      = @hash[:query_and]
