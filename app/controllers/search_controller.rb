@@ -96,6 +96,7 @@ class SearchController < ApplicationController
     @query_quorum   = @hash[:query_quorum]
     @fields         = @hash[:fields]
     @attributes     = @hash[:attributes] || Hash.new
+    @max_matches    = 50 # limit the total number of results
 
     # build attributes based on geo type
     case
@@ -125,13 +126,13 @@ class SearchController < ApplicationController
       @sort_order     = "popularity desc, @relevance desc"
     when 'locations'
       @klasses        = [Location]
-      @eager_loads    = [:company, :city, :state, :zip, :primary_phone_number]
+      @eager_loads    = [{:company => :tags}, :city, :state, :zip, :primary_phone_number]
       @facet_klass    = Location
       @tag_klasses    = [Location]
       @sort_order     = "popularity desc, @relevance desc"
     when 'events'
       @klasses        = [Appointment]
-      @eager_loads    = [{:location => :company}]
+      @eager_loads    = [{:location => :company}, :tags]
       @facet_klass    = Appointment
       @tag_klasses    = [Location]
       @sort_order     = "start_at asc"
@@ -140,7 +141,7 @@ class SearchController < ApplicationController
     self.class.benchmark("*** Benchmarking sphinx query", APP_LOGGER_LEVEL, false) do
       @objects = ThinkingSphinx.search(@query_quorum, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                        :match_mode => :extended2, :rank_mode => :bm25, :order => @sort_order, :include => @eager_loads, 
-                                       :page => params[:page], :per_page => 5)
+                                       :page => params[:page], :per_page => 5, :max_matches => @max_matches)
       # the first reference to 'objects' does the actual sphinx query 
       logger.debug("*** [sphinx] objects: #{@objects.size}")
     end
@@ -150,7 +151,7 @@ class SearchController < ApplicationController
     @objects.each do |object|
       @search_filters[object.class.to_s] += [object]
     end if @search_klass == 'search'
-    
+
     # self.class.benchmark("*** Benchmarking related tags from sphinx facets", Logger::INFO, false) do
     #   # find related tags by class; build tag facets for each specified tag klass
     #   related_size    = 11
@@ -164,9 +165,9 @@ class SearchController < ApplicationController
     # end
 
     self.class.benchmark("*** Benchmarking related tags from database", APP_LOGGER_LEVEL, false) do
-      # find related tags by collecting all company tags from the search results, sort by tag popularity
+      # find related tags by collecting all object tags from the search results, sort by tag popularity
       related_size   = 10
-      @related_tags  = @objects.collect{ |o| o.company.tags }.flatten.compact.uniq.sort_by{ |o| -o.taggings_count }
+      @related_tags  = @objects.collect{ |o| o.tags }.flatten.compact.uniq.sort_by{ |o| -o.taggings_count }
       # sort and filter number of tags shown
       @related_tags  = (@related_tags.collect(&:name) - [@tag ? @tag.name : @query_raw]).slice(0, related_size)
     end

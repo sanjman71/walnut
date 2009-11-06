@@ -23,7 +23,9 @@ class Location < ActiveRecord::Base
 
   # When we delete a location, we don't delete all it's appointments - we nullify them, so they don't refer to any location.
   has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment, :dependent => :nullify
-  
+
+  delegate                :tags, :to => :company
+
   # Note: the after_save_callback is deprecated, but its left here commented out for now for documentation purposes
   # after_save              :after_save_callback
 
