@@ -266,7 +266,7 @@ class SearchController < ApplicationController
     @h1     = @title
 
     # set robots flag
-    if indexable_klass?(@search_klass) and params[:page].to_i == 0 and indexable_query?(@tag, @query, @objects)
+    if indexable_klass?(@search_klass) and indexable_page?(@search_klass, params[:page].to_i) and indexable_query?(@tag, @query, @objects)
       @robots = true
     else
       @robots = false
@@ -366,6 +366,12 @@ class SearchController < ApplicationController
   # returns true if the search klass is indexable
   def indexable_klass?(klass)
     ['events', 'search'].include?(klass)
+  end
+
+  # returns true if the search results page is indexable
+  def indexable_page?(klass, page)
+    return true if page == 0
+    return false
   end
 
   # return true if the search tag/query can be indexed by robots

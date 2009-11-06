@@ -77,15 +77,17 @@ class SearchControllerTest < ActionController::TestCase
   end
 
   context "city search" do
-    context "with query 'anything'" do
+    context "with query 'anything' and 1 location" do
       setup do
         # stub search results
-        ThinkingSphinx.stubs(:search).returns([])
+        @results = [@location]
+        ThinkingSphinx.stubs(:search).returns(@results)
+        @results.stubs(:total_pages).returns(1)
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'anything'
       end
 
       should_respond_with :success
-      should_render_template 'search/no_results.html.haml'
+      should_render_template 'search/index.html.haml'
       should_assign_to(:klasses) { [Location] }
       should_assign_to(:country) { @us }
       should_assign_to(:state) { @il }
@@ -102,8 +104,8 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:title) { "Anything near Chicago, IL" }
       should_assign_to(:h1) { "Anything near Chicago, IL" }
 
-      should "disallow robots (query, no locations)" do
-        assert_false assigns(:robots)
+      should "allow robots" do
+        assert_true assigns(:robots)
       end
     end
 
