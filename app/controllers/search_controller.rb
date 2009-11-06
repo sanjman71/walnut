@@ -265,9 +265,8 @@ class SearchController < ApplicationController
     @title  = build_search_title(:tag => @tag.to_s, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
 
-    # enable/disable robots
-    if @search_klass == 'search' and params[:page].to_i == 0 and !@tag.blank? and !@objects.blank?
-      # its a tag search, with at least 1 location, and the first first page of results
+    # set robots flag
+    if indexable_klass?(@search_klass) and params[:page].to_i == 0 and indexable_query?(@tag, @query, @objects)
       @robots = true
     else
       @robots = false
@@ -364,4 +363,15 @@ class SearchController < ApplicationController
     end
   end
 
+  # returns true if the search klass is indexable
+  def indexable_klass?(klass)
+    ['events', 'search'].include?(klass)
+  end
+
+  # return true if the search tag/query can be indexed by robots
+  def indexable_query?(tag, query, objects)
+    return true if !tag.blank? and !objects.blank?
+    return true if query.to_s == 'anything' and !objects.blank?
+    return false
+  end
 end
