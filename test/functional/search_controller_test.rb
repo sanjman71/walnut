@@ -76,7 +76,37 @@ class SearchControllerTest < ActionController::TestCase
     @company.locations.push(@location)
   end
 
-  context "city search page" do
+  context "city search" do
+    context "with query 'anything'" do
+      setup do
+        # stub search results
+        ThinkingSphinx.stubs(:search).returns([])
+        get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'anything'
+      end
+
+      should_respond_with :success
+      should_render_template 'search/no_results.html.haml'
+      should_assign_to(:klasses) { [Location] }
+      should_assign_to(:country) { @us }
+      should_assign_to(:state) { @il }
+      should_assign_to(:city) { @chicago }
+      should_assign_to(:geo_search) { 'city' }
+      should_assign_to(:query) { 'anything' }
+      should_not_assign_to(:tag)
+      should_assign_to(:query_or) { "" }
+      should_assign_to(:query_and) { "" }
+      should_assign_to(:query_quorum) { "" }
+      should_assign_to(:query_raw) { "anything" }
+      should_not_assign_to(:fields)
+      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
+      should_assign_to(:title) { "Anything near Chicago, IL" }
+      should_assign_to(:h1) { "Anything near Chicago, IL" }
+
+      should "disallow robots (query, no locations)" do
+        assert_false assigns(:robots)
+      end
+    end
+
     context "with query and no locations" do
       setup do
         # stub search results
@@ -201,7 +231,7 @@ class SearchControllerTest < ActionController::TestCase
     end
   end
 
-  context "city page with no zips or neighborhoods" do
+  context "city with no zips or neighborhoods" do
     setup do
       get :city, :country => 'us', :state => 'il', :city => 'chicago'
     end
@@ -240,7 +270,7 @@ class SearchControllerTest < ActionController::TestCase
     end
   end
   
-  context "neighborhood page" do
+  context "neighborhood" do
     setup do
       @river_north = Factory(:neighborhood, :name => "River North", :city => @chicago)
       get :neighborhood, :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north'
@@ -280,7 +310,7 @@ class SearchControllerTest < ActionController::TestCase
     end
   end
 
-  context "zip page" do
+  context "zip" do
     setup do
       get :zip, :country => 'us', :state => 'il', :zip => '60610'
     end

@@ -79,11 +79,11 @@ class SearchController < ApplicationController
     
     @search_klass   = params[:klass]
     @tag            = find_tag(params[:tag].to_s.from_url_param)
-    @query          = params[:query] ? (session[:query] || params[:query]) : ''
+    @query          = find_query
 
     if @tag.blank? and @query.blank?
-      # default to tag 'anything'
-      redirect_to(url_for(:query => nil, :tag => 'anything')) and return
+      # default to query 'anything'
+      redirect_to(url_for(:query => 'anything', :tag => nil)) and return
     end
 
     # handle special case of 'something' to find a random tag
@@ -330,11 +330,26 @@ class SearchController < ApplicationController
 
   def find_tag(s)
     return nil if s.blank?
-    if ['anything', 'something'].include?(s)
+    if ['something'].include?(s)
       find_random_tag
     else
       # find specified tag
       Tag.find_by_name(s)
+    end
+  end
+
+  def find_query
+    # params[:query] ? (session[:query] || params[:query]) : ''
+    case
+    when (params[:query] and params[:query] == 'anything')
+      # the special 'anything' query
+      params[:query]
+    when params[:query]
+      # use session query if one exists, default to params
+      session[:query] || params[:query]
+    else
+      # no query
+      ''
     end
   end
 

@@ -38,7 +38,7 @@
 
     .span-11.last.padding-top-5#more_events
       - unless @featured_events_more.blank?
-        = link_to @featured_events_more, build_search_route('events', 'city', :city => @featured_city, :state => @featured_state, :country => @country, :tag => 'anything'), :class => 'locality search', :style => 'font-weight: bold;'  
+        = link_to @featured_events_more, build_search_route('events', 'city', :city => @featured_city, :state => @featured_state, :country => @country, :query => 'anything'), :class => 'locality search', :style => 'font-weight: bold;'  
         
   -#.span-13.last
     -#- unless @featured_set.blank?
