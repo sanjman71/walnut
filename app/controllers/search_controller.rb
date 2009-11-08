@@ -1,5 +1,6 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
+  before_filter   :validate_search_page_number, :only => [:index]
   before_filter   :init_localities, :only => [:country, :state, :city, :neighborhood, :zip, :index]
   before_filter   :init_weather, :only => [:index]
 
@@ -96,7 +97,7 @@ class SearchController < ApplicationController
     @query_quorum   = @hash[:query_quorum]
     @fields         = @hash[:fields]
     @attributes     = @hash[:attributes] || Hash.new
-    @max_matches    = 50 # limit the total number of results
+    @page           = params[:page] || 1
 
     # build attributes based on geo type
     case
@@ -141,7 +142,7 @@ class SearchController < ApplicationController
     self.class.benchmark("*** Benchmarking sphinx query", APP_LOGGER_LEVEL, false) do
       @objects = ThinkingSphinx.search(@query_quorum, :classes => @klasses, :with => @attributes, :conditions => @fields,
                                        :match_mode => :extended2, :rank_mode => :bm25, :order => @sort_order, :include => @eager_loads, 
-                                       :page => params[:page], :per_page => 5, :max_matches => @max_matches)
+                                       :page => @page, :per_page => search_per_page, :max_matches => search_max_matches)
       # the first reference to 'objects' does the actual sphinx query 
       logger.debug("*** [sphinx] objects: #{@objects.size}")
     end
@@ -380,4 +381,26 @@ class SearchController < ApplicationController
     return true if query.to_s == 'anything' and !objects.blank?
     return false
   end
+
+  def search_max_matches
+    50
+  end
+
+  def search_per_page
+    5
+  end
+
+  def search_max_page
+    search_max_matches / search_per_page
+  end
+
+  # before filter to check the page number is in bounds
+  def validate_search_page_number
+    current_page = (params[:page] || 1).to_i
+    if current_page > search_max_page
+      # redirect to page 1
+      redirect_to(:page => nil) and return
+    end
+  end
+
 end
