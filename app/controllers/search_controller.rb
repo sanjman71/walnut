@@ -255,8 +255,7 @@ class SearchController < ApplicationController
       # end
 
       self.class.benchmark("*** Benchmarking #{@zip.name} cities from database", APP_LOGGER_LEVEL, false) do
-        @city_ids = @objects.collect(&:city_id).flatten.compact.uniq
-        @cities   = City.find(@city_ids)
+        @cities = @objects.collect(&:city).flatten.compact.uniq
       end
     end
 
