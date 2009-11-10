@@ -217,6 +217,14 @@ div.instructions ul                               { font-size: 12px; }
 
 .pagination span.disabled                         { display: none; }
 
+/* chain styles */
+
+span.chain_letter                                 { background: #EEEEEE; color: #111111;  display: block; width: 15px; float: left;
+                                                    text-align: center; padding: 0.1em 0.1em; margin-right: 5px; }
+span.chain_letter.current                         { background: #0099FF; color: #111111; }
+span.chain_letter a                               { display: block; text-decoration: none; }
+span.chain_letter a:hover                         { background: #3300BB; color: #0099FF; }
+
 /* highlight styles */
 
 .shaded                                           { background: #EDF3FE; none repeat scroll 0 0; }

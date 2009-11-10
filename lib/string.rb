@@ -6,4 +6,8 @@ class String
   def from_url_param
     gsub('-', ' ')
   end
+
+  def digit?
+    !match(/\d{1,1}/).nil?
+  end
 end

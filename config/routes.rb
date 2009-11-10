@@ -18,13 +18,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources   :locations, :only => [:index, :show, :create]
 
-  # chains routes
-  map.connect     '/chains/:country/:id', :controller => 'chains', :action => 'country'
-  map.connect     '/chains/:country/:state/:id', :controller => 'chains', :action => 'state'
-  map.connect     '/chains/:country/:state/:city/:id', :controller => 'chains', :action => 'city'
-  
-  map.resources   :chains, :only => [:index]
-
   # search error route
   map.connect     '/search/error/:locality', :controller => 'search', :action => 'error'
   
@@ -50,6 +43,15 @@ ActionController::Routing::Routes.draw do |map|
 
   # autocomplete route
   map.connect     '/autocomplete/search/where', :controller => 'autocomplete', :action => 'where'
+
+  # chains routes
+  map.connect     '/chains/:letter', :controller => 'chains', :action => 'letter', :letter => /[a-z0-9]{1}/
+  map.connect     '/chains/:country/:id', :controller => 'chains', :action => 'country'
+  map.connect     '/chains/:country/:state/:id', :controller => 'chains', :action => 'state'
+  map.connect     '/chains/:country/:state/:city/:id', :controller => 'chains', :action => 'city'
+  
+  map.resources   :chains, :only => [:index]
+
   
   # tag group routes
   map.resources   :taggs

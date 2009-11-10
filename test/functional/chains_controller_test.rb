@@ -6,6 +6,9 @@ class ChainsControllerTest < ActionController::TestCase
   # index route
   should_route  :get, '/chains', :controller => 'chains', :action => 'index'
 
+  # chains by letter
+  should_route  :get, '/chains/s', :controller => 'chains', :action => 'letter', :letter => 's'
+  
   # chains in a country
   should_route  :get, '/chains/us/1', :controller => 'chains', :action => 'country', :country => 'us', :id => 1
   

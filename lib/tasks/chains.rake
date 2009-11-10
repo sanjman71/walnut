@@ -28,4 +28,28 @@ namespace :chains do
     
     puts "#{Time.now}: completed, changed #{changed} display names"
   end
+
+  desc "Initialize chain states hash"
+  task :init_chain_states do
+    Chain.order_by_company.each do |chain|
+      # find all chain states
+      states = State.all(:joins => {:locations => :companies}, :conditions => {:companies => {:chain_id => chain.id}}).uniq.sort_by{ |o| o.id }
+      puts "*** #{chain.display_name}: found #{states.size} states"
+
+      hash = states.inject(Hash[]) do |hash, state|
+        # find chain cities
+        cities    = City.all(:joins => {:locations => :companies}, :conditions => {:companies => {:chain_id => chain.id}, :locations => {:state_id => state.id}}).uniq
+        city_ids  = cities.collect(&:id)
+
+        # add hash entry mapping state id to city ids
+        hash[state.id] = city_ids
+        hash
+      end
+      chain.states = hash
+      chain.save
+    end
+
+    puts "#{Time.now}: completed"
+  end
+
 end

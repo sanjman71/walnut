@@ -1,12 +1,11 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class ChainTest < ActiveSupport::TestCase
   
   should_validate_presence_of   :name
   should_have_many              :companies
 
-  context "chain without a display name" do
+  context "chain display name" do
     setup do
       @chain = Chain.create(:name => "Chain Store")
     end
