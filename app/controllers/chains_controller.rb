@@ -128,7 +128,7 @@ class ChainsController < ApplicationController
     # @country, @state, @city initialized in before filter
     @chain      = Chain.find(params[:id])
 
-    self.class.benchmark("*** Benchmarking chain store locations by city using sphinx", APP_LOGGER_LEVEL, false) do
+    self.class.benchmark("*** Benchmarking chain store locations in #{@city.name.downcase} using sphinx", APP_LOGGER_LEVEL, false) do
       @eagers       = [:company, :state, :city, :zip, :primary_phone_number]
       @per_page     = 5
       @max_matches  = 200
