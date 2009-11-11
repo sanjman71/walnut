@@ -3,42 +3,48 @@ class HomeController < ApplicationController
   def index
     @country = Country.default
 
-    self.class.benchmark("Benchmarking featured/closest city") do
+    self.class.benchmark("*** Benchmarking featured/closest city", APP_LOGGER_LEVEL, false) do
       # find a city to highlight
-      @featured_city  = find_closest_city_using_ip || find_default_city
+      # Note: find a city by ip address can take up to 3 seconds, so lets skip that part for now
+      # @featured_city  = find_closest_city_using_ip || find_default_city
+      @featured_city  = find_default_city
       @featured_state = @featured_city.state
     end
 
     # find featured city objects
     featured_limit = 5
 
-    self.class.benchmark("Benchmarking #{@featured_city.name} featured places", Logger::INFO, false) do
+    self.class.benchmark("*** Benchmarking #{@featured_city.name} featured places", APP_LOGGER_LEVEL, false) do
       @featured_places = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:places", :expires_in => CacheExpire.locations) do
-        # ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
+        # Note: ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
+        # Note: So we can't use ThinkingSphinx.search here
         ids = ThinkingSphinx.search_for_ids(:with => Search.attributes(@featured_city), :classes => [Location],
                                             :include => [:company, :state, :city, :zip, :primary_phone_number],
                                             :page => 1, :per_page => featured_limit, :order => "popularity desc")
-        Location.find(ids)
+        locations = Location.find(ids, :include => [:company, :state, :city, :zip, :primary_phone_number])
+        locations
       end
       @featured_places_title = "#{@featured_city.name} Places"
     end
 
-    self.class.benchmark("Benchmarking #{@featured_city.name} featured events", Logger::INFO, false) do
+    self.class.benchmark("*** Benchmarking #{@featured_city.name} featured events", APP_LOGGER_LEVEL, false) do
       @featured_events = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:events", :expires_in => CacheExpire.locations) do
         # ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
         ids = ThinkingSphinx.search_for_ids(:with => Search.attributes(@featured_city), :classes => [Appointment],
                                             :include => {:location => :company},
                                             :page => 1, :per_page => featured_limit, :order => "start_at asc")
-        Appointment.find(ids)
+        events = Appointment.find(ids, :include => {:location => :company})
+        events
       end
       @featured_events_title  = "#{@featured_city.name} Events"
-      @featured_events_date   = "Today is #{Time.zone.now.to_s(:appt_day_short)}"
+      @featured_events_date   = "Today is #{Time.now.to_s(:appt_day_short)}"
       @featured_events_more   = "More #{@featured_city.name} Events"
     
       # use places if there are no events
       if @featured_events.blank?
         @featured_events = ThinkingSphinx.search(:with => Search.attributes(@featured_city), :classes => [Location], 
                                                  :page => 2, :per_page => featured_limit, :order => "popularity desc")
+        logger.debug("*** found #{@featured_events.size} locations instead of events")
         @featured_events_title  = "#{@featured_city.name} Places"
         @featured_events_date   = nil
         @featured_events_more   = nil
@@ -89,7 +95,7 @@ class HomeController < ApplicationController
 
   def find_default_city
     city = Rails.cache.fetch("default_city", :expires_in => 24.hours) do
-      state = State.find_by_name("Illinois")
+      state = Country.us.states.find_by_name("Illinois")
       city  = state.cities.find_by_name("Chicago")
     end
   end
