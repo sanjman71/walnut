@@ -262,7 +262,7 @@ class SearchController < ApplicationController
     @geo_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
 
     # build search title based on query, city, neighborhood, zip search
-    @title  = build_search_title(:tag => @tag.to_s, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @title  = build_search_title(:klass => @search_klass, :tag => @tag.to_s, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
 
     # set robots flag

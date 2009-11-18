@@ -6,7 +6,7 @@
       = yield :title
       == | Walnut Places
     -# default robots content is 'nofollow, noindex'
-    %meta{:name => 'robots', :content => @robots ? @robots : 'nofollow, noindex'}
+    %meta{:name => 'robots', :content => @robots ? @robots : 'noindex,nofollow'}
     = stylesheet_link_tag 'blueprint/screen', 'walnut', 'errors', 'orange', 'jquery-ui', 'jquery.autocomplete', :cache => true
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
@@ -29,5 +29,10 @@
       .container
         = render(:partial => "shared/footer")
         
+    #sitemap{:style => 'padding-top: 3px;'}
+      .container
+        = render(:partial => "shared/sitemap")
+      %hr.space
+
     -# google analytics
     = render(:partial => "shared/google_analytics")

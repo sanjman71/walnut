@@ -1,0 +1,28 @@
+- max_column_size = 4
+
+.span-6#sitemap_events
+  %h5.heading.bottom== Events
+  .span-3
+    - sitemap_events_list.slice(0,max_column_size).each do |city, url|
+      %h5.bottom= link_to "#{city.titleize} Events", url
+  .span-3.last
+    - sitemap_events_list.slice(max_column_size,max_column_size*2).each do |city, url|
+      %h5.bottom= link_to "#{city.titleize} Events", url
+
+.span-6.prepend-1#sitemap_places
+  %h5.heading.bottom== Places
+  .span-3
+    - sitemap_cities_list.slice(0,max_column_size).each do |city, url|
+      %h5.bottom= link_to "#{city.titleize} Places", url
+  .span-3.last
+    - sitemap_cities_list.slice(max_column_size,max_column_size*2).each do |city, url|
+      %h5.bottom= link_to "#{city.titleize} Places", url
+
+.span-6.prepend-1#sitemap_chains
+  %h5.heading.bottom== Chain Stores
+  .span-3
+    - sitemap_chains_list.slice(0,3).each do |name, url|
+      %h5.bottom= link_to name, url
+  .span-3.last
+    - sitemap_chains_list.slice(3,6).each do |name, url|
+      %h5.bottom= link_to name, url

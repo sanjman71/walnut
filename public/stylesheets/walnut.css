@@ -225,6 +225,13 @@ span.chain_letter.current                         { background: #0099FF; color: 
 span.chain_letter a                               { display: block; text-decoration: none; }
 span.chain_letter a:hover                         { background: #3300BB; color: #0099FF; }
 
+/* sitemap styles */
+
+div#sitemap h5                                    { font-size: 1.0em; }
+div#sitemap h5.heading                            { color: #444; font-weight: bold; }
+div#sitemap a                                     { display: inline; text-decoration: none; color: #999; } 
+div#sitemap a:hover                               { color: #0099FF; }
+
 /* highlight styles */
 
 .shaded                                           { background: #EDF3FE; none repeat scroll 0 0; }

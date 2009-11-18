@@ -12,7 +12,7 @@ class SearchControllerTest < ActionController::TestCase
   # city route
   should_route :get, '/search/us/il/chicago', :controller => 'search', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
   
-  # city search tag/what routes
+  # city search tag/query routes
   should_route :get, '/search/us/il/chicago/q/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :klass => 'search'
   should_route :get, '/search/us/il/chicago/tag/food',
@@ -26,7 +26,7 @@ class SearchControllerTest < ActionController::TestCase
   should_route :get, '/events/us/il/chicago/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food', :klass => 'events'
 
-  # neighborhood search tag/waht routes
+  # neighborhood search tag/query routes
   should_route :get, '/search/us/il/chicago/n/river-north/q/soccer',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :neighborhood => 'river-north', 
                :query => 'soccer', :klass => 'search'
@@ -101,11 +101,17 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:query_raw) { "anything" }
       should_not_assign_to(:fields)
       should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
-      should_assign_to(:title) { "Anything near Chicago, IL" }
-      should_assign_to(:h1) { "Anything near Chicago, IL" }
+      should_assign_to(:title) { "Places Directory near Chicago, IL" }
+      should_assign_to(:h1) { "Places Directory near Chicago, IL" }
 
       should "allow robots" do
         assert_true assigns(:robots)
+      end
+
+      should "have robots meta tag index,follow" do
+        assert_select "meta[name='robots']" do
+          assert_select "[content=?]", "index,follow"
+        end
       end
     end
 
@@ -136,6 +142,12 @@ class SearchControllerTest < ActionController::TestCase
 
       should "disallow robots (query, no locations)" do
         assert_false assigns(:robots)
+      end
+
+      should "have robots meta tag noindex,nofollow" do
+        assert_select "meta[name='robots']" do
+          assert_select "[content=?]", "noindex,nofollow"
+        end
       end
     end
 

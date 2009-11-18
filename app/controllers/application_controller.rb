@@ -276,6 +276,7 @@ class ApplicationController < ActionController::Base
     tag       = options[:tag] || ''
     query     = options[:query] || ''
     filter    = options[:filter] || ''
+    klass     = options[:klass] || 'search'
 
     raise ArgumentError if tag.blank? and query.blank? and filter.blank?
     
@@ -298,15 +299,29 @@ class ApplicationController < ActionController::Base
       subject = filter
     end
     
-    # add specifics based on the controller
-    case params['controller']
-    when 'places'
+    # add specifics based on the klass
+    case klass
+    when 'locations', 'places'
       subject += " Places"
     when 'events' 
       subject += " Events"
     end
-      
-    return "#{subject.titleize} near #{where}"
+
+    # check for special 'anything' search
+    if subject.to_s.downcase.match(/^anything/)
+      # change subject to 'Events|Places Directory'
+      case klass
+      when 'locations', 'places', 'search'
+        subject = "Places Directory"
+      when 'events'
+        subject = "Events Directory"
+      end
+    end
+
+    # build title from subject and where
+    title = "#{subject.titleize} near #{where}"
+
+    title
   end  
     
   def build_place_title(place, location, options={})
