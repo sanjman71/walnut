@@ -1,5 +1,5 @@
 # Be explicit about our different environments
-set :stages, %w(staging production)
+set :stages, %w(staging production calendar_staging calendar_production)
 require 'capistrano/ext/multistage'
 
 # Set application name
