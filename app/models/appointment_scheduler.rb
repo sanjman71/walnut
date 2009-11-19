@@ -59,10 +59,9 @@ class AppointmentScheduler
   end
   
   # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, provider, service, options)
+  def self.create_free_appointment(company, provider, options)
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "provider is required" if provider.blank?
-    raise ArgumentError, "service is required" if service.blank?
     
     # find company free service
     service = company.free_service
