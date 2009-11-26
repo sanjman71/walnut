@@ -17,5 +17,8 @@ class CacheExpire
   def self.events
     4.hours
   end
-  
+
+  def self.footer
+    3.days
+  end
 end
