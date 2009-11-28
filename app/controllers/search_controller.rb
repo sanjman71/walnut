@@ -167,7 +167,7 @@ class SearchController < ApplicationController
 
     self.class.benchmark("*** Benchmarking related tags from database", APP_LOGGER_LEVEL, false) do
       # find related tags by collecting all object tags from the search results, sort by tag popularity
-      related_size   = 10
+      related_size   = 25
       @related_tags  = @objects.collect{ |o| o.tags }.flatten.compact.uniq.sort_by{ |o| -o.taggings_count }
       # sort and filter number of tags shown
       @related_tags  = (@related_tags.collect(&:name) - [@tag ? @tag.name : @query_raw]).slice(0, related_size)
@@ -382,11 +382,11 @@ class SearchController < ApplicationController
   end
 
   def search_max_matches
-    50
+    100
   end
 
   def search_per_page
-    5
+    10
   end
 
   def search_max_page
