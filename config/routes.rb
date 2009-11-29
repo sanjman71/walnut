@@ -99,11 +99,15 @@ ActionController::Routing::Routes.draw do |map|
   map.import_all_events '/events/import', :controller => 'events', :action => 'import'
   map.remove_events     '/events/remove', :controller => 'events', :action => 'remove'
   map.events            '/events', :controller => 'events', :action => 'index'
-  
+
+  # sitemaps controller
+  map.sitemap_events    '/sitemap_city_events.:format', :controller => 'sitemaps', :action => 'events'
+  map.sitemap_tags      '/sitemap_city_tags.:format', :controller => 'sitemaps', :action => 'tags'
+
   # sphinx controller
   map.resources       :sphinx, :only => [:index]
   map.sphinx_reindex  '/sphinx/reindex/:index', :controller => 'sphinx', :action => 'reindex'
-  
+
   # debug controller
   map.connect   '/debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
 
