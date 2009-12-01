@@ -17,7 +17,7 @@ class SitemapsController < ApplicationController
   # GET /sitemaps.tags.charlotte
   # GET /sitemaps.tags.chicago
   def tags
-    @city     = City.find_by_name(params[:city])
+    @city     = City.find_by_name(params[:city].titleize)
     @state    = @city.state
     @country  = Country.us
 
