@@ -24,14 +24,8 @@ class SitemapsController < ApplicationController
     @protocol = self.request.protocol
     @host     = self.request.host
 
-    self.class.benchmark("Benchmarking #{@city.name} tag cloud") do
-      @popular_tags = Rails.cache.fetch("#{@state.code.downcase}:#{@city.name.to_url_param}:tag_cloud", :expires_in => CacheExpire.tags) do
-        # build tag cloud from (cached) geo tag counts in the database
-        tags = @city.tags
-        # return sorted, unique tags collection
-        tags.sort_by { |o| o.name }.uniq
-      end
-    end
+    # build tags collection from (cached) geo tag counts in the database, sort by name
+    @tags     = @city.tags.uniq.sort_by{ |o| o.name }
 
     respond_to do |format|
       format.xml
