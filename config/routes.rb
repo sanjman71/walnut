@@ -101,8 +101,8 @@ ActionController::Routing::Routes.draw do |map|
   map.events            '/events', :controller => 'events', :action => 'index'
 
   # sitemaps controller
-  map.sitemap_events    '/sitemap.events.:format', :controller => 'sitemaps', :action => 'events'
-  map.sitemap_tags      '/sitemap.tags.:city.:format', :controller => 'sitemaps', :action => 'tags', :city => /[a-z-]+/
+  map.sitemap_events    '/sitemap.events.xml', :controller => 'sitemaps', :action => 'events'
+  map.sitemap_tags      '/sitemap.tags.:city.xml', :controller => 'sitemaps', :action => 'tags', :city => /[a-z-]+/
 
   # sphinx controller
   map.resources       :sphinx, :only => [:index]
