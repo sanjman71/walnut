@@ -18,11 +18,11 @@ class SitemapsController < ApplicationController
     end
   end
 
-  # GET /sitemap.tags.charlotte.xml
-  # GET /sitemap.tags.chicago.xml
+  # GET /sitemap.tags.nc.charlotte.xml
+  # GET /sitemap.tags.il.chicago.xml
   def tags
-    @city     = City.find_by_name(params[:city].titleize)
-    @state    = @city.state
+    @state    = State.find_by_code(params[:state])
+    @city     = @state.cities.find_by_name(params[:city].titleize)
     @country  = Country.us
 
     # build tags collection from (cached) geo tag counts in the database, sort by name
@@ -36,12 +36,12 @@ class SitemapsController < ApplicationController
     end
   end
 
-  # GET /sitemap.locations.charlotte.1.xml
-  # GET /sitemap.locations.chicago.1.xml
+  # GET /sitemap.locations.nc.charlotte.1.xml
+  # GET /sitemap.locations.il.chicago.1.xml
   def locations
     @index      = params[:index].to_i
-    @city       = City.find_by_name(params[:city].titleize)
-    @state      = @city.state
+    @state      = State.find_by_code(params[:state])
+    @city       = @state.cities.find_by_name(params[:city].titleize)
     @country    = Country.us
 
     # find city locations
