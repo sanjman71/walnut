@@ -6,8 +6,8 @@ class SitemapsController < ApplicationController
   layout nil # turn off layouts
   
   # max urls in a single sitemap (protocol allows 50000)
-  @@urls_per_sitemap   = 5000
-
+  @@urls_per_sitemap  = 5000
+  
   # GET /sitemap.events.xml
   def events
     @protocol = self.request.protocol
@@ -38,16 +38,40 @@ class SitemapsController < ApplicationController
 
   # GET /sitemap.locations.nc.charlotte.1.xml
   # GET /sitemap.locations.il.chicago.1.xml
+  # GET /sitemap.locations.cities.tiny.1.xml
+  # GET /sitemap.locations.cities.small.1.xml
+  # GET /sitemap.locations.cities.medium.1.xml
   def locations
     @index      = params[:index].to_i
-    @state      = State.find_by_code(params[:state])
-    @city       = @state.cities.find_by_name(params[:city].titleize)
-    @country    = Country.us
-
-    # find city locations
     @offset     = (@index-1) * @@urls_per_sitemap
-    @locations  = Location.with_city(@city).all(:offset => @offset, :limit => @@urls_per_sitemap, :select => "id", :include => :companies)
-    
+
+    @country    = Country.us
+    @city_size  = params[:city_size]
+
+    case @city_size
+    when 'medium' # ~ 187K locations
+      # @locations  = Location.count(:joins => :city, :conditions => ["cities.locations_count < 25000 AND cities.locations_count >= 5000"])
+      # raise Exception, "medium locations: #{@locations}"
+      conditions  = ["cities.locations_count < 25000 AND cities.locations_count >= 5000"]
+      @locations  = Location.all(:offset => @offset, :limit => @@urls_per_sitemap, :joins => :city, :conditions => conditions)
+    when 'small' # ~ 773K locations
+      # @locations  = Location.count(:joins => :city, :conditions => ["cities.locations_count < 5000 AND cities.locations_count >= 1000"])
+      # raise Exception, "small locations: #{@locations}"
+      conditions  = ["cities.locations_count < 5000 AND cities.locations_count >= 1000"]
+      @locations  = Location.all(:offset => @offset, :limit => @@urls_per_sitemap, :joins => :city, :conditions => conditions)
+    when 'tiny' # ~ 440K locations
+      # @locations  = Location.count(:joins => :city, :conditions => ["cities.locations_count < 1000"])
+      # raise Exception, "tiny locations: #{@locations}"
+      conditions  = ["cities.locations_count < 1000"]
+      @locations  = Location.all(:offset => @offset, :limit => @@urls_per_sitemap, :joins => :city, :conditions => conditions)
+    else
+      # use specified state, city
+      @state      = @country.states.find_by_code(params[:state])
+      @city       = @state.cities.find_by_name(params[:city].titleize)
+      # find city locations
+      @locations  = Location.with_city(@city).all(:offset => @offset, :limit => @@urls_per_sitemap, :select => "id", :include => :companies)
+    end
+
     @protocol   = self.request.protocol
     @host       = self.request.host
 
