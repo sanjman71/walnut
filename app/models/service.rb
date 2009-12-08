@@ -39,12 +39,12 @@ class Service < ActiveRecord::Base
 
   # Virtual attribute for use in the UI - entering the lenght of the service is done in minutes rather than seconds. This converts in both directions
   def duration_in_minutes
-    (self.duration / 60).to_i
+    (self.duration.to_i / 60).to_i
   end
   
   def duration_in_minutes=(duration_in_minutes)
     duration_will_change!
-    self.duration = duration_in_minutes.minutes
+    self.duration = duration_in_minutes.to_i.minutes
   end
 
   # find all polymorphic providers through the company_providers collection
