@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class PromotionTest < ActiveSupport::TestCase
   
@@ -8,6 +7,18 @@ class PromotionTest < ActiveSupport::TestCase
   should_validate_presence_of     :discount
   should_validate_presence_of     :units
 
+  context "code uniqueness" do
+    setup do
+      @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'dollars')
+      assert_valid @promotion
+    end
+
+    should "not allow promotion with same code" do
+      @promotion2 = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'dollars')
+      assert_not_valid @promotion2
+    end
+  end
+  
   context "create with dollars" do
     setup do
       @promotion = Promotion.create(:code => "abc", :uses_allowed => 5, :discount => 5, :units => 'dollars')
