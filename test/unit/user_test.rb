@@ -49,6 +49,11 @@ class UserTest < ActiveSupport::TestCase
         @email = @user1.primary_email_address
         assert_equal "unverified", @email.state
       end
+
+      should "not set user rpx flag" do
+        assert_equal 0, @user1.rpx
+        assert_false @user1.rpx?
+      end
     end
 
     context "with a password and email_addresses_attributes" do
@@ -71,6 +76,11 @@ class UserTest < ActiveSupport::TestCase
       should "have user.email_address" do
         assert_equal "user1@walnut.com", @user1.reload.email_address
       end
+
+      should "not set user rpx flag" do
+        assert_equal 0, @user1.rpx
+        assert_false @user1.rpx?
+      end
     end
 
     context "with rpx" do
@@ -83,6 +93,7 @@ class UserTest < ActiveSupport::TestCase
 
       should "set user rpx flag" do
         assert_equal 1, @user1.rpx
+        assert_true @user1.rpx?
       end
 
       should "add to user.email_addresses collection" do
@@ -103,9 +114,9 @@ class UserTest < ActiveSupport::TestCase
         assert_equal "verified", @email.state
       end
     end
-    
+
   end
-  
+
   context "caldav token" do
     setup do
       @user2 = User.create(:name => "User 2", :password => "secret", :password_confirmation => "secret")

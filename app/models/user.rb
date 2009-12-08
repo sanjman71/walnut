@@ -162,6 +162,10 @@ class User < ActiveRecord::Base
     self.id == 0
   end
   
+  def rpx?
+    self.rpx == 1
+  end
+
   def email_address
     @email_address ||= self.email_addresses_count > 0 ? self.primary_email_address.address : ''
   end
