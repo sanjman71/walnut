@@ -3,6 +3,7 @@ class PromotionEmptyError < StandardError; end
 
 class Promotion < ActiveRecord::Base
   validates_presence_of     :code, :uses_allowed, :discount, :units
+  validates_uniqueness_of   :code
   validates_inclusion_of    :units, :in => %w(cents percent)
   has_many                  :promotion_redemptions, :dependent => :destroy
 
