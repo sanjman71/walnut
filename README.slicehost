@@ -46,8 +46,11 @@
 5. http://articles.slicehost.com/2008/5/27/ubuntu-hardy-nginx-rails-and-mongrels
 
 
-
 # Git
 
 1. sudo aptitude install curl libcurl4-openssl-dev libexpart1-dev gettext
 2. sudo aptitude install git-core
+
+# Timezone
+
+1. sudo dpkg-reconfigure tzdata
