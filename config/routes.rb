@@ -106,6 +106,9 @@ ActionController::Routing::Routes.draw do |map|
   map.sitemap_locations '/sitemap.locations.:state.:city.:index.xml', :controller => 'sitemaps', :action => 'locations', :state => /[a-z]{2}/, :city => /[a-z-]+/, :index => /[0-9]+/
   map.sitemap_metro     '/sitemap.locations.cities.:city_size.:index.xml', :controller => 'sitemaps', :action => 'locations', :city_size => /tiny|small|medium/, :index => /[0-9]+/
 
+  map.sitemap_ilocations  '/sitemap.index.locations.:state.:city.xml', :controller => 'sitemaps', :action => 'index_locations', :state => /[a-z]{2}/, :city => /[a-z-]+/
+  map.sitemap_ilocations  '/sitemap.index.locations.cities.:city_size.xml', :controller => 'sitemaps', :action => 'index_locations', :city_size => /tiny|small|medium/
+
   # sphinx controller
   map.resources       :sphinx, :only => [:index]
   map.sphinx_reindex  '/sphinx/reindex/:index', :controller => 'sphinx', :action => 'reindex'

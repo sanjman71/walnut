@@ -10,4 +10,7 @@ class SitemapsControllerTest < ActionController::TestCase
   should_route :get, '/sitemap.locations.cities.small.1.xml', :controller => 'sitemaps', :action => 'locations', :city_size => 'small', :index => '1'
   should_route :get, '/sitemap.locations.cities.tiny.1.xml', :controller => 'sitemaps', :action => 'locations', :city_size => 'tiny', :index => '1'
 
+  should_route :get, '/sitemap.index.locations.il.chicago.xml', :controller => 'sitemaps', :action => 'index_locations', :state => 'il', :city => 'chicago'
+  should_route :get, '/sitemap.index.locations.cities.medium.xml', :controller => 'sitemaps', :action => 'index_locations', :city_size => 'medium'
+
 end

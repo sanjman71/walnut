@@ -8,6 +8,9 @@ class SitemapsController < ApplicationController
   # max urls in a single sitemap (protocol allows 50000)
   @@urls_per_sitemap  = 5000
   
+  # max entries in an index file (self imposed limit for testing)
+  @@entries_per_index = 25
+
   # GET /sitemap.events.xml
   def events
     @protocol = self.request.protocol
@@ -30,6 +33,27 @@ class SitemapsController < ApplicationController
 
     @protocol = self.request.protocol
     @host     = self.request.host
+
+    respond_to do |format|
+      format.xml
+    end
+  end
+
+  # GET /sitemap.index.locations.il.chicago.xml
+  def index_locations
+    @country    = Country.us
+    @state      = @country.states.find_by_code(params[:state])
+    @city       = @state.cities.find_by_name(params[:city].titleize)
+
+    # figure out how many sitemaps are needed for this city based on locations count
+    @iend       = @city.locations_count/@@urls_per_sitemap + ((@city.locations_count % @@urls_per_sitemap) == 0 ? 0 : 1)
+    @range      = Range.new(1, [@iend, @@entries_per_index].min)
+
+    # build sitemap root to this city
+    @root       = "/sitemap.locations.#{@state.code.downcase}.#{@city.name.to_url_param}."
+
+    @protocol   = self.request.protocol
+    @host       = self.request.host
 
     respond_to do |format|
       format.xml
