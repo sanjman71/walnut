@@ -2,7 +2,7 @@ require 'test/test_helper'
 require 'test/factories'
 
 class LocationTest < ActiveSupport::TestCase
-  
+
   should_belong_to    :country
   should_belong_to    :state
   should_belong_to    :city
@@ -14,7 +14,7 @@ class LocationTest < ActiveSupport::TestCase
   should_have_many    :phone_numbers
   should_have_many    :neighbors
   should_have_many    :sources
-  
+
   def setup
     @us           = Factory(:us)
     @canada       = Factory(:canada)
@@ -25,6 +25,18 @@ class LocationTest < ActiveSupport::TestCase
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
     @company      = Company.create(:name => "My Company", :time_zone => "UTC")
+  end
+
+  context "location company_name (as to_param)" do
+    context "without a company" do
+      setup do
+        @location = Location.create(:name => "Home", :country => @us)
+      end
+
+      should "have to_param as location id with no name" do
+        assert_equal @location.id.to_s, @location.to_param
+      end
+    end
   end
 
   context "location with a company" do
