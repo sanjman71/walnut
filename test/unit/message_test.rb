@@ -5,6 +5,7 @@ class MessageTest < ActiveSupport::TestCase
   should_belong_to              :sender
   should_validate_presence_of   :sender_id, :body
   should_have_many              :message_recipients
+  should_have_many              :message_topics
 
   context "create" do
     context "with nested attributes" do
@@ -158,4 +159,24 @@ class MessageTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "message topics" do
+    setup do
+      @sender   = Factory(:user, :name => "Sender") 
+      @message  = Message.create(:sender => @sender, :subject => "Message subject", :body => "Message body")
+      @user     = Factory(:user)
+      @topic1   = @message.message_topics.create(:topic => @user, :tag => 'ping')
+    end
+
+    should_change("MessageTopic.count", :by => 1) { MessageTopic.count }
+
+    should "add user topic to message" do
+      assert_equal [@user], @message.reload.user_topics
+    end
+
+    should "add message to user" do
+      assert_equal [@message], @user.reload.messages
+    end
+  end
+
 end

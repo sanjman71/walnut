@@ -10,6 +10,8 @@ class Appointment < ActiveRecord::Base
   belongs_to                  :customer, :class_name => 'User'
   belongs_to                  :creator, :class_name => 'User'
   belongs_to                  :location
+  has_many                    :message_topics, :as => :topic
+  has_many                    :messages, :through => :message_topics
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
   # Relationships between free and work appointments, and between appointments and capacity

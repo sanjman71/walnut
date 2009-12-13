@@ -5,7 +5,9 @@ class Message < ActiveRecord::Base
   accepts_nested_attributes_for :message_recipients, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
   has_many                :message_threads
   has_one                 :message_thread, :order => 'id DESC'
-
+  has_many                :message_topics
+  has_many                :user_topics, :through => :message_topics, :source => :topic, :source_type => 'User'
+  has_many                :appointment_topics, :through => :message_topics, :source => :topic, :source_type => 'Appointment'
   before_destroy          :before_destroy_message
 
   # send message

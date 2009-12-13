@@ -27,6 +27,7 @@ class UserTest < ActiveSupport::TestCase
 
       should "not set user rpx flag" do
         assert_equal 0, @user1.rpx
+        assert_false @user1.rpx?
       end
 
       should "increment user.email_addresses_count" do
@@ -48,11 +49,6 @@ class UserTest < ActiveSupport::TestCase
       should "create email in unverified state" do
         @email = @user1.primary_email_address
         assert_equal "unverified", @email.state
-      end
-
-      should "not set user rpx flag" do
-        assert_equal 0, @user1.rpx
-        assert_false @user1.rpx?
       end
     end
 

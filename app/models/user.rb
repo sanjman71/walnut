@@ -36,6 +36,9 @@ class User < ActiveRecord::Base
   validates_uniqueness_of     :cal_dav_token
   before_validation_on_create :reset_cal_dav_token
 
+  has_many                    :message_topics, :as => :topic
+  has_many                    :messages, :through => :message_topics
+
   # Preferences
   serialized_hash           :preferences
 
