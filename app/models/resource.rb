@@ -16,4 +16,10 @@ class Resource < ActiveRecord::Base
   def tableize
     self.class.to_s.tableize
   end
+
+  # resources do not have email addresses
+  def email_addresses_count
+    0
+  end
+
 end
