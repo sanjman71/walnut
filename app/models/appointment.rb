@@ -770,7 +770,7 @@ class Appointment < ActiveRecord::Base
   def send_confirmation
     case self.mark_as
     when WORK
-      Delayed::Job.enqueue(AppointmentJob.new(:id => self.id, :method => 'send_confirmation'))
+      MessageComposeAppointment.confirmation(self)
     end
   end
 end
