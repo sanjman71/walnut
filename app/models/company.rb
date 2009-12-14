@@ -93,9 +93,9 @@ class Company < ActiveRecord::Base
     Badges::Role.find_by_name('company customer')
   end
 
-  # find all polymorphic providers through the company_providers collection
+  # find all polymorphic providers through the company_providers collection, sort by name
   def providers
-    self.company_providers(:include => :provider).collect(&:provider)
+    self.company_providers(:include => :provider).collect(&:provider).sort_by{ |p| p.name }
   end
 
   def primary_location
