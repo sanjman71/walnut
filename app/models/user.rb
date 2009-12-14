@@ -133,10 +133,13 @@ class User < ActiveRecord::Base
     User.transaction do
       # create user in passive state
       user  = self.create(:name => name, :rpx => 1)
-      # add email address with rpx identifier
-      email = user.email_addresses.create(:address => email, :identifier => identifier)
-      # change email state to verfied
-      email.verify!
+      # rpx users don't always have emails
+      unless email.blank?
+        # add email address with rpx identifier
+        email = user.email_addresses.create(:address => email, :identifier => identifier)
+        # change email state to verfied
+        email.verify!
+      end
       user
     end
   end
