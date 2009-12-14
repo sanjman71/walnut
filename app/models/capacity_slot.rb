@@ -14,6 +14,8 @@ class CapacitySlot < ActiveRecord::Base
   belongs_to                  :free_appointment, :class_name => "Appointment"
   
   validates_presence_of       :start_at, :end_at, :duration
+  validates_numericality_of   :duration, :greater_than_or_equal_to => 0
+  validates_numericality_of   :capacity, :greater_than => 0
 
   # This must be before validation, as it makes attributes that are required
   before_validation           :make_duration_time_start_end
@@ -51,26 +53,36 @@ class CapacitySlot < ActiveRecord::Base
                                                                            start_at, end_at] }}
 
 
-  # find capacity slots overlapping a time of day range
-  named_scope :time_overlap,  lambda { |time_range| if (time_range.blank?)
-                                                      {}
-                                                    else
-                                                      { :conditions => ["(`capacity_slots`.time_start_at < ? AND `capacity_slots`.time_end_at > ?) OR
-                                                                         (`capacity_slots`.time_start_at < ? AND `capacity_slots`.time_end_at > ?) OR
-                                                                         (`capacity_slots`.time_start_at >= ? AND `capacity_slots`.time_end_at <= ?)",
-                                                                         time_range.time_start_at_utc.to_i, time_range.time_start_at_utc.to_i,
-                                                                         time_range.time_end_at_utc.to_i, time_range.time_end_at_utc.to_i,
-                                                                         time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i] }
-                                                    end
-                                     }
-                                     
-
   # find capacity slots covering a time of day range (i.e. the entire time range is contained within the capacity slot)
+  # This needs to account for situations where the end time is the next day, and so is earlier than the start time
+  # The first clause deals with the normal situation where the time slot is during a single day
+  # The second clause checks if the end time is earlier than the start time. If so, it checks if any one of the following have occurred:
+  # - The start and end time are later than the start time
+  # - The start and end time are earlier than the end time
   named_scope :time_covers,  lambda { |time_range| if (time_range.blank?)
                                                      {}
                                                    else
-                                                     { :conditions => ["(`capacity_slots`.time_start_at <= ? AND `capacity_slots`.time_end_at >= ?)",
-                                                                        time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i] }
+                                                     { :conditions => ["((`capacity_slots`.time_start_at <= `capacity_slots`.time_end_at) AND 
+                                                                         (`capacity_slots`.time_start_at <= ?) AND (`capacity_slots`.time_end_at >= ?) AND
+                                                                         (`capacity_slots`.time_start_at <= ?) AND (`capacity_slots`.time_end_at >= ?)
+                                                                        )
+                                                                        OR
+                                                                        (
+                                                                         (`capacity_slots`.time_end_at < `capacity_slots`.time_start_at) AND 
+                                                                         (
+                                                                          ((`capacity_slots`.time_start_at <= ?) AND (`capacity_slots`.time_start_at <= ?)) OR
+                                                                          ((`capacity_slots`.time_end_at >= ?) AND (`capacity_slots`.time_end_at >= ?)) OR
+                                                                          ((`capacity_slots`.time_start_at <= ? AND `capacity_slots`.time_end_at >= ?))
+                                                                         )
+                                                                        )",
+                                                                        # For the first clause:
+                                                                        time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i,
+                                                                        time_range.time_end_at_utc.to_i, time_range.time_start_at_utc.to_i,
+                                                                        # For the second clause:
+                                                                        time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i,
+                                                                        time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i,
+                                                                        time_range.time_start_at_utc.to_i, time_range.time_end_at_utc.to_i
+                                                                        ] }
                                                    end
                                     }
 
@@ -122,7 +134,7 @@ class CapacitySlot < ActiveRecord::Base
   
   
   # Class method to merge additional capacity, or create a new capacity slot, as appropriate
-  def self.merge_or_add(free_appointment, commit = nil, options = nil)
+  def self.merge_or_add(free_appointment, options = {})
     options ||= {}
 
     # We require the free appointment we're working with
@@ -169,37 +181,34 @@ class CapacitySlot < ActiveRecord::Base
                                           :duration => new_duration, :capacity => 0)
     end
     
-    # Make sure the slot we're about to change is in the affected_slots array
+    # increase the slot's capacity
+    max_slot.increase_capacity(new_start_at, new_end_at, new_capacity, affected_slots)
+
+    # Make sure the slot we just changed is in the affected_slots array
     affected_slots.push(max_slot).uniq!
     affected_slots.compact!
-
-    # increase the slot's capacity
-    max_slot.increase_capacity(new_start_at, new_end_at, new_capacity, affected_slots, {:commit => false})
 
     #
     # commit the capacity slot changes in a single transaction if required
     #
-    if commit
-      CapacitySlot.transaction do
-                
-        # enumerate the changed slots
-        affected_slots.each do |slot|
-          if slot.changed?
-            if slot.capacity == 0
-              slot.destroy          # Delete those whose capacity is at 0
-            else
-              slot.save             # Save those with capacity > 0
-              if !slot.valid?
-                raise ActiveRecord::Rollback
-              end
+    CapacitySlot.transaction do
+              
+      # enumerate the changed slots
+      affected_slots.each do |slot|
+        if slot.changed?
+          if slot.capacity == 0
+            slot.destroy          # Delete those whose capacity is at 0
+          else
+            slot.save             # Save those with capacity > 0
+            if !slot.valid?
+              raise ActiveRecord::Rollback
             end
           end
         end
       end
-      free_appointment.reload
     end
+    free_appointment.reload
 
-    affected_slots
   end
   
   #
@@ -405,7 +414,7 @@ class CapacitySlot < ActiveRecord::Base
   # If we assume that the array was defragged before a change is made, and then record all the changes, we can optimize by starting to check only the changed slots.
   # There may be knock on impacts as a result of defragging this slot, but at least initially we can reduce the number of slots we check
   #
-  def self.defrag(affected_slots, commit = false)
+  def self.defrag(affected_slots)
     
     # We check each of the changed slots to see if any of them should be merged with an existing slot
     # We keep going until no defrag operations happen, as one run through can lead to additional defrags. Initialize defrags to ensure we do the loop at least once
@@ -477,21 +486,19 @@ class CapacitySlot < ActiveRecord::Base
     end
     
     #
-    # commit the capacity slot changes in a single transaction if required
+    # commit the capacity slot changes in a single transaction
     #
-    if commit
-      CapacitySlot.transaction do
-                
-        # enumerate the changed slots
-        affected_slots.each do |slot|
-          if slot.changed?
-            if slot.capacity == 0
-              slot.destroy          # Delete those whose capacity is at 0
-            else
-              slot.save             # Save those with capacity > 0
-              if !slot.valid?
-                raise ActiveRecord::Rollback
-              end
+    CapacitySlot.transaction do
+              
+      # enumerate the changed slots
+      affected_slots.each do |slot|
+        if slot.changed?
+          if slot.capacity == 0
+            slot.destroy          # Delete those whose capacity is at 0
+          else
+            slot.save             # Save those with capacity > 0
+            if !slot.valid?
+              raise ActiveRecord::Rollback
             end
           end
         end
@@ -551,9 +558,10 @@ class CapacitySlot < ActiveRecord::Base
       time_end_at_will_change!
       duration_will_change!
 
-      self.duration = self.end_at - self.start_at
-      self.time_start_at = self.start_at.utc.hour.hours + self.start_at.utc.min.minutes
-      self.time_end_at = self.time_start_at + self.duration
+      tr                 = TimeRange.new(:start_at => self.start_at, :end_at => self.end_at, :duration => self.duration)
+      self.time_start_at = tr.time_start_at_utc
+      self.time_end_at   = tr.time_end_at_utc
+      self.duration      = tr.duration
     end
   end
   
