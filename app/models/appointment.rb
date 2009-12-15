@@ -25,7 +25,7 @@ class Appointment < ActiveRecord::Base
 
   # Recurrences - an appointment might have a recurrence rule. If so, the appointment may have multiple recurrence instances.
   # These recurrence instances refer back to their parent. If their parent is destroyed, the instance refererences are nullified
-  has_many                    :recur_instances, :dependent => :destroy, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :nullify
+  has_many                    :recur_instances, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :nullify
   belongs_to                  :recur_parent, :class_name => "Appointment"
 
   has_many                    :appointment_waitlists, :dependent => :destroy
@@ -60,9 +60,6 @@ class Appointment < ActiveRecord::Base
   
   before_destroy            :before_destroy_callback
 
-  # If the appointment is updated, and is a recurrence, we need to do some work
-  after_update              :update_recurrence
-  
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
   CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
@@ -256,7 +253,7 @@ class Appointment < ActiveRecord::Base
     end
     Range.new(array[0], array[1])
   end
-  
+
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?
@@ -266,24 +263,37 @@ class Appointment < ActiveRecord::Base
       self.mark_as = self.service.mark_as
     end
 
-    # for free and work appointments, force end_at to be start_at + duration (converted to seconds)
-    if [FREE, WORK].include?(self.mark_as) and self.start_at and self.duration
-      self.end_at = self.start_at + self.duration
-    end
-
-    # initialize duration (in seconds)
-    if (self.start_at.nil? || self.end_at.nil?)
+    # Get a default value for duration
+    # If we don't have a start time, we don't have a duration. Shouldn't happen.
+    if self.start_at.blank?
       self.duration = 0
-    elsif (self.service.nil? || self.service.free?) and self.duration.blank?
-      # initialize duration based on start and end times
-      self.duration = self.end_at - self.start_at
+    # If we don't have a duration, and we do have a service, the duration is based on the service
     elsif self.service and self.duration.blank?
       # initialize duration based on service duration
       self.duration = self.service.duration
-    end
-        
-    # initialize when, time attributes with default values
+    end        
 
+    # If we have both a start time and a duration, force end_at to be start_at + duration
+    if !self.start_at.blank? and !self.duration.blank?
+      self.end_at = self.start_at + self.duration
+    end
+
+    # set time of day values based on appointment start and duration in utc format
+    # Note that the end time can be > 24 hours, if the appointment (in UTC time) crosses a day boundary
+    if (self.duration.blank? || (self.duration == 0)) && !self.start_at.blank? && !self.end_at.blank?
+      self.duration      = (self.end_at - self.start_at).to_i
+    end
+
+    if !self.start_at.blank?
+      self.time_start_at = (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes).to_i
+      self.time_start_at = (self.time_start_at % 24.hours).to_i unless (self.time_start_at < 24.hours)
+      if !self.duration.blank?
+        self.time_end_at   = (self.time_start_at.to_i + self.duration.to_i).to_i
+        self.time_end_at   = (self.time_end_at % 24.hours).to_i unless (self.time_end_at < 24.hours)
+      end
+    end
+
+    # initialize when, time attributes with default values
     if self.when.nil?
       self.when = ''
     end
@@ -292,15 +302,6 @@ class Appointment < ActiveRecord::Base
       self.time = ''
     end
     
-    # initialize time of day attributes
-    # set time of day values based on appointment start and duration in utc format
-    # Note that the end time can be > 24 hours, if the appointment (in UTC time) crosses a day boundary
-    if self.start_at
-      self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
-      if self.duration
-        self.time_end_at = self.time_start_at + duration
-      end
-    end
   end
   
   def validate
@@ -587,7 +588,6 @@ class Appointment < ActiveRecord::Base
   end
   
   def expand_recurrence(starting, before, count = nil)
-    
     # puts "***** expanding #{self.id}, start_at #{self.start_at.utc}, end_at #{self.end_at.utc}, recur_rule #{self.recur_rule}"
     # puts "starting: #{starting.utc}, before: #{before.utc}"
     return if recur_rule.blank?
@@ -614,7 +614,7 @@ class Appointment < ActiveRecord::Base
       attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
       # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
-                            :duration => ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time,
+                            :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time).to_i,
                             :recur_parent_id => self.id})
       # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
       if self.location_id
@@ -623,10 +623,36 @@ class Appointment < ActiveRecord::Base
         Appointment.create(attrs)
       end
     end
-    self.recur_expanded_to = before
+    self.update_attribute(:recur_expanded_to, before)
     self.recur_instances
   end
 
+  #
+  # update recurrence must be called explicitly with the list of changed attributes and the changes
+  #
+  def update_recurrence(attr_changed, attr_changes, force_destroy = false)
+    # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
+    if (!self.recur_rule.blank?) && (self.recur_parent.nil?) && (!self.recur_expanded_to.nil?)
+      # Check if any of the attributes changed that cause us to reexpand the recurring instances
+      if ((attr_changed & REEXPAND_INSTANCES_ATTRS).size > 0)
+        # We need to rebuild all the instances
+        self.recur_instances.each {|a| 
+          if !force_destroy && a.work_appointments.count > 0
+            raise Exception, "Some of the recurring appointments have work appointments attached"
+          else
+            a.destroy
+          end
+        }
+        # Make sure we start expanding after the end of the original appointment
+        self.expand_recurrence(Time.now.utc > self.end_at.utc ? Time.now.utc : self.end_at.utc, self.recur_expanded_to)
+      else
+        # We can update the existing instances
+        # Build a hash of the changes, take out any attributes we don't want to update
+        instance_updates = attr_changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }
+        self.recur_instances.each { |a| a.update_attributes(instance_updates) }
+      end
+    end
+  end
 
   protected
 
@@ -730,7 +756,7 @@ class Appointment < ActiveRecord::Base
     # This is how we differentiate events from other appointments right now
     # We commit the changes in this call, as the free appointment has already been created.
     if (self.mark_as == FREE && !self.public)
-      CapacitySlot.merge_or_add(self, true)
+      CapacitySlot.merge_or_add(self)
     end
   end
 
@@ -740,24 +766,6 @@ class Appointment < ActiveRecord::Base
     time_horizon = self.company.preferences[:time_horizon].to_i || 28.days
     if (Time.zone.now + time_horizon) > self.end_at
       self.send_later(:expand_recurrence, self.end_at, Time.zone.now + time_horizon)
-    end
-  end
-
-  def update_recurrence
-    # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
-    if (!self.recur_rule.blank?) && (self.recur_parent.nil?) && (!self.recur_expanded_to.nil?) && (self.changed?)
-      # Check if any of the attributes changed that cause us to reexpand the recurring instances
-      if ((self.changed & REEXPAND_INSTANCES_ATTRS).size > 0)
-        # We need to rebuild all the instances
-        self.recur_instances.each {|a| a.destroy}
-        # Make sure we start expanding after the end of the original appointment
-        self.expand_recurrence(Time.now.utc > self.end_at.utc ? Time.now.utc : self.end_at.utc, self.recur_expanded_to)
-      else
-        # We can update the existing instances
-        # Build a hash of the changes, take out any attributes we don't want to update
-        instance_updates = self.changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }
-        self.recur_instances.each { |a| a.update_attributes(instance_updates) }
-      end
     end
   end
 
@@ -773,4 +781,5 @@ class Appointment < ActiveRecord::Base
       MessageComposeAppointment.confirmation(self)
     end
   end
+  
 end
