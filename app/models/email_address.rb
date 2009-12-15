@@ -38,6 +38,16 @@ class EmailAddress < ActiveRecord::Base
     'email'
   end
   
+  # returns true if this email address is changeable
+  def changeable?
+    # email addresses tied to rpx users are not changeable
+    if !self.address.blank? and self.emailable.is_a?(User) and self.emailable.rpx?
+      false
+    else
+      true
+    end
+  end
+
   protected
   
   def manage_user_roles
