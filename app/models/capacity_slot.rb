@@ -21,9 +21,6 @@ class CapacitySlot < ActiveRecord::Base
   before_validation           :make_duration_time_start_end
 
 
-  named_scope :future,        lambda { { :conditions => ["`capacity_slots`.start_at >= ?", Time.now.beginning_of_day.utc] } }
-  named_scope :past,          lambda { { :conditions => ["`capacity_slots`.start_at < ?", Time.now.beginning_of_day.utc - 1.day] } } # be conservative
-
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["`capacity_slots`.`duration` >= ?", t] }}
   
   named_scope :capacity_gt,   lambda { |c| { :conditions => ["`capacity_slots`.`capacity` > ?", c]}}

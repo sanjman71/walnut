@@ -83,10 +83,6 @@ class Appointment < ActiveRecord::Base
   delegate                  :lat, :to => '(location or return nil)'
   delegate                  :lng, :to => '(location or return nil)'
 
-  # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
-  named_scope :future,          lambda { { :conditions => ["start_at >= ?", Time.now.beginning_of_day.utc] } }
-  named_scope :past,            lambda { { :conditions => ["start_at < ?", Time.now.beginning_of_day.utc - 1.day] } } # be conservative
-
   named_scope :min_popularity,  lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
   named_scope :service,         lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
