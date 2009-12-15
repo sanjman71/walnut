@@ -71,7 +71,7 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :logo, :allow_destroy => true
 
   # Preferences
-  serialized_hash           :preferences, {:time_horizon => CompanyPreference.default_time_horizon, :start_wday => 0}
+  serialized_hash           :preferences, {:time_horizon => CompanyPreference.default_time_horizon, :start_wday => 0, :appt_start_minutes => [0]}
 
   acts_as_taggable_on       :tags
   
