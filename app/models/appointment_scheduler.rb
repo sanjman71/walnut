@@ -48,7 +48,7 @@ class AppointmentScheduler
     
     if provider.anyone?
       # find free appointments for any provider, order by start times
-      slots = company.capacity_slots.overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).free.general_location(location).capacity_gteq(capacity_req).order_start_at
+      slots = company.capacity_slots.overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
     else
       # find free appointments for a specific provider, order by start times
       slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
