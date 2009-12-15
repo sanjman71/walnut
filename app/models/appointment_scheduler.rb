@@ -35,7 +35,7 @@ class AppointmentScheduler
     raise ArgumentError, "service is required" if service.blank?
     raise ArgumentError, "duration is required" if duration.blank?
     raise ArgumentError, "daterange is required" if daterange.blank?
-    
+
     # use daterange to build start_at, end_at
     start_at     = daterange.start_at.utc
     end_at       = daterange.end_at.utc
@@ -74,6 +74,7 @@ class AppointmentScheduler
     free_appointment  = Appointment.new(free_hash)
                       
     # free appointments should not have conflicts
+    # KILLIAN - Why not?
     if free_appointment.conflicts?
       raise TimeslotNotEmpty
     end
@@ -133,8 +134,9 @@ class AppointmentScheduler
 
     # if options[:commit] == true, then carry out the capacity changes but don't commit them
     commit = options.has_key?(:commit) ? options[:commit] : true
-    
-    if consume_capacity(work_appointment, max_slot, commit)
+
+    # We don't try to consume capacity if we're not commiting the changes. There's no point - we checked for capacity before
+    if !commit || consume_capacity(work_appointment, max_slot)
       work_appointment
     else
       raise AppointmentInvalid, "No capacity available"
@@ -143,8 +145,9 @@ class AppointmentScheduler
   
   #
   # Consume capacity from a capacity slot, with knock-on implications for other slots
+  # This always commits changes, in it's own transaction
   #
-  def self.consume_capacity(work_appointment, max_slot, commit)
+  def self.consume_capacity(work_appointment, max_slot)
     
     # Get all potentially affected capacity slots, and remove capacity from them as appropriate
     affected_slots   = work_appointment.affected_capacity_slots
@@ -158,211 +161,62 @@ class AppointmentScheduler
     free_appointment = work_appointment.free_appointment
 
     #
-    # commit the capacity slot changes in a single transaction if required
+    # commit the capacity slot changes in a single transaction
     #
-    if commit
-      Appointment.transaction do
-                
-        if max_slot && max_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
-            (max_slot.capacity >= work_appointment.capacity)
-          # Reduce the capacity of this slot, and those impacted by this
-          max_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, {:commit => false})
-          # Now defrag the capacity slots
-          CapacitySlot.defrag(affected_slots, false)
-        end
-    
-        # Save the appointments we were handed. This won't happen if they aren't new or dirty
-        # This allows the caller to have all of the changes commit in one txn
-        work_appointment.save
-        free_appointment.save
-        
-        # enumerate the changed slots
-        affected_slots.each do |slot|
-          if slot.changed?
-            if slot.capacity == 0
-              slot.destroy          # Delete those whose capacity is at 0
-            else
-              slot.save             # Save those with capacity > 0
-              if !slot.valid?
-                raise ActiveRecord::Rollback
-              end
-            end
-          end
-        end
-      end
-      free_appointment.reload
-      
-    else
+    Appointment.transaction do
 
       if max_slot && max_slot.covers_range_incl?(work_appointment.start_at, work_appointment.end_at) &&
           (max_slot.capacity >= work_appointment.capacity)
         # Reduce the capacity of this slot, and those impacted by this
-        max_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots, {:commit => false})
+        max_slot.reduce_capacity(work_appointment.start_at, work_appointment.end_at, work_appointment.capacity, affected_slots)
         # Now defrag the capacity slots
-        CapacitySlot.defrag(affected_slots, false)
+        CapacitySlot.defrag(affected_slots)
       end
-
+  
+      # Save the appointments we were handed. This won't happen if they aren't new or dirty
+      work_appointment.save
+      free_appointment.save
+      
     end
+    free_appointment.reload
 
     true
   end
 
-  # create a waitlist appointment
-  # options:
-  #  - commit => if true, commit the waitlist appointment; otherwise, create the object but don't save it; default is true
-  # def self.create_waitlist_appointment(company, provider, service, customer, date_time_options, options={})
-  #   # should be a service that is not marked as work
-  #   raise AppointmentInvalid if service.mark_as != Appointment::WORK
-  #   
-  #   wait_commit       = options.has_key?(:commit) ? options[:commit] : true
-  #   wait_hash         = {:company => company, :service => service, :provider => provider, :customer => customer, :mark_as => Appointment::WAIT}.merge(date_time_options)
-  #   wait_appointment  = Appointment.new(wait_hash)
-  # 
-  #   raise AppointmentInvalid if !wait_appointment.valid?
-  #   
-  #   if wait_commit
-  #     # save appointment
-  #     wait_appointment.save
-  #   end
-  #   
-  #   wait_appointment
-  # end
-  
-  # split a free appointment into multiple appointments using the specified service and time
-  def self.split_free_appointment(appointment, service, duration, service_start_at, service_end_at, options={})
-    # validate service argument
-    raise ArgumentError if service.blank? or !service.is_a?(Service)
-    raise ArgumentError if appointment.service.mark_as != Appointment::FREE
-
-    # check that the current appointment is free
-    raise Appointment::AppointmentNotFree if appointment.mark_as != Appointment::FREE
-    
-    # convert argument Strings to ActiveSupport::TimeWithZones
-    service_start_at = Time.zone.parse(service_start_at) if service_start_at.is_a?(String)
-    service_end_at   = Time.zone.parse(service_end_at) if service_end_at.is_a?(String)
-    
-    # time arguments should now be ActiveSupport::TimeWithZone objects
-    raise ArgumentError if !service_start_at.is_a?(ActiveSupport::TimeWithZone) or !service_end_at.is_a?(ActiveSupport::TimeWithZone)
-        
-    # check that the service_start_at and service_end_at times fall within the appointment timeslot
-    raise ArgumentError unless service_start_at.between?(appointment.start_at, appointment.end_at) and 
-                               service_end_at.between?(appointment.start_at, appointment.end_at)
-    
-    # build new appointment
-    new_appt              = Appointment.new
-    new_appt.provider     = appointment.provider
-    new_appt.company      = appointment.company
-    new_appt.service      = service
-    new_appt.start_at     = service_start_at
-    new_appt.end_at       = service_end_at
-    new_appt.mark_as      = service.mark_as
-    new_appt.duration     = duration
-    new_appt.customer     = options[:customer]  # set to nil if no customer is specified
-    
-    # build new start, end appointments
-    unless service_start_at == appointment.start_at
-      # the start appointment starts at the same time but ends when the new appointment starts
-      start_appt          = Appointment.new(appointment.attributes)
-      start_appt.start_at = appointment.start_at
-      start_appt.end_at   = new_appt.start_at
-      start_appt.duration -= duration
-    end
-    
-    unless service_end_at == appointment.end_at
-      # the end appointment ends at the same time, but starts when the new appointment ends
-      end_appt            = Appointment.new(appointment.attributes)
-      end_appt.start_at   = new_appt.end_at
-      end_appt.end_at     = appointment.end_at
-      end_appt.duration   -= duration
-    end
-    
-    appointments = [start_appt, new_appt, end_appt].compact
-    
-    if options[:commit]
-      
-      # commit the apointment changes
-      Appointment.transaction do
-        # remove the existing appointment first
-        appointment.destroy
-        
-        # add new appointments
-        appointments.each do |appointment|
-          appointment.save
-          if !appointment.valid?
-            raise ActiveRecord::Rollback
-          end
-        end
-      end
-      
-    end
-    
-    appointments
-  end
-  
   # cancel the work appointment, and reclaim the necessary free time
-  def self.cancel_work_appointment(appointment, options = {})
+  def self.cancel_work_appointment(appointment)
     raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WORK
 
     # find any free time that book-ends this work appointment
     company          = appointment.company
     
     free_appointment = appointment.free_appointment
-    if free_appointment.blank?
-      raise AppointmentInvalid, "No associated free appointment"
-    end
-    
-    commit = options.has_key?(:commit) ? options[:commit] : false
 
-    if commit
-      Appointment.transaction do
+    # We always commit a cancel
+    Appointment.transaction do
 
-        # Create capacity corresponding to the canceled work appointment. We'll commit the changes below.
-        affected_slots = CapacitySlot.merge_or_add(free_appointment, false, :work_appointment => appointment)
+      # If we have a free appointment (the usual case) we add the canceled appointment's capacity back to that appointment
+      if !free_appointment.blank?
+        # Create capacity corresponding to the canceled work appointment.
+        CapacitySlot.merge_or_add(free_appointment, :work_appointment => appointment)
 
         # Defrag the capacity slots
-        CapacitySlot.defrag(affected_slots)
-
-        # cancel and save work appointment
-        appointment.cancel
-        appointment.save
-
-        # enumerate the changed slots
-        affected_slots.each do |slot|
-          if slot.changed?
-            if slot.capacity == 0
-              slot.destroy          # Delete those whose capacity is at 0
-            else
-              slot.save             # Save those with capacity > 0
-              if !slot.valid?
-                raise ActiveRecord::Rollback
-              end
-            end
-          end
-        end
+        CapacitySlot.defrag(free_appointment.capacity_slots)
+      else
+        affected_slots = []
       end
-      free_appointment.reload
-    else
-      # Create capacity corresponding to the canceled work appointment. We'll commit the changes below.
-      affected_slots = CapacitySlot.merge_or_add(free_appointment, false, :work_appointment => appointment)
 
-      # Defrag the capacity slots
-      CapacitySlot.defrag(affected_slots)
-
-      # cancel work appointment
+      # cancel and save work appointment
       appointment.cancel
+      appointment.save
 
-      free_appointment.reload
     end
+
+    free_appointment.reload unless free_appointment.blank?
 
     free_appointment
   end
 
-  # cancel the wait appointment
-  # def self.cancel_wait_appointment(appointment)
-  #   raise AppointmentInvalid, "Expected a waitlist appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
-  #   appointment.cancel
-  # end
-  
   # build collection of all free and work appointments that have not been canceled over the specified date range
   def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
     company.appointments.provider(provider).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
