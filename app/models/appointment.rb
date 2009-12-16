@@ -42,7 +42,7 @@ class Appointment < ActiveRecord::Base
 
   before_save                 :make_confirmation_code
   after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
-                              :expand_recurrence_after_create, :create_appointment_waitlist, :send_confirmation
+                              :expand_recurrence_after_create, :create_appointment_waitlist, :send_confirmation, :auto_approve
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -118,9 +118,8 @@ class Appointment < ActiveRecord::Base
   named_scope :free_work,             { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
 
   # find appointments by state is part of the AASM plugin
-  # add special named scopes for special state queries
-  named_scope :upcoming_completed,    { :conditions => ["state = ? or state = ?", 'upcoming', 'completed'] }
-  named_scope :upcoming,              { :conditions => ["state = ?", 'upcoming'] }
+  # add named scopes for special state queries
+  named_scope :not_canceled,          { :conditions => ["state <> 'canceled'"] }
 
   # order by start_at
   named_scope :order_start_at,        {:order => 'start_at'}
@@ -193,17 +192,27 @@ class Appointment < ActiveRecord::Base
   include AASM
   
   aasm_column           :state
-  aasm_initial_state    :upcoming
-  aasm_state            :upcoming
+  aasm_initial_state    :unapproved
+  aasm_state            :unapproved
+  aasm_state            :confirmed
+  aasm_state            :noshow
   aasm_state            :completed
   aasm_state            :canceled
   
-  aasm_event :checkout do
-    transitions :to => :completed, :from => [:upcoming]
+  aasm_event :approve do
+    transitions :to => :confirmed, :from => [:unapproved]
+  end
+
+  aasm_event :complete do
+    transitions :to => :completed, :from => [:confirmed, :noshow] # very flexible about transitions
+  end
+
+  aasm_event :noshow do
+    transitions :to => :noshow, :from => [:confirmed, :completed]
   end
 
   aasm_event :cancel do
-    transitions :to => :canceled, :from => [:upcoming]
+    transitions :to => :canceled, :from => [:confirmed, :completed, :noshow]
   end
   # END acts_as_state_machine
 
@@ -431,14 +440,14 @@ class Appointment < ActiveRecord::Base
   #  - provider must be the same
   #  - start, end times must overlap
   #  - must be marked as 'free' or 'work'
-  #  - state must not be 'upcoming' or 'completed'
+  #  - state must not be 'confirmed' or 'completed' # SK not sure about this anymore
   def conflicts
-    @conflicts ||= self.company.appointments.free_work.upcoming_completed.provider(provider).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free_work.provider(provider).overlap(start_at, end_at)
   end
 
   # Conflicting free time conflicts
   def free_conflicts
-    @conflicts ||= self.company.appointments.free.upcoming_completed.provider(provider).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free.provider(provider).overlap(start_at, end_at)
   end
 
   # Overlapping capacity slots include those overlapping a time range, not necessarily covering all of it. It doesn't include those that only touch, or abut, the time range
@@ -771,11 +780,17 @@ class Appointment < ActiveRecord::Base
     end
   end
 
+  # after create callback to send appt confirmation
   def send_confirmation
     case self.mark_as
     when WORK
       MessageComposeAppointment.confirmation(self)
     end
   end
-  
+
+  # after create callback to automatically approve appointments
+  def auto_approve
+    self.approve!
+  end
+
 end
