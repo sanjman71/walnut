@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
       user.password_confirmation = password
       user.save
       # send user password reset
-      Delayed::Job.enqueue(UserJob.new(:id => user.id, :password => password, :method => 'send_password_reset'))
+      MessageComposeUser.password_reset(user, password)
     else
       User.transaction do
         # create user in active state
@@ -123,7 +123,7 @@ class User < ActiveRecord::Base
         end
       end
       # send user account created
-      Delayed::Job.enqueue(UserJob.new(:id => user.id, :password => password, :method => 'send_account_created'))
+      MessageComposeUser.created(user.reload)
     end
 
     user

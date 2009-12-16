@@ -1,7 +1,7 @@
 class MessageCompose
   
-  # default message sender for the company
-  def self.sender(company)
+  # default message sender for the company, user
+  def self.sender(object)
     User.first # fix this
   end
 

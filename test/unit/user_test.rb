@@ -31,7 +31,7 @@ class UserTest < ActiveSupport::TestCase
       end
 
       should "increment user.email_addresses_count" do
-        assert_equal 0, @user1.email_addresses_count
+        assert_equal 1, @user1.reload.email_addresses_count
       end
 
       should "add to user.email_addresses collection" do
@@ -50,6 +50,9 @@ class UserTest < ActiveSupport::TestCase
         @email = @user1.primary_email_address
         assert_equal "unverified", @email.state
       end
+      
+      # should send user created message
+      should_change("delayed job count", :by => 1) { Delayed::Job.count }
     end
 
     context "with a password and email_addresses_attributes" do
@@ -62,7 +65,7 @@ class UserTest < ActiveSupport::TestCase
       should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
 
       should "increment user.email_addresses_count" do
-        assert_equal 0, @user1.email_addresses_count
+        assert_equal 1, @user1.reload.email_addresses_count
       end
 
       should "add to user.email_addresses collection" do
@@ -77,6 +80,9 @@ class UserTest < ActiveSupport::TestCase
         assert_equal 0, @user1.rpx
         assert_false @user1.rpx?
       end
+
+      # should send user created message
+      should_change("delayed job count", :by => 1) { Delayed::Job.count }
     end
 
     context "with rpx" do
@@ -109,8 +115,10 @@ class UserTest < ActiveSupport::TestCase
         @email = @user1.primary_email_address
         assert_equal "verified", @email.state
       end
-    end
 
+      # should *not* send user created message
+      should_not_change("delayed job count") { Delayed::Job.count }
+    end
   end
 
   context "caldav token" do
