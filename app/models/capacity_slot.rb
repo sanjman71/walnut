@@ -144,7 +144,7 @@ class CapacitySlot < ActiveRecord::Base
     #
     new_start_at = new_end_at = new_capacity = nil
 
-    if free_appointment && !options[:work_appointment] && options[:start_at].blank? && options[:end_at].blank?
+    if free_appointment && options[:work_appointment].blank? && options[:start_at].blank? && options[:end_at].blank?
       # If we aren't given a work appointment, start_at and end_at options, we assume we're to create capacity directly corresponding to the free appointment
       new_start_at = free_appointment.start_at.utc
       new_end_at   = free_appointment.end_at.utc
@@ -165,7 +165,8 @@ class CapacitySlot < ActiveRecord::Base
     end
 
     # Calculate the duration for the new timeslot
-    new_duration = new_end_at.utc - new_start_at.utc
+    # Very important to use Time types here - not DateTime
+    new_duration = new_end_at.to_time - new_start_at.to_time
 
     # Find the capacity slot attached to this free appointment with the most capacity covering the range.
     max_slot = free_appointment.capacity_slots.covers(new_start_at, new_end_at).order_capacity_desc.first
