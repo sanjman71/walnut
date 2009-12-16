@@ -85,6 +85,7 @@ class Appointment < ActiveRecord::Base
 
   named_scope :min_popularity,  lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
+  named_scope :company,         lambda { |o| { :conditions => {:company_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :service,         lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :provider,        lambda { |provider| if (provider)
                                                     {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}

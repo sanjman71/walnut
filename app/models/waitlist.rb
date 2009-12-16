@@ -19,6 +19,7 @@ class Waitlist < ActiveRecord::Base
 
   has_many                    :appointment_waitlists, :dependent => :destroy
 
+  named_scope :company,       lambda { |o| { :conditions => {:company_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :provider,      lambda { |provider| if (provider)
                                                     {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
