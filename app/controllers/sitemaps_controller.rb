@@ -112,6 +112,12 @@ class SitemapsController < ApplicationController
       @locations  = Location.with_city(@city).all(:offset => @offset, :limit => @@urls_per_sitemap, :select => "id", :include => :companies)
     end
 
+    # we must have at least 1 location
+    if @locations.size == 0
+      # redirect to a smaller index
+      redirect_to url_for(params.merge(:index => @index-1)) and return
+    end
+
     @protocol   = self.request.protocol
     @host       = self.request.host
 
