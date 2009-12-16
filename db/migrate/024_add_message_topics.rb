@@ -4,6 +4,7 @@ class AddMessageTopics < ActiveRecord::Migration
       t.references  :message
       t.references  :topic,  :polymorphic => true    # e.g. appointments, waitlist
       t.string      :tag, :length => 50
+      t.timestamps
     end
 
     add_index :message_topics, :message_id
