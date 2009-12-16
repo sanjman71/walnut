@@ -54,7 +54,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible           :name, :password, :password_confirmation, :rpx, :email_addresses_attributes, :phone_numbers_attributes
+  attr_accessible           :name, :password, :password_confirmation, :rpx, :email_addresses_attributes, :phone_numbers_attributes, :capacity
 
   named_scope               :with_emails, { :conditions => ["email_addresses_count > 0"] }
   named_scope               :with_email, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.address = ?", s] } }

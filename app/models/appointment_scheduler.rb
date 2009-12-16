@@ -44,7 +44,7 @@ class AppointmentScheduler
     time_range   = options.has_key?(:time_range) ? options[:time_range] : nil
     
     # use the (absolute value of the) capacity requested or the capacity from the service (defaults to 1)
-    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : @service.capacity
+    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : service.capacity
     
     if provider.anyone?
       # find free appointments for any provider, order by start times
