@@ -193,7 +193,7 @@ class Company < ActiveRecord::Base
     Company.decrement_counter(:providers_count, self.id) if provider
     
     # check provider to see if they provide any services to this company
-    if provider.respond_to?(:has_role?) and provider.has_role?('company provider', self) and !provider.companies.include?(self)
+    if provider.respond_to?(:has_role?) and provider.has_role?('company provider', self) and !provider.provided_companies.include?(self)
       # revoke company roles from provider
       provider.revoke_role('company provider', self)
     end
