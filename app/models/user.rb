@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
   has_many                  :ownerships, :through => :subscriptions, :source => :company
 
   has_many                  :company_providers, :as => :provider, :dependent => :destroy
-  has_many                  :companies, :through => :company_providers, :source => :company
+  has_many                  :provided_companies, :through => :company_providers, :source => :company
 
   has_many                  :waitlists, :foreign_key => :customer_id
 
@@ -166,6 +166,11 @@ class User < ActiveRecord::Base
   # return true if its the special user 'anyone'
   def anyone?
     self.id == 0
+  end
+  
+  # return true if the user is a provider
+  def provider?
+    self.company_providers.count > 0
   end
   
   def rpx?
