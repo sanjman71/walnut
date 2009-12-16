@@ -287,42 +287,5 @@ class AppointmentScheduler
     
     unscheduled_hash
   end
-  
-  # options:
-  #  - email => true|false, defaults to false
-  #  - sms   => true|false, defaults to false
-  # def self.send_confirmation(appointment, options={})
-  #   confirmations_sent = 0
-  #   
-  #   email = options.has_key?(:email) ? options[:email] : false
-  #   sms   = options.has_key?(:sms) ? options[:sms] : false
-  #   
-  #   if email
-  #     begin
-  #       case appointment.mark_as
-  #       when Appointment::WORK
-  #         MailWorker.async_send_appointment_confirmation(:id => appointment.id)
-  #       end
-  #       confirmations_sent += 1
-  #       RAILS_DEFAULT_LOGGER.debug("Sent email #{appointment.mark_as} appointment confirmation")
-  #     rescue Exception => e
-  #       RAILS_DEFAULT_LOGGER.debug("Error sending email confirmation message for your appointment.")
-  #     end
-  #   end
-  #   
-  #   if sms
-  #     begin
-  #       case appointment.mark_as
-  #       when Appointment::WORK
-  #         SmsWorker.async_send_appointment_confirmation(:id => appointment.id)
-  #       end
-  #       confirmations_sent += 1
-  #       RAILS_DEFAULT_LOGGER.debug("Sent sms #{appointment.mark_as} appointment confirmation")
-  #     rescue Exception => e
-  #       RAILS_DEFAULT_LOGGER.debug("Error sending sms confirmation message for your appointment - #{e.message}")
-  #     end
-  #   end
-  #   
-  #   confirmations_sent
-  # end
+
 end
