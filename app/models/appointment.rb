@@ -759,7 +759,7 @@ class Appointment < ActiveRecord::Base
   # expand recurrence appointments by some default value
   def expand_recurrence_after_create
     return if recur_rule.blank?
-    time_horizon = self.company.preferences[:time_horizon].to_i || CompanyPreference.default_time_horizon.to_i
+    time_horizon = self.company.preferences[:time_horizon].to_i
     if (Time.zone.now + time_horizon) > self.end_at
       self.send_later(:expand_recurrence, self.end_at, Time.zone.now + time_horizon)
     end
