@@ -43,8 +43,8 @@ class AppointmentScheduler
     # use time range if it was specified
     time_range   = options.has_key?(:time_range) ? options[:time_range] : nil
     
-    # use the (absolute value of the) capacity requested or the default
-    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : 1
+    # use the (absolute value of the) capacity requested or the capacity from the service (defaults to 1)
+    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : @service.capacity
     
     if provider.anyone?
       # find free appointments for any provider, order by start times
@@ -70,7 +70,7 @@ class AppointmentScheduler
     
     # create a new appointment object
     # Make sure it has company, service, provider and capacity values. These will be overridden by the options parameter
-    free_hash         = {:company => company, :service => service, :provider => provider, :capacity => 1}.merge(options)
+    free_hash         = {:company => company, :service => service, :provider => provider, :capacity => provider.capacity }.merge(options)
     free_appointment  = Appointment.new(free_hash)
                       
     # free appointments should not have conflicts
@@ -112,7 +112,8 @@ class AppointmentScheduler
     raise AppointmentInvalid if !service.provided_by?(provider)
 
     # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
-    work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
+    work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer,
+                        :capacity => service.capacity }.merge(date_time_options)
     work_appointment = Appointment.new(work_hash)
     
     # Determine if there is capacity to accomodate the work appointment. This will also find the appropriate free appointment for the work appointment.

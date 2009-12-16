@@ -2,6 +2,8 @@ class Service < ActiveRecord::Base
   belongs_to                  :company
   validates_presence_of       :name, :company_id, :price_in_cents
   validates_presence_of       :duration, :if => :duration_required?
+  validates_presence_of       :capacity
+  validates_numericality_of   :capacity
   validates_inclusion_of      :duration, :in => 1..(7.days), :message => "must be a non-zero reasonable value", :if => :duration_required?
   validates_inclusion_of      :mark_as, :in => %w(free work), :message => "can only be scheduled as free or work"
   validates_uniqueness_of     :name, :scope => :company_id
