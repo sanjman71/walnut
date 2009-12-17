@@ -106,8 +106,7 @@ class Waitlist < ActiveRecord::Base
   def after_add_waitlist_time_range(waitlist_time_range)
     # the callback can be invoked on new records, make sure we skip these
     return if self.new_record?
-    if RAILS_ENV == 'development'
-      AppointmentWaitlist.create_waitlist(self)
-    end
+    # build appointment_waitlist objects using delayed job
+    AppointmentWaitlist.send_later(:create_waitlist, self)
   end
 end
