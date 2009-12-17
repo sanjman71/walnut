@@ -39,6 +39,10 @@ class Service < ActiveRecord::Base
     self.id == 0
   end
 
+  def tableize
+    self.class.to_s.tableize
+  end
+
   # Virtual attribute for use in the UI - entering the lenght of the service is done in minutes rather than seconds. This converts in both directions
   def duration_in_minutes
     (self.duration.to_i / 60).to_i
