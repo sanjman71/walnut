@@ -1,11 +1,8 @@
 class AppointmentScheduler
   
-  def self.find_free_appointments(company, location, provider, service, duration, daterange, date_time_options={}, options={})
+  def self.find_free_appointments(company, location, provider, service, duration, daterange, options={})
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "location is required" if location.blank?
-    raise ArgumentError, "provider is required" if provider.blank?
-    raise ArgumentError, "service is required" if service.blank?
-    raise ArgumentError, "duration is required" if duration.blank?
     raise ArgumentError, "daterange is required" if daterange.blank?
 
     # use daterange to build start_at, end_at
@@ -13,49 +10,64 @@ class AppointmentScheduler
     end_at      = daterange.end_at
 
     # use time range if it was specified, default to 'anytime'
-    time        = date_time_options.has_key?(:time) ? date_time_options[:time] : 'anytime'
+    time        = options.has_key?(:time_range) ? date_time_options[:time_range] : 'anytime'
     time_range  = Appointment.time_range(time)
 
-    if provider.anyone?
-      # find free appointments for any provider, order by start times
-      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
-    else
-      # find free appointments for a specific provider, order by start times
-      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location).order_start_at
-    end
+    # Clear the service and provider parameters if we don't need to specify specifics
+    service  = nil if service.blank? || service.nothing?
+    provider = nil if provider.blank? || provider.anyone?
 
-    # remove appointments that have ended (when compared to Time.now) or appointment providers that do not provide the requested service
-    appointments.select { |appt| appt.end_at.utc > Time.now.utc and service.provided_by?(appt.provider) }
+    # remove appointments in the past?
+    keep_old = options.has_key?(:keep_old) ? options[:keep_old] : false
+    
+    # find free appointments for a specific provider, order by start times
+    appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.general_location(location).order_start_at
+
+    # remove appointments that have ended (when compared to Time.now) unless we're told not to (option :keep_old => true) or appointment providers that do not provide the requested service
+    appointments.select { |appt| ((keep_old || (appt.end_at.utc > Time.zone.now.utc)) &&
+                                  (service.blank? || service.provided_by?(appt.provider)))
+                        }
   end
   
   def self.find_free_capacity_slots(company, location, provider, service, duration, daterange, options={})
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "location is required" if location.blank?
-    raise ArgumentError, "provider is required" if provider.blank?
-    raise ArgumentError, "service is required" if service.blank?
-    raise ArgumentError, "duration is required" if duration.blank?
     raise ArgumentError, "daterange is required" if daterange.blank?
 
     # use daterange to build start_at, end_at
-    start_at     = daterange.start_at.utc
-    end_at       = daterange.end_at.utc
+    start_at     = daterange.start_at
+    end_at       = daterange.end_at
     
     # use time range if it was specified
     time_range   = options.has_key?(:time_range) ? options[:time_range] : nil
     
-    # use the (absolute value of the) capacity requested or the capacity from the service (defaults to 1)
-    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : service.capacity
+    # Clear the service and provider parameters if we don't need to specify specifics
+    service  = nil if service.blank? || service.nothing?
+    provider = nil if provider.blank? || provider.anyone?
+
+    # remove appointments in the past?
+    keep_old = options.has_key?(:keep_old) ? options[:keep_old] : false
     
-    if provider.anyone?
-      # find free appointments for any provider, order by start times
-      slots = company.capacity_slots.overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
-    else
-      # find free appointments for a specific provider, order by start times
-      slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gt(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
-    end
+    # use the (absolute value of the) capacity requested or the capacity from the service (defaults to 1)
+    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : (service.blank? ? 1 : service.capacity)
+    
+    # find free appointments for a specific provider, order by start times
+    slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gteq(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
     
     # remove slots that have ended (when compared to Time.zone.now) or appointment providers that do not provide the requested service
-    slots.select { |slot| slot.end_at.utc > Time.zone.now.utc and service.provided_by?(slot.free_appointment.provider) }
+    slots.select { |slot| ((keep_old || (slot.end_at.utc > Time.zone.now.utc)) &&
+                           (service.blank? || service.provided_by?(slot.free_appointment.provider)))
+                 }
+  end
+  
+  # build collection of all free and work appointments over the specified date range
+  def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
+    company.appointments.provider(provider).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+  end
+
+  # build collection of all work appointments over the specified date range
+  def self.find_work_appointments(company, location, provider, daterange, options = {})
+    company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
   end
   
   # create a free appointment in the specified timeslot
@@ -218,11 +230,6 @@ class AppointmentScheduler
     free_appointment
   end
 
-  # build collection of all free and work appointments that have not been canceled over the specified date range
-  def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
-    company.appointments.provider(provider).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
-  end
-  
   # build collection of all unscheduled appointments over the specified date range
   # returns a hash mapping dates to a appointment collection
   def self.find_unscheduled_time(company, location, provider, daterange, appointments=nil)

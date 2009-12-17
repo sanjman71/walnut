@@ -63,7 +63,7 @@ class Waitlist < ActiveRecord::Base
       start_date    = waitlist_time_range.start_date
       end_date      = waitlist_time_range.end_date
       time_range    = [waitlist_time_range.start_time, waitlist_time_range.end_time]
-      array         += company.appointments.free.provider(provider).overlap(start_date, end_date).time_overlap(time_range).duration_gt(duration).order_start_at
+      array         += company.appointments.free.provider(provider).overlap(start_date, end_date).time_overlap(time_range).duration_gteq(duration).order_start_at
     end
     appointments
   end

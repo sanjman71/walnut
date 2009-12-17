@@ -86,16 +86,28 @@ class Appointment < ActiveRecord::Base
   named_scope :min_popularity,  lambda { |x| {:conditions => ["popularity >= ?", x] }}
 
   named_scope :company,         lambda { |o| { :conditions => {:company_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :service,         lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :provider,        lambda { |provider| if (provider)
-                                                    {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
-                                                  else
+  named_scope :service,         lambda { |service| if (service.blank?)
                                                     {}
+                                                  else
+                                                    {:conditions => {:service_id => service.is_a?(Integer) ? service : service.id}}
+                                                  end
+                                        }
+  named_scope :provider,        lambda { |provider| if (provider.blank?)
+                                                    {}
+                                                  else
+                                                    {:conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s}}
                                                   end
                                         }
   named_scope :no_provider,   { :conditions => {:provider_id => nil, :provider_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
+
+  # Duration greater than or equal to a value. If nil passed in here, no conditions are added
+  named_scope :duration_gteq, lambda { |t|  if (t.blank?)
+                                              {}
+                                            else
+                                              { :conditions => ["duration >= ?", t] }
+                                            end
+                                     }
 
   # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
   named_scope :future,        lambda { { :conditions => ["start_at >= ?", Time.zone.now] } }
@@ -453,38 +465,38 @@ class Appointment < ActiveRecord::Base
 
   # Overlapping capacity slots include those overlapping a time range, not necessarily covering all of it. It doesn't include those that only touch, or abut, the time range
   def overlapping_capacity_slots
-    self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gt(self.duration).order_capacity_desc
+    self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gteq(self.duration).order_capacity_desc
   end
 
   # Affected capacity slots include those overlapping or touching a time range, not necessarily covering all of it
   def affected_capacity_slots
-    self.company.capacity_slots.provider(self.provider).overlap_incl(self.start_at, self.end_at).duration_gt(self.duration).order_capacity_desc
+    self.company.capacity_slots.provider(self.provider).overlap_incl(self.start_at, self.end_at).duration_gteq(self.duration).order_capacity_desc
   end
 
   def self.affected_capacity_slots_range(company, start_at, end_at, duration, provider = nil)
-    company.capacity_slots.provider(provider).overlap_incl(start_at, end_at).duration_gt(duration).order_capacity_desc
+    company.capacity_slots.provider(provider).overlap_incl(start_at, end_at).duration_gteq(duration).order_capacity_desc
   end
 
   # Capacity slot which has maximum capacity, completely covers the time range and has enough capacity to satisfy the request
   # If this call doesn't return a slot, there is no capacity in this time range
   # There may be several slots that can satisfy the request, if so this call returns the one with the most capacity
   def max_capacity_slot
-    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).capacity_gteq(self.capacity).order_capacity_desc.first
+    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gteq(self.duration).capacity_gteq(self.capacity).order_capacity_desc.first
   end
   
   def self.max_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
-    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gt(duration).capacity_gteq(capacity).order_capacity_desc.first
+    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gteq(duration).capacity_gteq(capacity).order_capacity_desc.first
   end
   
   # Capacity slot which has minimum capacity, completely covers the time range and has more capacity than requested
   # If this call doesn't return a slot, there is no capacity in this time range
   # There may be several slots that can satisfy the request, if so this call returns the one with the least capacity
   def min_capacity_slot
-    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gt(self.duration).capacity_gteq(self.capacity).order_capacity_asc.first
+    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gteq(self.duration).capacity_gteq(self.capacity).order_capacity_asc.first
   end
   
   def self.min_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
-    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gt(duration).capacity_gteq(capacity).order_capacity_asc.first
+    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gteq(duration).capacity_gteq(capacity).order_capacity_asc.first
   end
 
   # returns true if this appointment conflicts with any other

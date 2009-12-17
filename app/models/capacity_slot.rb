@@ -21,7 +21,13 @@ class CapacitySlot < ActiveRecord::Base
   before_validation           :make_duration_time_start_end
 
 
-  named_scope :duration_gt,   lambda { |t|  { :conditions => ["`capacity_slots`.`duration` >= ?", t] }}
+  # Duration greater than or equal to a value. If nil passed in here, no conditions are added
+  named_scope :duration_gteq, lambda { |t|  if (t.blank?)
+                                              {}
+                                            else
+                                              { :conditions => ["`capacity_slots`.`duration` >= ?", t] }
+                                            end
+                                     }
   
   named_scope :capacity_gt,   lambda { |c| { :conditions => ["`capacity_slots`.`capacity` > ?", c]}}
   named_scope :capacity_gteq, lambda { |c| { :conditions => ["`capacity_slots`.`capacity` >= ?", c]}}
