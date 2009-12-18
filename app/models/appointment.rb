@@ -63,10 +63,10 @@ class Appointment < ActiveRecord::Base
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
   CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
-                              "confirmation_code", "uid", "description", "public", "name", "popularity", "url"]
+                              "confirmation_code", "uid", "description", "public", "name", "popularity", "url", "capacity"]
 
   # If any of these attributes change in a recurrence update, we have to re-expand the instances of the recurrence
-  REEXPAND_INSTANCES_ATTRS = ["recur_rule", "start_at", "end_at", "duration"]
+  REEXPAND_INSTANCES_ATTRS = ["recur_rule", "start_at", "end_at", "duration", "capacity"]
 
   # These are the attributes which can be used in an update
   UPDATE_APPT_ATTRS        = CREATE_APPT_ATTRS - REEXPAND_INSTANCES_ATTRS
