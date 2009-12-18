@@ -60,6 +60,7 @@ class User < ActiveRecord::Base
   named_scope               :with_email, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.address = ?", s] } }
   named_scope               :with_identifier, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.identifier = ?", s] } }
   named_scope               :with_phones, lambda { |s| { :conditions => ["phone_numbers_count > 0"] }}
+  named_scope               :with_phone, lambda { |s| { :include => :phone_numbers, :conditions => ["phone_numbers.address = ?", s] } }
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => 'users.name' }
@@ -75,9 +76,15 @@ class User < ActiveRecord::Base
   # We really need a Dispatch Chain here or something.
   # This will also let us return a human error message.
   #
-  def self.authenticate(email, password, options={})
-    return nil if email.blank? || password.blank?
-    u = self.with_email(email).find_in_state(:first, :active) # need to get the salt
+  def self.authenticate(email_or_phone, password, options={})
+    return nil if email_or_phone.blank? || password.blank?
+    if PhoneNumber.phone?(email_or_phone)
+      # phone authentication
+      u = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_state(:first, :active) # need to get the salt
+    else
+      # assume email authentication
+      u = self.with_email(email_or_phone).find_in_state(:first, :active) # need to get the salt
+    end
     u && u.authenticated?(password) ? u : nil
   end
 

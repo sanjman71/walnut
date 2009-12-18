@@ -3,6 +3,7 @@ class PhoneNumber < ActiveRecord::Base
   validates_presence_of     :name, :address
   validates_format_of       :address, :with => /[0-9]{10,11}/
   validates_uniqueness_of   :address, :scope => [:callable_id, :callable_type]
+  validates_inclusion_of    :name, :in => ['Mobile', 'Work', 'Home', 'Other']
   before_validation         :format_phone
   belongs_to                :callable, :polymorphic => true, :counter_cache => :phone_numbers_count
 
@@ -29,11 +30,26 @@ class PhoneNumber < ActiveRecord::Base
     self.state == 'verified'
   end
 
+  # valid phone number names
+  def self.names
+    ['Mobile', 'Work', 'Home', 'Other']
+  end
+  
+  # returns true if the string is a valid phone numers
+  def self.phone?(s)
+    format(s).match(/[0-9]{10,11}/)
+  end
+
+  def self.format(s)
+    return s if s.blank?
+    s.gsub(/[^\d]/, '')
+  end
+
   protected
   
   # format phone by removing all non-digits
   def format_phone
-    self.address.gsub!(/[^\d]/, '') unless self.address.blank?
+    self.address = PhoneNumber.format(self.address)
   end
 
 end

@@ -8,7 +8,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
   context "create phone number" do
     context "with invalid number" do
       setup do
-        @phone = PhoneNumber.create(:name => "Work", :address => "5551234")
+        @phone = PhoneNumber.create(:name => "Mobile", :address => "5551234")
       end
 
       should_not_change("PhoneNumber.count") { PhoneNumber.count }
@@ -51,7 +51,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
     context "with callable and number with extra chars" do
       setup do
         @user  = Factory(:user)
-        @phone = @user.phone_numbers.create(:name => "Work", :address => "555-999-9999")
+        @phone = @user.phone_numbers.create(:name => "Mobile", :address => "555-999-9999")
       end
 
       should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
