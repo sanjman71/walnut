@@ -71,7 +71,7 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :logo, :allow_destroy => true
 
   # Preferences
-  serialized_hash           :preferences, {:time_horizon => 28.days, :start_wday => 0, :appt_start_minutes => [0]}
+  serialized_hash           :preferences, {:time_horizon => 28.days, :start_wday => 0, :appt_start_minutes => [0], :work_appointment_confirmations => [:customer]}
 
   acts_as_taggable_on       :tags
   
@@ -91,6 +91,10 @@ class Company < ActiveRecord::Base
 
   def self.customer_role
     Badges::Role.find_by_name('company customer')
+  end
+
+  def self.manager_role
+    Badges::Role.find_by_name('company manager')
   end
 
   # find all polymorphic providers through the company_providers collection, sort by name
@@ -126,7 +130,13 @@ class Company < ActiveRecord::Base
   def may_add_provider?
     self.plan.may_add_provider?(self)
   end  
-  
+
+  # find all company managers
+  def managers
+    role_id = Company.manager_role.id
+    self.user_roles.collect{ |ur| ur.role_id == role_id ? ur.user : nil}.compact.uniq
+  end
+
   private
 
   # initialize subdomain based on company name

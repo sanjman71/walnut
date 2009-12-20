@@ -42,7 +42,7 @@ class Appointment < ActiveRecord::Base
 
   before_save                 :make_confirmation_code
   after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
-                              :expand_recurrence_after_create, :create_appointment_waitlist, :send_confirmation, :auto_approve
+                              :expand_recurrence_after_create, :create_appointment_waitlist, :auto_approve
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -790,14 +790,6 @@ class Appointment < ActiveRecord::Base
   def create_appointment_waitlist
     if RAILS_ENV == 'development'
       AppointmentWaitlist.create_waitlist(self)
-    end
-  end
-
-  # after create callback to send appt confirmation
-  def send_confirmation
-    case self.mark_as
-    when WORK
-      MessageComposeAppointment.confirmation(self)
     end
   end
 
