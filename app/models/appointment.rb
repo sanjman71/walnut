@@ -1,3 +1,5 @@
+require 'serialized_hash'
+
 # define exception classes
 class AppointmentNotFree < Exception; end
 class AppointmentInvalid < Exception; end
