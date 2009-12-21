@@ -44,6 +44,9 @@ class Appointment < ActiveRecord::Base
   after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
                               :expand_recurrence_after_create, :create_appointment_waitlist, :auto_approve
 
+  # preferences
+  serialized_hash             :preferences, {:reminder => 1}
+
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   WORK                    = 'work'      # work appointments can be scheduled in free timeslots
