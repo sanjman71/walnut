@@ -2,8 +2,8 @@ class MessageComposeUser
 
   # send user created
   def self.created(user)
-    return -1 if user.blank?
-    return -1 if user.email_addresses_count == 0
+    return nil if user.blank?
+    return nil if user.email_addresses_count == 0
 
     email     = user.primary_email_address
     subject   = "[#{user.name}] Account created" 
@@ -11,13 +11,13 @@ class MessageComposeUser
     sender    = MessageCompose.sender(user) # default sender
     message   = MessageCompose.send(sender, subject, body, [email], user, 'created')
 
-    return 0
+    return message
   end
   
   # send user password reset
   def self.password_reset(user, password)
-    return -1 if user.blank?
-    return -1 if user.email_addresses_count == 0
+    return nil if user.blank?
+    return nil if user.email_addresses_count == 0
 
     email     = user.primary_email_address
     subject   = "[#{user.name}] Password reset" 
@@ -25,7 +25,7 @@ class MessageComposeUser
     sender    = MessageCompose.sender(user) # default sender
     message   = MessageCompose.send(sender, subject, body, [email], user, 'reset')
 
-    return 0
+    return message
   end
 
 end
