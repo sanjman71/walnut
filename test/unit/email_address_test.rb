@@ -46,6 +46,10 @@ class EmailAddressTest < ActiveSupport::TestCase
         should "be changeable" do
           assert_true @email.changeable?
         end
+
+        should "be deletable" do
+          assert_true @email.deletable?
+        end
       end
       
       context "for rpx user" do
@@ -69,6 +73,10 @@ class EmailAddressTest < ActiveSupport::TestCase
 
         should "not be changeable" do
           assert_false @email.changeable?
+        end
+
+        should "not be deletable" do
+          assert_false @email.deletable?
         end
       end
     end
