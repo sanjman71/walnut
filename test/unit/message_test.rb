@@ -8,7 +8,7 @@ class MessageTest < ActiveSupport::TestCase
   should_have_many              :message_topics
 
   context "create" do
-    context "with nested attributes" do
+    context "with email nested attributes" do
       setup do
         @recipient  = Factory(:user, :name => "Recipient")
         @email      = @recipient.email_addresses.create(:address => "a@b.com")
@@ -33,7 +33,7 @@ class MessageTest < ActiveSupport::TestCase
 
     should_change("Message.count", :by => 1) { Message.count }
 
-    context "add message recipient" do
+    context "add user message recipient" do
       setup do
         @recipient          = Factory(:user, :name => "Recipient")
         @message_recipient  = @message.message_recipients.create(:messagable => @recipient, :protocol => "local")
@@ -71,6 +71,29 @@ class MessageTest < ActiveSupport::TestCase
           @message_recipient.reload
           assert_not_equal @sent_at, @message_recipient.sent_at
         end
+      end
+    end
+  
+    context "add invitation message recipient" do
+      setup do
+        @recipient          = Invitation.create(:recipient_email => 'sanjay@jarna.com')
+        @message_recipient  = @message.message_recipients.create(:messagable => @recipient, :protocol => @recipient.protocol)
+      end
+
+      should_change("MessageRecipient.count", :by => 1) { MessageRecipient.count }
+
+      should "start in 'created' state" do
+        @message.reload
+        assert_equal 'created', @message_recipient.state
+      end
+
+      context "send message" do
+        setup do
+          @sent_at = @message_recipient.sent_at
+          @message.send!
+        end
+
+        should_change("delayed job count", :by => 1) { Delayed::Job.count }
       end
     end
   end

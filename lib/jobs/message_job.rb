@@ -57,5 +57,8 @@ class MessageJob < Struct.new(:params)
                                                 :escalation => 0,
                                                 :recipients => {:recipient => [{:position => 1, :channel => channel, :address => address}]})
     notification.save
+
+    # update recipient sent_at timestamp
+    recipient.update_attribute(:sent_at, Time.now) if recipient.respond_to?(:sent_at)
   end
 end
