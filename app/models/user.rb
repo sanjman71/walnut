@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
   validates_length_of       :name, :maximum => 100
   validates_presence_of     :name
 
-  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy
+  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc"
   has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
   accepts_nested_attributes_for :email_addresses, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
   has_many                  :phone_numbers, :as => :callable, :dependent => :destroy

@@ -50,8 +50,8 @@ class EmailAddressTest < ActiveSupport::TestCase
       
       context "for rpx user" do
         setup do
-          @user   = Factory(:user, :rpx => 1)
-          @email  = @user.email_addresses.create(:address => "a@b.com")
+          @user   = Factory(:user)
+          @email  = @user.email_addresses.create(:address => "a@b.com", :identifier => "zdaf2dfas")
         end
         should_change("EmailAddress.count") { EmailAddress.count }
       
@@ -60,8 +60,7 @@ class EmailAddressTest < ActiveSupport::TestCase
         end
       
         should "increment user.email_addresses_count" do
-          @user.reload
-          assert_equal 1, @user.email_addresses_count
+          assert_equal 1, @user.reload.email_addresses_count
         end
 
         should "have state 'unverified'" do

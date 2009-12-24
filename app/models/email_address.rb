@@ -25,6 +25,9 @@ class EmailAddress < ActiveRecord::Base
   named_scope               :with_emailable_user, {:conditions => {:emailable_type => 'User'}}
   named_scope               :with_address, lambda { |t| { :conditions => {:address => t} } }
 
+  PRIORITY_HIGHEST    = 1
+  PRIORITY_MEDIUM     = 2
+
   def before_validation_on_create
     # set default priority
     self.priority = 1 if self.priority.blank?
@@ -40,8 +43,8 @@ class EmailAddress < ActiveRecord::Base
   
   # returns true if this email address is changeable
   def changeable?
-    # email addresses tied to rpx users are not changeable
-    if !self.address.blank? and self.emailable.is_a?(User) and self.emailable.rpx?
+    # email addresses tied to rpx accounts are not changeable
+    if !self.address.blank? and !self.identifier.blank?
       false
     else
       true
