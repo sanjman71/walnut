@@ -41,7 +41,7 @@ class EmailAddress < ActiveRecord::Base
     'email'
   end
   
-  # returns true if this email address is changeable
+  # returns true if the email address is changeable
   def changeable?
     # email addresses tied to rpx accounts are not changeable
     if !self.address.blank? and !self.identifier.blank?
@@ -49,6 +49,13 @@ class EmailAddress < ActiveRecord::Base
     else
       true
     end
+  end
+
+  # return true if the email address is deletable
+  def deletable?
+    return false if new_record?
+    # emails with identifiers (from rpx) are not deletable
+    self.identifier.blank?
   end
 
   protected
