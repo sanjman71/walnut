@@ -81,6 +81,10 @@ class UserTest < ActiveSupport::TestCase
         assert_false @user1.rpx?
       end
 
+      should "have password?" do
+        assert_true @user1.reload.password?
+      end
+
       # should send user created message
       should_change("delayed job count", :by => 1) { Delayed::Job.count }
     end
@@ -106,14 +110,18 @@ class UserTest < ActiveSupport::TestCase
       should "have user.email_address" do
         assert_equal "user1@walnut.com", @user1.reload.email_address
       end
-      
-      should "create user in active state" do
+
+      should "create user in passive state" do
         assert_equal "passive", @user1.state
       end
-      
-      should "create email in verfied state" do
+
+      should "create email in verified state" do
         @email = @user1.primary_email_address
         assert_equal "verified", @email.state
+      end
+
+      should "not have password?" do
+        assert_false @user1.reload.password?
       end
 
       # should *not* send user created message

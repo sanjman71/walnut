@@ -192,6 +192,10 @@ class User < ActiveRecord::Base
     @phone_number ||= self.phone_numbers_count > 0 ? self.primary_phone_number.address : ''
   end
 
+  def password?
+    !self.crypted_password.blank?
+  end
+
   def tableize
     self.class.to_s.tableize
   end
