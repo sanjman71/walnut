@@ -234,6 +234,15 @@ class Appointment < ActiveRecord::Base
   end
   # END acts_as_state_machine
 
+  def self.aasm_states_with_all
+    ['all', 'confirmed', 'noshow', 'completed', 'canceled']
+  end
+
+  def self.aasm_states_for_select_with_all
+    # remove 'unapproved' state
+    [['All', 'all']] + Appointment.aasm_states_for_select.select{ |state_cap, state| state != 'unapproved' }
+  end
+
   # Sphinx index
   define_index do
     indexes name, :as => :name
