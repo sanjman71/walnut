@@ -9,8 +9,8 @@ class SitemapsController < ApplicationController
   # max urls in a single sitemap (protocol allows 50000)
   @@urls_per_sitemap  = 5000
   
-  # max entries in an index file (self imposed limit for testing)
-  @@entries_per_index = 100
+  # max entries in an index file
+  @@entries_per_index = 1000
 
   # GET /sitemap.events.xml
   def events
