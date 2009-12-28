@@ -74,7 +74,7 @@ class AppointmentScheduler
   def self.create_free_appointment(company, provider, options)
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "provider is required" if provider.blank?
-    
+
     # find company free service
     service = company.free_service
     
@@ -86,9 +86,8 @@ class AppointmentScheduler
     free_appointment  = Appointment.new(free_hash)
                       
     # free appointments should not have conflicts
-    # KILLIAN - Why not?
     if free_appointment.conflicts?
-      raise TimeslotNotEmpty
+      raise TimeslotNotEmpty, 'This time conflicts with existing availability.'
     end
     
     # save appointment
