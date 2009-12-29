@@ -134,10 +134,15 @@ class Appointment < ActiveRecord::Base
   # find appointments by mark_as type
   MARK_AS_TYPES.each                  { |s| named_scope s, :conditions => {:mark_as => s} }
   named_scope :free_work,             { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
+  named_scope :work,                  { :conditions => ["mark_as = ?", WORK] }
+  named_scope :free,                  { :conditions => ["mark_as = ?", FREE] }
 
   # find appointments by state is part of the AASM plugin
   # add named scopes for special state queries
   named_scope :not_canceled,          { :conditions => ["state <> 'canceled'"] }
+  
+  # find appointments that have no free appointment
+  named_scope :orphan,                { :conditions => ["free_appointment_id is null"] }
 
   # order by start_at
   named_scope :order_start_at,        {:order => 'start_at'}

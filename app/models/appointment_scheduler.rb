@@ -51,13 +51,17 @@ class AppointmentScheduler
     # use the (absolute value of the) capacity requested or the capacity from the service (defaults to 1)
     capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : (service.blank? ? 1 : service.capacity)
     
-    # find free appointments for a specific provider, order by start times
-    slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gteq(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
+    # find free appointments for a specific provider, order by start times and capacity (largest first)
+    slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).time_covers(time_range).duration_gteq(duration).general_location(location).capacity_gteq(capacity_req).order_start_at_capacity_desc
     
     # remove slots that have ended (when compared to Time.zone.now) or appointment providers that do not provide the requested service
-    slots.select { |slot| ((keep_old || (slot.end_at.utc > Time.zone.now.utc)) &&
-                           (service.blank? || service.provided_by?(slot.free_appointment.provider)))
-                 }
+    if keep_old && service.blank?
+      slots
+    else
+      slots.select { |slot| ((keep_old || (slot.end_at.utc > Time.zone.now.utc)) &&
+                             (service.blank? || service.provided_by?(slot.free_appointment.provider)))
+                   }
+    end
   end
   
   # build collection of all free and work appointments over the specified date range
@@ -68,6 +72,11 @@ class AppointmentScheduler
   # build collection of all work appointments over the specified date range
   def self.find_work_appointments(company, location, provider, daterange, options = {})
     company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+  end
+  
+  # build collection of all orphaned appointments over the specified date range (i.e. - no parent free appointment)
+  def self.find_orphan_work_appointments(company, location, provider, daterange, options = {})
+    company.appointments.provider(provider).work.orphan.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
   end
   
   # create a free appointment in the specified timeslot
