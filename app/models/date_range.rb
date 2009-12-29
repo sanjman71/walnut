@@ -179,8 +179,12 @@ class DateRange
     # Convert to UTC
     start_at  = start_at.utc
     end_at    = end_at.utc
-    
-    range     = "#{start_at.in_time_zone.to_s(:appt_short_month_day_year)} - #{end_at.in_time_zone.to_s(:appt_short_month_day_year)}"
+
+    if (start_at.in_time_zone.to_s(:appt_short_month_day_year) == end_at.in_time_zone.to_s(:appt_short_month_day_year))
+      range   = start_at.in_time_zone.to_s(:appt_short_month_day_year)
+    else
+      range   = "#{start_at.in_time_zone.to_s(:appt_short_month_day_year)} - #{end_at.in_time_zone.to_s(:appt_short_month_day_year)}"
+    end
     name      = "#{s.titleize}"
     DateRange.new(Hash[:name => name, :name_with_dates => "#{name}: #{range}", :start_at => start_at, :end_at => end_at, :range_type => range_type])
   end
