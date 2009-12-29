@@ -129,11 +129,12 @@ class CapacitySlot < ActiveRecord::Base
                
   # order by start_at
   named_scope :order_start_at, {:order => 'start_at'}
-  
   # order by capacity
   named_scope :order_capacity_desc, {:order => 'capacity DESC'}
   named_scope :order_capacity_asc, {:order => 'capacity ASC'}
-  
+  # combined ordering, first by start_at, then by capacity, larger capacity first
+  named_scope :order_start_at_capacity_desc, {:order => 'start_at, capacity DESC'}
+  named_scope :order_start_at_capacity_asc, {:order => 'start_at, capacity ASC'}
   
   
   # Class method to merge additional capacity, or create a new capacity slot, as appropriate
@@ -546,6 +547,100 @@ class CapacitySlot < ActiveRecord::Base
   # This version includes appointments that touch this appointment
   def covers_range_incl?(start_at, end_at)
     (self.start_at <= start_at && self.end_at >= end_at)
+  end
+
+  #
+  # This function takes an array of capacity slots and returns an array of slots which do not overlap
+  # Capacities are retained in the returned array. This is intended for use in displaying the capacity
+  # available at different times in the schedule view.
+  # The array that is returned is for view use only, and must not be saved
+  #
+  def self.build_capacities_for_view(slots)
+    if slots.size <= 1
+      return slots
+    end
+
+    res_slots = slots.dup
+    
+    res_slots.each do |a_slot|
+      res_slots.each do |b_slot|
+
+        # if we aren't comparing the same slot
+        if (a_slot != b_slot)
+
+          # if there's overlap between the slots, and the a_slot has less capacity than the b slot
+          if (a_slot.overlaps_incl?(b_slot)) && (a_slot.capacity < b_slot.capacity)
+          
+            # if the a slot begins before the b slot
+            if (a_slot.start_at < b_slot.start_at)
+            
+              # change the a_slot to end when the b slot starts
+              a_slot.end_at = b_slot.start_at
+              if (a_slot.end_at > b_slot.end_at)
+                # if the a slot ends after the b slot ends, we cut off the a slot earlier and create a new slot after the b slot for the remainder of a's time
+                res_slots << CapacitySlot.new(:start_at => b_slot.end_at, :end_at => a_slot.end_at, :capacity => a_slot.capacity)
+              end
+            
+              # if the a slot begins at the same time as or after the b slot begins
+            else
+              # if the a slot ends before the b slot, we remove the a slot. 
+              if (a_slot.end_at <= b_slot.end_at)
+                res_slots.delete(a_slot)
+              else
+                # if the a slot ends after the b slot, we start the a slot later
+                a_slot.start_at = b_slot.end_at
+              end
+
+            end
+
+          else
+            # There's no overlap, or the a_slot capacity is larger than the b_slot. No change
+          end
+
+        end
+
+      end # b_slot loop
+    end # a_slot loop
+    
+    res_slots
+
+  end
+
+  #
+  # This function takes an array of capacity slots and returns an array of slots which do not overlap
+  # It is assumed that the slots provided have the capacity required.
+  # All capacity greater than or equal to the required capacity is treated the same. This is intended for use in
+  # displaying the openings available.
+  # The array that is returned is for view use only, and must not be saved
+  #
+  def self.build_openings_for_view(slots)
+    if slots.size <= 1
+      slots
+    else
+
+      # Sort the slots by start time and then by capacity ascending
+      sorted_slots = slots.sort_by {|x| [x.start_at, x.capacity] }
+
+      # Our result array starts with the first of the existing slots. This will be extended or added to as required
+      res_slots = [sorted_slots.first.dup]
+
+      sorted_slots.slice(1,sorted_slots.size).each do |slot|
+
+        # We know the start time is greater than or equal to the start time of the current slot
+        # We also know that larger capacities must be covered by slots for smaller capacity
+        # As a result, we only need to add the first slot that doesn't overlap the current one
+        if (res_slots.last.end_at < slot.start_at)
+
+          res_slots << slot.dup
+          
+        end
+
+      end # slot loop
+
+      res_slots
+      
+    end
+
   end
 
   protected
