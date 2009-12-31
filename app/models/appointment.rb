@@ -548,14 +548,16 @@ class Appointment < ActiveRecord::Base
     !self.public
   end
 
-  # Is this appointment an instance of a recurrence (includes the parent instance)
+  # Is this appointment an instance of a recurrence (does not include the parent instance)
+  # Should have a recurrence parent
   def recurrence_instance?
-    !self.recur_parent.blank? || recurrence_parent?
+    !self.recur_parent.blank?
   end
 
-  # Is this appointment the parent instance of a recurrence
+  # Is this appointment the parent of a recurrence
+  # Should have a recurrence rule and no recurrence parent
   def recurrence_parent?
-    !self.recur_rule.blank?
+    !self.recur_rule.blank? && self.recur_parent.blank?
   end
 
   # Is this appointment a member of a recurrence - either instance or parent
@@ -618,21 +620,50 @@ class Appointment < ActiveRecord::Base
     location.appointments.delete(self) if location
   end
 
-  def self.expand_all_recurrences(company, starting, before, count = nil)
+  # expand_all_recurrences loops through all recurrences for a single company, and queues jobs to expand
+  # them all using the dates provided.
+  # Note that these dates are passed through to expand_recurrence. As a result they can all be nil, in which case the sensible
+  # thing will happen - i.e. It will start at the end of the parent, or at the expanded_to date, whichever is later, and will
+  # continue to the time horizon, assuming that's later than the parent.
+  # So, the sensible thing is to call this function with one parameter = the company
+  def self.expand_all_recurrences(company, starting = nil, before = nil, count = nil)
     company.appointments.recurring.each do |recur|
-      recur.expand_recurrence(starting, before, count)
+      recur.send_later(:expand_recurrence, starting, before, count)
     end
   end
-  
-  def expand_recurrence(starting, before, count = nil)
+
+  #
+  # Expand a recurrence from a starting date up to a before date, or a certain number of times
+  # If starting is nil, starting will be the recur_expanded_to DateTime, unless it too is blank. In this case, it will
+  # be the end time of the recurrence parent.
+  # If before is nil, the recurrence will be expanded to Time.zone.now.beginning_of_day + the time horizon
+  #
+  # So, if you want to do the sensible thing, call the function with no parameters and it will figure it out
+  #
+  def expand_recurrence(starting = nil, before = nil, count = nil)
     # puts "***** expanding #{self.id}, start_at #{self.start_at.utc}, end_at #{self.end_at.utc}, recur_rule #{self.recur_rule}"
     # puts "starting: #{starting.utc}, before: #{before.utc}"
-    return if recur_rule.blank?
+
+    # We can only expand recurrence on a recurrence parent.
+    return unless recurrence_parent?
 
     # Make sure we start expanding after the end of the master appointment.
     # Otherwise we will get an instance created on top of the master
-    if starting < self.end_at
-      starting = self.end_at
+    # By default we expand from the the date it has already been expanded to, until the before date
+    # If the expanded to date is blank we use the end DateTime of the recurrence parent. Same if the expanded_to date is corrupt (< self.end_at)
+    if starting.blank? || (starting < self.end_at)
+      starting = (recur_expanded_to.blank? || (recur_expanded_to < self.end_at)) ? self.end_at : self.recur_expanded_to
+    end
+    
+    # By default the before time is the beginning of today + the time horizon
+    # If the time horizon added to the beginning of today results in a time that is invalid (earlier than the end of the recurrence parent)
+    # we return.
+    if before.blank? || (before < self.end_at)
+      time_horizon = self.company.preferences[:time_horizon].to_i
+      before = Time.zone.now.beginning_of_day + time_horizon
+      if before < self.end_at
+        return
+      end
     end
 
     # Create a RiCal calendar with our recurring appointments
@@ -799,11 +830,8 @@ class Appointment < ActiveRecord::Base
 
   # expand recurrence appointments by some default value
   def expand_recurrence_after_create
-    return if recur_rule.blank?
-    time_horizon = self.company.preferences[:time_horizon].to_i
-    if (Time.zone.now + time_horizon) > self.end_at
-      self.send_later(:expand_recurrence, self.end_at, Time.zone.now + time_horizon)
-    end
+    return unless recurrence_parent?
+    self.send_later(:expand_recurrence)
   end
 
   def create_appointment_waitlist
