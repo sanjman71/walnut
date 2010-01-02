@@ -520,7 +520,11 @@ class Appointment < ActiveRecord::Base
 
   # returns true if this appointment conflicts with any other
   def conflicts?
-    self.conflicts.size > 0
+    self.conflicts.count > 0
+  end
+  
+  def free_conflicts?
+    self.free_conflicts.count > 0
   end
 
   def free?
@@ -686,9 +690,14 @@ class Appointment < ActiveRecord::Base
                             :recur_parent_id => self.id})
       # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
       if self.location_id
-        self.location.appointments.create(attrs)
+        a = self.location.appointments.new(attrs)
       else
-        Appointment.create(attrs)
+        a = Appointment.new(attrs)
+      end
+      if !a.free_conflicts? && a.valid?
+        a.save
+      else
+        # Nothing to do here yet. Will need to flag the issue by adding something to the parent record.
       end
     end
     self.update_attribute(:recur_expanded_to, before)
