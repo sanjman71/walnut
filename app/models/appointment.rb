@@ -88,7 +88,7 @@ class Appointment < ActiveRecord::Base
   delegate                  :lat, :to => '(location or return nil)'
   delegate                  :lng, :to => '(location or return nil)'
 
-  named_scope :min_popularity,  lambda { |x| {:conditions => ["popularity >= ?", x] }}
+  named_scope :min_popularity,  lambda { |x| {:conditions => ["appointments.popularity >= ?", x] }}
 
   named_scope :company,         lambda { |o| { :conditions => {:company_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :service,         lambda { |service| if (service.blank?)
@@ -110,42 +110,42 @@ class Appointment < ActiveRecord::Base
   named_scope :duration_gteq, lambda { |t|  if (t.blank?)
                                               {}
                                             else
-                                              { :conditions => ["duration >= ?", t] }
+                                              { :conditions => ["appointments.duration >= ?", t] }
                                             end
                                      }
 
   # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
-  named_scope :future,        lambda { { :conditions => ["start_at >= ?", Time.zone.now] } }
-  named_scope :past,          lambda { { :conditions => ["end_at <= ?", Time.zone.now] } }
+  named_scope :future,        lambda { { :conditions => ["appointments.start_at >= ?", Time.zone.now] } }
+  named_scope :past,          lambda { { :conditions => ["appointments.end_at <= ?", Time.zone.now] } }
   
   # find appointments overlapping a time range
-  named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
-                                                                             (start_at >= ? AND end_at <= ?)", 
+  named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(appointments.start_at < ? AND end_at > ?) OR (appointments.start_at < ? AND end_at > ?) OR 
+                                                                             (appointments.start_at >= ? AND end_at <= ?)", 
                                                                              start_at, start_at, end_at, end_at, start_at, end_at] }}
 
   # find appointments overlapping a time of day range
-  named_scope :time_overlap,  lambda { |time_range| { :conditions => ["(time_start_at < ? AND time_end_at > ?) OR 
-                                                                       (time_start_at < ? AND time_end_at > ?) OR 
-                                                                       (time_start_at >= ? AND time_end_at <= ?)", 
+  named_scope :time_overlap,  lambda { |time_range| { :conditions => ["(appointments.time_start_at < ? AND appointments.time_end_at > ?) OR 
+                                                                       (appointments.time_start_at < ? AND appointments.time_end_at > ?) OR 
+                                                                       (appointments.time_start_at >= ? AND appointments.time_end_at <= ?)", 
                                                                        time_range.first, time_range.first, 
                                                                        time_range.last, time_range.last, 
                                                                        time_range.first, time_range.last] }}
 
   # find appointments by mark_as type
   MARK_AS_TYPES.each                  { |s| named_scope s, :conditions => {:mark_as => s} }
-  named_scope :free_work,             { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
-  named_scope :work,                  { :conditions => ["mark_as = ?", WORK] }
-  named_scope :free,                  { :conditions => ["mark_as = ?", FREE] }
+  named_scope :free_work,             { :conditions => ["appointments.mark_as = ? OR appointments.mark_as = ?", FREE, WORK]}
+  named_scope :work,                  { :conditions => ["appointments.mark_as = ?", WORK] }
+  named_scope :free,                  { :conditions => ["appointments.mark_as = ?", FREE] }
 
   # find appointments by state is part of the AASM plugin
   # add named scopes for special state queries
-  named_scope :not_canceled,          { :conditions => ["state <> 'canceled'"] }
+  named_scope :not_canceled,          { :conditions => ["appointments.state <> 'canceled'"] }
   
   # find appointments that have no free appointment
-  named_scope :orphan,                { :conditions => ["free_appointment_id is null"] }
+  named_scope :orphan,                { :conditions => ["appointments.free_appointment_id is null"] }
 
   # order by start_at
-  named_scope :order_start_at,        {:order => 'start_at'}
+  named_scope :order_start_at,        {:order => 'appointments.start_at'}
 
   # scope appointment search by a location
   
@@ -158,7 +158,7 @@ class Appointment < ActiveRecord::Base
                     {}
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :location, :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
+                    { :include => :location, :conditions => ["appointments.location_id = '?' OR appointments.location_id IS NULL", location.id] }
                   end
                 }
   # specific_location is used for narrow searches, where a search for appointments in Chicago includes only those appointments assigned to
@@ -167,20 +167,28 @@ class Appointment < ActiveRecord::Base
                 lambda { |location|
                   # If the request is for any location, there is no condition
                   if (location.nil? || location.id == 0 || location.id.blank? )
-                    { :include => :location, :conditions => ["location_id IS NULL"] }
+                    { :include => :location, :conditions => ["appointments.location_id IS NULL"] }
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :location, :conditions => ["location_id = '?'", location.id] }
+                    { :include => :location, :conditions => ["appointments.location_id = '?'", location.id] }
                   end
                 }
   
-  named_scope :public,                    { :conditions => "public = TRUE" }
-  named_scope :private,                   { :conditions => "public = FALSE" }
+  named_scope :public,                    { :conditions => "appointments.public = TRUE" }
+  named_scope :private,                   { :conditions => "appointments.public = FALSE" }
   
-  named_scope :recurring,                 { :conditions => ["recur_rule IS NOT NULL AND recur_rule != ''"] }
-  named_scope :not_recurring,             { :conditions => ["recur_rule IS NULL OR recur_rule = ''"] }
-  named_scope :recurrence_instances,      { :conditions => ["recur_parent_id IS NOT NULL"]}
-  named_scope :not_recurrence_instances,  { :conditions => ["recur_parent_id IS NULL"] }
+  named_scope :recurring,                 { :conditions => ["appointments.recur_rule IS NOT NULL AND appointments.recur_rule != ''"] }
+  named_scope :not_recurring,             { :conditions => ["appointments.recur_rule IS NULL OR appointments.recur_rule = ''"] }
+  named_scope :recurrence_instances,      { :conditions => ["appointments.recur_parent_id IS NOT NULL"]}
+  named_scope :not_recurrence_instances,  { :conditions => ["appointments.recur_parent_id IS NULL"] }
+
+  named_scope :in_recurrence,             lambda { |recur_parent_id|
+                                            { 
+                                            :joins => "inner join appointments free_appointments on (free_appointments.id = appointments.free_appointment_id)",
+                                            :conditions => ["(free_appointments.id = ? or free_appointments.recur_parent_id = ?)", recur_parent_id, recur_parent_id],
+                                            :select => "appointments.*"
+                                            }
+                                          }
 
   # valid when values
   WHEN_TODAY                = 'today'
