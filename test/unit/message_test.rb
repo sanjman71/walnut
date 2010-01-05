@@ -6,7 +6,9 @@ class MessageTest < ActiveSupport::TestCase
   should_validate_presence_of   :sender_id, :body
   should_have_many              :message_recipients
   should_have_many              :message_topics
-
+  should_have_many              :company_message_deliveries
+  should_have_many              :companies
+  
   context "create" do
     context "with email nested attributes" do
       setup do
@@ -23,6 +25,71 @@ class MessageTest < ActiveSupport::TestCase
       
       should "set recipient to email address" do
         assert_equal [@email], @message.message_recipients.collect(&:messagable)
+      end
+    end
+
+    context "with company message delivery" do
+      context "using association create method" do
+        setup do
+          @company            = Factory(:company, :name => "Company 1")
+          @sender             = Factory(:user, :name => "Sender")
+          @message            = Message.create(:sender => @sender, :subject => "Message subject", :body => "Message body")
+          @recipient          = Factory(:user, :name => "Recipient")
+          @message_recipient  = @message.message_recipients.create(:messagable => @recipient, :protocol => "local")
+          @message_delivery   = @company.company_message_deliveries.create(:message => @message, :message_recipient => @message_recipient)
+        end
+
+        should_change("Message.count", :by => 1) { Message.count }
+        should_change("Company.count", :by => 1) { Company.count }
+        should_change("CompanyMessageDelivery.count", :by => 1) { CompanyMessageDelivery.count }
+
+        should "change company.messages collection" do
+          assert_equal [@message], @company.reload.messages
+        end
+
+        should "change message.companies collection" do
+          assert_equal [@company], @message.reload.companies
+        end
+
+        should "have non-empty named scope for_company collection" do
+          assert_equal [@message_delivery], CompanyMessageDelivery.for_company(@company)
+        end
+
+        should "have non-empty named scope for_protocol collection" do
+          assert_equal [@message_delivery], CompanyMessageDelivery.for_protocol('local')
+        end
+
+        should "have non-empty named scope for_company, for_protocol collection" do
+          assert_equal [@message_delivery], CompanyMessageDelivery.for_company(@company).for_protocol('local')
+        end
+      end
+      
+      context "using add method" do
+        setup do
+          @company            = Factory(:company, :name => "Company 1")
+          @sender             = Factory(:user, :name => "Sender")
+          @message            = Message.create(:sender => @sender, :subject => "Message subject", :body => "Message body")
+          @recipient          = Factory(:user, :name => "Recipient")
+          @message_recipient  = @message.message_recipients.create(:messagable => @recipient, :protocol => "local")
+          # add company customer as a message topic
+          @user               = Factory(:user)
+          @user.grant_role('company customer', @company)
+          @message_topic      = @message.message_topics.create(:topic => @user, :tag => 'test')
+          @added_count        = CompanyMessageDelivery.add(@message)
+          assert_equal 1, @added_count
+        end
+
+        should_change("Message.count", :by => 1) { Message.count }
+        should_change("Company.count", :by => 1) { Company.count }
+        should_change("CompanyMessageDelivery.count", :by => 1) { CompanyMessageDelivery.count }
+
+        should "change company.messages collection" do
+          assert_equal [@message], @company.reload.messages
+        end
+
+        should "change message.companies collection" do
+          assert_equal [@company], @message.reload.companies
+        end
       end
     end
 

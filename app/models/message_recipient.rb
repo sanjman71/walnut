@@ -30,12 +30,17 @@ class MessageRecipient < ActiveRecord::Base
   end
   # END acts_as_state_machine
 
-  # find messages by procotol
+  # find messages by protocol
   named_scope :local,           { :conditions => {:protocol => 'local'} }
   named_scope :email,           { :conditions => {:protocol => 'email'} }
   named_scope :sms,             { :conditions => {:protocol => 'sms'} }
 
   named_scope :for_messagable,  lambda { |o| {:conditions => {:messagable_id => o.id, :messagable_type => o.class.to_s} }}
+
+  # valid, supported protocols
+  def self.protocols
+    ['local', 'email', 'sms']
+  end
 
   # called when the message is marked as sent
   def message_sent

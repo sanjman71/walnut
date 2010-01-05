@@ -8,8 +8,10 @@ class Message < ActiveRecord::Base
   has_many                :message_topics
   has_many                :user_topics, :through => :message_topics, :source => :topic, :source_type => 'User'
   has_many                :appointment_topics, :through => :message_topics, :source => :topic, :source_type => 'Appointment'
+  has_many                :company_message_deliveries
+  has_many                :companies, :through => :company_message_deliveries
   before_destroy          :before_destroy_message
-
+  
   # send message
   def send!
     send_local_messages

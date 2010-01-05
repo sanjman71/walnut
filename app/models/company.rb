@@ -63,8 +63,12 @@ class Company < ActiveRecord::Base
   # Delegate state to subscription
   delegate                  :state, :to => '(subscription or return nil)'
 
-  # LogEntry log
-  has_many                  :log_entries, :dependent => :destroy
+  # Message deliveries
+  has_many                  :company_message_deliveries
+  has_many                  :messages, :through => :company_message_deliveries
+
+  # LogEntry log - deprecated
+  # has_many                  :log_entries, :dependent => :destroy
 
   # Logo
   has_one                   :logo, :dependent => :destroy

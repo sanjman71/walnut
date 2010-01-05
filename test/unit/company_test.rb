@@ -16,6 +16,8 @@ class CompanyTest < ActiveSupport::TestCase
   should_have_many              :appointments
   should_have_many              :invitations
   should_have_many              :company_providers
+  should_have_many              :company_message_deliveries
+  should_have_many              :messages
   
   context "company locations" do
     setup do

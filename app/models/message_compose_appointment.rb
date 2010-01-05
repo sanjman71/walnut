@@ -63,7 +63,7 @@ class MessageComposeAppointment
     return message
   end
 
-  # send appointment reminder
+  # send appointment reminder to appointment customer
   def self.reminder(appointment)
     company   = appointment.company
     provider  = appointment.provider

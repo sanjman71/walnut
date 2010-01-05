@@ -13,7 +13,7 @@ class MessageJob < Struct.new(:params)
   end
 
   def perform
-    logger.info("*** #{Time.now}: message job: #{params.inspect}")
+    logger.info("#{Time.now}: message job: #{params.inspect}")
 
     message     = Message.find(params[:message_id])
     recipients  = message.message_recipients
@@ -22,11 +22,19 @@ class MessageJob < Struct.new(:params)
       case recipient.protocol
       when 'email', 'sms'
         send_message_using_message_pub(message, recipient)
-      when 'inbox'
+      when 'local'
+        # local messages are automatically delivered to local recipients
         next
       else
-        logger.error("#{Time.now}: xxx ignoring message type #{params[recipient.protocol]}")
+        logger.error("#{Time.now}: [error] ignoring message type #{params[recipient.protocol]}")
       end
+    end
+
+    begin
+      # track company message statistics
+      CompanyMessageDelivery.add(message)
+    rescue Exception => e
+      logger.error("#{Time.now}: [error] #{e.message}")
     end
   end
 
@@ -36,7 +44,7 @@ class MessageJob < Struct.new(:params)
 
     address = recipient.messagable.address
 
-    logger.debug("*** #{Time.now}: *** sending google email to: #{address}, subject: #{subject}, body: #{body}")
+    logger.debug("#{Time.now}: [message] sending google email to: #{address}, subject: #{subject}, body: #{body}")
 
     # send email
     UserMailer.deliver_email(address, subject, body)
@@ -49,7 +57,7 @@ class MessageJob < Struct.new(:params)
     address = recipient.messagable.address
     channel = recipient.protocol
 
-    logger.debug("*** #{Time.now}: *** sending message pub #{channel} to: #{address}, subject: #{subject}, body: #{body}")
+    logger.debug("#{Time.now}: [message] sending message pub #{channel} to: #{address}, subject: #{subject}, body: #{body}")
 
     # create notification
     notification = MessagePub::Notification.new(:body => body,
