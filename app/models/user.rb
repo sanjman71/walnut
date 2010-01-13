@@ -65,6 +65,11 @@ class User < ActiveRecord::Base
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => 'users.name' }
 
+  named_scope               :search_by_name_email_phone, lambda { |s| {
+                                                                  :include => [:email_addresses, :phone_numbers],
+                                                                  :conditions => ["LOWER(users.name) LIKE ? OR LOWER(email_addresses.address) LIKE ? OR phone_numbers.address LIKE ?", '%' + s.downcase + '%', '%' + s.downcase + '%', '%' + s.downcase + '%']
+                                                                  }}
+
   # include other required user modules
   include UserSubscription
   include UserAppointment
