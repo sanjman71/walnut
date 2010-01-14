@@ -120,16 +120,22 @@ class AppointmentScheduler
   # options:
   #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
   def self.create_work_appointment(company, provider, service, duration, customer, date_time_options, options={})
-    raise ArgumentError, "company is required" if company.blank?
-    raise ArgumentError, "provider is required" if provider.blank?
-    raise ArgumentError, "service is required" if service.blank?
-    raise ArgumentError, "customer is required" if customer.blank?
+    raise ArgumentError, "You must specify the company" if company.blank?
+    raise ArgumentError, "You must specify the provider" if provider.blank?
+    raise ArgumentError, "You must specify the service" if service.blank?
+    raise ArgumentError, "You must specify the customer" if customer.blank?
     
     # should be a work service
-    raise AppointmentInvalid if service.mark_as != Appointment::WORK
+    raise AppointmentInvalid, "This is not a valid service" if service.mark_as != Appointment::WORK
     
     # should be a service provided by the provider
-    raise AppointmentInvalid if !service.provided_by?(provider)
+    raise AppointmentInvalid, "This service is not provided by this provider" if !service.provided_by?(provider)
+
+    # if options[:commit] == true, then carry out the capacity changes but don't commit them. By default, commit
+    commit = options.has_key?(:commit) ? options[:commit] : true
+    
+    # if options[:force_add] == true, then add the appointment regardless of the availability of capacity. By default, do not force add
+    force_add = options.has_key?(:force_add) ? options[:force_add] : false
 
     # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
     work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer,
@@ -140,28 +146,46 @@ class AppointmentScheduler
     max_slot         = work_appointment.max_capacity_slot
 
     # If we can't find capacity, fail
-    if max_slot.blank?
+    if (max_slot.blank? && !force_add)
+
       raise AppointmentInvalid, "No capacity available"
-    else
-      # Otherwise update the work appointment with the corresponding free appointment
+
+    elsif !max_slot.blank?
+      # We have capacity - update the work appointment with the corresponding free appointment
       work_appointment.free_appointment = max_slot.free_appointment
-    end
 
-    raise AppointmentInvalid if !work_appointment.valid?
-    
-    # should have exactly 1 free time conflict
-    # Note that with capacities we may have additional conflicts with work appointments, but we shouldn't have conflicts with more than one free appointment
-    raise TimeslotNotEmpty if work_appointment.free_conflicts.size != 1
+      # Make sure we were able to create the work_appointment correctly
+      raise AppointmentInvalid, "There was a problem creating the appointment" if !work_appointment.valid?
 
-    # if options[:commit] == true, then carry out the capacity changes but don't commit them
-    commit = options.has_key?(:commit) ? options[:commit] : true
+      # should have exactly 1 free time conflict
+      # Note that with capacities we may have additional conflicts with work appointments, but we shouldn't have conflicts with more than one free appointment
+      # This shouldn't happen - adding free time ensures that there are no availability conflicts
+      raise TimeslotNotEmpty, "There is an availability conflict at this time" if work_appointment.free_conflicts.size != 1
 
-    # We don't try to consume capacity if we're not commiting the changes. There's no point - we checked for capacity before
-    if !commit || consume_capacity(work_appointment, max_slot)
-      work_appointment
+      # We don't try to consume capacity if we're not commiting the changes. There's no point - we checked for capacity before
+      if !commit || consume_capacity(work_appointment, max_slot)
+        work_appointment
+      else
+        # We failed to consume capacity for some reason, even though we had a max_slot. Shouldn't happen, but transactions? KILLIAN TODO
+        raise AppointmentInvalid, "No capacity available"
+      end
+
     else
-      raise AppointmentInvalid, "No capacity available"
+      # We don't have capacity, but we are required to force add the appointment
+      # Don't assign the free_appointment
+
+      # Make sure we were able to create the work_appointment correctly
+      raise AppointmentInvalid, "There was a problem creating the appointment" if !work_appointment.valid?
+
     end
+
+    # If we're to commit the changes, make sure the work_appointment is saved (will happen in consume_capacity in the normal course of events)
+    if commit
+      work_appointment.save
+    end
+    
+    work_appointment
+
   end
   
   #

@@ -24,6 +24,7 @@ class Service < ActiveRecord::Base
   
   # find services with at least 1 service provider
   named_scope :with_providers,  { :conditions => ["providers_count > 0"] }
+  named_scope :with_provider,   lambda { |pid| {:joins => :service_providers, :conditions => ["services.providers_count > 0 and service_providers.provider_id = ?", pid]} }
   
   def self.nothing(options={})
     r = Service.new do |o|
