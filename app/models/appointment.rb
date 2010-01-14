@@ -196,13 +196,14 @@ class Appointment < ActiveRecord::Base
   WHEN_7_DAYS               = 'next 7 days'
   WHEN_THIS_WEEK            = 'this week'
   WHEN_NEXT_WEEK            = 'next week'
+  WHEN_NEXT_2WEEKS          = 'next 2 weeks'
   WHEN_PAST_WEEK            = 'past week'
   WHEN_THIS_MONTH           = 'this month'
   WHEN_NEXT_MONTH           = 'next month'
 
   WHENS                     = [WHEN_TODAY, WHEN_TOMORROW, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, 'later']
-  WHEN_WEEKS                = [WHEN_7_DAYS, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, 'later']
-  WHENS_EXTENDED            = [WHEN_TODAY, WHEN_TOMORROW, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, 'next 2 weeks', 'next 4 weeks', WHEN_THIS_MONTH, 'later']
+  WHEN_WEEKS                = [WHEN_NEXT_WEEK, WHEN_NEXT_2WEEKS, 'later']
+  WHENS_EXTENDED            = [WHEN_TODAY, WHEN_TOMORROW, WHEN_THIS_WEEK, WHEN_NEXT_WEEK, WHEN_NEXT_2WEEKS, 'next 4 weeks', WHEN_THIS_MONTH, 'later']
   WHENS_PAST                = [WHEN_PAST_WEEK, 'past 2 weeks', 'past month']
   
   # valid time of day values

@@ -91,18 +91,21 @@ class DateRange
   
   # parse when string into a valid date range
   # options:
+  #  - start_week_on => [0..6], day of week company preference to start calendar on; defaults to monday (1)
   #  - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
   #  - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
   #  - include   => :today, add today if utc day <> local time day 
   def self.parse_when(s, options={})
     # initialize now in the current time zone
     now = Time.zone.now
-    
+
+    start_week_on = options[:start_week_on] ? options[:start_week_on].to_i : 1
+
     if (m = s.match(/next (\d{1}) week/)) # e.g. 'next 3 weeks', 'next 1 week'
-      # use [today, today + n weeks - 1.second], always end on sunday at midnight
+      # use [today, today + n weeks til end of week - 1.second], always end on last day of week at midnight
       n         = m[1].to_i
       start_at  = now.beginning_of_day
-      end_at    = start_at + n.weeks - 1.second
+      end_at    = (start_at + n.weeks).end_of_week_starting_on(start_week_on)
       range_type = 'weekly'
     else
       case s
@@ -121,23 +124,31 @@ class DateRange
         start_at  = now
         range_type = 'weekly'
       when 'this week'
-        # ends on sunday at midnight
-        end_at    = now.end_of_week
         if options[:include] == :today
           start_at  = now.beginning_of_day
         else
           start_at  = now.tomorrow.beginning_of_day
         end
-        range_type = 'weekly'
+        # ends on last day of week at midnight
+        end_at      = now.end_of_week_starting_on(start_week_on)
+        range_type  = 'weekly'
       when 'next week'
-        # next week starts on monday, and end on sunday at midnight
-        start_at  = now.next_week
-        end_at    = start_at.end_of_week
+        if options[:include] == :today
+          # next week starts today
+          start_at  = now.beginning_of_day
+          # use start_week_on to determine end day next week, and add 1 week
+          end_at    = (start_at + 1.week).end_of_week_starting_on(start_week_on)
+        else
+          # next week uses start_week_on to determine start day
+          start_at  = now.next_week_starting_on(start_week_on)
+          # use start_week_on to determine the end day next week
+          end_at    = start_at.end_of_week_starting_on(start_week_on)
+        end
         range_type = 'weekly'
       when 'later'
-        # should start after 'next week', and continue for 2 weeks, ending on sunday at midnight
-        start_at  = now.next_week + 1.week
-        end_at    = (start_at + 1.week).end_of_week
+        # should start after 'next 2 weeks', and continue for 2 weeks, ending on the last day at midnight
+        start_at  = now.next_week_starting_on(start_week_on) + 2.weeks
+        end_at    = (start_at + 1.week).end_of_week_starting_on(start_week_on)
         range_type = 'weekly'
       when 'this month'
         end_at    = now.end_of_month
@@ -175,8 +186,8 @@ class DateRange
     # adjust calendar based on start_on and end_on days
     start_at  = adjust_start_day_to_start_on(start_at, options)
     end_at    = adjust_end_day_to_end_on(end_at, options)
-      
-    # Convert to UTC
+
+    # convert times to UTC
     start_at  = start_at.utc
     end_at    = end_at.utc
 
