@@ -74,6 +74,16 @@ class Company < ActiveRecord::Base
   has_one                   :logo, :dependent => :destroy
   accepts_nested_attributes_for :logo, :allow_destroy => true
 
+  # Roles through badges associations
+  has_many                  :authorized_managers, :through => :user_roles, :source => :user,
+                            :conditions => ['badges_user_roles.role_id = #{Company.manager_role.id}']
+
+  has_many                  :authorized_providers, :through => :user_roles, :source => :user,
+                            :conditions => ['badges_user_roles.role_id = #{Company.provider_role.id}']
+
+  has_many                  :authorized_customers, :through => :user_roles, :source => :user,
+                            :conditions => ['badges_user_roles.role_id = #{Company.customer_role.id}']
+
   # Preferences
   serialized_hash           :preferences,
                             {:time_horizon => 28.days, :start_wday => 0, :appt_start_minutes => [0], :work_appointment_confirmations => [:customer],
@@ -95,6 +105,11 @@ class Company < ActiveRecord::Base
   # find all subscriptions with billing errors
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
+
+  def self.provider_role
+    Badges::Role.find_by_name('company provider')
+  end
+
   def self.customer_role
     Badges::Role.find_by_name('company customer')
   end
@@ -103,18 +118,6 @@ class Company < ActiveRecord::Base
     Badges::Role.find_by_name('company manager')
   end
 
-  # find all company managers
-  def managers
-    role_id = Company.manager_role.id
-    ms = []
-    self.user_roles.each do |ur|
-      if (ur.role_id == role_id) && !(ms.include?(ur.user))
-        ms << ur.user
-      end
-    end
-    ms
-  end
-  
   # find all polymorphic providers through the company_providers collection, sort by name
   def providers
     self.company_providers(:include => :provider).collect(&:provider).sort_by{ |p| p.name }

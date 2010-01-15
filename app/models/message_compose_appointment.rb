@@ -2,7 +2,7 @@ class MessageComposeAppointment
 
   def self.confirmations(appointment, preferences, options={})
     preferences = eval(preferences) if preferences.is_a?(String)
-    managers    = options[:managers]
+    company     = options[:company]
     messages    = []
 
     # iterate through each preference
@@ -15,7 +15,7 @@ class MessageComposeAppointment
         message = MessageComposeAppointment.confirmation(appointment, :provider)
         messages.push(message)
       when :managers
-        managers.each do |manager|
+        company.authorized_managers.each do |manager|
           message = MessageComposeAppointment.confirmation(appointment, :manager, :manager => manager)
           messages.push(message)
         end
