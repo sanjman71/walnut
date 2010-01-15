@@ -90,6 +90,11 @@ module AuthenticatedSystem
       session[:return_to] = request.request_uri
     end
 
+    # Clear the URI of the current request in the session.
+    def clear_location
+      session[:return_to] = nil
+    end
+
     # Redirect to the URI stored by the most recent store_location call or
     # to the passed default.  Set an appropriately modified
     #   after_filter :store_location, :only => [:index, :new, :show, :edit]
