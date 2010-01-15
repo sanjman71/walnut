@@ -175,7 +175,7 @@ class AppointmentScheduler
       # Don't assign the free_appointment
 
       # Make sure we were able to create the work_appointment correctly
-      raise AppointmentInvalid, "There was a problem creating the appointment" if !work_appointment.valid?
+      raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
 
     end
 
