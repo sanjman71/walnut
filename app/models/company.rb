@@ -103,6 +103,11 @@ class Company < ActiveRecord::Base
     Badges::Role.find_by_name('company manager')
   end
 
+  # find all company managers
+  def managers
+    self.users_with_role(Company.manager_role.id)
+  end
+  
   # find all polymorphic providers through the company_providers collection, sort by name
   def providers
     self.company_providers(:include => :provider).collect(&:provider).sort_by{ |p| p.name }
@@ -137,13 +142,17 @@ class Company < ActiveRecord::Base
     self.plan.may_add_provider?(self)
   end  
 
-  # find all company managers
-  def managers
-    role_id = Company.manager_role.id
-    self.user_roles.collect{ |ur| ur.role_id == role_id ? ur.user : nil}.compact.uniq
-  end
-
   private
+  
+  def users_with_role(role_id)
+    users = []
+    self.user_roles.each do |ur|
+      if (ur.role_id == role_id) && !(users.include?(ur.user))
+        users << ur.user
+      end
+    end
+    users
+  end
 
   # initialize subdomain based on company name
   def init_subdomain
