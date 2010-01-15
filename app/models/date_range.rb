@@ -63,7 +63,7 @@ class DateRange
 
   # returns true if the daterange includes the specifed date
   def include?(date)
-    Range.new(@start_at, @end_at).include?(date)
+    date >= @start_at and date <= @end_at
   end
   
   # options
