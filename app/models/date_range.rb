@@ -60,6 +60,11 @@ class DateRange
       yield @start_at + i.days
     end
   end
+
+  # returns true if the daterange includes the specifed date
+  def include?(date)
+    Range.new(@start_at, @end_at).include?(date)
+  end
   
   # options
   #  - :with_dates => true|false; if true, return the name with dates, otherwise use the basic name
