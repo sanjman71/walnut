@@ -44,7 +44,6 @@ class DateRange
     
     # initialize range type
     @range_type = options[:range_type] || 'none'
-
   end
   
   def valid?
@@ -91,21 +90,26 @@ class DateRange
   
   # parse when string into a valid date range
   # options:
-  #  - start_week_on => [0..6], day of week company preference to start calendar on; defaults to monday (1)
-  #  - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
-  #  - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
-  #  - include   => :today, add today if utc day <> local time day 
+  #  - start_date     => day to start date range
+  #  - start_week_on  => [0..6], day of week company preference to start calendar on; defaults to monday (1)
+  #  - start_on       => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
+  #  - end_on         => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
+  #  - include        => :today, add today if utc day <> local time day 
   def self.parse_when(s, options={})
     # initialize now in the current time zone
     now = Time.zone.now
 
     start_week_on = options[:start_week_on] ? options[:start_week_on].to_i : 1
 
-    if (m = s.match(/next (\d{1}) week/)) # e.g. 'next 3 weeks', 'next 1 week'
+    if (m = s.match(/next (\d{1,2}) week/)) # e.g. 'next 3 weeks', 'next 1 week', 'next 10 weeks'
       # use [today, today + n weeks til end of week - 1.second], always end on last day of week at midnight
-      n         = m[1].to_i
-      start_at  = now.beginning_of_day
-      end_at    = (start_at + n.weeks).end_of_week_starting_on(start_week_on)
+      nweeks    = m[1].to_i
+      start_at  = options[:start_date] ? options[:start_date].beginning_of_day : now.beginning_of_day
+      if start_at.in_time_zone.wday == start_week_on
+        # subtract a week, so we don't extend over n+1 full weeks
+        nweeks -= 1
+      end
+      end_at    = (start_at + nweeks.weeks).end_of_week_starting_on(start_week_on)
       range_type = 'weekly'
     else
       case s
