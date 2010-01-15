@@ -172,7 +172,15 @@ class AppointmentScheduler
 
     else
       # We don't have capacity, but we are required to force add the appointment
-      # Don't assign the free_appointment
+      # Find out if there's a free appointment overlapping this work_appointment.
+      # If so, we assign it. If not, the work appointment has no free appointment.
+      free_appointments = work_appointment.free_conflicts
+      if !free_appointments.empty?
+        work_appointment.free_appointment = free_appointments.first
+      end
+      
+      # Mark the work appointment as taking zero capacity
+      work_appointment.capacity = 0
 
       # Make sure we were able to create the work_appointment correctly
       raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
