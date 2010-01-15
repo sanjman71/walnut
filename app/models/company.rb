@@ -105,7 +105,14 @@ class Company < ActiveRecord::Base
 
   # find all company managers
   def managers
-    self.users_with_role(Company.manager_role.id)
+    role_id = Company.manager_role.id
+    ms = []
+    self.user_roles.each do |ur|
+      if (ur.role_id == role_id) && !(ms.include?(ur.user))
+        ms << ur.user
+      end
+    end
+    ms
   end
   
   # find all polymorphic providers through the company_providers collection, sort by name
@@ -144,16 +151,6 @@ class Company < ActiveRecord::Base
 
   private
   
-  def users_with_role(role_id)
-    users = []
-    self.user_roles.each do |ur|
-      if (ur.role_id == role_id) && !(users.include?(ur.user))
-        users << ur.user
-      end
-    end
-    users
-  end
-
   # initialize subdomain based on company name
   def init_subdomain
     if !attribute_present?("subdomain")
