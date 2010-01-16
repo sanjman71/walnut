@@ -6,18 +6,24 @@ class MessageComposeAppointment
     messages    = []
 
     # iterate through each preference
-    preferences.each do |preference|
-      case preference
+    preferences.keys.each do |key|
+      case key
       when :customer
-        message = MessageComposeAppointment.confirmation(appointment, :customer)
-        messages.push(message)
-      when :provider
-        message = MessageComposeAppointment.confirmation(appointment, :provider)
-        messages.push(message)
-      when :managers
-        company.authorized_managers.each do |manager|
-          message = MessageComposeAppointment.confirmation(appointment, :manager, :manager => manager)
+        if preferences[key].to_i == 1
+          message = MessageComposeAppointment.confirmation(appointment, :customer)
           messages.push(message)
+        end
+      when :provider
+        if preferences[key].to_i == 1
+          message = MessageComposeAppointment.confirmation(appointment, :provider)
+          messages.push(message)
+        end
+      when :manager
+        if preferences[key].to_i == 1 and !company.blank?
+          company.authorized_managers.each do |manager|
+            message = MessageComposeAppointment.confirmation(appointment, :manager, :manager => manager)
+            messages.push(message)
+          end
         end
       end
     end
