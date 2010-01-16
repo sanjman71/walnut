@@ -13,7 +13,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
 
       should_not_change("PhoneNumber.count") { PhoneNumber.count }
 
-      should "have number marked as invalid" do
+      should "not be valid" do
         assert_equal false, @phone.valid?
       end
     end
@@ -24,10 +24,6 @@ class PhoneNumberTest < ActiveSupport::TestCase
       end
 
       should_not_change("PhoneNumber.count") { PhoneNumber.count }
-
-      should "have error on callable" do
-        assert_true @phone.errors.on(:callable)
-      end
     end
 
     context "with callable and valid number" do

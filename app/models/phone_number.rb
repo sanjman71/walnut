@@ -1,5 +1,5 @@
 class PhoneNumber < ActiveRecord::Base
-  validates_presence_of     :callable, :polymorphic => true
+  # validates_presence_of     :callable, :polymorphic => true # validation is done in a before filter so nested attributes work
   validates_presence_of     :name, :address
   validates_format_of       :address, :with => /[0-9]{10,11}/
   validates_uniqueness_of   :address, :scope => [:callable_id, :callable_type]
@@ -24,6 +24,15 @@ class PhoneNumber < ActiveRecord::Base
   def before_validation_on_create
     # set default priority
     self.priority = 1 if self.priority.blank?
+  end
+
+  def before_create
+    # validate callable
+    if self.callable_id.blank? or self.callable_type.blank?
+      self.errors.add_to_base("Callable can't be blank")
+      return false
+    end
+    true
   end
 
   def verified?

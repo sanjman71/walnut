@@ -9,16 +9,8 @@ class EmailAddressTest < ActiveSupport::TestCase
       setup do
         @email = EmailAddress.create(:address => "a@b.com")
       end
-      
+
       should_not_change("EmailAddress.count") { EmailAddress.count }
-      
-      should "be invalid" do
-        assert_equal false, @email.valid?
-      end
-      
-      should "have error on emailable" do
-        assert_true @email.errors.on(:emailable)
-      end
     end
 
     context "with emailable" do

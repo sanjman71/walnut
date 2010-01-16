@@ -1,6 +1,6 @@
 class EmailAddress < ActiveRecord::Base
   validates_presence_of     :address, :priority
-  validates_presence_of     :emailable, :polymorphic => true
+  # validates_presence_of     :emailable, :polymorphic => true  # validation is done in a before filter so nested attributes work
   validates_length_of       :address, :within => 6..100 #r@a.wk
   validates_uniqueness_of   :address, :case_sensitive => false
   validates_format_of       :address, :with => Authentication.email_regex, :message => Authentication.bad_email_message
@@ -31,6 +31,15 @@ class EmailAddress < ActiveRecord::Base
   def before_validation_on_create
     # set default priority
     self.priority = 1 if self.priority.blank?
+  end
+
+  def before_create
+    # validate emailable
+    if self.emailable_id.blank? or self.emailable_type.blank?
+      self.errors.add_to_base("Emailable can't be blank")
+      return false
+    end
+    true
   end
 
   def verified?

@@ -14,9 +14,6 @@ class RpxControllerTest < ActionController::TestCase
         @user = User.with_email("sanjay@walnutindustries.com").first
       end
 
-      should_respond_with :redirect
-      should_redirect_to("root path") { "/" }
-      
       should_change("User.count", :by => 1) { User.count }
 
       should_assign_to :data
@@ -34,12 +31,15 @@ class RpxControllerTest < ActionController::TestCase
         assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
 
-      should "create user in passive state" do
-        assert_equal "passive", @user.state
+      should "create user in active state" do
+        assert_equal "active", @user.state
       end
-      
+
       should_set_session(:user_id) { User.with_email("sanjay@walnutindustries.com").first.id }
       should_set_the_flash_to /Logged in successfully/i
+
+      should_respond_with :redirect
+      should_redirect_to("root path") { "/" }
     end
 
     context "create regular user with rpx token" do
@@ -50,12 +50,12 @@ class RpxControllerTest < ActionController::TestCase
         get :login, :token => '12345'
       end
 
-      should_respond_with :redirect
-      should_redirect_to("root path") { "/" }
-      
       should_not_change("User.count") { User.count }
 
       should_set_the_flash_to /This feature is coming soon/i
+
+      should_respond_with :redirect
+      should_redirect_to("root path") { "/" }
     end
     
     # context "create regular user using rpx token" do
@@ -99,9 +99,6 @@ class RpxControllerTest < ActionController::TestCase
         get :login, :token => '12345'
       end
 
-      should_respond_with :redirect
-      should_redirect_to("root path") { "/" }
-
       # for the factory user, which is the same as the session user
       should_change("User.count", :by => 1) { User.count }
 
@@ -109,6 +106,9 @@ class RpxControllerTest < ActionController::TestCase
       
       should_set_session(:user_id) { @user.id }
       should_set_the_flash_to /Logged in successfully/i
+
+      should_respond_with :redirect
+      should_redirect_to("root path") { "/" }
     end
   end
 end

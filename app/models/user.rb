@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
                             :include => {:message => :sender}
   has_many                  :inbox, :through => :inbox_deliveries, :source => :message
 
-  after_create              :manage_user_roles
+  after_create              :manage_user_roles, :activate_user
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
@@ -93,54 +93,6 @@ class User < ActiveRecord::Base
     u && u.authenticated?(password) ? u : nil
   end
 
-  # create new user or reset user's password
-  def self.create_or_reset(options={})
-    if !options[:email].blank?
-      email = options.delete(:email)
-      user  = self.with_email(email).first
-    elsif !options[:email_addresses_attributes].blank?
-      email_addresses_attributes = options.delete(:email_addresses_attributes)
-    end
-
-    case options[:password]
-    when :random
-      password = User.generate_password(10)
-    else
-      password = options[:password].to_s
-    end
-
-    if user
-      # reset password
-      user.password = password
-      user.password_confirmation = password
-      user.save
-      # send user password reset
-      MessageComposeUser.password_reset(user, password)
-    else
-      User.transaction do
-        # create user in active state
-        name = options[:name]
-        user = self.create(:name => name, :password => password, :password_confirmation => password)
-        user.register!
-        user.activate!
-        
-        case
-        when email
-          # add email address
-          email = user.email_addresses.create(:address => email)
-        when email_addresses_attributes
-          # add email addresses attributes
-          user.email_addresses_attributes = email_addresses_attributes
-          user.save
-        end
-      end
-      # send user account created
-      MessageComposeUser.created(user.reload)
-    end
-
-    user
-  end
-
   def self.create_rpx(name, email, identifier)
     User.transaction do
       # create user in passive state
@@ -162,10 +114,6 @@ class User < ActiveRecord::Base
     length.times { |i| password << chars[rand(chars.length)] }
     password
   end
-
-  # def email=(value)
-  #   write_attribute :email, (value ? value.downcase : nil)
-  # end
 
   # the special user 'anyone'
   def self.anyone
@@ -225,4 +173,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def activate_user
+    if self.rpx? and self.state == 'passive'
+      # change state to active
+      self.update_attribute(:state, 'active')
+    elsif self.state == 'passive'
+      # register and activate all users
+      self.register!
+      self.activate!
+    end
+  end
+  
 end

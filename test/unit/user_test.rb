@@ -16,10 +16,33 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    context "with a password and email" do
+    context "with an empty nested email address hash" do
       setup do
-        options = Hash[:password => 'secret', :password_confirmation => 'secret', :email => "user1@walnut.com"]
-        @user1  = User.create_or_reset(options)
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :email_addresses_attributes => { "0" => {:address => ""}}]
+        @user1  = User.create(options)
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+      should_not_change("EmailAddress.count") { EmailAddress.count }
+    end
+
+    context "with an invalid nested email address hash" do
+      setup do
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :email_addresses_attributes => { "0" => {:address => "xyz"}}]
+        @user1  = User.create(options)
+      end
+
+      should_not_change("User.count") { User.count }
+      should_not_change("EmailAddress.count") { EmailAddress.count }
+    end
+
+    context "with a nested email address hash" do
+      setup do
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :email_addresses_attributes => { "0" => {:address => "user1@walnut.com"}}]
+        @user1  = User.create(options)
       end
 
       should_change("User.count", :by => 1) { User.count }
@@ -50,43 +73,117 @@ class UserTest < ActiveSupport::TestCase
         @email = @user1.primary_email_address
         assert_equal "unverified", @email.state
       end
-      
-      # should send user created message
-      should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+      # should not send user created message
+      should_not_change("delayed job count") { Delayed::Job.count }
+
+      context "then delete user" do
+        setup do
+          @user1.destroy
+        end
+
+        should_change("User.count", :by => -1) { User.count }
+        should_change("EmailAddress.count", :by => -1) { EmailAddress.count }
+      end
     end
 
-    context "with a password and email_addresses_attributes" do
+    context "with a nested email address array" do
       setup do
-        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret', :email_addresses_attributes => [{:address => "user1@walnut.com"}]]
-        @user1  = User.create_or_reset(options)
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :email_addresses_attributes => [{:address => "user1@walnut.com"}]]
+        @user1  = User.create(options)
+        # puts @user1.errors.full_messages
       end
-
+    
       should_change("User.count", :by => 1) { User.count }
       should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
-
+    
       should "increment user.email_addresses_count" do
         assert_equal 1, @user1.reload.email_addresses_count
       end
-
+    
       should "add to user.email_addresses collection" do
         assert_equal ["user1@walnut.com"], @user1.email_addresses.collect(&:address)
       end
-
+    
       should "have user.email_address" do
         assert_equal "user1@walnut.com", @user1.reload.email_address
       end
-
+    
+      should "create user in active state" do
+        assert_equal "active", @user1.state
+      end
+    
+      should "create email in unverified state" do
+        @email = @user1.primary_email_address
+        assert_equal "unverified", @email.state
+      end
+    
       should "not set user rpx flag" do
         assert_equal 0, @user1.rpx
         assert_false @user1.rpx?
       end
-
+    
       should "have password?" do
         assert_true @user1.reload.password?
       end
+    
+      # should not send user created message
+      should_not_change("delayed job count") { Delayed::Job.count }
+    end
 
-      # should send user created message
-      should_change("delayed job count", :by => 1) { Delayed::Job.count }
+    context "with an empty nested phone number array" do
+      setup do
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :phone_numbers_attributes => [{:address => "", :name => ""}]]
+        @user1  = User.create(options)
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+      should_not_change("PhoneNumber.count") { PhoneNumber.count }
+    end
+
+    context "with an invalid nested phone number array" do
+      setup do
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :phone_numbers_attributes => [{:address => "3125551212", :name => ""}]]
+        @user1  = User.create(options)
+      end
+
+      should_not_change("User.count") { User.count }
+      should_not_change("PhoneNumber.count") { PhoneNumber.count }
+    end
+    
+    context "with a nested phone number array" do
+      setup do
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :phone_numbers_attributes => [{:address => "3125551212", :name => "Mobile"}]]
+        @user1  = User.create(options)
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+      should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+      should "increment user.phone_numbers_count" do
+        assert_equal 1, @user1.reload.phone_numbers_count
+      end
+
+      should "add to user.phone_numbers collection" do
+        assert_equal ["3125551212"], @user1.phone_numbers.collect(&:address)
+      end
+
+      should "have user.phone_number" do
+        assert_equal "3125551212", @user1.reload.phone_number
+      end
+
+      context "then delete user" do
+        setup do
+          @user1.destroy
+        end
+
+        should_change("User.count", :by => -1) { User.count }
+        should_change("PhoneNumber.count", :by => -1) { PhoneNumber.count }
+      end
     end
 
     context "with rpx" do
@@ -111,8 +208,8 @@ class UserTest < ActiveSupport::TestCase
         assert_equal "user1@walnut.com", @user1.reload.email_address
       end
 
-      should "create user in passive state" do
-        assert_equal "passive", @user1.state
+      should "create user in active state" do
+        assert_equal "active", @user1.state
       end
 
       should "create email in verified state" do
