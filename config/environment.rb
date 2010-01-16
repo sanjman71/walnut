@@ -103,6 +103,7 @@ require "#{RAILS_ROOT}/lib/hash.rb"
 require "#{RAILS_ROOT}/lib/math.rb"
 require "#{RAILS_ROOT}/lib/array.rb"
 require "#{RAILS_ROOT}/lib/secure_random.rb"
+require "#{RAILS_ROOT}/lib/time_calculations.rb"
 
 # RPX key
 RPXNow.api_key = "486f794f3a5473f9b5d3b08d1d43c9aa3c7e5872"
