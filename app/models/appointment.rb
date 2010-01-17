@@ -47,7 +47,7 @@ class Appointment < ActiveRecord::Base
                               :expand_recurrence_after_create, :create_appointment_waitlist, :auto_approve
 
   # preferences
-  serialized_hash             :preferences, {:reminder => 1}
+  serialized_hash             :preferences, {:reminder_customer => '1'}
 
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
