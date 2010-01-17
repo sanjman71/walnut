@@ -48,7 +48,12 @@ class CompanyMessageDelivery < ActiveRecord::Base
 
   # find company associated with the message topic
   def self.find_company(message_topic)
+    return nil if message_topic.blank? or message_topic.topic.blank?
+
     case
+    when message_topic.topic.is_a?(Company)
+      # topic is a company
+      return message_topic.topic
     when message_topic.topic.respond_to?(:company)
       # topic has a company
       return message_topic.topic.company
