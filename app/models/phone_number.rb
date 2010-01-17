@@ -21,6 +21,9 @@ class PhoneNumber < ActiveRecord::Base
   
   named_scope               :with_callable_type, lambda { |t| { :conditions => {:callable_type => t} } }
 
+  PRIORITY_HIGHEST    = 1
+  PRIORITY_MEDIUM     = 2
+
   def before_validation_on_create
     # set default priority
     self.priority = 1 if self.priority.blank?
@@ -37,6 +40,12 @@ class PhoneNumber < ActiveRecord::Base
 
   def verified?
     self.state == 'verified'
+  end
+
+  # return true if the phone number is deletable
+  def deletable?
+    return false if new_record?
+    true # all phones are deletable
   end
 
   # valid phone number names
