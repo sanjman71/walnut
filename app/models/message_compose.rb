@@ -2,7 +2,15 @@ class MessageCompose
   
   # default message sender for the company, user
   def self.sender(object)
-    User.first # fix this
+    case object.class.to_s.downcase
+    when 'company'
+      # find first company manager, or first provider
+      object.authorized_managers.first || object.authorized_providers.first
+    when 'user'
+      object
+    else
+      User.first
+    end
   end
 
   def self.send(sender, subject, body, recipients, topic, tag)
