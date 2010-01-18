@@ -54,11 +54,11 @@ namespace :neighbors do
       exit
     end
 
-    puts "#{Time.now}: initializing neighbors for all #{city.name} locations with no existing neighbors"
+    puts "#{Time.now}: initializing neighbors for #{city.name} locations with no existing neighbors, limit #{limit}"
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
+    ids         = Location.find(:all, :limit => limit, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
     
     # substract locations that already have neighbors
     ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
@@ -82,11 +82,11 @@ namespace :neighbors do
       exit
     end
 
-    puts "#{Time.now}: initializing neighbors for all #{city.name} locations with tags and no existing neighbors"
+    puts "#{Time.now}: initializing neighbors for #{city.name} locations with tags and no existing neighbors, limit #{limit}"
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    ids         = Location.find(:all, :limit => limit, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
 
     # substract locations that already have neighbors
     ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
