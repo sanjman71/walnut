@@ -15,7 +15,7 @@
 - unless @letters.blank?
   .span-23.prepend-1.last#chain_filter
     .last
-      %h5.bottom== Filter by Letter or Digit
+      %h5.bottom== Search by Letter or Digit
     .last{:style => 'padding-top: 5px;'}
       - @letters.each do |letter|
         - klasses = (letter.downcase == @letter) ? ['current'] : []

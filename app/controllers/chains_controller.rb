@@ -2,6 +2,9 @@ class ChainsController < ApplicationController
   before_filter   :normalize_page_number, :only => [:city]
   before_filter   :init_areas, :only => [:country, :state, :city]
 
+  # use the acts_as_friendly_param plugin filter to handle showing a unique friendly url for chain locations
+  around_filter ActionController::FriendlyFilter.new
+
   # GET /chains
   def index
     self.class.benchmark("*** Benchmarking popular chains", APP_LOGGER_LEVEL, false) do
@@ -53,7 +56,8 @@ class ChainsController < ApplicationController
       format.html { render(:action => 'index') }
     end
   end
-  
+
+  # GET /chains/us/433-jimmy-johns
   def country
     # @country initialized in before filter
     @chain    = Chain.find(params[:id])
@@ -89,6 +93,7 @@ class ChainsController < ApplicationController
     end
   end
 
+  # GET /chains/us/il/433-jimmy-johns
   def state
     # @country, @state initialized in before filter
     @chain    = Chain.find(params[:id])
@@ -124,6 +129,7 @@ class ChainsController < ApplicationController
     end
   end
 
+  # GET /chains/us/il/chicago/433-jimmy-johns
   def city
     # @country, @state, @city initialized in before filter
     @chain      = Chain.find(params[:id])

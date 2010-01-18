@@ -13,6 +13,6 @@
 %h3.prepend-1.span-23#states
   - @states.each_with_index do |state, i|
     - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-    %span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to state, {:action => 'state', :country => @country, :state => state}, :class => klasses.join(" ")
+    %span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to state, chain_state_path(@country, state, @chain), :class => klasses.join(" ")
   
 

@@ -3,6 +3,8 @@ class SitemapsController < ApplicationController
   caches_page :tags
   caches_page :locations
   caches_page :index_locations
+  caches_page :chains
+  caches_page :index_chains
 
   layout nil # turn off layouts
   
@@ -126,4 +128,44 @@ class SitemapsController < ApplicationController
     end
   end
 
+  # GET /sitemap.chains.:id
+  def chains
+    @chain    = Chain.find_by_id(params[:id])
+    @country  = Country.us
+
+    self.class.benchmark("*** Benchmarking chain store states", APP_LOGGER_LEVEL, false) do
+      @states = State.find(@chain.states.keys).sort_by{|o| o.name}
+    end
+
+    @cities_hash = @states.inject(Hash[]) do |hash, state|
+      self.class.benchmark("*** Benchmarking #{state.name.downcase} chain store cities", APP_LOGGER_LEVEL, false) do
+        city_ids  = @chain.states[state.id] || []
+        @cities   = City.find(city_ids).sort_by{|o| o.name}
+        # add hash key mapping state to cities
+        hash[state] = @cities
+        hash
+      end
+    end
+
+    @protocol = self.request.protocol
+    @host     = self.request.host
+
+    respond_to do |format|
+      format.xml
+    end
+  end
+
+  # GET /sitemap.index.chains
+  def index_chains
+    self.class.benchmark("*** Benchmarking all chains", APP_LOGGER_LEVEL, false) do
+      @chains = Chain.all(:order => "id asc")
+    end
+
+    @protocol = self.request.protocol
+    @host     = self.request.host
+
+    respond_to do |format|
+      format.xml
+    end
+  end
 end

@@ -45,10 +45,10 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/autocomplete/search/where', :controller => 'autocomplete', :action => 'where'
 
   # chains routes
-  map.connect     '/chains/:letter', :controller => 'chains', :action => 'letter', :letter => /[a-z0-9]{1}/
-  map.connect     '/chains/:country/:id', :controller => 'chains', :action => 'country'
-  map.connect     '/chains/:country/:state/:id', :controller => 'chains', :action => 'state'
-  map.connect     '/chains/:country/:state/:city/:id', :controller => 'chains', :action => 'city'
+  map.chain_letter    '/chains/:letter', :controller => 'chains', :action => 'letter', :letter => /[a-z0-9]{1}/
+  map.chain_country   '/chains/:country/:id', :controller => 'chains', :action => 'country'
+  map.chain_state     '/chains/:country/:state/:id', :controller => 'chains', :action => 'state'
+  map.chain_city      '/chains/:country/:state/:city/:id', :controller => 'chains', :action => 'city'
   
   map.resources   :chains, :only => [:index]
 
@@ -103,11 +103,13 @@ ActionController::Routing::Routes.draw do |map|
   # sitemaps controller
   map.sitemap_events    '/sitemap.events.xml', :controller => 'sitemaps', :action => 'events'
   map.sitemap_tags      '/sitemap.tags.:state.:city.xml', :controller => 'sitemaps', :action => 'tags', :state => /[a-z]{2}/, :city => /[a-z-]+/
+  map.sitemap_chains    '/sitemap.chains.:id.xml', :controller => 'sitemaps', :action => 'chains'
   map.sitemap_locations '/sitemap.locations.:state.:city.:index.xml', :controller => 'sitemaps', :action => 'locations', :state => /[a-z]{2}/, :city => /[a-z-]+/, :index => /[0-9]+/
   map.sitemap_metro     '/sitemap.locations.cities.:city_size.:index.xml', :controller => 'sitemaps', :action => 'locations', :city_size => /tiny|small|medium/, :index => /[0-9]+/
 
   map.sitemap_ilocations  '/sitemap.index.locations.:state.:city.xml', :controller => 'sitemaps', :action => 'index_locations', :state => /[a-z]{2}/, :city => /[a-z-]+/
   map.sitemap_ilocations  '/sitemap.index.locations.cities.:city_size.xml', :controller => 'sitemaps', :action => 'index_locations', :city_size => /tiny|small|medium/
+  map.sitemap_ichains     '/sitemap.index.chains.xml', :controller => 'sitemaps', :action => 'index_chains'
 
   # sphinx controller
   map.resources       :sphinx, :only => [:index]
