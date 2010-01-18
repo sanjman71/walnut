@@ -22,6 +22,7 @@ namespace :neighbors do
   task :init_all do
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
+    sleep   = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 0
 
     puts "#{Time.now}: initializing neighbors for all locations with no existing neighbors"
 
@@ -36,7 +37,7 @@ namespace :neighbors do
 
     exit
 
-    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
+    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit, :sleep => sleep)
 
     puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
   end
@@ -46,6 +47,7 @@ namespace :neighbors do
     city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
+    sleep   = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 0
 
     if city.blank?
       puts "*** invalid city"
@@ -63,16 +65,17 @@ namespace :neighbors do
 
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
-    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
+    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit, :sleep => sleep)
 
     puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
   end
   
-  desc "Initialzie neighborhods for all city locations with tags"
+  desc "Initialize neighbors for all city locations with tags"
   task :init_by_city_locations_with_tags do
     city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
+    sleep   = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 0
 
     if city.blank?
       puts "*** invalid city"
@@ -90,7 +93,7 @@ namespace :neighbors do
 
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
-    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit)
+    neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit, :sleep => sleep)
 
     puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
   end
@@ -98,6 +101,7 @@ namespace :neighbors do
   def init_neighbors(ids, page, page_size, options={})
     filter    = options[:filter]
     limit     = options[:limit] ? options[:limit].to_i : 2**30
+    isleep    = options[:sleep].to_i
     neighbors = 0
      
     # Note: the 'find_in_batches' method messes up the sql conditions for all nested sql calls
@@ -111,6 +115,8 @@ namespace :neighbors do
         neighbors += set_location_neighbors(location)
         # check limit
         return neighbors if neighbors >= limit
+        # sleep
+        sleep(isleep) if isleep > 0
       end
       puts "#{Time.now}: #{page * page_size} locations processed, added neighbors to #{neighbors} locations"
       page  += 1
