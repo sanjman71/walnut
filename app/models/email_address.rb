@@ -2,9 +2,8 @@ class EmailAddress < ActiveRecord::Base
   validates_presence_of     :address, :priority
   # validates_presence_of     :emailable, :polymorphic => true  # validation is done in a before filter so nested attributes work
   validates_length_of       :address, :within => 6..100 #r@a.wk
-  validates_uniqueness_of   :address, :case_sensitive => false
+  validates_uniqueness_of   :address, :case_sensitive => false, :message => "Email address is already in use"
   validates_format_of       :address, :with => Authentication.email_regex, :message => Authentication.bad_email_message
-  validates_uniqueness_of   :address, :scope => [:emailable_id, :emailable_type]
   belongs_to                :emailable, :polymorphic => true, :counter_cache => :email_addresses_count
 
   after_create              :manage_user_roles
