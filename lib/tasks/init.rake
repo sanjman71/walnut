@@ -14,7 +14,7 @@ namespace :init do
 
   desc "Initialize states."
   task :states do
-    @us     = Country.find_by_code("US")
+    @us     = Country.us
     
     klass   = State
     columns = [:id, :name, :code, :country_id, :lat, :lng]
@@ -23,9 +23,10 @@ namespace :init do
     options = { :validate => false }
 
     puts "#{Time.now}: importing states ... parsing file #{file}" 
-    CSV.foreach(file, :row_sep => "\n", :col_sep => ',') do |row|
-      id, name, code, lat, lng = row
-      value = [id, name, code, @us.id, lat, lng]
+    # note: CSV.foreach broke on this file, and not sure why
+    File.open(file).lines.each do |row|
+      id, name, code, lat, lng = row.strip.split(',')
+      value = [id.to_i, name, code, @us.id, lat.to_f, lng.to_f]
       values << value
     end
 
