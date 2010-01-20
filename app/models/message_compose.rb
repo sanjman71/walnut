@@ -23,8 +23,11 @@ class MessageCompose
       end
       # send message
       message.send!
-      # create message topic
-      message.message_topics.create(:topic => topic, :tag => tag)
+
+      if !topic.blank?
+        # create message topic
+        message.message_topics.create(:topic => topic, :tag => tag)
+      end
 
       return message
     end
