@@ -16,6 +16,8 @@ class LocationTest < ActiveSupport::TestCase
   should_have_many    :sources
 
   def setup
+    # delete all objects
+    PhoneNumber.delete_all
     @us           = Factory(:us)
     @canada       = Factory(:canada)
     @il           = Factory(:il, :country => @us)
@@ -549,7 +551,7 @@ class LocationTest < ActiveSupport::TestCase
   context "merge locations" do
     setup do
       @location1  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
-      @location1.phone_numbers.push(PhoneNumber.new(:name => "Work", :address => "1111111111"))
+      @phone1     = @location1.phone_numbers.create(:name => "Work", :address => "9999999999")
       @location1.location_sources.push(LocationSource.new(:location => @location1, :source_id => 1, :source_type => "Test"))
       @company1   = Company.create(:name => "Walnut Industries Chicago", :time_zone => "UTC")
       @company1.locations.push(@location1)
@@ -558,7 +560,7 @@ class LocationTest < ActiveSupport::TestCase
       @company1.save
       
       @location2  = Location.create(:country => @us, :state => @illinois, :city => @chicago)
-      @location2.phone_numbers.push(PhoneNumber.new(:name => "Work", :address => "2222222222"))
+      @phone2     = @location2.phone_numbers.create(:name => "Work", :address => "2222222222")
       @location2.location_sources.push(LocationSource.new(:location => @location2, :source_id => 2, :source_type => "Test"))
       @company2   = Company.create(:name => "Walnut Industries San Francisco", :time_zone => "UTC")
       @company2.locations.push(@location2)
@@ -588,7 +590,7 @@ class LocationTest < ActiveSupport::TestCase
       end
       
       should "add phone number to location1" do
-        assert_equal ["1111111111", "2222222222"], @location1.phone_numbers.collect(&:address)
+        assert_equal ["9999999999", "2222222222"], @location1.phone_numbers.collect(&:address)
       end
       
       should "have phone_numbers_count == 2" do
