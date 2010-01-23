@@ -47,6 +47,7 @@ namespace :neighbors do
     city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
     filter  = ENV["FILTER"] if ENV["FILTER"]
+    offset  = ENV["OFFSET"] ? ENV["OFFSET"].to_i : 0
     sleep   = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 0
 
     if city.blank?
@@ -54,11 +55,11 @@ namespace :neighbors do
       exit
     end
 
-    puts "#{Time.now}: initializing neighbors for #{city.name} locations with no existing neighbors, limit #{limit}"
+    puts "#{Time.now}: initializing neighbors for #{city.name} locations with no existing neighbors, offset: #{offset} limit #{limit}"
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :limit => limit, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
+    ids         = Location.find(:all, :offset => offset, :limit => limit, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
     
     # substract locations that already have neighbors
     ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
@@ -74,6 +75,7 @@ namespace :neighbors do
   task :init_by_city_locations_with_tags do
     city    = City.find_by_name(ENV["CITY"].titleize) if ENV["CITY"]
     limit   = ENV["LIMIT"] ? ENV["LIMIT"].to_i : 2**30
+    offset  = ENV["OFFSET"] ? ENV["OFFSET"].to_i : 0
     filter  = ENV["FILTER"] if ENV["FILTER"]
     sleep   = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 0
 
@@ -82,11 +84,11 @@ namespace :neighbors do
       exit
     end
 
-    puts "#{Time.now}: initializing neighbors for #{city.name} locations with tags and no existing neighbors, limit #{limit}"
+    puts "#{Time.now}: initializing neighbors for #{city.name} locations with tags and no existing neighbors, offset: #{offset} limit: #{limit}"
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :limit => limit, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
+    ids         = Location.find(:all, :offset => offset, :limit => limit, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
 
     # substract locations that already have neighbors
     ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
