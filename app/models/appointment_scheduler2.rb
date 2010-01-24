@@ -1,0 +1,191 @@
+class AppointmentScheduler2
+  
+  def self.find_free_appointments(company, location, provider, service, duration, daterange, options={})
+    raise ArgumentError, "company is required" if company.blank?
+    raise ArgumentError, "location is required" if location.blank?
+    raise ArgumentError, "daterange is required" if daterange.blank?
+
+    # use daterange to build start_at, end_at
+    start_at    = daterange.start_at
+    end_at      = daterange.end_at
+
+    # use time range if it was specified, default to 'anytime'
+    time        = options.has_key?(:time_range) ? date_time_options[:time_range] : 'anytime'
+    time_range  = Appointment.time_range(time)
+
+    # Clear the service and provider parameters if we don't need to specify specifics
+    service  = nil if service.blank? || service.nothing?
+    provider = nil if provider.blank? || provider.anyone?
+
+    # remove appointments in the past?
+    keep_old = options.has_key?(:keep_old) ? options[:keep_old] : false
+    
+    # find free appointments for a specific provider, order by start times
+    appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.general_location(location).order_start_at
+
+    # remove appointments that have ended (when compared to Time.now) unless we're told not to (option :keep_old => true) or appointment providers that do not provide the requested service
+    appointments.select { |appt| ((keep_old || (appt.end_at.utc > Time.zone.now.utc)) &&
+                                  (service.blank? || service.provided_by?(appt.provider)))
+                        }
+  end
+  
+  def self.find_free_capacity_slots(company, location, provider, service, duration, daterange, options={})
+    raise ArgumentError, "company is required" if company.blank?
+    raise ArgumentError, "location is required" if location.blank?
+    raise ArgumentError, "daterange is required" if daterange.blank?
+
+    # use daterange to build start_at, end_at
+    start_at     = daterange.start_at
+    end_at       = daterange.end_at
+    
+    # use time range if it was specified
+    time_range   = options.has_key?(:time_range) ? options[:time_range] : nil
+    
+    # Clear the service and provider parameters if we don't need to specify specifics
+    service  = nil if service.blank? || service.nothing?
+    provider = nil if provider.blank? || provider.anyone?
+
+    # remove appointments in the past?
+    keep_old = options.has_key?(:keep_old) ? options[:keep_old] : false
+    
+    # use the (absolute value of the) capacity requested or the capacity from the service (defaults to nil - all capacities are collected)
+    capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : (service.blank? ? nil : service.capacity)
+    
+    # find free appointments for a specific provider, order by start times
+    slots = company.capacity_slot2s.provider(provider).overlap(start_at, end_at).duration_gteq(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
+    
+    # remove slots that have ended (when compared to Time.zone.now) or appointment providers that do not provide the requested service
+    if (!keep_old) || (!service.blank?)
+      slots = slots.select { |slot| ((keep_old || (slot.end_at.utc > Time.zone.now.utc)) && (service.blank? || service.provided_by?(slot.provider))) }
+    end
+    
+    CapacitySlot2.consolidate_slots_for_capacity(slots, capacity_req)
+    
+  end
+  
+  # build collection of all free and work appointments over the specified date range
+  def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
+    company.appointments.provider(provider).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+  end
+
+  # build collection of all work appointments over the specified date range
+  def self.find_work_appointments(company, location, provider, daterange, options = {})
+    company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+  end
+  
+  # build collection of all orphaned appointments over the specified date range (i.e. - no parent free appointment)
+  def self.find_orphan_work_appointments(company, location, provider, daterange, options = {})
+    company.appointments.provider(provider).work.orphan.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+  end
+  
+  # create a free appointment in the specified timeslot
+  def self.create_free_appointment(company, location, provider, options)
+    raise ArgumentError, "company is required" if company.blank?
+    raise ArgumentError, "provider is required" if provider.blank?
+
+    # find company free service
+    service = company.free_service
+    
+    raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
+    
+    # create the new appointment object
+    # Make sure it has company, service, provider and capacity values. These will be overridden by the options parameter
+    free_hash         = {:company => company, :service => service, :provider => provider, :capacity => provider.capacity }.merge(options)
+    free_appointment  = Appointment.new(free_hash)
+                      
+    # free appointments should not have conflicts
+    if free_appointment.conflicts?
+      raise TimeslotNotEmpty, 'This time conflicts with existing availability.'
+    end
+
+    # Save the free appointment and add capacity in a single transaction
+    Appointment.transaction do
+      
+      free_appointment.save
+      raise AppointmentInvalid, free_appointment.errors.full_messages unless free_appointment.valid?
+      CapacitySlot2.change_capacity(company, location, provider, free_appointment.start_at, free_appointment.end_at, free_appointment.capacity)
+      
+    end
+    
+    free_appointment
+  end
+  
+  # create a work appointment by scheduling the specified appointment in a free timeslot
+  # options:
+  #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
+  def self.create_work_appointment(company, location, provider, service, duration, customer, date_time_options, options={})
+    raise ArgumentError, "You must specify the company" if company.blank?
+    raise ArgumentError, "You must specify the provider" if provider.blank?
+    raise ArgumentError, "You must specify the service" if service.blank?
+    raise ArgumentError, "You must specify the customer" if customer.blank?
+    
+    # should be a work service
+    raise AppointmentInvalid, "This is not a valid service" if service.mark_as != Appointment::WORK
+    
+    # should be a service provided by the provider
+    raise AppointmentInvalid, "This service is not provided by this provider" if !service.provided_by?(provider)
+
+    # if options[:commit] == true, then carry out the capacity changes but don't commit them. By default, commit
+    commit = options.has_key?(:commit) ? options[:commit] : true
+    
+    # if options[:force] == true, then add the appointment regardless of the availability of capacity. By default, do not force add
+    force = options.has_key?(:force) ? options[:force] : false
+
+    # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
+    work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer,
+                        :capacity => service.capacity }.merge(date_time_options)
+    work_appointment = Appointment.new(work_hash)
+    
+    # If we're to commit the changes, make sure the work_appointment is saved
+    if commit
+
+      Appointment.transaction do
+        
+        # These calls will raise an exception if they fail 
+        work_appointment.save
+        raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
+        CapacitySlot2.change_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity, :force => force)
+        
+      end
+      
+    else
+      
+      # Check if we have capacity
+      if !(CapacitySlot2.check_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity))
+        raise AppointmentInvalid, "No capacity available"
+      end
+                                      
+    end
+    
+    work_appointment
+
+  end
+  
+
+  # cancel the work appointment, and reclaim the necessary free time
+  def self.cancel_work_appointment(appointment)
+    raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WORK
+
+    # find any free time that book-ends this work appointment
+    company  = appointment.company
+    provider = appointment.provider
+    location = appointment.location
+    
+    # We always commit a cancel
+    Appointment.transaction do
+      
+      # cancel and save work appointment
+      appointment.cancel
+      appointment.save
+      raise AppointmentInvalid, appointment.errors.full_messages unless appointment.valid?
+      
+      # Return the capacity
+      CapacitySlot2.change_capacity(company, location, provider, appointment.start_at, appointment.end_at, appointment.capacity)
+
+    end
+    
+    appointment
+
+  end
+
+end
