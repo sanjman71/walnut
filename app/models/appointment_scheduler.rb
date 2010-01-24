@@ -134,8 +134,8 @@ class AppointmentScheduler
     # if options[:commit] == true, then carry out the capacity changes but don't commit them. By default, commit
     commit = options.has_key?(:commit) ? options[:commit] : true
     
-    # if options[:force_add] == true, then add the appointment regardless of the availability of capacity. By default, do not force add
-    force_add = options.has_key?(:force_add) ? options[:force_add] : false
+    # if options[:force] == true, then add the appointment regardless of the availability of capacity. By default, do not force add
+    force = options.has_key?(:force) ? options[:force] : false
 
     # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
     work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer,
@@ -146,7 +146,7 @@ class AppointmentScheduler
     max_slot         = work_appointment.max_capacity_slot
 
     # If we can't find capacity, fail
-    if (max_slot.blank? && !force_add)
+    if (max_slot.blank? && !force)
 
       raise AppointmentInvalid, "No capacity available"
 
