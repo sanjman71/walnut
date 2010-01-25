@@ -80,7 +80,7 @@ class AppointmentScheduler
   end
   
   # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, provider, options)
+  def self.create_free_appointment(company, location, provider,  options)
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "provider is required" if provider.blank?
 
@@ -119,7 +119,7 @@ class AppointmentScheduler
   # create a work appointment by scheduling the specified appointment in a free timeslot
   # options:
   #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
-  def self.create_work_appointment(company, provider, service, duration, customer, date_time_options, options={})
+  def self.create_work_appointment(company, location, provider,  service, duration, customer, date_time_options, options={})
     raise ArgumentError, "You must specify the company" if company.blank?
     raise ArgumentError, "You must specify the provider" if provider.blank?
     raise ArgumentError, "You must specify the service" if service.blank?
