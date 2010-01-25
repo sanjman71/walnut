@@ -493,7 +493,7 @@ class Appointment < ActiveRecord::Base
 
   # Conflicting work time conflicts
   def work_conflicts
-    @conflicts ||= self.company.appointments.work.provider(provider).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.work.not_canceled.provider(provider).overlap(start_at, end_at)
   end
 
   # Overlapping capacity slots include those overlapping a time range, not necessarily covering all of it. It doesn't include those that only touch, or abut, the time range
