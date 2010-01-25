@@ -73,11 +73,6 @@ class AppointmentScheduler2
     company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
   end
   
-  # build collection of all orphaned appointments over the specified date range (i.e. - no parent free appointment)
-  def self.find_orphan_work_appointments(company, location, provider, daterange, options = {})
-    company.appointments.provider(provider).work.orphan.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
-  end
-  
   # create a free appointment in the specified timeslot
   def self.create_free_appointment(company, location, provider, options)
     raise ArgumentError, "company is required" if company.blank?
@@ -99,11 +94,11 @@ class AppointmentScheduler2
     end
 
     # Save the free appointment and add capacity in a single transaction
+    # Capacity is added in the after create filter on Appointment, make_capacity_slot
     Appointment.transaction do
-      
+
       free_appointment.save
       raise AppointmentInvalid, free_appointment.errors.full_messages unless free_appointment.valid?
-      CapacitySlot2.change_capacity(company, location, provider, free_appointment.start_at, free_appointment.end_at, free_appointment.capacity)
       
     end
     

@@ -491,6 +491,11 @@ class Appointment < ActiveRecord::Base
     @conflicts ||= self.company.appointments.free.provider(provider).overlap(start_at, end_at)
   end
 
+  # Conflicting work time conflicts
+  def work_conflicts
+    @conflicts ||= self.company.appointments.work.provider(provider).overlap(start_at, end_at)
+  end
+
   # Overlapping capacity slots include those overlapping a time range, not necessarily covering all of it. It doesn't include those that only touch, or abut, the time range
   def overlapping_capacity_slots
     self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gteq(self.duration).order_capacity_desc
@@ -704,7 +709,9 @@ class Appointment < ActiveRecord::Base
         a = Appointment.new(attrs)
       end
       if !a.free_conflicts? && a.valid?
-        a.save
+        Appointment.transaction do
+          a.save
+        end
       else
         # Nothing to do here yet. Will need to flag the issue by adding something to the parent record.
       end
@@ -842,7 +849,7 @@ class Appointment < ActiveRecord::Base
     # This is how we differentiate events from other appointments right now
     # We commit the changes in this call, as the free appointment has already been created.
     if (self.mark_as == FREE && !self.public)
-      CapacitySlot.merge_or_add(self)
+      CapacitySlot2.merge_or_add(self)
     end
   end
 

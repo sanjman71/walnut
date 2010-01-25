@@ -88,7 +88,15 @@ class CapacitySlot2 < ActiveRecord::Base
   # combined ordering, first by start_at, then by capacity, larger capacity first
   named_scope :order_start_at_capacity_desc, {:order => 'start_at, capacity DESC'}
   named_scope :order_start_at_capacity_asc, {:order => 'start_at, capacity ASC'}
-  
+
+  #
+  # Maintain API from CapacitySlot
+  #
+  def self.merge_or_add(appointment)
+    self.change_capacity(appointment.company, appointment.location, appointment.provider, 
+                        appointment.start_at, appointment.end_at, (appointment.free? ? appointment.capacity : -appointment.capacity))
+  end
+
   #
   # Class method to change capacity in a time period
   #
@@ -262,7 +270,6 @@ class CapacitySlot2 < ActiveRecord::Base
   def self.check_capacity(company, location, provider, start_at, end_at, capacity_change, options = {})
 
     raise ArgumentError, "You must specify the company" if company.blank?
-    raise ArgumentError, "You must specify the location" if location.blank?
     raise ArgumentError, "You must specify the provider" if provider.blank?
     raise ArgumentError, "You must specify the start time" if start_at.blank?
     raise ArgumentError, "You must specify the end time" if end_at.blank?
@@ -339,6 +346,11 @@ class CapacitySlot2 < ActiveRecord::Base
   #
   def self.consolidate_slots_for_capacity(slots, capacity_req)
 
+    # If capacity_req wasn't provided, make no changes
+    if capacity_req.blank?
+      return slots
+    end
+
     case slots.size
     when 0 then
       return slots
@@ -388,6 +400,11 @@ class CapacitySlot2 < ActiveRecord::Base
       
   end
 
+  # Preserve the API from CapacitySlot
+  def self.build_openings_for_view(slots)
+    slots
+  end
+  
   protected
 
   # Assign duration if required
