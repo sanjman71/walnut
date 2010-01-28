@@ -1,6 +1,8 @@
 class CreateCapacitySlot2s < ActiveRecord::Migration
   def self.up
-    create_table :capacity_slot2s do |t|
+    drop_table    :capacity_slots
+    
+    create_table  :capacity_slots do |t|
       t.references    :company
       t.references    :provider, :polymorphic => true
       t.references    :location
@@ -37,5 +39,18 @@ class CreateCapacitySlot2s < ActiveRecord::Migration
 
   def self.down
     drop_table  :capacity_slot2s
+
+    create_table "capacity_slots" do |t|
+      t.integer  "free_appointment_id"
+      t.datetime "start_at"
+      t.datetime "end_at"
+      t.integer  "duration"
+      t.integer  "capacity"
+      t.integer  "time_start_at"
+      t.integer  "time_end_at"
+      t.datetime "created_at"
+      t.datetime "updated_at"
+    end
+
   end
 end
