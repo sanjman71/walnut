@@ -36,6 +36,7 @@ Rails::Initializer.run do |config|
   config.gem "httparty", :lib => false # used by google weather plugin
   config.gem 'javan-whenever', :version => '~> 0.3.7', :lib => false, :source => 'http://gems.github.com'
   config.gem "json", :version => '~> 1.1.7' # requires native components
+  config.gem 'mechanize', :version => '0.9.3'
   config.gem "mime-types", :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'ri_cal', :version => '~> 0.8.1'
