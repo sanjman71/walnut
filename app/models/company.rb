@@ -107,6 +107,9 @@ class Company < ActiveRecord::Base
   # find all subscriptions with billing errors
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
+  # find all companies with appointments
+  named_scope :with_appointments,   { :joins => :appointments, :conditions => ["appointments.id > 0"] }
+
 
   def self.provider_role
     Badges::Role.find_by_name('company provider')
