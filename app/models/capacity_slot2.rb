@@ -114,7 +114,8 @@ class CapacitySlot2 < ActiveRecord::Base
     force = options.has_key?(:force) ? options[:force] : false
 
     # Find all the affected capacity slots
-    affected_slots = company.capacity_slot2s.provider(provider).specific_location(location).overlap_incl(start_at, end_at).order_start_at
+    # We want to find slots that are allocated to Location.anywhere and those allocated to the specific location chosen - i.e. general_location
+    affected_slots = company.capacity_slot2s.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
 
     current_time       = start_at
     current_slot_index = 0
@@ -233,7 +234,7 @@ class CapacitySlot2 < ActiveRecord::Base
       # Consolidate the slots - combine any that abut each other and have the same capacity
 
       # Find all the affected slots again
-      affected_slots = company.capacity_slot2s.provider(provider).specific_location(location).overlap_incl(start_at, end_at).order_start_at
+      affected_slots = company.capacity_slot2s.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
 
       # Iterate through them, comparing the previous slot with the current one in each case. We start on the second item
       previous_slot = nil
@@ -276,7 +277,7 @@ class CapacitySlot2 < ActiveRecord::Base
     raise ArgumentError, "You must specify the capacity change" if capacity_change.blank?
 
     # Find all the affected capacity slots - don't include those abutting the start and end time
-    affected_slots = company.capacity_slot2s.provider(provider).specific_location(location).overlap(start_at, end_at).order_start_at
+    affected_slots = company.capacity_slot2s.provider(provider).general_location(location).overlap(start_at, end_at).order_start_at
     
     # iterate through the slots, making sure that they have capacity + capacity_change > 0, and that there are no gaps
     have_capacity = true
@@ -383,7 +384,9 @@ class CapacitySlot2 < ActiveRecord::Base
 
           # The slots don't abut, so add the previous slot to the results array and start a new res_slot
           res_slots << res_slot unless res_slot.blank?
-          res_slot = current_slot
+          res_slot = CapacitySlot2.new(:company => current_slot.company, :location => current_slot.location, :provider => current_slot.provider,
+                                        :start_at => current_slot.start_at, :end_at => current_slot.end_at, :duration => current_slot.duration,
+                                        :capacity => current_slot.capacity)
           
         end
         
