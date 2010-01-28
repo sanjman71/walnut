@@ -13,14 +13,26 @@ class MessageJob < Struct.new(:params)
   end
 
   def perform
-    logger.info("#{Time.now}: message job: #{params.inspect}")
+    logger.info("#{Time.now}: [message job]: #{params.inspect}")
 
     message     = Message.find(params[:message_id])
     recipients  = message.message_recipients
 
     recipients.each do |recipient|
       case recipient.protocol
-      when 'email', 'sms'
+      when 'email'
+        # check global configuration for email smtp provider
+        case SMTP_PROVIDER
+        when :google
+          send_email_using_google(message, recipient)
+        when :message_pub
+          send_message_using_message_pub(message, recipient)
+        else
+          # default to google
+          send_email_using_google(message, recipient)
+        end
+      when 'sms'
+        # use message pub
         send_message_using_message_pub(message, recipient)
       when 'local'
         # local messages are automatically delivered to local recipients
@@ -46,8 +58,19 @@ class MessageJob < Struct.new(:params)
 
     logger.debug("#{Time.now}: [message] sending google email to: #{address}, subject: #{subject}, body: #{body}")
 
-    # send email
-    UserMailer.deliver_email(address, subject, body)
+    begin
+      # send email
+      UserMailer.deliver_email(address, subject, body)
+    rescue Exception => e
+      logger.debug("#{Time.now}: [message exception] #{e.message}")
+      return
+    end
+
+    begin
+      # change recipient state to sent
+      recipient.sent!
+    rescue
+    end
   end
   
   def send_message_using_message_pub(message, recipient)

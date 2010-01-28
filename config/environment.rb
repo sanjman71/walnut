@@ -114,7 +114,7 @@ ADMIN_USER_EMAILS  = %w(sanjay@walnutindustries.com killian@walnutindustries.com
 # Auth token
 AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
 
-#
+# Application logger level used for benchmark logging purposes
 APP_LOGGER_LEVEL  = ActiveRecord::Base.logger.level
 
 # Initialize exception notifier
@@ -124,6 +124,10 @@ ExceptionNotifier.email_prefix          = "Walnut Places "
 
 # Weather enabled environments
 WEATHER_ENVS = []
+
+# Application SMTP provider; valid options are :google, :message_pub
+SMTP_PROVIDER = :google
+SMTP_FROM     = "Walnut Messaging <messaging@walnutindustries.com>"
 
 # create special localeze loggers
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
