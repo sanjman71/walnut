@@ -27,7 +27,7 @@ namespace :mechanize do
       next if location.location_neighbors.count > 0
       url = location_url(location, :host => @@host)
       url += "?neighbors=1"
-      puts "*** url: #{url.inspect}"
+      # puts "*** url: #{url.inspect}"
       agent.get(url)
       count += 1
       break if count >= limit
