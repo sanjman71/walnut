@@ -1,4 +1,4 @@
-class CreateCapacitySlot2s < ActiveRecord::Migration
+class RecreateCapacitySlots < ActiveRecord::Migration
   def self.up
     drop_table    :capacity_slots
     
@@ -24,13 +24,13 @@ class CreateCapacitySlot2s < ActiveRecord::Migration
       
       # Add capacity for each free appointment
       company.appointments.free.each do |appointment|
-        CapacitySlot2.change_capacity(company, appointment.location || Location.anywhere, appointment.provider, 
+        CapacitySlot.change_capacity(company, appointment.location || Location.anywhere, appointment.provider, 
                                       appointment.start_at, appointment.end_at, appointment.capacity, :force => true)
       end
 
       # Remove capacity for each work appointment that hasn't been cancelled
       company.appointments.work.not_canceled.each do |appointment|
-        CapacitySlot2.change_capacity(company, appointment.location || Location.anywhere, appointment.provider, 
+        CapacitySlot.change_capacity(company, appointment.location || Location.anywhere, appointment.provider, 
                                       appointment.start_at, appointment.end_at, -appointment.capacity, :force => true)
       end
     end
@@ -38,7 +38,7 @@ class CreateCapacitySlot2s < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table  :capacity_slot2s
+    drop_table  :capacity_slots
 
     create_table "capacity_slots" do |t|
       t.integer  "free_appointment_id"
