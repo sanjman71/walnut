@@ -55,7 +55,7 @@ class Company < ActiveRecord::Base
   has_many                  :invitations, :dependent => :destroy
   has_many                  :waitlists, :dependent => :destroy
 
-  has_many                  :capacity_slot2s, :dependent => :destroy
+  has_many                  :capacity_slots, :dependent => :destroy
 
   # Accounting info
   has_one                   :subscription, :dependent => :destroy

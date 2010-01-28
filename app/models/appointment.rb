@@ -16,15 +16,6 @@ class Appointment < ActiveRecord::Base
   has_many                    :messages, :through => :message_topics
   has_one                     :invoice, :dependent => :destroy, :as => :invoiceable
 
-  # Relationships between free and work appointments, and between appointments and capacity
-  # Free appointments have associated work appts. A free appointment may be deleted, in which case it's associated work appointments are orphaned.
-  # This might happen if a work appointment is canceled, and then the corresponding free appointment is destroyed.
-  has_many                    :work_appointments, :class_name => "Appointment", :foreign_key => :free_appointment_id, :dependent => :nullify
-  belongs_to                  :free_appointment, :class_name => "Appointment"       # Work appointments refer to their corresponding free appointment
-
-  # free appointments refer to their corresponding capacity_slots
-  has_many                    :capacity_slots, :foreign_key => :free_appointment_id, :dependent => :destroy
-
   # Recurrences - an appointment might have a recurrence rule. If so, the appointment may have multiple recurrence instances.
   # These recurrence instances refer back to their parent. If their parent is destroyed, the instance refererences are nullified
   has_many                    :recur_instances, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :nullify
@@ -491,45 +482,14 @@ class Appointment < ActiveRecord::Base
     @conflicts ||= self.company.appointments.free.provider(provider).overlap(start_at, end_at)
   end
 
-  # Conflicting work time conflicts
+  # Conflicting work time conflicts, not including canceled work appointments
   def work_conflicts
     @conflicts ||= self.company.appointments.work.not_canceled.provider(provider).overlap(start_at, end_at)
-  end
-
-  # Overlapping capacity slots include those overlapping a time range, not necessarily covering all of it. It doesn't include those that only touch, or abut, the time range
-  def overlapping_capacity_slots
-    self.company.capacity_slots.provider(self.provider).overlap(self.start_at, self.end_at).duration_gteq(self.duration).order_capacity_desc
   end
 
   # Affected capacity slots include those overlapping or touching a time range, not necessarily covering all of it
   def affected_capacity_slots
     self.company.capacity_slots.provider(self.provider).overlap_incl(self.start_at, self.end_at).duration_gteq(self.duration).order_capacity_desc
-  end
-
-  def self.affected_capacity_slots_range(company, start_at, end_at, duration, provider = nil)
-    company.capacity_slots.provider(provider).overlap_incl(start_at, end_at).duration_gteq(duration).order_capacity_desc
-  end
-
-  # Capacity slot which has maximum capacity, completely covers the time range and has enough capacity to satisfy the request
-  # If this call doesn't return a slot, there is no capacity in this time range
-  # There may be several slots that can satisfy the request, if so this call returns the one with the most capacity
-  def max_capacity_slot
-    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gteq(self.duration).capacity_gteq(self.capacity).order_capacity_desc.first
-  end
-  
-  def self.max_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
-    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gteq(duration).capacity_gteq(capacity).order_capacity_desc.first
-  end
-  
-  # Capacity slot which has minimum capacity, completely covers the time range and has more capacity than requested
-  # If this call doesn't return a slot, there is no capacity in this time range
-  # There may be several slots that can satisfy the request, if so this call returns the one with the least capacity
-  def min_capacity_slot
-    self.company.capacity_slots.provider(self.provider).covers(self.start_at, self.end_at).duration_gteq(self.duration).capacity_gteq(self.capacity).order_capacity_asc.first
-  end
-  
-  def self.min_capacity_slot_range(company, start_at, end_at, duration, capacity, provider = nil)
-    company.capacity_slots.provider(provider).covers(start_at, end_at).duration_gteq(duration).capacity_gteq(capacity).order_capacity_asc.first
   end
 
   # returns true if this appointment conflicts with any other
@@ -730,7 +690,7 @@ class Appointment < ActiveRecord::Base
       if ((attr_changed & REEXPAND_INSTANCES_ATTRS).size > 0)
         # We need to rebuild all the instances
         self.recur_instances.each {|a| 
-          if !force_destroy && a.work_appointments.count > 0
+          if !force_destroy && a.work_conflicts.count > 0
             raise Exception, "Some of the recurring appointments have work appointments attached"
           else
             a.destroy
@@ -849,7 +809,7 @@ class Appointment < ActiveRecord::Base
     # This is how we differentiate events from other appointments right now
     # We commit the changes in this call, as the free appointment has already been created.
     if (self.mark_as == FREE && !self.public)
-      CapacitySlot2.merge_or_add(self)
+      CapacitySlot.merge_or_add(self)
     end
   end
 

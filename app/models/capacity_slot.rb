@@ -1,5 +1,5 @@
 # Migration is:
-# create_table :capacity_slot2s do |t|
+# create_table :capacity_slots do |t|
 # t.references    :company
 # t.references    :provider
 # t.references    :location
@@ -8,7 +8,7 @@
 # t.integer       :capacity
 # end
 # 
-class CapacitySlot2 < ActiveRecord::Base
+class CapacitySlot < ActiveRecord::Base
   
   belongs_to                  :company
   belongs_to                  :provider, :polymorphic => true
@@ -23,35 +23,35 @@ class CapacitySlot2 < ActiveRecord::Base
 
 
   named_scope :provider,      lambda { |provider| (provider.blank?) ? {} : 
-                                                    { :conditions => ["`capacity_slot2s`.`provider_id` = ? AND `capacity_slot2s`.`provider_type` = ?", provider.id, provider.class.to_s]} }
+                                                    { :conditions => ["`capacity_slots`.`provider_id` = ? AND `capacity_slots`.`provider_type` = ?", provider.id, provider.class.to_s]} }
 
   # Duration greater than or equal to a value. If nil passed in here, no conditions are added
-  named_scope :duration_gteq, lambda { |t| (t.blank?) ? {} : { :conditions => ["`capacity_slot2s`.`duration` >= ?", t] } }
+  named_scope :duration_gteq, lambda { |t| (t.blank?) ? {} : { :conditions => ["`capacity_slots`.`duration` >= ?", t] } }
   
-  named_scope :capacity_gt,   lambda { |c| (c.blank?) ? {} : {:conditions => ["`capacity_slot2s`.`capacity` > ?", c]} }
-  named_scope :capacity_gteq, lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slot2s`.`capacity` >= ?", c]} }
+  named_scope :capacity_gt,   lambda { |c| (c.blank?) ? {} : {:conditions => ["`capacity_slots`.`capacity` > ?", c]} }
+  named_scope :capacity_gteq, lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` >= ?", c]} }
 
   # find capacity slots based on a named time range, use lambda to ensure time value is evaluated at run-time
-  named_scope :future,        lambda { { :conditions => ["`capacity_slot2s`.`start_at` >= ?", Time.now] } }
-  named_scope :past,          lambda { { :conditions => ["`capacity_slot2s`.`end_at` <= ?", Time.now] } }
+  named_scope :future,        lambda { { :conditions => ["`capacity_slots`.`start_at` >= ?", Time.now] } }
+  named_scope :past,          lambda { { :conditions => ["`capacity_slots`.`end_at` <= ?", Time.now] } }
 
   # find capacity slots overlapping a start and end time
-  named_scope :overlap,       lambda { |start_at, end_at|{ :conditions => ["(`capacity_slot2s`.start_at < ? AND `capacity_slot2s`.end_at > ?) OR
-                                                                            (`capacity_slot2s`.start_at < ? AND `capacity_slot2s`.end_at > ?) OR 
-                                                                            (`capacity_slot2s`.start_at >= ? AND `capacity_slot2s`.end_at <= ?)", 
+  named_scope :overlap,       lambda { |start_at, end_at|{ :conditions => ["(`capacity_slots`.start_at < ? AND `capacity_slots`.end_at > ?) OR
+                                                                            (`capacity_slots`.start_at < ? AND `capacity_slots`.end_at > ?) OR 
+                                                                            (`capacity_slots`.start_at >= ? AND `capacity_slots`.end_at <= ?)", 
                                                                             start_at, start_at, end_at, end_at, start_at, end_at] }}
 
   # find capacity slots overlapping a start and end time, include those which touch the start or end times
-  named_scope :overlap_incl,  lambda { |start_at, end_at| { :conditions => ["(`capacity_slot2s`.start_at < ? AND `capacity_slot2s`.end_at >= ?) OR
-                                                                             (`capacity_slot2s`.start_at <= ? AND `capacity_slot2s`.end_at > ?) OR 
-                                                                             (`capacity_slot2s`.start_at >= ? AND `capacity_slot2s`.end_at <= ?)", 
+  named_scope :overlap_incl,  lambda { |start_at, end_at| { :conditions => ["(`capacity_slots`.start_at < ? AND `capacity_slots`.end_at >= ?) OR
+                                                                             (`capacity_slots`.start_at <= ? AND `capacity_slots`.end_at > ?) OR 
+                                                                             (`capacity_slots`.start_at >= ? AND `capacity_slots`.end_at <= ?)", 
                                                                              start_at, start_at, end_at, end_at, start_at, end_at] }}
                                                                              
-  named_scope :abuts_before, lambda { |start_at| {:conditions => ["capacity_slot2s.end_at = ?", start_at]}}
-  named_scope :abuts_after, lambda { |end_at| {:conditions => ["capacity_slot2s.start_at = ?", end_at]}}
+  named_scope :abuts_before, lambda { |start_at| {:conditions => ["capacity_slots.end_at = ?", start_at]}}
+  named_scope :abuts_after, lambda { |end_at| {:conditions => ["capacity_slots.start_at = ?", end_at]}}
 
   # find capacity slots covering the entire time between a start and end time
-  named_scope :covers,       lambda { |start_at, end_at|{ :conditions => ["(`capacity_slot2s`.start_at <= ? AND `capacity_slot2s`.end_at >= ?)", 
+  named_scope :covers,       lambda { |start_at, end_at|{ :conditions => ["(`capacity_slots`.start_at <= ? AND `capacity_slots`.end_at >= ?)", 
                                                                            start_at, end_at] }}
 
 
@@ -115,13 +115,13 @@ class CapacitySlot2 < ActiveRecord::Base
 
     # Find all the affected capacity slots
     # We want to find slots that are allocated to Location.anywhere and those allocated to the specific location chosen - i.e. general_location
-    affected_slots = company.capacity_slot2s.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
+    affected_slots = company.capacity_slots.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
 
     current_time       = start_at
     current_slot_index = 0
 
     # Carry this out in a transaction
-    CapacitySlot2.transaction do
+    CapacitySlot.transaction do
       
       while (current_time < end_at)
         
@@ -135,7 +135,7 @@ class CapacitySlot2 < ActiveRecord::Base
           end
           
           # We've run out of slots. Build a slot from current_time to the end of the request
-          CapacitySlot2.create(:company => company, :provider => provider, :location => location, 
+          CapacitySlot.create(:company => company, :provider => provider, :location => location, 
                                :start_at => current_time, :end_at => end_at, :capacity => capacity_change)
           
           # Move current time forward to the end of this newly created capacity slot. This will finish the loop.
@@ -144,7 +144,7 @@ class CapacitySlot2 < ActiveRecord::Base
         elsif current_slot.end_at <= current_time
           # The current slot ends before we start. Move onto the next slot.
           # This shouldn't happen
-          RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot2: change_capacity: shouldn't reach this point #1")
+          RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot: change_capacity: shouldn't reach this point #1")
           current_slot_index += 1
           
         elsif (current_slot.start_at > current_time)
@@ -155,7 +155,7 @@ class CapacitySlot2 < ActiveRecord::Base
           # the array if it isn't impacted, i.e. current_slot.start_at should never be > end_at
           if (current_slot.start_at > end_at)
             slot_end_at = end_at
-            RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot2: change_capacity: shouldn't reach this point #2")
+            RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot: change_capacity: shouldn't reach this point #2")
           else
             slot_end_at = current_slot.start_at
           end
@@ -166,7 +166,7 @@ class CapacitySlot2 < ActiveRecord::Base
           end
 
           # Create the new slot
-          CapacitySlot2.create(:company => company, :provider => provider, :location => location, 
+          CapacitySlot.create(:company => company, :provider => provider, :location => location, 
                                :start_at => current_time, :end_at => slot_end_at, :capacity => capacity_change)
 
           # Don't move forward the affected_slots index - we haven't processed the current_slot
@@ -197,7 +197,7 @@ class CapacitySlot2 < ActiveRecord::Base
 
             # Create a new slot from current_slot.start_at to current_time, if necessary. It retains the same capacity as current_slot
             # This new slot occurs earlier than our time of interest (current_time to end_time) and so we don't have to process it again
-            CapacitySlot2.create(:company => company, :provider => provider, :location => location, 
+            CapacitySlot.create(:company => company, :provider => provider, :location => location, 
                                  :start_at => orig_start_at, :end_at => current_time, :capacity => orig_capacity)
 
           end
@@ -217,12 +217,12 @@ class CapacitySlot2 < ActiveRecord::Base
             # We did change the current_slot.end at, because the current_slot ended later than end_at.
             # We need to create a new slot, from the new_end_at to the orig_end_at, with the orig_capacity
 
-            CapacitySlot2.create(:company => company, :provider => provider, :location => location, 
+            CapacitySlot.create(:company => company, :provider => provider, :location => location, 
                                  :start_at => new_end_at, :end_at => orig_end_at, :capacity => orig_capacity)
 
             # At this point current_time == end_at, and we're finished. If not, yell about it!
             if (current_time != end_at)
-              RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot2: change_capacity: shouldn't reach this point #3")
+              RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot: change_capacity: shouldn't reach this point #3")
             end
 
           end
@@ -234,7 +234,7 @@ class CapacitySlot2 < ActiveRecord::Base
       # Consolidate the slots - combine any that abut each other and have the same capacity
 
       # Find all the affected slots again
-      affected_slots = company.capacity_slot2s.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
+      affected_slots = company.capacity_slots.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
 
       # Iterate through them, comparing the previous slot with the current one in each case. We start on the second item
       previous_slot = nil
@@ -277,7 +277,7 @@ class CapacitySlot2 < ActiveRecord::Base
     raise ArgumentError, "You must specify the capacity change" if capacity_change.blank?
 
     # Find all the affected capacity slots - don't include those abutting the start and end time
-    affected_slots = company.capacity_slot2s.provider(provider).general_location(location).overlap(start_at, end_at).order_start_at
+    affected_slots = company.capacity_slots.provider(provider).general_location(location).overlap(start_at, end_at).order_start_at
     
     # iterate through the slots, making sure that they have capacity + capacity_change > 0, and that there are no gaps
     have_capacity = true
@@ -384,7 +384,7 @@ class CapacitySlot2 < ActiveRecord::Base
 
           # The slots don't abut, so add the previous slot to the results array and start a new res_slot
           res_slots << res_slot unless res_slot.blank?
-          res_slot = CapacitySlot2.new(:company => current_slot.company, :location => current_slot.location, :provider => current_slot.provider,
+          res_slot = CapacitySlot.new(:company => current_slot.company, :location => current_slot.location, :provider => current_slot.provider,
                                         :start_at => current_slot.start_at, :end_at => current_slot.end_at, :duration => current_slot.duration,
                                         :capacity => current_slot.capacity)
           

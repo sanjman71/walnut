@@ -1,4 +1,4 @@
-class AppointmentScheduler2
+class AppointmentScheduler
   
   def self.find_free_appointments(company, location, provider, service, duration, daterange, options={})
     raise ArgumentError, "company is required" if company.blank?
@@ -52,14 +52,14 @@ class AppointmentScheduler2
     capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : (service.blank? ? nil : service.capacity)
     
     # find free appointments for a specific provider, order by start times
-    slots = company.capacity_slot2s.provider(provider).overlap(start_at, end_at).duration_gteq(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
+    slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).duration_gteq(duration).general_location(location).capacity_gteq(capacity_req).order_start_at
     
     # remove slots that have ended (when compared to Time.zone.now) or appointment providers that do not provide the requested service
     if (!keep_old) || (!service.blank?)
       slots = slots.select { |slot| ((keep_old || (slot.end_at.utc > Time.zone.now.utc)) && (service.blank? || service.provided_by?(slot.provider))) }
     end
     
-    CapacitySlot2.consolidate_slots_for_capacity(slots, capacity_req)
+    CapacitySlot.consolidate_slots_for_capacity(slots, capacity_req)
     
   end
   
@@ -139,14 +139,14 @@ class AppointmentScheduler2
         # These calls will raise an exception if they fail 
         work_appointment.save
         raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
-        CapacitySlot2.change_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity, :force => force)
+        CapacitySlot.change_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity, :force => force)
         
       end
       
     else
       
       # Check if we have capacity
-      if !(CapacitySlot2.check_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity))
+      if !(CapacitySlot.check_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity))
         raise AppointmentInvalid, "No capacity available"
       end
                                       
@@ -175,7 +175,7 @@ class AppointmentScheduler2
       raise AppointmentInvalid, appointment.errors.full_messages unless appointment.valid?
       
       # Return the capacity
-      CapacitySlot2.change_capacity(company, location, provider, appointment.start_at, appointment.end_at, appointment.capacity)
+      CapacitySlot.change_capacity(company, location, provider, appointment.start_at, appointment.end_at, appointment.capacity)
 
     end
     
