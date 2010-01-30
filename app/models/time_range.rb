@@ -52,8 +52,9 @@ class TimeRange
     
     # If I don't have an end time, or a start_time + duration, then end_time is the end of whatever day I have
     if @end_at.blank? and @end_day
-      # default to end of 'day'
-      @end_at   = Time.zone.parse(@end_day).end_of_day + 1.second
+      # default to the very beginning of the day after the end_day. 
+      # Use beginning_of_day to remove some extra milliseconds that mess up some rounded calcs
+      @end_at   = (Time.zone.parse(@end_day).end_of_day + 1.second).beginning_of_day
     end
 
     # initialize duration (in seconds) unless the times aren't set. If we were given duration we recalc here anyway, just in case.
@@ -79,7 +80,7 @@ class TimeRange
   def time_start_at
     @time_start_at ||= nil
     if !self.start_at.blank?
-      @time_start_at ||= (self.start_at.in_time_zone.hour.hours + self.start_at.in_time_zone.min.minutes).to_i
+      @time_start_at ||= (self.start_at.in_time_zone.hour.hours + self.start_at.in_time_zone.min.minutes + self.start_at.in_time_zone.sec.seconds).to_i
       @time_start_at = (@time_start_at % 24.hours).to_i unless (@time_start_at < 24.hours)
     end
     @time_start_at
@@ -105,7 +106,7 @@ class TimeRange
   def time_start_at_utc
     @time_start_at_utc ||= nil
     if !self.start_at.blank?
-      @time_start_at_utc ||= (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes).to_i
+      @time_start_at_utc ||= (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes + self.start_at.utc.sec.seconds).to_i
       @time_start_at_utc = (@time_start_at_utc % 24.hours).to_i unless (@time_start_at_utc < 24.hours)
     end
     @time_start_at_utc
