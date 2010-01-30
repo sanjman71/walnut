@@ -114,11 +114,15 @@ class CapacitySlot < ActiveRecord::Base
     force = options.has_key?(:force) ? options[:force] : false
 
     # Find all the affected capacity slots
-    # We want to find slots that are allocated to Location.anywhere and those allocated to the specific location chosen - i.e. general_location
-    affected_slots = company.capacity_slots.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
+    # We want to adjust slots that are allocated to Location.anywhere and those allocated to the specific location chosen
+    # so we use the general_location named_scope
+    # We do not impact abutting but not overlapping slots, so we use the overlap named_scope, not overlap_incl
+    affected_slots = company.capacity_slots.provider(provider).general_location(location).overlap(start_at, end_at).order_start_at
 
     current_time       = start_at
     current_slot_index = 0
+    
+    overbooked         = false
 
     # Carry this out in a transaction
     CapacitySlot.transaction do
@@ -130,8 +134,12 @@ class CapacitySlot < ActiveRecord::Base
         if (current_slot.blank?)
 
           # We aren't allowed go below 0 if we weren't asked to force
-          if (capacity_change < 0) && (!force)
-            raise AppointmentInvalid, "Not enough capacity available"
+          if (capacity_change < 0)
+            if (force)
+              overbooked = true
+            else
+              raise AppointmentInvalid, "Not enough capacity available"
+            end
           end
           
           # We've run out of slots. Build a slot from current_time to the end of the request
@@ -143,7 +151,7 @@ class CapacitySlot < ActiveRecord::Base
           
         elsif current_slot.end_at <= current_time
           # The current slot ends before we start. Move onto the next slot.
-          # This shouldn't happen
+          # This shouldn't happen - we should only be processing overlapping slots, this either abuts or doesn't overlap
           RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot: change_capacity: shouldn't reach this point #1")
           current_slot_index += 1
           
@@ -152,8 +160,8 @@ class CapacitySlot < ActiveRecord::Base
           # Since there is no slot here now, there is capacity 0. The new slot will have capacity set to capacity_change
 
           # Figure out what time this new slot should end at. Note that it should always be current_slot.start_at, because current_slot shouldn't be in
-          # the array if it isn't impacted, i.e. current_slot.start_at should never be > end_at
-          if (current_slot.start_at > end_at)
+          # the array if it isn't impacted, i.e. current_slot.start_at should never be >= end_at
+          if (current_slot.start_at >= end_at)
             slot_end_at = end_at
             RAILS_DEFAULT_LOGGER.debug("********* CapacitySlot: change_capacity: shouldn't reach this point #2")
           else
@@ -161,8 +169,12 @@ class CapacitySlot < ActiveRecord::Base
           end
 
           # We aren't allowed go below 0 if we weren't asked to force
-          if (capacity_change < 0) && (!force)
-            raise AppointmentInvalid, "Not enough capacity available"
+          if (capacity_change < 0)
+            if (force)
+              overbooked = true
+            else
+              raise AppointmentInvalid, "Not enough capacity available"
+            end
           end
 
           # Create the new slot
@@ -187,8 +199,12 @@ class CapacitySlot < ActiveRecord::Base
           new_capacity  = current_slot.capacity + capacity_change
 
           # We aren't allowed go below 0 if we weren't asked to force
-          if (capacity_change < 0) && (new_capacity < 0) && (!force)
-            raise AppointmentInvalid, "Not enough capacity available"
+          if (capacity_change < 0) && (new_capacity < 0)
+            if (force)
+              overbooked = true
+            else
+              raise AppointmentInvalid, "Not enough capacity available"
+            end
           end
 
           # If the current_slot starts before our current_time, we need to create a new slot 
@@ -231,41 +247,52 @@ class CapacitySlot < ActiveRecord::Base
         
       end
       
-      # Consolidate the slots - combine any that abut each other and have the same capacity
+      # Consolidate the slots
+      consolidate_capacity_slots(company, location, provider, start_at, end_at)
 
-      # Find all the affected slots again
-      affected_slots = company.capacity_slots.provider(provider).general_location(location).overlap_incl(start_at, end_at).order_start_at
+      # Tell the caller if we were forced to overbook or not
+      overbooked
 
-      # Iterate through them, comparing the previous slot with the current one in each case. We start on the second item
-      previous_slot = nil
-
-      affected_slots.each do |current_slot|
-
-        # We remove slots with 0 capacity
-        if (current_slot.capacity == 0)
-
-          current_slot.destroy
-          current_slot = nil
-          
-        elsif ((!previous_slot.blank?) &&
-               (previous_slot.capacity == current_slot.capacity) &&
-               (previous_slot.end_at == current_slot.start_at))
-
-          # If the slots abut and have the same capacity, we extend the current_slot to include the previous_slot,
-          # and destroy the previous_slot
-          current_slot.start_at = previous_slot.start_at
-          current_slot.save
-          previous_slot.destroy
-          
-        end
-
-        # Move the current_slot to the previous slot
-        previous_slot = current_slot
-        
-      end
-      
     end
 
+  end
+
+  #
+  # Consolidate the slots - combine any that abut each other and have the same capacity
+  #
+  def self.consolidate_capacity_slots(company, location, provider, start_at, end_at)
+
+    # Find all the affected slots
+    # We only consolidate slots with the same company, provider & location_id, so we use the the specific_location instead of general_location named_scope here
+    affected_slots = company.capacity_slots.provider(provider).specific_location(location).overlap_incl(start_at, end_at).order_start_at
+
+    # Iterate through them, comparing the previous slot with the current one in each case. We start on the second item
+    previous_slot = nil
+
+    affected_slots.each do |current_slot|
+
+      # We remove slots with 0 capacity
+      if (current_slot.capacity == 0)
+
+        current_slot.destroy
+        current_slot = nil
+        
+      elsif ((!previous_slot.blank?) &&
+             (previous_slot.capacity == current_slot.capacity) &&
+             (previous_slot.end_at == current_slot.start_at))
+
+        # If the slots abut and have the same capacity, we extend the current_slot to include the previous_slot,
+        # and destroy the previous_slot
+        current_slot.start_at = previous_slot.start_at
+        current_slot.save
+        previous_slot.destroy
+        
+      end
+
+      # Move the current_slot to the previous slot
+      previous_slot = current_slot
+      
+    end
   end
   
   def self.check_capacity(company, location, provider, start_at, end_at, capacity_change, options = {})
