@@ -11,6 +11,9 @@ class LocationsController < ApplicationController
       redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
     end
 
+    # check params, default to 0
+    @neighbors        = params[:neighbors] ? params[:neighbors].to_i : 0
+
     # initialize localities
     @country          = @location.country
     @state            = @location.state
@@ -37,10 +40,10 @@ class LocationsController < ApplicationController
           @nearby_limit = LocationNeighbor.default_limit
           @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
 
-          if @nearby_locations.blank? and @nearby_event_venues.blank?
+          if @nearby_locations.blank? and @nearby_event_venues.blank? and (@neighbors == 1)
             # initialize neighbors and try again
-            # LocationNeighbor.set_neighbors(@location, :limit => @nearby_limit, :geodist => 0.0..LocationNeighbor.default_radius_meters)
-            # @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
+            LocationNeighbor.set_neighbors(@location, :limit => @nearby_limit, :geodist => 0.0..LocationNeighbor.default_radius_meters)
+            @nearby_locations, @nearby_event_venues = LocationNeighbor.partition_neighbors(@location, :limit => @nearby_limit)
           end
 
           [@nearby_locations, @nearby_event_venues]

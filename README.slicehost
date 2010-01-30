@@ -48,7 +48,7 @@
 
 # Git
 
-1. sudo aptitude install curl libcurl4-openssl-dev libexpart1-dev gettext
+1. sudo aptitude install curl libcurl4-openssl-dev libexpart1-dev gettext libxml2-dev libxslt1-dev
 2. sudo aptitude install git-core
 
 # Timezone
