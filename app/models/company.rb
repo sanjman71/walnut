@@ -50,12 +50,10 @@ class Company < ActiveRecord::Base
   has_many                  :services, :dependent => :destroy, :after_add => :after_add_service, :after_remove => :after_remove_service
   has_many                  :products, :dependent => :destroy
   has_many                  :appointments, :dependent => :destroy
-  has_many                  :capacity_slots, :through => :appointments, :foreign_key => :free_appointment_id
+  has_many                  :capacity_slots, :dependent => :destroy
   has_many                  :customers, :through => :appointments, :uniq => true
   has_many                  :invitations, :dependent => :destroy
   has_many                  :waitlists, :dependent => :destroy
-
-  has_many                  :capacity_slots, :dependent => :destroy
 
   # Accounting info
   has_one                   :subscription, :dependent => :destroy
@@ -110,10 +108,7 @@ class Company < ActiveRecord::Base
   named_scope :billing_errors,      { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
   # find all companies with appointments
-  named_scope :with_appointments,   { :joins => :appointments, :conditions => ["appointments.id > 0"] }
-
-  # find distinct companies - use with with_appointments
-  named_scope :distinct_companies,  { :select => "distinct `companies`.*" }
+  named_scope :with_appointments,   { :select => "distinct `companies`.*", :joins => :appointments, :conditions => ["appointments.id > 0"] }
 
   def self.provider_role
     Badges::Role.find_by_name('company provider')

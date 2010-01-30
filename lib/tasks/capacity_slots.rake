@@ -5,7 +5,7 @@ namespace :calendar do
     desc "rebuild capacity slots for all companies"
     task :rebuild_all do
         
-      Company.with_appointments.distinct_companies.each do |company|
+      Company.with_appointments.each do |company|
         rebuild_capacity_slots_for_company(company)
       end
 
