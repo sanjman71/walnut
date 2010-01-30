@@ -21,8 +21,9 @@ class Location < ActiveRecord::Base
   has_many                :location_sources, :dependent => :destroy
   has_many                :sources, :through => :location_sources
 
-  # When we delete a location, we don't delete all it's appointments - we nullify them, so they don't refer to any location.
+  # When we delete a location, we don't delete all it's appointments - we nullify them, so they don't refer to any location (= Location.anywhere). Same with capacity_slots. Is this right?
   has_many                :appointments, :after_add => :after_add_appointment, :after_remove => :after_remove_appointment, :dependent => :nullify
+  has_many                :capacity_slots, :dependent => :nullify
 
   delegate                :tags, :to => :company
 
