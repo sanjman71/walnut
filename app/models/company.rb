@@ -112,6 +112,8 @@ class Company < ActiveRecord::Base
   # find all companies with appointments
   named_scope :with_appointments,   { :joins => :appointments, :conditions => ["appointments.id > 0"] }
 
+  # find distinct companies - use with with_appointments
+  named_scope :distinct_companies,  { :select => "distinct `companies`.*" }
 
   def self.provider_role
     Badges::Role.find_by_name('company provider')
