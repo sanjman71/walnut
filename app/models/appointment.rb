@@ -811,6 +811,9 @@ class Appointment < ActiveRecord::Base
     if (self.mark_as == FREE && !self.public)
       CapacitySlot.merge_or_add(self)
     end
+    
+    # Make sure the filter chain continues
+    true
   end
 
   # expand recurrence appointments by some default value

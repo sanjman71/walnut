@@ -122,7 +122,7 @@ class CapacitySlot < ActiveRecord::Base
     current_time       = start_at
     current_slot_index = 0
     
-    overbooked         = false
+    enough_capacity    = true
 
     # Carry this out in a transaction
     CapacitySlot.transaction do
@@ -135,9 +135,8 @@ class CapacitySlot < ActiveRecord::Base
 
           # We aren't allowed go below 0 if we weren't asked to force
           if (capacity_change < 0)
-            if (force)
-              overbooked = true
-            else
+            enough_capacity = false
+            if (!force)
               raise AppointmentInvalid, "Not enough capacity available"
             end
           end
@@ -170,9 +169,8 @@ class CapacitySlot < ActiveRecord::Base
 
           # We aren't allowed go below 0 if we weren't asked to force
           if (capacity_change < 0)
-            if (force)
-              overbooked = true
-            else
+            enough_capacity = false
+            if (!force)
               raise AppointmentInvalid, "Not enough capacity available"
             end
           end
@@ -200,9 +198,8 @@ class CapacitySlot < ActiveRecord::Base
 
           # We aren't allowed go below 0 if we weren't asked to force
           if (capacity_change < 0) && (new_capacity < 0)
-            if (force)
-              overbooked = true
-            else
+            enough_capacity = false
+            if (!force)
               raise AppointmentInvalid, "Not enough capacity available"
             end
           end
@@ -250,8 +247,8 @@ class CapacitySlot < ActiveRecord::Base
       # Consolidate the slots
       consolidate_capacity_slots(company, location, provider, start_at, end_at)
 
-      # Tell the caller if we were forced to overbook or not
-      overbooked
+      # Tell the caller if we had enough capacity or not
+      enough_capacity
 
     end
 

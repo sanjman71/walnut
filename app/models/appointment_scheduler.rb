@@ -145,7 +145,7 @@ class AppointmentScheduler
         # These calls will raise an exception if they fail 
         work_appointment.save
         raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
-        overbooked = CapacitySlot.change_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity, :force => force)
+        enough_capacity = CapacitySlot.change_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity, :force => force)
         
       end
       
@@ -181,7 +181,7 @@ class AppointmentScheduler
       raise AppointmentInvalid, appointment.errors.full_messages unless appointment.valid?
       
       # Add back to the available capacity
-      overbooked = CapacitySlot.change_capacity(company, location, provider, appointment.start_at, appointment.end_at, appointment.capacity)
+      enough_capacity = CapacitySlot.change_capacity(company, location, provider, appointment.start_at, appointment.end_at, appointment.capacity)
 
     end
     
