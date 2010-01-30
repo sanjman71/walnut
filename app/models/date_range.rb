@@ -33,8 +33,8 @@ class DateRange
       # if end_at ends at 59 minutes and 59 seconds, add 1 second to make sure the days calculation is correct
       seconds   = (@end_at - @start_at).to_i
       seconds   += 1 if @end_at.min == 59 and @end_at.sec == 59
-      # convert seconds to days
-      @days     = seconds / 24.hours
+      # convert seconds to days. Use floating point and round to allow for 1 extra or 1 fewer hours at spring fwd / fall back
+      @days     = (seconds.to_f / 24.hours).round
     else
       @days     = 0
     end
