@@ -64,7 +64,7 @@ class CapacitySlot < ActiveRecord::Base
                    {}
                  else
                    # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                   { :conditions => ["location_id = '?' OR location_id IS NULL", location.id] }
+                   { :conditions => ["location_id = '?' OR location_id IS NULL OR location_id = 0", location.id] }
                  end
                }
   # specific_location is used for narrow searches, where a search for appointments in Chicago includes only those appointments assigned to
