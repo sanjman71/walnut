@@ -1,7 +1,7 @@
 class WaitlistTimeRange < ActiveRecord::Base
   belongs_to                  :waitlist
 
-  validates_presence_of       :waitlist_id
+  # validates_presence_of       :waitlist_id  # validation is done in a before filter so nested attributes work
   validates_presence_of       :start_date
   validates_presence_of       :end_date
   validates_presence_of       :start_time
@@ -13,6 +13,11 @@ class WaitlistTimeRange < ActiveRecord::Base
     unless self.end_date.blank?
       # set end date time to end of day
       self.end_date = self.end_date.end_of_day
+    end
+    # validate waitlist
+    if self.waitlist_id.blank?
+      self.errors.add_to_base("Waitlist can't be blank")
+      return false
     end
   end
   
