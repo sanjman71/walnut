@@ -39,6 +39,9 @@ class MessageComposeAppointment
     sender    = MessageCompose.sender(company)
     message   = nil
 
+    # check company email preference
+    text      = company.preferences[:email_text]
+
     return message if customer.blank? or provider.blank?
     
     case recipient
@@ -47,6 +50,7 @@ class MessageComposeAppointment
       # send confirmation to appointment customer
       subject   = "[#{company.name}] Appointment confirmation"
       body      = "Your appointment with #{provider.name} on #{appointment.start_at.to_s(:appt_day_date_time)} has been confirmed."
+      body      += "\n\n#{text}" unless text.blank?
       email     = customer.primary_email_address
       message   = MessageCompose.send(sender, subject, body, [email], appointment, 'confirmation')
     when :provider

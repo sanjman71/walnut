@@ -87,6 +87,7 @@ class Company < ActiveRecord::Base
   # Preferences
   serialized_hash           :preferences,
                             {:time_horizon => 28.days, :start_wday => '0', :appt_start_minutes => [0], :public => '1',
+                             :email_text => '',
                              :work_appointment_confirmation_customer => '0',
                              :work_appointment_confirmation_manager => '0',
                              :work_appointment_confirmation_provider => '0'}
