@@ -34,15 +34,13 @@ Rails::Initializer.run do |config|
   config.gem "geokit" # required by geokit-rails plugin
   config.gem "haml", :version => '~> 2.2.4'
   config.gem "httparty", :lib => false # used by google weather plugin
-  config.gem 'javan-whenever', :version => '~> 0.3.7', :lib => false, :source => 'http://gems.github.com'
   config.gem "json", :version => '~> 1.1.7' # requires native components
   config.gem 'mechanize', :version => '0.9.3'
   config.gem "mime-types", :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'ri_cal', :version => '~> 0.8.1'
   config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"
-  # config.gem 'unicode', :lib => false, :version => '~> 0.1'   # ruby 1.9 problems
-  # config.gem 'unicode_utils', :lib => false, :version => '~> 1.0.0'   # ruby 1.9 replacement for ruby 1.8 unicode
+  config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
