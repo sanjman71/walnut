@@ -2,7 +2,7 @@
 %html{:xmlns => "http://www.w3.org/1999/xhtml", 'xml:lang' => "en", :lang => "en"}
   %head
     %meta{'http-equiv' => "content-type", :content => "text/html;charset=UTF-8"}
-    %title= yield(:title) + " | Walnut Places"
+    %title= yield(:title).to_s + " | Walnut Places"
     -# default robots content is 'nofollow, noindex'
     %meta{:name => 'robots', :content => @robots ? @robots : 'noindex,nofollow'}
     = stylesheet_link_tag 'blueprint/screen', 'walnut', 'errors', 'orange', 'jquery-ui', 'jquery.autocomplete', :cache => true
