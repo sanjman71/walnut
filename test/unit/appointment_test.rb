@@ -272,13 +272,8 @@ class AppointmentTest < ActiveSupport::TestCase
     should_change("Appointment.count", :by => 1) { Appointment.count }
     should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
     
-    should "should increment location.appointments_count" do
-      assert_equal 1, @location.reload.appointments_count 
-    end
-    
-    should "should increment location.events_count" do
-      assert_equal 1, @location.reload.events_count 
-    end
+    should_change("location.appointments_count", :by => 1) { @location.reload.appointments_count }
+    should_change("location.events_count", :by => 1) { @location.reload.events_count }
     
     context "expand 1 instance" do
       setup do
@@ -304,13 +299,8 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 2.hours, @appointment.duration
       end
       
-      should "should increment location.appointments_count" do
-        assert_equal 2, @location.reload.appointments_count 
-      end
-      
-      should "should increment location.events_count" do
-        assert_equal 2, @location.reload.events_count 
-      end
+      should_not_change("location.appointments_count") { @location.reload.appointments_count }
+      should_not_change("location.events_count") { @location.reload.events_count }
     end
 
     context "then remove company" do
