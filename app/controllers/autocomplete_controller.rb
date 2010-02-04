@@ -18,7 +18,6 @@ class AutocompleteController < ApplicationController
     
     respond_to do |format|
       format.html { render(:layout => false, :text => @where.join("\n")) }
-      format.js
       format.json { render(:json => @where.to_json) }
     end  
   end

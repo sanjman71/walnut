@@ -42,7 +42,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
   # autocomplete route
-  map.connect     '/autocomplete/search/where', :controller => 'autocomplete', :action => 'where'
+  map.search_where_complete          '/autocomplete/search/where', :controller => 'autocomplete', :action => 'where'
+  map.search_where_complete_format   '/autocomplete/search/where.:format', :controller => 'autocomplete', :action => 'where'
 
   # chains routes
   map.chain_letter    '/chains/:letter', :controller => 'chains', :action => 'letter', :letter => /[a-z0-9]{1}/
