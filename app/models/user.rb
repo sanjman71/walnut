@@ -47,7 +47,7 @@ class User < ActiveRecord::Base
   has_many                  :capacity_slots, :as => :provider
 
   # Preferences
-  serialized_hash           :preferences, {:provider_email_text => ''}
+  serialized_hash           :preferences, {:provider_email_text => '', :provider_email_daily_schedule => '0'}
 
   # messages sent
   has_many                  :outbox, :class_name => "Message", :foreign_key => "sender_id"
@@ -62,7 +62,7 @@ class User < ActiveRecord::Base
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible           :name, :password, :password_confirmation, :rpx, :email_addresses_attributes, :phone_numbers_attributes, 
-                            :capacity, :preferences_provider_email_text
+                            :capacity, :preferences_provider_email_text, :preferences_provider_email_daily_schedule
 
   named_scope               :with_emails, { :conditions => ["email_addresses_count > 0"] }
   named_scope               :with_email, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.address = ?", s] } }
