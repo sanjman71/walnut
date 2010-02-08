@@ -21,4 +21,8 @@ class SitemapsControllerTest < ActionController::TestCase
   should_route :get, '/sitemap.chains.1.xml', :controller => 'sitemaps', :action => 'chains', :id => '1'
   should_route :get, '/sitemap.index.chains.xml', :controller => 'sitemaps', :action => 'index_chains'
 
+  # zips
+  should_route :get, '/sitemap.index.zips.xml', :controller => 'sitemaps', :action => 'index_zips'
+  should_route :get, '/sitemap.zips.il.xml', :controller => 'sitemaps', :action => 'zips', :state => 'il'
+
 end
