@@ -6,7 +6,7 @@ module ActiveSupport #:nodoc:
     end
 
     def beginning_of_week_starting_on(day)
-      days_to_week_start_day = (self.wday > day) ? (self.wday - day) : 6 - (day - self.wday)
+      days_to_week_start_day = (self.wday > day) ? (self.wday - day) : 7 - (day - self.wday)
       (self - days_to_week_start_day.days).midnight
     end
 
