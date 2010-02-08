@@ -54,7 +54,7 @@ namespace :calendar do
       company.capacity_slots.destroy_all
 
       # Add capacity for each free appointment
-      company.appointments.free.each do |appointment|
+      company.appointments.free.not_canceled.each do |appointment|
         CapacitySlot.change_capacity(company, appointment.location || Location.anywhere, appointment.provider, 
                                       appointment.start_at, appointment.end_at, appointment.capacity, :force => true)
       end
