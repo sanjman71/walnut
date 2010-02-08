@@ -814,15 +814,18 @@ class Appointment < ActiveRecord::Base
 
     # initialize mark_as if its blank and we have a service
     if self.mark_as.blank? and !self.service.blank?
+      self.mark_as_will_change!
       self.mark_as = self.service.mark_as
     end
 
     # initialize when, time attributes with default values
     if self.when.blank?
+      self.when_will_change!
       self.when = ''
     end
 
     if self.time.blank?
+      self.time_will_change!
       self.time = ''
     end
 
@@ -835,8 +838,8 @@ class Appointment < ActiveRecord::Base
     if self.changed.include?("duration")
       self.end_at_will_change!
       self.end_at = self.start_at.in_time_zone + self.duration
-    elsif self.changed.include?("end_at")
-      # If end_at changed we adjust the duration
+    elsif self.changed.include?("start_at") || self.changed.include?("end_at")
+      # If start_at or end_at changed we adjust the duration
       self.duration_will_change!
       self.duration = (self.end_at.in_time_zone - self.start_at.in_time_zone).to_i
     end
