@@ -30,6 +30,7 @@ class CapacitySlot < ActiveRecord::Base
   
   named_scope :capacity_gt,   lambda { |c| (c.blank?) ? {} : {:conditions => ["`capacity_slots`.`capacity` > ?", c]} }
   named_scope :capacity_gteq, lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` >= ?", c]} }
+  named_scope :capacity_eq,   lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` = ?", c]} }
 
   # find capacity slots based on a named time range, use lambda to ensure time value is evaluated at run-time
   named_scope :future,        lambda { { :conditions => ["`capacity_slots`.`start_at` >= ?", Time.now] } }
@@ -290,6 +291,17 @@ class CapacitySlot < ActiveRecord::Base
       previous_slot = current_slot
       
     end
+
+    # Make sure we have removed all slots with 0 capacity for this company, regardless of location
+    # This is here because sometimes the use of general_location for change_capacity and specific_location for consolidate_capacity_slots
+    # results in some slots falling between the cracks. Almost all 0 capacity slots should be visible above, and removed there. This
+    # just cleans up any that escape.
+    # Note that using company.capacity_slots.capacity_eq(0).destroy_all doesn't work here - it destroys all slots, not just those
+    # with capacity = 0
+    company.capacity_slots.capacity_eq(0).each do |slot|
+      slot.destroy
+    end
+
   end
   
   def self.check_capacity(company, location, provider, start_at, end_at, capacity_change, options = {})
@@ -427,11 +439,6 @@ class CapacitySlot < ActiveRecord::Base
       
   end
 
-  # Preserve the API from CapacitySlot
-  def self.build_openings_for_view(slots)
-    slots
-  end
-  
   protected
 
   # Assign duration if required
