@@ -33,9 +33,10 @@ class Appointment < ActiveRecord::Base
   validates_presence_of       :customer_id, :if => :customer_required?
   validates_inclusion_of      :mark_as, :in => %w(free work)
 
-  before_save                 :make_confirmation_code
-  after_create                :grant_company_customer_role, :grant_appointment_manager_role, :make_uid, :make_capacity_slot,
+  before_validation           :calc_and_store_defaults, :make_confirmation_code, :make_uid
+  after_create                :grant_company_customer_role, :grant_appointment_manager_role,
                               :expand_recurrence_after_create, :create_appointment_waitlist, :auto_approve
+  after_save                  :update_capacity_slot
 
   # preferences
   serialized_hash             :preferences, {:reminder_customer => '1'}
@@ -66,7 +67,9 @@ class Appointment < ActiveRecord::Base
 
   # These are the attributes which can be used in an update
   UPDATE_APPT_ATTRS        = CREATE_APPT_ATTRS - REEXPAND_INSTANCES_ATTRS
-
+  
+  # If any of these attributes change in an appointment update we have to recalculate the capacity
+  UPDATE_CAPACITY_ATTRS   = ["start_at", "end_at", "capacity", "provider_id", "provider_type", "location_id"]
 
   acts_as_taggable_on       :tags
 
@@ -78,6 +81,43 @@ class Appointment < ActiveRecord::Base
   delegate                  :street_address, :to => '(location or return nil)'
   delegate                  :lat, :to => '(location or return nil)'
   delegate                  :lng, :to => '(location or return nil)'
+
+  attr_accessor             :customer_name, :start_date, :start_time, :end_date, :end_time, :force
+
+  def customer_name
+    self.customer.name
+  end
+  
+  def customer_name=(new_name)
+  end
+  
+  def start_date
+    self.start_at.to_s(:appt_datepicker_date)
+  end
+  
+  def start_date=(new_date)
+  end
+  
+  def end_date
+    self.end_at.to_s(:appt_datepicker_date)
+  end
+  
+  def end_date=(new_date)
+  end
+  
+  def start_time
+    self.start_at.to_s(:appt_time).downcase
+  end
+
+  def start_time=(new_time)
+  end
+
+  def end_time
+    self.end_at.to_s(:appt_time).downcase
+  end
+
+  def end_time=(new_time)
+  end
 
   named_scope :min_popularity,  lambda { |x| {:conditions => ["appointments.popularity >= ?", x] }}
 
@@ -149,18 +189,20 @@ class Appointment < ActiveRecord::Base
                     {}
                   else
                     # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
-                    { :include => :location, :conditions => ["appointments.location_id = '?' OR appointments.location_id IS NULL", location.id] }
+                    { :include => :location, 
+                      :conditions => ["appointments.location_id = '?' OR appointments.location_id IS NULL OR appointments.location_id = 0",
+                                      location.id] }
                   end
                 }
   # specific_location is used for narrow searches, where a search for appointments in Chicago includes only those appointments assigned to
   # Chicago. A search for appointments assigned to anywhere includes only those appointments - not those assigned to Chicago, for example.
   named_scope :specific_location,
                 lambda { |location|
-                  # If the request is for any location, there is no condition
+                  # If the request is for any location, we look for exactly that
                   if (location.nil? || location.id == 0 || location.id.blank? )
-                    { :include => :location, :conditions => ["appointments.location_id IS NULL"] }
+                    { :include => :location, :conditions => ["appointments.location_id IS NULL OR appointments.location_id = 0"] }
                   else
-                    # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
+                    # If a location is specified, we accept appointments with this location only - we do not include Anywhere
                     { :include => :location, :conditions => ["appointments.location_id = '?'", location.id] }
                   end
                 }
@@ -291,56 +333,6 @@ class Appointment < ActiveRecord::Base
     Range.new(array[0], array[1])
   end
 
-  def after_initialize
-    # after_initialize can also be called when retrieving objects from the database
-    return unless new_record?
-
-    # initialize mark_as if its blank and we have a service
-    if self.mark_as.blank? and self.service
-      self.mark_as = self.service.mark_as
-    end
-
-    # Get a default value for duration
-    # If we don't have a start time, we don't have a duration. Shouldn't happen.
-    if self.start_at.blank?
-      self.duration = 0
-    # If we don't have a duration, and we do have a service, the duration is based on the service
-    elsif self.service and self.duration.blank?
-      # initialize duration based on service duration
-      self.duration = self.service.duration
-    end        
-
-    # If we have both a start time and a duration, force end_at to be start_at + duration
-    if !self.start_at.blank? and !self.duration.blank?
-      self.end_at = self.start_at + self.duration
-    end
-
-    # set time of day values based on appointment start and duration in utc format
-    # Note that the end time can be > 24 hours, if the appointment (in UTC time) crosses a day boundary
-    if (self.duration.blank? || (self.duration == 0)) && !self.start_at.blank? && !self.end_at.blank?
-      self.duration      = (self.end_at - self.start_at).to_i
-    end
-
-    if !self.start_at.blank?
-      self.time_start_at = (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes).to_i
-      self.time_start_at = (self.time_start_at % 24.hours).to_i unless (self.time_start_at < 24.hours)
-      if !self.duration.blank?
-        self.time_end_at   = (self.time_start_at.to_i + self.duration.to_i).to_i
-        self.time_end_at   = (self.time_end_at % 24.hours).to_i unless (self.time_end_at < 24.hours)
-      end
-    end
-
-    # initialize when, time attributes with default values
-    if self.when.nil?
-      self.when = ''
-    end
-
-    if self.time.nil?
-      self.time = ''
-    end
-    
-  end
-  
   def validate
     if self.when == :error
       errors.add_to_base("When is invalid")
@@ -355,6 +347,11 @@ class Appointment < ActiveRecord::Base
       if !(start_at < end_at)
         errors.add_to_base("Appointment must start before it ends")
       end
+      if (self.end_at - self.start_at != self.duration)
+        errors.add_to_base("Appointment duration is incorrect")
+      end
+    else
+      errors.add_to_base("Appointment must have both start and end time")
     end
     
     if self.provider and self.company
@@ -479,7 +476,7 @@ class Appointment < ActiveRecord::Base
 
   # Conflicting free time conflicts
   def free_conflicts
-    @conflicts ||= self.company.appointments.free.provider(provider).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free.not_canceled.provider(provider).overlap(start_at, end_at)
   end
 
   # Conflicting work time conflicts, not including canceled work appointments
@@ -658,19 +655,21 @@ class Appointment < ActiveRecord::Base
       # Create an appointment 
       # We extract the attributes we want to copy over into the new appointment instances
       attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
+
       # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
       attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
                             :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time).to_i,
-                            :recur_parent_id => self.id})
+                            :recur_parent_id => self.id, :location_id => self.location_id})
+
       # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
-      if self.location_id
-        a = self.location.appointments.new(attrs)
-      else
-        a = Appointment.new(attrs)
-      end
-      if !a.free_conflicts? && a.valid?
-        Appointment.transaction do
-          a.save
+      a = Appointment.new(attrs)
+
+      # Make sure to check validity before free_conflicts - validity check ensures start_at, end_at and duration are all in line
+      if a.valid?
+        if !a.free_conflicts?
+          Appointment.transaction do
+            a.save
+          end
         end
       else
         # Nothing to do here yet. Will need to flag the issue by adding something to the parent record.
@@ -771,11 +770,13 @@ class Appointment < ActiveRecord::Base
   
   # iCalendar uid attribute
   def make_uid
-    unless self.uid
+    if self.uid.blank?
+      # Make sure we have a confirmation code
+      if self.confirmation_code.blank?
+        make_confirmation_code
+      end
       # use a constant string
-      self.uid  = "#{self.created_at.strftime("%Y%m%d%H%M%S")}-#{self.id}@walnutindustries.com"
-      # save the change
-      self.save
+      self.uid = "#{Time.zone.now.to_s(:appt_schedule)}-#{self.confirmation_code}@walnutindustries.com"
     end
   end
 
@@ -798,22 +799,136 @@ class Appointment < ActiveRecord::Base
     end
   end
   
-  def make_capacity_slot
-    # All appointments should have capacity. If not specified, this is 1
-    unless self.capacity
-      self.capacity = 1
-      self.save
+  #
+  # calc_and_store_defaults
+  #
+  # Ensures basic values like mark_as, time and when are set OK
+  # Make start_at and end_at times from the start_date / start_time and end_date / end_time combination, if appropriate
+  # Set the capacity if required
+  #
+  def calc_and_store_defaults
+
+    #
+    # First some basic defaults for mark_as, when and time
+    #
+
+    # initialize mark_as if its blank and we have a service
+    if self.mark_as.blank? and !self.service.blank?
+      self.mark_as = self.service.mark_as
+    end
+
+    # initialize when, time attributes with default values
+    if self.when.blank?
+      self.when = ''
+    end
+
+    if self.time.blank?
+      self.time = ''
+    end
+
+    #
+    # Fix up the duration and end_at values
+    #
+    
+    # If the duration changed, we adjust end_at
+    # Note that if both duration and end_at change, duration wins
+    if self.changed.include?("duration")
+      self.end_at_will_change!
+      self.end_at = self.start_at.in_time_zone + self.duration
+    elsif self.changed.include?("end_at")
+      # If end_at changed we adjust the duration
+      self.duration_will_change!
+      self.duration = (self.end_at.in_time_zone - self.start_at.in_time_zone).to_i
     end
     
-    # Free appointments that are not public have associated capacity slots
-    # This is how we differentiate events from other appointments right now
-    # We commit the changes in this call, as the free appointment has already been created.
-    if (self.mark_as == FREE && !self.public)
-      CapacitySlot.merge_or_add(self)
+    # Make sure the time_start_at and time_end_at values are calculated correctly
+    if !self.start_at.blank?
+      self.time_start_at_will_change!
+      self.time_start_at = (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes).to_i
+      self.time_start_at = (self.time_start_at % 24.hours).to_i unless (self.time_start_at < 24.hours)
+      if !self.duration.blank?
+        self.time_end_at_will_change!
+        self.time_end_at   = (self.time_start_at.to_i + self.duration.to_i).to_i
+        self.time_end_at   = (self.time_end_at % 24.hours).to_i unless (self.time_end_at < 24.hours)
+      end
     end
-    
-    # Make sure the filter chain continues
+
+    # Make sure the capacity is set, from the service if possible
+    if self.capacity.blank?
+      if self.service.blank?
+        self.capacity = 1
+      else
+        self.capacity = self.service.capacity
+      end
+    end
+
+    # Continue the filter chain
     true
+
+  end
+  
+  def update_capacity_slot
+
+    # Determine if we need to update the capacity slot or not
+    if ((self.changed & UPDATE_CAPACITY_ATTRS).size == 0)
+      # None of the relevant attributes were changed. We don't process this change
+      return true
+    end
+
+    # Figure out the capacity changes to undo the old capacity and carry out the new
+    # Basically a sign difference between work and free appointments
+    if self.work?
+      capacity_undo_old = self.capacity_was
+      capacity_do_new = -self.capacity
+    elsif (self.free? && !self.public)
+      capacity_undo_old = -self.capacity_was
+      capacity_do_new = self.capacity
+    else
+      # It's not a work appointment and it's not a free private appointment
+      # Might be a public appointment. Regardless, we're not going to process it
+      return true
+    end
+    
+    # Get the old associations (the new associations are available in the usual way)
+    if (self.location_id_was == 0 || self.location_id_was.blank?)
+      location_was = Location.anywhere
+    else
+      location_was = Location.find(self.location_id_was)
+    end
+
+    if self.provider_type_was == 'User'
+      provider_was = User.find(self.provider_id_was)
+    elsif self.provider_type_was == 'Resource'
+      provider_was = Resource.find(self.provider_id_was)
+    end
+
+    # Determine if this is a new record - essentially, are any of the old versions of the key fields blank
+    # If so, we couldn't have processed capacity for it previously, so we don't try to undo that
+    dont_undo_old = provider_was.blank? || self.start_at_was.blank? || self.end_at_was.blank? || self.capacity_was.blank? || self.new_record?
+
+    # If for some reason the new data is invalid, don't try to process the new values. This shouldn't happen
+    dont_do_new   = self.provider.blank? || self.start_at.blank? || self.end_at.blank? || self.capacity.blank?
+
+    CapacitySlot.transaction do
+
+      # We undo the old capacity for the appointment
+      enough_capacity = CapacitySlot.change_capacity(self.company, location_was, provider_was, self.start_at_was, self.end_at_was,
+                                                     capacity_undo_old, :force => self.force) unless dont_undo_old
+
+      # Now carry out the new capacity change
+      # If this user has rights, we force it. If not, we don't
+      enough_capacity &= CapacitySlot.change_capacity(self.company, self.location, self.provider, self.start_at, self.end_at,
+                                                      capacity_do_new, :force => self.force) unless dont_do_new
+      
+      # If the update was unsuccessful, we rollback and stop the filter chain
+    end
+    
+    # Clear the force attribute - make sure this object's force value isn't cached and used again incorrectly
+    self.force = false
+    
+    # Continue the filter chain
+    true
+
   end
 
   # expand recurrence appointments by some default value
