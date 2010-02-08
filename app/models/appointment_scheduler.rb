@@ -21,7 +21,7 @@ class AppointmentScheduler
     keep_old = options.has_key?(:keep_old) ? options[:keep_old] : false
     
     # find free appointments for a specific provider, order by start times
-    appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.general_location(location).order_start_at
+    appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.not_canceled.general_location(location).order_start_at
 
     # remove appointments that have ended (when compared to Time.now) unless we're told not to (option :keep_old => true) or appointment providers that do not provide the requested service
     appointments.select { |appt| ((keep_old || (appt.end_at.utc > Time.zone.now.utc)) &&
@@ -93,6 +93,9 @@ class AppointmentScheduler
     # Make sure it has company, service, provider and capacity values. These will be overridden by the options parameter
     free_hash         = {:company => company, :service => service, :provider => provider, :capacity => provider.capacity }.merge(options)
     free_appointment  = Appointment.new(free_hash)
+
+    # Make sure that it's valid
+    raise AppointmentInvalid, free_appointment.errors.full_messages unless free_appointment.valid?
                       
     # free appointments should not have conflicts
     if free_appointment.conflicts?
@@ -130,13 +133,18 @@ class AppointmentScheduler
     commit = options.has_key?(:commit) ? options[:commit] : true
     
     # if options[:force] == true, then add the appointment regardless of the availability of capacity. By default, do not force add
+    # This will be added to the appointment object before saving it
     force = options.has_key?(:force) ? options[:force] : false
 
     # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
     work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer,
                         :capacity => service.capacity }.merge(date_time_options)
+    work_hash        = work_hash.merge(:force => force)
     work_appointment = Appointment.new(work_hash)
     
+    # Make sure that it's valid. Important to do this because we may not save it below (in the no-commit path)
+    raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
+                      
     # If we're to commit the changes, make sure the work_appointment is saved
     if commit
 
@@ -145,7 +153,6 @@ class AppointmentScheduler
         # These calls will raise an exception if they fail 
         work_appointment.save
         raise AppointmentInvalid, work_appointment.errors.full_messages unless work_appointment.valid?
-        enough_capacity = CapacitySlot.change_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity, :force => force)
         
       end
       
