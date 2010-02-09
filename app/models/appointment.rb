@@ -756,15 +756,10 @@ class Appointment < ActiveRecord::Base
 
   def make_confirmation_code
     unless self.confirmation_code
-      if [WORK].include?(self.mark_as)
-        # create a random string
-        possible_values         = Array('A'..'Z') + Array(0..9)
-        code_length             = 5
-        self.confirmation_code  = (0...code_length).map{ possible_values[rand(possible_values.size)]}.join
-      else
-        # use a constant string
-        self.confirmation_code  = CONFIRMATION_CODE_ZERO
-      end
+      # create a random string
+      possible_values         = Array('A'..'Z') + Array(0..9)
+      code_length             = 5
+      self.confirmation_code  = (0...code_length).map{ possible_values[rand(possible_values.size)]}.join
     end
   end
   
