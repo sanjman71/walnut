@@ -21,7 +21,13 @@ class AppointmentScheduler
     keep_old = options.has_key?(:keep_old) ? options[:keep_old] : false
     
     # find free appointments for a specific provider, order by start times
-    appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.not_canceled.general_location(location).order_start_at
+    if (!options[:include_canceled].blank?)
+      # Include canceled free appointments
+      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.general_location(location).order_start_at
+    else
+      # Exclude canceled free appointments
+      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gteq(duration).free.not_canceled.general_location(location).order_start_at
+    end
 
     # remove appointments that have ended (when compared to Time.now) unless we're told not to (option :keep_old => true) or appointment providers that do not provide the requested service
     appointments.select { |appt| ((keep_old || (appt.end_at.utc > Time.zone.now.utc)) &&
@@ -160,7 +166,7 @@ class AppointmentScheduler
       
       # Check if we have capacity
       if !(CapacitySlot.check_capacity(company, location, provider, work_appointment.start_at, work_appointment.end_at, -work_appointment.capacity))
-        raise AppointmentInvalid, "Not enough capacity available"
+        raise OutOfCapacity, "Not enough capacity available"
       end
                                       
     end
@@ -170,26 +176,21 @@ class AppointmentScheduler
   end
   
 
-  # cancel the work appointment, and reclaim the necessary free time
-  def self.cancel_work_appointment(appointment)
-    raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WORK
+  # cancel an appointment. Set force as appropriate
+  def self.cancel_appointment(appointment, force = false)
+    raise AppointmentInvalid, "Expected an appointment" if appointment.blank?
 
-    # find any free time that book-ends this work appointment
-    company  = appointment.company
-    provider = appointment.provider
-    location = appointment.location
-    
     # We always commit a cancel
     Appointment.transaction do
+      
+      # Tell the appointment if it's allowed to create an overbooked situation or not
+      appointment.force = force
       
       # cancel and save work appointment
       appointment.cancel
       appointment.save
       raise AppointmentInvalid, appointment.errors.full_messages unless appointment.valid?
       
-      # Add back to the available capacity
-      enough_capacity = CapacitySlot.change_capacity(company, location, provider, appointment.start_at, appointment.end_at, appointment.capacity)
-
     end
     
     appointment
