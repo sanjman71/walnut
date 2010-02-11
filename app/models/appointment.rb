@@ -36,7 +36,7 @@ class Appointment < ActiveRecord::Base
   before_validation           :calc_and_store_defaults, :make_confirmation_code, :make_uid
   after_create                :grant_company_customer_role, :grant_appointment_manager_role,
                               :expand_recurrence_after_create, :create_appointment_waitlist, :auto_approve
-  after_save                  :update_capacity_slot
+  after_save                  :update_capacity
 
   # preferences
   serialized_hash             :preferences, {:reminder_customer => '1'}
@@ -69,8 +69,8 @@ class Appointment < ActiveRecord::Base
   UPDATE_APPT_ATTRS        = CREATE_APPT_ATTRS - REEXPAND_INSTANCES_ATTRS
   
   # If any of these attributes change in an appointment update we have to recalculate the capacity
-  UPDATE_CAPACITY_ATTRS   = ["start_at", "end_at", "capacity", "provider_id", "provider_type", "location_id"]
-
+  UPDATE_CAPACITY_ATTRS   = ["start_at", "end_at", "capacity", "provider_id", "provider_type", "location_id", "state"]
+  
   acts_as_taggable_on       :tags
 
   delegate                  :country, :to => '(location or return nil)'
@@ -145,9 +145,13 @@ class Appointment < ActiveRecord::Base
                                             end
                                      }
 
-  # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
+  # find future, past appointments, or those before or after a specific datetime
   named_scope :future,        lambda { { :conditions => ["appointments.start_at >= ?", Time.zone.now] } }
   named_scope :past,          lambda { { :conditions => ["appointments.end_at <= ?", Time.zone.now] } }
+  named_scope :after,         lambda { |t| { :conditions => ["appointments.start_at > ?", t] } }
+  named_scope :after_incl,    lambda { |t| { :conditions => ["appointments.start_at >= ?", t] } }
+  named_scope :before,        lambda { |t| { :conditions => ["appointments.start_at < ?", t] } }
+  named_scope :before_incl,   lambda { |t| { :conditions => ["appointments.start_at <= ?", t] } }
   
   # find appointments overlapping a time range
   named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(appointments.start_at < ? AND end_at > ?) OR (appointments.start_at < ? AND end_at > ?) OR 
@@ -253,7 +257,15 @@ class Appointment < ActiveRecord::Base
                                'never'      => [0,        0]
                               }
 
+
+  # List the states in which capacity is used, and in which capacity is unused
+  USED_CAPACITY_STATES   = ["confirmed", "noshow", "completed"]
+  UNUSED_CAPACITY_STATES = ["unapproved", "canceled"]
+
+
   # BEGIN acts_as_state_machine
+  # If you change these states, you must also change the USED_CAPACITY_STATES & UNUSED_CAPACITY_STATES variables above
+  # They will have an impact in the update_capacity filter
   include AASM
   
   aasm_column           :state
@@ -602,7 +614,7 @@ class Appointment < ActiveRecord::Base
   # continue to the time horizon, assuming that's later than the parent.
   # So, the sensible thing is to call this function with one parameter = the company
   def self.expand_all_recurrences(company, starting = nil, before = nil, count = nil)
-    company.appointments.recurring.each do |recur|
+    company.appointments.recurring.not_canceled.each do |recur|
       recur.send_later(:expand_recurrence, starting, before, count)
     end
   end
@@ -865,7 +877,7 @@ class Appointment < ActiveRecord::Base
 
   end
   
-  def update_capacity_slot
+  def update_capacity
 
     # Determine if we need to update the capacity slot or not
     if ((self.changed & UPDATE_CAPACITY_ATTRS).size == 0)
@@ -900,23 +912,55 @@ class Appointment < ActiveRecord::Base
       provider_was = Resource.find(self.provider_id_was)
     end
 
-    # Determine if this is a new record - essentially, are any of the old versions of the key fields blank
-    # If so, we couldn't have processed capacity for it previously, so we don't try to undo that
-    dont_undo_old = provider_was.blank? || self.start_at_was.blank? || self.end_at_was.blank? || self.capacity_was.blank? || self.new_record?
+    # We don't undo the old state if there was no old state - essentially if any of the old fields are blank, or if the old state is unapproved or canceled
+    # If so, we couldn't / shouldn't have processed capacity for it previously, so we don't try to undo that
+    dont_undo_old = provider_was.blank? || self.start_at_was.blank? || self.end_at_was.blank? || self.capacity_was.blank? || (self.state_was.blank?) || self.new_record? ||
+                      (UNUSED_CAPACITY_STATES.include?(self.state_was))
 
-    # If for some reason the new data is invalid, don't try to process the new values. This shouldn't happen
-    dont_do_new   = self.provider.blank? || self.start_at.blank? || self.end_at.blank? || self.capacity.blank?
+    # If the new appointment state is either unapproved or canceled, or for some reason the new data is invalid, don't try to process the new values.
+    dont_do_new   = self.provider.blank? || self.start_at.blank? || self.end_at.blank? || self.capacity.blank? || (self.state.blank?) || 
+                      (UNUSED_CAPACITY_STATES.include?(self.state))
+                      
+    # If the only thing that changed is the state, and the change in state doesn't cause a change in capacity, we don't change capacity
+    # This happens, for example, if a confirmed appointment is completed or a noshow - any of these states consume capacity, so the capacity doesn't change
+    # Similarly, if the appointment goes from unapproved to canceled, neither state consumes capacity and so no change is made
+    if (((self.changed & UPDATE_CAPACITY_ATTRS) == ["state"]) &&
+        (
+          ((USED_CAPACITY_STATES.include?(self.state_was)) && (USED_CAPACITY_STATES.include?(self.state))) ||
+          ((UNUSED_CAPACITY_STATES.include?(self.state_was)) && (UNUSED_CAPACITY_STATES.include?(self.state)))
+        )
+       )
+        dont_undo_old = dont_do_new = true
+    end
 
     CapacitySlot.transaction do
+      
+      # Always add capacity before taking it away. This is intended to avoid a situation where a fleeting lack of capacity causes an issue
+      if capacity_undo_old > capacity_do_new
 
-      # We undo the old capacity for the appointment
-      enough_capacity = CapacitySlot.change_capacity(self.company, location_was, provider_was, self.start_at_was, self.end_at_was,
-                                                     capacity_undo_old, :force => self.force) unless dont_undo_old
+        # We undo the old capacity for the appointment
+        enough_capacity = CapacitySlot.change_capacity(self.company, location_was, provider_was, self.start_at_was, self.end_at_was,
+                                                       capacity_undo_old, :force => self.force) unless dont_undo_old
 
-      # Now carry out the new capacity change
-      # If this user has rights, we force it. If not, we don't
-      enough_capacity &= CapacitySlot.change_capacity(self.company, self.location, self.provider, self.start_at, self.end_at,
-                                                      capacity_do_new, :force => self.force) unless dont_do_new
+        # Now carry out the new capacity change
+        # If this user has rights, we force it. If not, we don't
+        enough_capacity &= CapacitySlot.change_capacity(self.company, self.location, self.provider, self.start_at, self.end_at,
+                                                        capacity_do_new, :force => self.force) unless dont_do_new
+                                                        
+      else
+
+        # We create new capacity
+        # If this user has rights, we force it. If not, we don't
+        enough_capacity &= CapacitySlot.change_capacity(self.company, self.location, self.provider, self.start_at, self.end_at,
+                                                        capacity_do_new, :force => self.force) unless dont_do_new
+                                
+        # Then remove old capacity
+        # We undo the old capacity for the appointment
+        enough_capacity = CapacitySlot.change_capacity(self.company, location_was, provider_was, self.start_at_was, self.end_at_was,
+                                                       capacity_undo_old, :force => self.force) unless dont_undo_old
+
+      end
+
       
       # If the update was unsuccessful, we rollback and stop the filter chain
     end
