@@ -8,6 +8,9 @@
 # t.integer       :capacity
 # end
 # 
+
+class OutOfCapacity < Exception; end
+
 class CapacitySlot < ActiveRecord::Base
   
   belongs_to                  :company
@@ -138,7 +141,7 @@ class CapacitySlot < ActiveRecord::Base
           if (capacity_change < 0)
             enough_capacity = false
             if (!force)
-              raise AppointmentInvalid, "Not enough capacity available"
+              raise OutOfCapacity, "Not enough capacity available"
             end
           end
           
@@ -174,7 +177,7 @@ class CapacitySlot < ActiveRecord::Base
           if (capacity_change < 0)
             enough_capacity = false
             if (!force)
-              raise AppointmentInvalid, "Not enough capacity available"
+              raise OutOfCapacity, "Not enough capacity available"
             end
           end
 
@@ -205,7 +208,7 @@ class CapacitySlot < ActiveRecord::Base
           if (capacity_change < 0) && (new_capacity < 0)
             enough_capacity = false
             if (!force)
-              raise AppointmentInvalid, "Not enough capacity available"
+              raise OutOfCapacity, "Not enough capacity available"
             end
           end
 
