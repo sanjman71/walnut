@@ -74,11 +74,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources             :event_venues, :only => [:create]
   
   # zip routes
-  map.connect     '/zips/error/:locality', :controller => 'zips', :action => 'error'
-  map.connect     '/zips/:country/:state/:city', :controller => 'zips', :action => 'city', :city => /[a-z-]+/
-  map.connect     '/zips/:country/:state/:zip', :controller => 'zips', :action => 'zip', :zip => /\d{5}/
-  map.connect     '/zips/:country/:state', :controller => 'zips', :action => 'state'
-  map.connect     '/zips/:country', :controller => 'zips', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
+  map.zips_error    '/zips/error/:locality', :controller => 'zips', :action => 'error'
+  map.zips_city     '/zips/:country/:state/:city', :controller => 'zips', :action => 'city', :city => /[a-z-]+/
+  map.zip           '/zips/:country/:state/:zip', :controller => 'zips', :action => 'zip', :zip => /\d{5}/
+  map.zips_state    '/zips/:country/:state', :controller => 'zips', :action => 'state'
+  map.zips_country  '/zips/:country', :controller => 'zips', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 
   map.resources   :zips, :only => [:index]
   
@@ -107,10 +107,12 @@ ActionController::Routing::Routes.draw do |map|
   map.sitemap_chains    '/sitemap.chains.:id.xml', :controller => 'sitemaps', :action => 'chains'
   map.sitemap_locations '/sitemap.locations.:state.:city.:index.xml', :controller => 'sitemaps', :action => 'locations', :state => /[a-z]{2}/, :city => /[a-z-]+/, :index => /[0-9]+/
   map.sitemap_metro     '/sitemap.locations.cities.:city_size.:index.xml', :controller => 'sitemaps', :action => 'locations', :city_size => /tiny|small|medium/, :index => /[0-9]+/
+  map.sitemap_zips      '/sitemap.zips.:state.xml', :controller => 'sitemaps', :action => 'zips', :state => /[a-z]{2}/
 
   map.sitemap_ilocations  '/sitemap.index.locations.:state.:city.xml', :controller => 'sitemaps', :action => 'index_locations', :state => /[a-z]{2}/, :city => /[a-z-]+/
   map.sitemap_ilocations  '/sitemap.index.locations.cities.:city_size.xml', :controller => 'sitemaps', :action => 'index_locations', :city_size => /tiny|small|medium/
   map.sitemap_ichains     '/sitemap.index.chains.xml', :controller => 'sitemaps', :action => 'index_chains'
+  map.sitemap_izips       '/sitemap.index.zips.xml', :controller => 'sitemaps', :action => 'index_zips'
 
   # sphinx controller
   map.resources       :sphinx, :only => [:index]

@@ -13,10 +13,10 @@
     = link_to 'Home', root_path, :class => 'header link'
     %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
     = link_to 'Chain Stores', chains_path, :class => 'header link'
+    %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
+    = link_to 'Zip Finder', zips_path, :class => 'header link'
 
     - if has_privilege?('manage site')
-      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
-      = link_to 'Zip Finder', zips_path, :class => 'header link'
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Tag Groups', taggs_path, :class => 'header link'
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;

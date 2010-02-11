@@ -1,9 +1,12 @@
 class ZipsController < ApplicationController
-  # before_filter   :init_areas, :only => [:country, :state, :city, :zip]
   before_filter   :init_localities, :only => [:country, :state, :city, :zip]
   
-  privilege_required 'manage site', :on => :current_user
-  
+  # GET /zips
+  def index
+    redirect_to(:action => 'country', :country => 'us') and return
+  end
+
+  # GET /zips/us
   def country
     # @country, @states initialized in before filter
     
@@ -11,15 +14,25 @@ class ZipsController < ApplicationController
     @states = @states.find_all { |o| o.zips_count > 0 }
     @title  = "#{@country.name} Zip Code Finder"
     @h1     = "Find Zips by State"
+
+    respond_to do |format|
+      format.html
+    end
   end
   
+  # GET /zips/us/il
   def state
     # @country, @state, @zips and @cities initialized in before filter
-    
+
     @title  = "#{@state.name} Zip Code Finder"
     @h1     = "#{@state.name} Zip Code Directory"
+
+    respond_to do |format|
+      format.html
+    end
   end
-  
+
+  # GET /zips/us/il/60610
   def zip
     # @country, @state, @zip and @cities all initialized in before filter
 
@@ -30,17 +43,17 @@ class ZipsController < ApplicationController
     # @nearby_zips    = Rails.cache.fetch("#{@zip.name.to_url_param}:nearby:zips", :expires_in => CacheExpire.localities) do
     #   Zip.exclude(@zip).within_state(@state).all(:origin => @zip, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
     # end
-    
-    @title  = "#{@zip.name} #{@state.code} Zip Code"
+
+    @title  = "#{@state.name} #{@zip.name} Zip Code"
     @h1     = "#{@zip.name} #{@state.code} Zip Code"
+
+    respond_to do |format|
+      format.html
+    end
   end
-  
-  def index
-    redirect_to(:action => 'country', :country => 'us') and return
-  end
-  
+
   protected
-  
+
   # def init_areas
   #   # country is required for all actions
   #   @country  = Country.find_by_code(params[:country].to_s.upcase)

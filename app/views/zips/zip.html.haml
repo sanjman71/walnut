@@ -14,7 +14,7 @@
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-20
   %h2= @h1
   %h4.span-7.last#breadcrumbs
-    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :zip => @zip})
+    = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'zips', :country => @country, :state => @state, :zip => @zip})
 
 %hr.space
 
@@ -26,17 +26,28 @@
   .span-19.last[@zip]
     .span-10
       .span-10.unselected{:id => "mappable_0", :class => klasses.join, :lat => @zip.lat, :lng => @zip.lng, :index => 0, :color => '_orange', :html => zip_html}
-        %h2= @zip.name
-        %h4
-          == Latitude:
-          = @zip.lat
-        %h4
-          == Longitude
-          = @zip.lng
-      .span-10
+        .span-10.last
+          .span-3
+            %h3== Zip:
+          .span-7.last
+            %h3= @zip.name
+        .span-10.last
+          .span-3
+            %h3== Latitude:
+          .span-7.last
+            %h3= @zip.lat
+        .span-10.last
+          .span-3
+            %h3== Longitude:
+          .span-7.last
+            %h3= @zip.lng
+      .span-10.last
         - unless @cities.blank?
-          %h3== City
-          %h4= @cities.join(" | ")
-        
+          .span-3
+            %h3= @cities.size == 1 ? 'City:' : 'Cities:'
+          .span-7.last
+            - @cities.each do |city|
+              %h3.bottom.padding-bottom-5= city
+
     .span-9.last
       .jmap#map{:style => "width: 350px; height: 430px;"}

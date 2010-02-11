@@ -107,7 +107,7 @@ class CapacitySlot < ActiveRecord::Base
     raise ArgumentError, "You must specify the start time" if start_at.blank?
     raise ArgumentError, "You must specify the end time" if end_at.blank?
     raise ArgumentError, "You must specify the capacity change" if capacity_change.blank?
-    
+
     # If no capacity change is requested, do nothing
     return if (capacity_change == 0)
 
@@ -143,6 +143,7 @@ class CapacitySlot < ActiveRecord::Base
           end
           
           # We've run out of slots. Build a slot from current_time to the end of the request
+          # The location of the new slot is set specifically to the location requested for the capacity change
           CapacitySlot.create(:company => company, :provider => provider, :location => location, 
                                :start_at => current_time, :end_at => end_at, :capacity => capacity_change)
           
@@ -158,6 +159,7 @@ class CapacitySlot < ActiveRecord::Base
         elsif (current_slot.start_at > current_time)
           # The next slot in the list starts later than the current time. We need to make a new slot to fill this gap from current_time until current_slot.start_at
           # Since there is no slot here now, there is capacity 0. The new slot will have capacity set to capacity_change
+          # The location of the new slot is set specifically to the location requested for the capacity change
 
           # Figure out what time this new slot should end at. Note that it should always be current_slot.start_at, because current_slot shouldn't be in
           # the array if it isn't impacted, i.e. current_slot.start_at should never be >= end_at
@@ -187,10 +189,12 @@ class CapacitySlot < ActiveRecord::Base
         else
           # We know, because of the above tests, that (current_slot.start_at <= current_time) && (current_slot.end_at > current_time)
           
-          # Remember the current_slot's original capacity and end time
-          orig_capacity = current_slot.capacity
-          orig_start_at = current_slot.start_at
-          orig_end_at   = current_slot.end_at
+          # Remember the current_slot's original attributes
+          orig_provider    = current_slot.provider
+          orig_location_id = current_slot.location_id
+          orig_start_at    = current_slot.start_at
+          orig_end_at      = current_slot.end_at
+          orig_capacity    = current_slot.capacity
 
           # Change current_slot's start_time, end_time and capacity
           # The new end time is the earlier of end_at and current_slot.end_at
@@ -206,12 +210,17 @@ class CapacitySlot < ActiveRecord::Base
           end
 
           # If the current_slot starts before our current_time, we need to create a new slot 
-          # from current_slot.start_at to current_time with the current_slot's capacity        
+          # from current_slot.start_at to current_time with the current_slot's capacity, provider & location
+          # The provider should be the same as the request (like company). The requested location might be Location.anywhere 
+          # or the specific location in the request, however. We make sure to use current_slot.location
           if (orig_start_at < current_time)
 
             # Create a new slot from current_slot.start_at to current_time, if necessary. It retains the same capacity as current_slot
             # This new slot occurs earlier than our time of interest (current_time to end_time) and so we don't have to process it again
-            CapacitySlot.create(:company => company, :provider => provider, :location => location, 
+            # The location of the new slot is set to the location of the slot we are splitting up, i.e. current_slot.location. 
+            # This might be nil or 0, so we set location_id
+
+            CapacitySlot.create(:company => company, :provider => orig_provider, :location_id => orig_location_id, 
                                  :start_at => orig_start_at, :end_at => current_time, :capacity => orig_capacity)
 
           end
@@ -230,8 +239,10 @@ class CapacitySlot < ActiveRecord::Base
 
             # We did change the current_slot.end at, because the current_slot ended later than end_at.
             # We need to create a new slot, from the new_end_at to the orig_end_at, with the orig_capacity
+            # The location of the slot is set to the location of the slot we are splitting up, i.e. current_slot.location. 
+            # This might be nil or 0, so we set location_id
 
-            CapacitySlot.create(:company => company, :provider => provider, :location => location, 
+            CapacitySlot.create(:company => company, :provider => orig_provider, :location_id => orig_location_id, 
                                  :start_at => new_end_at, :end_at => orig_end_at, :capacity => orig_capacity)
 
             # At this point current_time == end_at, and we're finished. If not, yell about it!

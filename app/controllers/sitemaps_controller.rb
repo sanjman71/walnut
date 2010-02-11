@@ -5,6 +5,8 @@ class SitemapsController < ApplicationController
   caches_page :index_locations
   caches_page :chains
   caches_page :index_chains
+  caches_page :zips
+  caches_page :index_zips
 
   layout nil # turn off layouts
   
@@ -168,4 +170,30 @@ class SitemapsController < ApplicationController
       format.xml
     end
   end
+  
+  # GET /sitemap.zips.:state
+  def zips
+    @country  = Country.us
+    @state    = @country.states.find_by_code(params[:state])
+    @zips     = @state.zips.with_locations.order_by_density
+
+    @protocol = self.request.protocol
+    @host     = self.request.host
+
+    respond_to do |format|
+      format.xml
+    end
+  end
+
+  # GET /sitemap.index.zips
+  def index_zips
+    @states   = State.with_locations
+    @protocol = self.request.protocol
+    @host     = self.request.host
+
+    respond_to do |format|
+      format.xml
+    end
+  end
+
 end
