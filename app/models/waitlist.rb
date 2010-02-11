@@ -63,7 +63,9 @@ class Waitlist < ActiveRecord::Base
       start_date    = waitlist_time_range.start_date
       end_date      = waitlist_time_range.end_date
       time_range    = [waitlist_time_range.start_time, waitlist_time_range.end_time]
-      array         += company.appointments.free.provider(provider).overlap(start_date, end_date).time_overlap(time_range).duration_gteq(duration).order_start_at
+      # TODO - This probably won't work, because the duration_gteq check is no longer a valid way of finding enough capacity
+      # You should probably use AppointmentScheduler.find_free_capacity_slots here
+      array         += company.appointments.free.not_canceled.provider(provider).overlap(start_date, end_date).time_overlap(time_range).duration_gteq(duration).order_start_at
     end
     appointments
   end
