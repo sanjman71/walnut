@@ -38,6 +38,20 @@ class UserTest < ActiveSupport::TestCase
       should_not_change("EmailAddress.count") { EmailAddress.count }
     end
 
+    context "with a duplicate email address" do
+      setup do
+        @user   = Factory(:user, :name => "User")
+        @email  = @user.email_addresses.create(:address => "user1@walnut.com")
+        options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
+                       :email_addresses_attributes => { "0" => {:address => "user1@walnut.com"}}]
+        @user1  = User.create(options)
+      end
+
+      should "not create user1" do
+        assert_false @user1.valid?
+      end
+    end
+
     context "with a nested email address hash" do
       setup do
         options = Hash[:name => "User 1", :password => 'secret', :password_confirmation => 'secret',
