@@ -11,24 +11,24 @@ class MessageComposeAppointment
       when :customer
         if preferences[key].to_i == 1
           message = MessageComposeAppointment.confirmation(appointment, :customer)
-          messages.push(message)
+          messages.push([:customer, message]) unless message.blank?
         end
       when :provider
         if preferences[key].to_i == 1
           message = MessageComposeAppointment.confirmation(appointment, :provider)
-          messages.push(message)
+          messages.push([:provider, message]) unless message.blank?
         end
       when :manager
         if preferences[key].to_i == 1 and !company.blank?
           company.authorized_managers.each do |manager|
             message = MessageComposeAppointment.confirmation(appointment, :manager, :manager => manager)
-            messages.push(message)
+            messages.push([:manager, message]) unless message.blank?
           end
         end
       end
     end
 
-    messages.compact
+    messages
   end
 
   # send confirmation to appointment customer, provider, or manager
