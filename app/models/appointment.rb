@@ -359,7 +359,8 @@ class Appointment < ActiveRecord::Base
       if !(start_at < end_at)
         errors.add_to_base("Appointment must start before it ends")
       end
-      if (self.end_at - self.start_at != self.duration)
+      
+      if ((self.end_at.in_time_zone - self.start_at.in_time_zone).to_i != self.duration)
         errors.add_to_base("Appointment duration is incorrect")
       end
     else
