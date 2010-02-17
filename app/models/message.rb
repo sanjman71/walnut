@@ -11,13 +11,16 @@ class Message < ActiveRecord::Base
   has_many                :company_message_deliveries
   has_many                :companies, :through => :company_message_deliveries
   before_destroy          :before_destroy_message
-  
+
+  # preferences
+  serialized_hash         :preferences
+
   # send message
   def send!
     send_local_messages
     send_remote_messages
   end
-  
+
   # reply to message sender
   def reply(options={})
     @reply_sender   = options[:sender]

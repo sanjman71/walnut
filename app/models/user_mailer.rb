@@ -21,11 +21,34 @@ class UserMailer < ActionMailer::Base
     body(:message => message)
   end
 
-  def email(to, subject, body)
+  def email(to, subject, body, options={})
     from(SMTP_FROM)
     recipients(to)
     subject(subject)
-    body(:body => body)
+
+    if options[:template].blank?
+      # use default template
+      options[:body] = body
+      template_html  = "email.html.haml"
+      template_text  = "email.text.haml"
+    else
+      # use specified template to render email body
+      template_html = options[:template].to_s + ".html.haml"
+      template_text = options[:template].to_s + ".text.haml"
+    end
+
+    part :content_type => "multipart/alternative" do |a|
+      a.part "text/plain" do |p|
+        p.body = render_message(template_text, options)
+      end
+
+      unless options.empty?
+        a.part "text/html" do |p|
+          p.body = render_message(template_html, options)
+        end
+      end
+    end
+
   end
 
 end

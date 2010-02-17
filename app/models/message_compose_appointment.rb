@@ -36,37 +36,41 @@ class MessageComposeAppointment
     company   = appointment.company
     provider  = appointment.provider
     customer  = appointment.customer
+    manager   = options[:manager]
     sender    = MessageCompose.sender(company)
     message   = nil
 
     return message if customer.blank? or provider.blank?
-    
+
+    # build message options
+    options   = Hash[:template => :appointment_confirmation, :topic => appointment, :tag => 'confirmation', :provider => provider.name,
+                     :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
+
     case recipient
     when :customer
       return nil if customer.email_addresses_count == 0
       # check company, provider email preferences
-      text      = [company.preferences[:email_text], provider.preferences[:provider_email_text]].reject(&:blank?).join("\n\n")
+      footers   = [company.preferences[:email_text], provider.preferences[:provider_email_text]].reject(&:blank?)
+      options.update(:footers => footers) unless footers.empty?
       # send confirmation to appointment customer
       subject   = "[#{company.name}] Appointment confirmation"
-      body      = "Your appointment with #{provider.name} on #{appointment.start_at.to_s(:appt_day_date_time)} has been confirmed."
-      body      += "\n\n#{text}" unless text.blank?
+      body      = subject
       email     = customer.primary_email_address
-      message   = MessageCompose.send(sender, subject, body, [email], appointment, 'confirmation')
+      message   = MessageCompose.send(sender, subject, body, [email], options)
     when :provider
       return nil if provider.email_addresses_count == 0
       # send confirmation to appointment provider
       subject   = "[#{company.name}] Appointment confirmation"
-      body      = "Customer #{customer.name} has scheduled an appointment with you on #{appointment.start_at.to_s(:appt_day_date_time)}."
+      body      = subject
       email     = provider.primary_email_address
-      message   = MessageCompose.send(sender, subject, body, [email], appointment, 'confirmation')
+      message   = MessageCompose.send(sender, subject, body, [email], options)
     when :manager
       # send confirmation to company manager
-      manager  = options[:manager]
-      return nil if manager.email_addresses_count == 0
+      return nil if manager.blank? || manager.email_addresses_count == 0
       subject   = "[#{company.name}] Appointment confirmation"
-      body      = "Your appointment with #{customer.name} on #{appointment.start_at.to_s(:appt_day_date_time)} has been confirmed."
+      body      = subject
       email     = manager.primary_email_address
-      message   = MessageCompose.send(sender, subject, body, [email], appointment, 'confirmation')
+      message   = MessageCompose.send(sender, subject, body, [email], options)
     end
 
     return message
@@ -82,11 +86,19 @@ class MessageComposeAppointment
     return nil if customer.blank? or provider.blank?
     return nil if customer.email_addresses_count == 0
 
+    # build message options
+    options   = Hash[:template => :appointment_reminder, :topic => appointment, :tag => 'reminder', :provider => provider.name,
+                     :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
+
+    # check company, provider email preferences
+    footers   = [company.preferences[:email_text], provider.preferences[:provider_email_text]].reject(&:blank?)
+    options.update(:footers => footers) unless footers.empty?
+
     # send reminder to appointment customer
     subject   = "[#{company.name}] Appointment reminder"
-    body      = "This is just a reminder that your appointment with #{provider.name} on #{appointment.start_at.to_s(:appt_day_date_time)} is coming up."
+    body      = subject
     email     = customer.primary_email_address
-    message   = MessageCompose.send(sender, subject, body, [email], appointment, 'reminder')
+    message   = MessageCompose.send(sender, subject, body, [email], options)
 
     return message
   end

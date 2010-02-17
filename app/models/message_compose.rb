@@ -13,21 +13,28 @@ class MessageCompose
     end
   end
 
-  def self.send(sender, subject, body, recipients, topic, tag)
+  def self.send(sender, subject, body, recipients, options={})
+    topic = options[:topic]
+    tag   = options[:tag]
+    
     Message.transaction do
-      # create message
+      # create message, with preferences
       message = Message.create(:sender => sender, :subject => subject, :body => body)
+      [:template, :footers, :provider, :service, :customer, :when].each do |s|
+        next if options[s].blank?
+        message.preferences[s] = options[s]
+      end
+      message.save
       # add recipients
       recipients.each do |recipient|
         message.message_recipients.create(:messagable => recipient, :protocol => recipient.protocol)
       end
-      # send message
-      message.send!
-
       if !topic.blank?
         # create message topic
         message.message_topics.create(:topic => topic, :tag => tag)
       end
+      # send message
+      message.send!
 
       return message
     end

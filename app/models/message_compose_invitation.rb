@@ -8,7 +8,7 @@ class MessageComposeInvitation
     subject   = "[#{company.name}] Invitation"
     body      = "#{invitation.sender.name.to_s.titleize} has invited you to sign up as a company provider.  Your invitation url is #{invite_url}."
     email     = invitation
-    message   = MessageCompose.send(sender, subject, body, [email], invitation, 'provider')
+    message   = MessageCompose.send(sender, subject, body, [email], {:topic => invitation, :tag => 'provider'})
 
     return message
   end

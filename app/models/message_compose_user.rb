@@ -9,7 +9,7 @@ class MessageComposeUser
     subject   = "[#{user.name}] Account created" 
     body      = "Your user account was created"
     sender    = MessageCompose.sender(user) # default sender
-    message   = MessageCompose.send(sender, subject, body, [email], user, 'created')
+    message   = MessageCompose.send(sender, subject, body, [email], {:topic => user, :tag => 'created'})
 
     return message
   end
@@ -23,7 +23,7 @@ class MessageComposeUser
     subject   = "[#{user.name}] Password reset" 
     body      = "Your new password is: #{password}"
     sender    = MessageCompose.sender(user) # default sender
-    message   = MessageCompose.send(sender, subject, body, [email], user, 'reset')
+    message   = MessageCompose.send(sender, subject, body, [email], {:topic => user, :tag => 'reset'})
 
     return message
   end

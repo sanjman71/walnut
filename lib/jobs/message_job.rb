@@ -53,14 +53,29 @@ class MessageJob < Struct.new(:params)
   def send_email_using_google(message, recipient)
     subject = message.subject
     body    = message.body
-
     address = recipient.messagable.address
+    options = {}
+    topics  = message.message_topics
 
-    logger.debug("#{Time.now}: [message] sending google email to: #{address}, subject: #{subject}, body: #{body}")
+    # check message template
+    case message.preferences[:template]
+    when :appointment_confirmation, :appointment_reminder
+      options[:template]  = message.preferences[:template]
+      options[:provider]  = message.preferences[:provider]
+      options[:service]   = message.preferences[:service]
+      options[:customer]  = message.preferences[:customer]
+      options[:when]      = message.preferences[:when]
+      options[:footers]   = message.preferences[:footers]
+    else
+      # default template
+      options[:template]  = :email
+    end
+
+    logger.debug("#{Time.now}: [message] sending google email to: #{address}, subject: #{subject}, template: #{options[:template]}")
 
     begin
       # send email
-      UserMailer.deliver_email(address, subject, body)
+      UserMailer.deliver_email(address, subject, body, options)
     rescue Exception => e
       logger.debug("#{Time.now}: [message exception] #{e.message}")
       return
@@ -72,11 +87,11 @@ class MessageJob < Struct.new(:params)
     rescue
     end
   end
-  
+
   def send_message_using_message_pub(message, recipient)
     subject = message.subject
     body    = message.body
-    
+  
     address = recipient.messagable.address
     channel = recipient.protocol
 
