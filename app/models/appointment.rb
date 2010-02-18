@@ -665,27 +665,40 @@ class Appointment < ActiveRecord::Base
     args = args.merge({:count => count}) unless count.nil?
 
     ri_ev.occurrences(args).each do |ri_occurrence|
-      # Create an appointment 
-      # We extract the attributes we want to copy over into the new appointment instances
-      attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
 
-      # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
-      attrs = attrs.merge({:start_at => ri_occurrence.dtstart.to_time, :end_at => ri_occurrence.dtend.to_time,
-                            :duration => (ri_occurrence.dtend.to_time - ri_occurrence.dtstart.to_time).to_i,
-                            :recur_parent_id => self.id, :location_id => self.location_id})
+      begin
+        
+        # Create an appointment 
+        # We extract the attributes we want to copy over into the new appointment instances
+        attrs = self.attributes.inject(Hash.new){|h, (k,v)| CREATE_APPT_ATTRS.include?(k) ? h.merge(k => v) : h }
 
-      # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
-      a = Appointment.new(attrs)
+        # Then we add the attributes we get from the recurrence above, and the refence to the recurrence
+        attrs = attrs.merge({:start_at => ri_occurrence.dtstart.in_time_zone, :end_at => ri_occurrence.dtend.in_time_zone,
+                              :duration => (ri_occurrence.dtend.in_time_zone - ri_occurrence.dtstart.in_time_zone).to_i,
+                              :recur_parent_id => self.id, :location_id => self.location_id})
 
-      # Make sure to check validity before free_conflicts - validity check ensures start_at, end_at and duration are all in line
-      if a.valid?
-        if !a.free_conflicts?
-          Appointment.transaction do
-            a.save
+        # puts "***** creating instance: start_at: #{ri_occurrence.dtstart.to_time.utc}, end_at: #{ri_occurrence.dtend.to_time.utc}"
+        a = Appointment.new(attrs)
+
+        # Make sure to check validity before free_conflicts - validity check ensures start_at, end_at and duration are all in line
+        if a.valid?
+          if !a.free_conflicts?
+            Appointment.transaction do
+              a.save
+            end
           end
+        else
+          # TODO - need to communicate to the user that we had a failure
+          # Nothing to do here yet. Will need to flag the issue by adding something to the parent record.
         end
-      else
+
+      rescue Exception => e
+
+        # TODO - need to communicate to the user that we had a failure
         # Nothing to do here yet. Will need to flag the issue by adding something to the parent record.
+        puts "Exception expanding recurrence: " + e.message
+        puts "Need to send message to user here"
+
       end
     end
     self.update_attribute(:recur_expanded_to, before)
@@ -709,7 +722,7 @@ class Appointment < ActiveRecord::Base
           end
         }
         # Make sure we start expanding after the end of the original appointment
-        self.expand_recurrence(Time.now.utc > self.end_at.utc ? Time.now.utc : self.end_at.utc, self.recur_expanded_to)
+        self.expand_recurrence(((Time.now.in_time_zone > self.end_at.in_time_zone) ? Time.now.in_time_zone : self.end_at.in_time_zone), self.recur_expanded_to)
       else
         # We can update the existing instances
         # Build a hash of the changes, take out any attributes we don't want to update
@@ -855,7 +868,7 @@ class Appointment < ActiveRecord::Base
     # Make sure the time_start_at and time_end_at values are calculated correctly
     if !self.start_at.blank?
       self.time_start_at_will_change!
-      self.time_start_at = (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes).to_i
+      self.time_start_at = (self.start_at.utc.hour.hours + self.start_at.utc.min.minutes + self.start_at.utc.sec.seconds).to_i
       self.time_start_at = (self.time_start_at % 24.hours).to_i unless (self.time_start_at < 24.hours)
       if !self.duration.blank?
         self.time_end_at_will_change!
