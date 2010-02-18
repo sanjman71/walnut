@@ -46,15 +46,15 @@ class MessageComposeAppointment
     options   = Hash[:template => :appointment_confirmation, :topic => appointment, :tag => 'confirmation', :provider => provider.name,
                      :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
 
+    # add company, provider footers
+    options   = add_footers(company, provider, options)
+
     # add signature template
-    options.update(:signature_template => :signature_general)
+    options   = add_signature(options)
 
     case recipient
     when :customer
       return nil if customer.email_addresses_count == 0
-      # check company, provider email preferences
-      footers   = [company.preferences[:email_text], provider.preferences[:provider_email_text]].reject(&:blank?)
-      options.update(:footers => footers) unless footers.empty?
       # send confirmation to appointment customer
       subject   = "[#{company.name}] Appointment confirmation"
       body      = subject
@@ -93,12 +93,11 @@ class MessageComposeAppointment
     options   = Hash[:template => :appointment_reminder, :topic => appointment, :tag => 'reminder', :provider => provider.name,
                      :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
 
-    # check company, provider email preferences
-    footers   = [company.preferences[:email_text], provider.preferences[:provider_email_text]].reject(&:blank?)
-    options.update(:footers => footers) unless footers.empty?
+    # add company, provider footers
+    options   = add_footers(company, provider, options)
 
     # add signature template
-    options.update(:signature_template => :signature_general)
+    options   = add_signature(options)
 
     # send reminder to appointment customer
     subject   = "[#{company.name}] Appointment reminder"
@@ -107,6 +106,19 @@ class MessageComposeAppointment
     message   = MessageCompose.send(sender, subject, body, [email], options)
 
     return message
+  end
+
+  protected
+
+  # add company and provider footers
+  def self.add_footers(company, provider, options)
+    options.update(:footer_company => company.preferences[:email_text]) unless (company.blank? or company.preferences[:email_text].blank?)
+    options.update(:footer_provider => provider.preferences[:provider_email_text]) unless (provider.blank? or provider.preferences[:provider_email_text].blank?)
+    options
+  end
+
+  def self.add_signature(options)
+    options.update(:signature_template => :signature_general)
   end
 
 end
