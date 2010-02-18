@@ -60,14 +60,10 @@ class MessageJob < Struct.new(:params)
     # check message template
     case message.preferences[:template]
     when :appointment_confirmation, :appointment_reminder
-      options[:template]  = message.preferences[:template]
-      options[:provider]  = message.preferences[:provider]
-      options[:service]   = message.preferences[:service]
-      options[:customer]  = message.preferences[:customer]
-      options[:when]      = message.preferences[:when]
-      options[:footers]   = message.preferences[:footers]
+      # use all message preferences
+      options = message.preferences
     else
-      # default template
+      # use default template
       options[:template]  = :email
     end
 

@@ -20,7 +20,7 @@ class MessageCompose
     Message.transaction do
       # create message, with preferences
       message = Message.create(:sender => sender, :subject => subject, :body => body)
-      [:template, :footers, :provider, :service, :customer, :when].each do |s|
+      [:template, :footers, :signature_template, :provider, :service, :customer, :when].each do |s|
         next if options[s].blank?
         message.preferences[s] = options[s]
       end

@@ -46,6 +46,9 @@ class MessageComposeAppointment
     options   = Hash[:template => :appointment_confirmation, :topic => appointment, :tag => 'confirmation', :provider => provider.name,
                      :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
 
+    # add signature template
+    options.update(:signature_template => :signature_general)
+
     case recipient
     when :customer
       return nil if customer.email_addresses_count == 0
@@ -93,6 +96,9 @@ class MessageComposeAppointment
     # check company, provider email preferences
     footers   = [company.preferences[:email_text], provider.preferences[:provider_email_text]].reject(&:blank?)
     options.update(:footers => footers) unless footers.empty?
+
+    # add signature template
+    options.update(:signature_template => :signature_general)
 
     # send reminder to appointment customer
     subject   = "[#{company.name}] Appointment reminder"
