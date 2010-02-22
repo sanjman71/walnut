@@ -26,7 +26,7 @@ class LocationTest < ActiveSupport::TestCase
     @toronto      = Factory(:toronto, :state => @on)
     @zip          = Factory(:zip, :name => "60654", :state => @il)
     @river_north  = Factory(:neighborhood, :name => "River North", :city => @chicago)
-    @company      = Company.create(:name => "My Company", :time_zone => "UTC")
+    @company      = Company.create(:name => "My Company", :time_zone => "UTC", :tag_list => 'beer, soccer')
   end
 
   context "location company_name (as to_param)" do
@@ -37,6 +37,30 @@ class LocationTest < ActiveSupport::TestCase
 
       should "have to_param as location id with no name" do
         assert_equal @location.id.to_s, @location.to_param
+      end
+    end
+  end
+
+  context "location tags delegate" do
+    context "with no company" do
+      setup do
+        @location = Location.create(:name => "Home", :country => @us)
+      end
+
+      should "have empty tags collection" do
+        assert_equal [], @location.tags
+      end
+    end
+    
+    context "with a company" do
+      setup do
+        @location = Location.create(:name => "Home", :country => @us)
+        @company.locations.push(@location)
+        @company.reload
+      end
+
+      should "have empty tags collection" do
+        assert_equal ['beer', 'soccer'], @location.tags.collect(&:name)
       end
     end
   end
