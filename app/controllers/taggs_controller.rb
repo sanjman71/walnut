@@ -59,11 +59,10 @@ class TaggsController < ApplicationController
   end
   
   def show
-    @tagg   = TagGroup.find(params[:id], :include => :places)
-    
-    # find places tagged with this group
-    @places = @tagg.places.paginate(:page => params[:page], :per_page => 50)
-    
-    @title  = "Tag Group '#{@tagg.name}'"
+    # find tag group and companies tagged with the group
+    @tagg       = TagGroup.find(params[:id], :include => :companies)
+    @companies  = @tagg.companies.paginate(:page => params[:page], :per_page => 50)
+
+    @title      = "Tag Group '#{@tagg.name}'"
   end
 end
