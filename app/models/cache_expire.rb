@@ -18,7 +18,12 @@ class CacheExpire
     4.hours
   end
 
+  def self.weather
+    2.hours
+  end
+
   def self.footer
     3.days
   end
+
 end

@@ -239,7 +239,7 @@ class ApplicationController < ActionController::Base
     
     return true
   end
-  
+
   def init_weather
     @weather = nil
 
@@ -249,7 +249,7 @@ class ApplicationController < ActionController::Base
       if Weather.city?(@city)
         self.class.benchmark("*** Benchmarking #{@city.name.downcase} weather", APP_LOGGER_LEVEL, false) do
           # initialize city weather
-          @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@city.name.to_url_param}", :expires_in => 2.hours) do
+          @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@city.name.to_url_param}", :expires_in => CacheExpire.weather) do
             Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
           end
         end
@@ -258,7 +258,7 @@ class ApplicationController < ActionController::Base
       if Weather.zip?(@zip)
         self.class.benchmark("*** Benchmarking #{@zip.name} weather", APP_LOGGER_LEVEL, false) do
           # initialize zip weather
-          @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@zip.name}", :expires_in => 2.hours) do
+          @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@zip.name}", :expires_in => CacheExpire.weather) do
             Weather.get("#{@zip.name}", "#{@zip.name} Weather")
           end
         end

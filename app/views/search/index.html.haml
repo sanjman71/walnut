@@ -12,8 +12,10 @@
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood, :link_all => true})
 
 .span-8.padding-top-5.bottom.last#weather
-  = render(:partial => 'shared/weather', :locals => {:weather => @weather}) unless @weather.blank?
-  
+  - unless @weather.blank?
+    - cache("#{@weather.name.to_url_param}", :expires_in => CacheExpire.weather) do
+      = render(:partial => 'shared/weather', :locals => {:weather => @weather})
+
 %hr.space
 
 .span-24.last

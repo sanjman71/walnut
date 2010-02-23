@@ -18,7 +18,7 @@ class Weather
     @forecast_today_temp_low    = @google_weather.forecast_conditions[0].low
     @forecast_today_temp_high   = @google_weather.forecast_conditions[0].high
     @forecast_today_icon        = "http://www.google.com#{@google_weather.forecast_conditions[0].icon}"
-    
+
     @name = name
   end
   
