@@ -54,8 +54,9 @@ $.fn.init_input_hints = function() {
   });
   
   // hook up the clear buttons
+  /*
   $("span.clear").click(function() {
-    console.log("clear field");
+    //console.log("clear field");
 
     // clear the input field
     $field = $(this).prev(".text").find("input.title");
@@ -67,6 +68,7 @@ $.fn.init_input_hints = function() {
     // hide the button
     $(this).hide();
   });
+  */
 }
 
 $.fn.init_search_objects_form = function() {

@@ -142,7 +142,7 @@ div.location.search_result, div.appointment.search_result
                                                   
 .location.nearby.places, .location.events         { color: #3A2313; }
 
-a.location.name                                   { color: #3A2313; font-size: 1.1em; font-weight: bold; }
+a.location.name                                   { color: #3A2313; font-weight: bold; }
 a.location.name:hover                             { color: #FFFFFF; background-color: #3A2313; }
 
 /* company name */
@@ -158,10 +158,10 @@ a.company_name:hover                              { color: #FFFFFF; background-c
 
 /* event location link styles */
 
-a.event.location                                  { color: #3A2313; font-size: 1.0em; font-weight: bold; }
+a.event.location                                  { color: #3A2313; font-weight: bold; }
 a.event.location:hover                            { color: #FFFFFF; background-color: #3A2313; }
 
-a.event.location.name                             { color: #3A2313; font-size: 1.1em; font-weight: bold; }
+a.event.location.name                             { color: #3A2313; font-weight: bold; }
 a.event.location.name:hover                       { color: #FFFFFF; background-color: #3A2313; }
 
 a.event.add                                       { color: #3A2313; font-weight: bold; }
@@ -190,7 +190,7 @@ span.weather.forecast, span.weather.current       { color: #0000BB; font-weight:
 
 /* phone styles */
 
-span.phone                                        { color: #3A2313; font-size: 1.2em;}
+span.phone                                        { color: #3A2313; }
 
 /* sidebar styles */
 

@@ -12,17 +12,15 @@
   -# cache event info, independent of its list index
   - cache("#{event.cache_key}") do
     .span-7.info
-      %h4.name.margin-bottom-5{:style => 'font-weight: bold; font-size: 1.3em;'}
-        = truncate(event.name, :length => 40)
+      %h4.name.margin-bottom-5{:style => 'font-weight: normal;'}
+        = truncate(event.name, :length => 30)
       %h4.venue.margin-bottom-5
         -# link to event location
         = link_to event.location_name, location_path(event.location), :class => 'event location'
-
       %h6.details.bottom{:style => 'font-weight: normal;'}
-        %span{:style => 'color: #111111; font-size: 1.1em;'}= event.start_at.to_s(:appt_time)
+        %span{:style => 'color: #111111;'}= event.start_at.to_s(:appt_time)
         - if !event.url.blank?
           - # link to event url, important for eventful events
-          %span{:style => 'font-size: 1.0em; padding-left: 5px;'}= link_to "Details", event.url
-
+          %span{:style => 'padding-left: 5px;'}= link_to "Details", event.url
     .span-2.date.last
       = render(:partial => 'events/calendar_date', :locals => {:date => event.start_at})

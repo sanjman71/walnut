@@ -46,9 +46,9 @@ namespace :tags do
     checked = 0
     tagged  = 0
     
-    Place.find_in_batches(:batch_size => 100, :conditions => conditions) do |places|
-      places.each do |place|
-        puts "#{Time.now}: #{place.name}:#{place.primary_location.city.name}:#{place.primary_location.street_address}"
+    Company.find_in_batches(:batch_size => 100, :conditions => conditions) do |companies|
+      companies.each do |company|
+        puts "#{Time.now}: #{company.name}:#{company.primary_location.city.name}:#{company.primary_location.street_address}"
         
         checked += 1
 

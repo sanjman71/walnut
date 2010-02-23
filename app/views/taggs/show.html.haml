@@ -1,32 +1,32 @@
 - title(@title)
 
 .span-23.prepend-1.mat.padding-top-10.padding-bottom-20
-  .span-18
+  .last
     %h1== Tag group '#{@tagg.name}'
     == Tags: #{@tagg.tags}
-  .span-4.last
+  .last.padding-top-10
     = link_to 'Edit', edit_tagg_path(@tagg)
     == &nbsp;|&nbsp;
-    = link_to 'Show all Tag Groups', taggs_path
+    = link_to 'Back', taggs_path
 
 %hr.space
 
 -# show page links
 .span-23.prepend-1
   .span-13
-    %h4= page_entries_info @places unless @places.blank?
+    %h4= page_entries_info @companies unless @companies.blank?
   .span-10.last
-    = will_paginate(@places, :page_links => true)
+    = will_paginate(@companies, :page_links => true)
 
-- @places.each do |place|
-  .prepend-1.span-23.letterbox{:class => cycle("shaded", "")}[place]
+- @companies.each do |company|
+  .prepend-1.span-23.letterbox{:class => cycle("shaded", "")}[company]
     %h3{:style => 'margin-bottom: 3px;'}
-      = place.name
+      = company.name
     .span-2
-      == Locations: #{place.locations_count}
+      == Locations: #{company.locations_count}
     %br
     == Tags:
-    = place.tag_list.sort.join(", ")
+    = company.tag_list.sort.join(", ")
 
 
 %hr.space
@@ -34,6 +34,6 @@
 -# show page links
 .span-23.prepend-1
   .span-13
-    %h4= page_entries_info @places unless @places.blank?
+    %h4= page_entries_info @companies unless @companies.blank?
   .span-10.last
-    = will_paginate(@places, :page_links => true)
+    = will_paginate(@companies, :page_links => true)
