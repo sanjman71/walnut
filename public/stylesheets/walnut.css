@@ -185,7 +185,7 @@ a.event.category.odd:hover                        { color: #FFFFFF; background-c
 
 /* weather styles */
 
-.weather.heading                                  { color: #3A2313; font-size: 1.1em; }
+.weather.heading                                  { color: #3A2313; font-size: 1.0em; }
 span.weather.forecast, span.weather.current       { color: #0000BB; font-weight: bold; }
 
 /* phone styles */

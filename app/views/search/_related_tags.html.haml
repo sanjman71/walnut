@@ -2,7 +2,7 @@
 
 - tags.each do |tag|
   - klasses = ["tag related"]
-  %span{:style => "white-space: nowrap; padding-right: 3px; font-size: 1.1em;"}= link_to(tag, url_for(:tag => tag.to_url_param), :class => klasses.join)
+  %span{:style => "white-space: nowrap; padding-right: 3px;"}= link_to(tag, url_for(:tag => tag.to_url_param), :class => klasses.join(" "))
 
 
 %hr.space

@@ -38,6 +38,8 @@ class Location < ActiveRecord::Base
   acts_as_friendly_param  :company_name
 
   named_scope :no_company,            { :conditions => ["id not in (select distinct location_id from company_locations)"] }
+  named_scope :with_companies,        { :joins => :company_locations, :conditions => ["company_locations.location_id > 0"] }
+  named_scope :with_chains,           { :joins => :companies, :conditions => ["companies.chain_id > 0"] }
   named_scope :with_state,            lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }

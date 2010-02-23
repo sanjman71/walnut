@@ -241,25 +241,29 @@ class ApplicationController < ActionController::Base
   end
   
   def init_weather
+    @weather = nil
+
     if WEATHER_ENVS.include?(RAILS_ENV)
     case
     when @city
-      self.class.benchmark("*** Benchmarking city weather", Logger::INFO, false) do
-        # initialize city weather
-        @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@city.name.to_url_param}", :expires_in => 2.hours) do
-          Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
+      if Weather.city?(@city)
+        self.class.benchmark("*** Benchmarking #{@city.name.downcase} weather", APP_LOGGER_LEVEL, false) do
+          # initialize city weather
+          @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@city.name.to_url_param}", :expires_in => 2.hours) do
+            Weather.get("#{@city.name},#{@state.name}", "#{@city.name} Weather")
+          end
         end
       end
     when @zip
-      self.class.benchmark("*** Benchmarking zip weather", Logger::INFO, false) do
-        # initialize zip weather
-        @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@zip.name}", :expires_in => 2.hours) do
-          Weather.get("#{@zip.name}", "#{@zip.name} Weather")
+      if Weather.zip?(@zip)
+        self.class.benchmark("*** Benchmarking #{@zip.name} weather", APP_LOGGER_LEVEL, false) do
+          # initialize zip weather
+          @weather = Rails.cache.fetch("weather:#{@state.code.downcase}:#{@zip.name}", :expires_in => 2.hours) do
+            Weather.get("#{@zip.name}", "#{@zip.name} Weather")
+          end
         end
       end
-    else
-      @weather = nil
-    end
+    end # case
     end # RAILS_ENV
 
     @weather

@@ -5,7 +5,6 @@ class Weather
               :forecast_today_day_of_week, :forecast_today_condition, :forecast_today_temp_low, :forecast_today_temp_high, :forecast_today_icon,
               :name
 
-  
   def initialize(google_weather, name)
     @google_weather = google_weather
     
@@ -30,8 +29,28 @@ class Weather
     rescue Exception => e
       w = nil
     end
-    
+
     w
   end
-  
+
+  @@weather_cities = City.min_density(25000).order_by_density
+
+  # return list of weather enabled cities
+  def self.cities
+    @@weather_cities
+  end
+
+  # returns true if the specified city is a weather city
+  def self.city?(o)
+    return false if o.blank? or !o.is_a?(City)
+    cities.include?(o)
+  end
+
+  # returns true if the specified zip is a weather zip
+  def self.zip?(o)
+    return false if o.blank? or !o.is_a?(Zip)
+    # map zip to city, and check city
+    city?(o.city)
+  end
+
 end

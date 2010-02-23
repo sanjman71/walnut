@@ -122,7 +122,7 @@ ExceptionNotifier.sender_address        = %("Walnut Places Exception" <app@walnu
 ExceptionNotifier.email_prefix          = "Walnut Places "
 
 # Weather enabled environments
-WEATHER_ENVS = []
+WEATHER_ENVS = ['development']
 
 # Application SMTP provider; valid options are :google, :message_pub
 SMTP_PROVIDER = :google

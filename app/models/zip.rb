@@ -29,6 +29,8 @@ class Zip < ActiveRecord::Base
   named_scope :exclude,               lambda { |zip| {:conditions => ["id <> ?", zip.is_a?(Integer) ? zip : zip.id] } }
   named_scope :within_state,          lambda { |state| {:conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] } }
 
+  named_scope :min_density,           lambda { |density| { :conditions => ["locations_count >= ?", density] }}
+
   # order zips by location count
   named_scope :order_by_density,      {:order => "zips.locations_count DESC"}
 

@@ -11,7 +11,7 @@
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood, :link_all => true})
 
-.span-8.padding-top-5.bottom.last
+.span-8.padding-top-5.bottom.last#weather
   = render(:partial => 'shared/weather', :locals => {:weather => @weather}) unless @weather.blank?
   
 %hr.space
@@ -49,7 +49,7 @@
       - if @search_filters.keys.size > 0
         -# filter search results by type
         - @search_filters.keys.each do |klass|
-          %span{:style => 'font-weight: bold; font-size: 1.1em;'}
+          %span
             = link_to("Search #{klass_to_word(klass.pluralize).titleize} only", build_search_route(klass, @geo_search, @geo_params.merge(:tag => @tag.to_s, :query => @query).compact), :style => 'color: #0099FF;')
             = "&nbsp;|&nbsp;" unless klass == @search_filters.keys[-1]
     
