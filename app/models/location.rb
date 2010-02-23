@@ -37,6 +37,7 @@ class Location < ActiveRecord::Base
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :company_name
 
+  named_scope :no_company,            { :conditions => ["id not in (select distinct location_id from company_locations)"] }
   named_scope :with_state,            lambda { |state| { :conditions => ["state_id = ?", state.is_a?(Integer) ? state : state.id] }}
   named_scope :with_city,             lambda { |city| { :conditions => ["city_id = ?", city.is_a?(Integer) ? city : city.id] }}
   named_scope :with_neighborhoods,    { :conditions => ["neighborhoods_count > 0"] }
@@ -51,6 +52,7 @@ class Location < ActiveRecord::Base
   named_scope :not_urban_mapped,      { :conditions => ["urban_mapping_at is NULL"] }
   named_scope :with_events,           { :conditions => ["events_count > 0"] }
   named_scope :with_neighbors,        { :joins => :location_neighbors, :conditions => ["location_neighbors.location_id > 0"] }
+  named_scope :no_neighbors,          { :conditions => ["id not in (select distinct location_id from location_neighbors)"] }
   named_scope :with_phone_numbers,    { :conditions => ["phone_numbers_count > 0"] }
   named_scope :no_phone_numbers,      { :conditions => ["phone_numbers_count = 0"] }
   named_scope :min_phone_numbers,     lambda { |x| {:conditions => ["phone_numbers_count >= ?", x] }}
