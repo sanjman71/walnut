@@ -8,7 +8,7 @@ class LocationsController < ApplicationController
     @company  = @location.company unless @location.blank?
 
     if @location.blank? or @company.blank?
-      redirect_to(:controller => 'places', :action => 'error', :locality => 'location') and return
+      redirect_to(:controller => 'search', :action => 'error', :locality => 'location') and return
     end
 
     # check params, default to 0
