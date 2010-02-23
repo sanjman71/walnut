@@ -38,6 +38,16 @@ every 1.day, :at => "2am" do
   command "curl http://www.walnutplaces.com/events/import?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
 end
 
+every 2.hours do
+  # refresh cached weather cities
+  Weather.cities.each do |city|
+    state   = city.state
+    country = state.country
+    url     = url_for(:host => "www.walnutplaces.com", :klass => 'search', :controller => 'search', :action => 'index', :country => country, :state => state, :city => city, :query => 'anything')
+    command "curl #{url} > /dev/null"
+  end
+end
+
 every :reboot do
   # start sphinx searchd
   command "cd /usr/apps/walnut/current && RAILS_ENV=production /usr/bin/env rake ts:start"

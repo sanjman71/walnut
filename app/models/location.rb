@@ -103,7 +103,7 @@ class Location < ActiveRecord::Base
   end
 
   def company_name
-    @company_name ||= self.company ? self.company.name : ''
+    @company_name ||= self.company.andand.name
   end
 
   # return collection of location's country, state, city, zip, neighborhoods

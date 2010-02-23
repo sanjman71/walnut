@@ -24,6 +24,7 @@ Rails::Initializer.run do |config|
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
   # You have to specify the :lib option for libraries, where the Gem name (sqlite3-ruby) differs from the file itself (sqlite3)
+  config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
   config.gem "ar-extensions", :version => "~> 0.9.2"
   config.gem "chronic", :version => '~> 0.2.3' # required by javan-whenever
   config.gem "crack", :version => "~> 0.1.4" # required by google weather
@@ -122,7 +123,7 @@ ExceptionNotifier.sender_address        = %("Walnut Places Exception" <app@walnu
 ExceptionNotifier.email_prefix          = "Walnut Places "
 
 # Weather enabled environments
-WEATHER_ENVS = ['development']
+WEATHER_ENVS  = ['development', 'production']
 
 # Application SMTP provider; valid options are :google, :message_pub
 SMTP_PROVIDER = :google

@@ -19,7 +19,7 @@ class CacheExpire
   end
 
   def self.weather
-    2.hours
+    4.hours
   end
 
   def self.footer
