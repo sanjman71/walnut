@@ -145,6 +145,9 @@ class ChainsController < ApplicationController
       logger.debug("*** [sphinx] locations: #{@locations.size}")
     end
 
+    # show weather on chain city pages
+    @weather    = init_weather
+
     @title      = "#{@chain.display_name} Locations in #{@city.name}, #{@state.name} | Store Locator"
     @h1         = "#{@chain.display_name} Locations in #{@city.name}, #{@state.name}"
 
