@@ -1,12 +1,35 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class UserTest < ActiveSupport::TestCase
 
   context "create user" do
-    context "without a password or rpx" do
+    context "with no password or confirmation" do
       setup do
         @user1 = User.create(:name => "User 1")
+      end
+
+      should_change("User.count") { User.count }
+
+      should "create user in active state" do
+        assert_equal "active", @user1.state
+      end
+    end
+
+    context "with an empty password and confirmation" do
+      setup do
+        @user1 = User.create(:name => "User 1", :password => '', :password_confirmation => '')
+      end
+
+      should_change("User.count") { User.count }
+
+      should "create user in active state" do
+        assert_equal "active", @user1.state
+      end
+    end
+
+    context "with password and confirmation mismatch" do
+      setup do
+        @user1 = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secretx")
       end
 
       should_not_change("User.count") { User.count }

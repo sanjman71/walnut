@@ -90,7 +90,8 @@ class Company < ActiveRecord::Base
                              :email_text => '',
                              :work_appointment_confirmation_customer => '0',
                              :work_appointment_confirmation_manager => '0',
-                             :work_appointment_confirmation_provider => '0'}
+                             :work_appointment_confirmation_provider => '0',
+                             :customer_password => 'required'}
 
   acts_as_taggable_on       :tags
   

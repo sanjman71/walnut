@@ -2,7 +2,8 @@ class PhoneNumber < ActiveRecord::Base
   # validates_presence_of     :callable, :polymorphic => true # validation is done in a before filter so nested attributes work
   validates_presence_of     :name, :address
   validates_format_of       :address, :with => /[0-9]{10,11}/, :message => "Phone number is invalid. It should have 10 digits - area code and number."
-  validates_uniqueness_of   :address, :case_sensitive => false, :message => "Phone number is already in use"
+  # Note: we allow duplicate phone numbers since it models real world usage more accurately than uniqueness
+  # validates_uniqueness_of   :address, :case_sensitive => false, :message => "Phone number is already in use"
   validates_inclusion_of    :name, :in => ['Mobile', 'Work', 'Home', 'Other']
   before_validation         :format_phone
   belongs_to                :callable, :polymorphic => true, :counter_cache => :phone_numbers_count

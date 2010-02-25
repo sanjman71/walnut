@@ -63,16 +63,37 @@ class PhoneNumberTest < ActiveSupport::TestCase
     end
   end
 
+  context "duplicate phone numbers" do
+    setup do
+      @user1  = Factory(:user)
+      @phone1 = @user1.phone_numbers.create(:name => 'Mobile', :address => "5559999999")
+      @user1.reload
+      assert_equal 1, @user1.phone_numbers_count
+    end
+
+    context "add same phone number" do
+      setup do
+        @user2  = Factory(:user)
+        @phone2 = @user2.phone_numbers.create(:name => 'Mobile', :address => "5559999999")
+        puts @phone2.errors.full_messages
+        @user2.reload
+      end
+      
+      should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+    end
+  end
+
   context "remove phone number" do
-    should "decrement user.phone_numbers_count" do
+    setup do
       @user   = Factory(:user)
       @phone  = @user.phone_numbers.create(:name => 'Mobile', :address => "5559999999")
       @user.reload
       assert_equal 1, @user.phone_numbers_count
       @user.phone_numbers.delete(@phone)
-      @user.reload
-      assert_equal [], @user.phone_numbers
-      assert_equal 0, @user.phone_numbers_count
+    end
+
+    should "decrement user.phone_numbers_count" do
+      assert_equal 0, @user.reload.phone_numbers_count
     end
   end
 end

@@ -7,14 +7,16 @@ class User < ActiveRecord::Base
   include Authentication::ByCookieToken
   include Authorization::AasmRoles
 
-  include UserAuthIdentity
-
   # Badges for authorization
   badges_authorized_user
 
   validates_format_of       :name, :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name, :maximum => 100
   validates_presence_of     :name
+
+  # overrides Authentication::ByPassword validations
+  validates_presence_of     :password,  :if => :password_required?
+  validates_confirmation_of :password,  :if => :password_set?
 
   has_many                  :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc"
   has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
@@ -90,15 +92,21 @@ class User < ActiveRecord::Base
   # This will also let us return a human error message.
   #
   def self.authenticate(email_or_phone, password, options={})
-    return nil if email_or_phone.blank? || password.blank?
+    return nil if email_or_phone.blank?
     if PhoneNumber.phone?(email_or_phone)
       # phone authentication
-      u = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_state(:first, :active) # need to get the salt
+      users = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_state(:all, :active) # need to get the salt
     else
       # assume email authentication
-      u = self.with_email(email_or_phone).find_in_state(:first, :active) # need to get the salt
+      users = self.with_email(email_or_phone).find_in_state(:all, :active) # need to get the salt
     end
-    u && u.authenticated?(password) ? u : nil
+    # authentication fails if there is no user or more than 1 user
+    return nil if users.empty? or users.size > 1
+    u = users.first
+    # check is user password is blank
+    return u if u.crypted_password.blank? and u.password.blank? and password.blank?
+    # authenticate
+    u.authenticated?(password) ? u : nil
   end
 
   def self.create_rpx(name, email, identifier)
@@ -169,6 +177,15 @@ class User < ActiveRecord::Base
   
   protected
     
+  # password is not required
+  def password_required?
+    return false
+  end
+
+  def password_set?
+    !self.password.blank?
+  end
+
   def make_activation_code
     self.deleted_at = nil
     self.activation_code = self.class.make_token
@@ -182,8 +199,8 @@ class User < ActiveRecord::Base
   end
 
   def activate_user
-    if self.rpx? and self.state == 'passive'
-      # change state to active
+    if self.password.blank? and self.crypted_password.blank? and self.state == 'passive'
+      # force state to active
       self.update_attribute(:state, 'active')
     elsif self.state == 'passive'
       # register and activate all users
