@@ -20,14 +20,13 @@ namespace :mechanize do
     agent   = WWW::Mechanize.new
     count   = 0
 
-    puts "#{Time.now}: finding all locations with no neighbors"
+    puts "#{Time.now}: finding all locations with no neighbors; limit: #{limit}, sleep: #{isleep}"
 
     # find locations with no neighbors
-    Location.find_each(:batch_size => 1000) do |location|
-      next if location.location_neighbors.count > 0
+    Location.no_neighbors.all(:limit => limit).each do |location|
       url = location_url(location, :host => @@host)
       url += "?neighbors=1"
-      # puts "*** url: #{url.inspect}"
+      # puts "#{Time.now}: *** url: #{url.inspect}"
       agent.get(url)
       count += 1
       break if count >= limit
