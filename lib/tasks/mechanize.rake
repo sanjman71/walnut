@@ -23,7 +23,7 @@ namespace :mechanize do
     puts "#{Time.now}: finding all locations with no neighbors; limit: #{limit}, sleep: #{isleep}"
 
     # find locations with no neighbors
-    Location.no_neighbors.all(:limit => limit).each do |location|
+    Location.no_neighbors.with_latlng.all(:limit => limit).each do |location|
       url = location_url(location, :host => @@host)
       url += "?neighbors=1"
       # puts "#{Time.now}: *** url: #{url.inspect}"
