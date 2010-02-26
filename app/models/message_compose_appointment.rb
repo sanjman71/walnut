@@ -1,27 +1,44 @@
 class MessageComposeAppointment
 
+  # send all appointment confirmations for the specified appointment
   def self.confirmations(appointment, preferences, options={})
-    preferences = eval(preferences) if preferences.is_a?(String)
-    company     = options[:company]
-    messages    = []
+    process('confirmation', appointment, preferences, options)
+  end
+  
+  # send all appointment cancelations for the specified appointment
+  def self.cancelations(appointment, preferences, options={})
+    process('cancelation', appointment, preferences, options)
+  end
+
+  # send appointment reminder to appointment customer
+  def self.reminder(appointment)
+    process('reminder', appointment, Hash[:customer => 1])
+  end
+
+  protected
+
+  # process preferences for sending this appointment message(s)
+  def self.process(text, appointment, preferences, options={})
+    company   = options[:company]
+    messages  = []
 
     # iterate through each preference
     preferences.keys.each do |key|
       case key
       when :customer
         if preferences[key].to_i == 1
-          message = MessageComposeAppointment.confirmation(appointment, :customer)
+          message = MessageComposeAppointment.send(text, appointment, :customer)
           messages.push([:customer, message]) unless message.blank?
         end
       when :provider
         if preferences[key].to_i == 1
-          message = MessageComposeAppointment.confirmation(appointment, :provider)
+          message = MessageComposeAppointment.send(text, appointment, :provider)
           messages.push([:provider, message]) unless message.blank?
         end
       when :manager
         if preferences[key].to_i == 1 and !company.blank?
           company.authorized_managers.each do |manager|
-            message = MessageComposeAppointment.confirmation(appointment, :manager, :manager => manager)
+            message = MessageComposeAppointment.send(text, appointment, :manager, :manager => manager)
             messages.push([:manager, message]) unless message.blank?
           end
         end
@@ -31,8 +48,8 @@ class MessageComposeAppointment
     messages
   end
 
-  # send confirmation to appointment customer, provider, or manager
-  def self.confirmation(appointment, recipient, options={})
+  # send [confirmation, cancelation, reminder] to appointment [customer, provider, or manager]
+  def self.send(text, appointment, recipient, options={})
     company   = appointment.company
     provider  = appointment.provider
     customer  = appointment.customer
@@ -43,8 +60,17 @@ class MessageComposeAppointment
     return message if customer.blank? or provider.blank?
 
     # build message options
-    options   = Hash[:template => :appointment_confirmation, :topic => appointment, :tag => 'confirmation', :provider => provider.name,
+    options   = Hash[:template => "appointment_#{text}".to_sym, :topic => appointment, :tag => text, :provider => provider.name,
                      :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
+
+    # add customer email, phone
+    if customer.email_addresses_count > 0
+      options.update(:customer_email => appointment.customer.primary_email_address.address)
+    end
+
+    if customer.phone_numbers_count > 0
+      options.update(:customer_phone => appointment.customer.primary_phone_number.address)
+    end
 
     # add company, provider footers
     options   = add_footers(company, provider, options)
@@ -55,22 +81,22 @@ class MessageComposeAppointment
     case recipient
     when :customer
       return nil if customer.email_addresses_count == 0
-      # send confirmation to appointment customer
-      subject   = "[#{company.name}] Appointment confirmation"
+      # send confirm/cancle to appointment customer
+      subject   = "[#{company.name}] Appointment #{text}"
       body      = subject
       email     = customer.primary_email_address
       message   = MessageCompose.send(sender, subject, body, [email], options)
     when :provider
       return nil if provider.email_addresses_count == 0
-      # send confirmation to appointment provider
-      subject   = "[#{company.name}] Appointment confirmation"
+      # send confirm/cancel to appointment provider
+      subject   = "[#{company.name}] Appointment #{text}"
       body      = subject
       email     = provider.primary_email_address
       message   = MessageCompose.send(sender, subject, body, [email], options)
     when :manager
-      # send confirmation to company manager
+      # send confirm/cancel to company manager
       return nil if manager.blank? || manager.email_addresses_count == 0
-      subject   = "[#{company.name}] Appointment confirmation"
+      subject   = "[#{company.name}] Appointment #{text}"
       body      = subject
       email     = manager.primary_email_address
       message   = MessageCompose.send(sender, subject, body, [email], options)
@@ -78,37 +104,6 @@ class MessageComposeAppointment
 
     return message
   end
-
-  # send appointment reminder to appointment customer
-  def self.reminder(appointment)
-    company   = appointment.company
-    provider  = appointment.provider
-    customer  = appointment.customer
-    sender    = MessageCompose.sender(company)
-
-    return nil if customer.blank? or provider.blank?
-    return nil if customer.email_addresses_count == 0
-
-    # build message options
-    options   = Hash[:template => :appointment_reminder, :topic => appointment, :tag => 'reminder', :provider => provider.name,
-                     :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
-
-    # add company, provider footers
-    options   = add_footers(company, provider, options)
-
-    # add signature template
-    options   = add_signature(options)
-
-    # send reminder to appointment customer
-    subject   = "[#{company.name}] Appointment reminder"
-    body      = subject
-    email     = customer.primary_email_address
-    message   = MessageCompose.send(sender, subject, body, [email], options)
-
-    return message
-  end
-
-  protected
 
   # add company and provider footers
   def self.add_footers(company, provider, options)

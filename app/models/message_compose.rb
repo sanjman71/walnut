@@ -1,5 +1,9 @@
 class MessageCompose
   
+  def self.preferences_list
+    [:template, :provider, :service, :customer, :customer_email, :customer_phone, :when, :footer_company, :footer_provider, :signature_template]
+  end
+  
   # default message sender for the company, user
   def self.sender(object)
     case object.class.to_s.downcase
@@ -20,7 +24,7 @@ class MessageCompose
     Message.transaction do
       # create message, with preferences
       message = Message.create(:sender => sender, :subject => subject, :body => body)
-      [:template, :provider, :service, :customer, :when, :footer_company, :footer_provider, :signature_template].each do |s|
+      preferences_list.each do |s|
         next if options[s].blank?
         message.preferences[s] = options[s]
       end
