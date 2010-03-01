@@ -60,6 +60,19 @@ class SearchControllerTest < ActionController::TestCase
   should_route :get, '/events/us/il/60610/tag/food',
                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :zip => '60610', :tag => 'food', :klass => 'events'
 
+   # lat/lng with or without street search tag/query routes
+   should_route :get, '/search/us/il/chicago/x/41891133/y/-87634015/q/food',
+                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :lat => '41891133', :lng => '-87634015',
+                :query => 'food', :klass => 'search'
+   should_route :get, '/search/us/il/chicago/x/41891133/y/-87634015/tag/food',
+                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :lat => '41891133', :lng => '-87634015',
+                :tag => 'food', :klass => 'search'
+   should_route :get, '/search/us/il/chicago/s/200-w-grand-ave/x/41891133/y/-87634015/q/food',
+                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :lat => '41891133', :lng => '-87634015',
+                :street => '200-w-grand-ave', :query => 'food', :klass => 'search'
+   should_route :get, '/search/us/il/chicago/s/200-w-grand-ave/x/41891133/y/-87634015/tag/food',
+                :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :lat => '41891133', :lng => '-87634015',
+                :street => '200-w-grand-ave', :tag => 'food', :klass => 'search'
 
   # error route
   should_route :get, '/search/error/country', :controller => 'search', :action => 'error', :locality => 'country'
@@ -72,11 +85,12 @@ class SearchControllerTest < ActionController::TestCase
     @z60610   = Factory(:zip, :name => "60610", :state => @il)
     @tag      = Tag.create(:name => 'food')
     @company  = Company.create(:name => "My Company", :time_zone => "UTC")
-    @location = Location.create(:name => "Home", :country => @us, :state => @il, :city => @chicago)
+    @location = Location.create(:name => "Home", :country => @us, :state => @il, :city => @chicago, :street_address => '100 W Grand Ave',
+                                :lat => 41.891737, :lng => -87.631483)
     @company.locations.push(@location)
   end
 
-  context "city search" do
+  context "city search without street and lat/lng" do
     context "with query 'anything' and 1 location" do
       setup do
         # stub search results
@@ -213,14 +227,45 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:state) { @il }
       should_assign_to(:city) { @chicago }
       should_assign_to(:geo_search) { 'city' }
+      should_not_assign_to(:geo_origin)
       should_assign_to(:query) { '' }
       should_assign_to(:tag) { @tag }
       should_assign_to(:query_or) { "" }
       should_assign_to(:query_and) { "" }
       should_assign_to(:query_quorum) { "" }
       should_assign_to(:query_raw) { "tags:food" }
-      should_assign_to(:fields) { Hash[:tags => 'food'] }
-      should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
+      # should_assign_to(:fields) { Hash[:tags => 'food'] }
+      # should_assign_to(:attributes) { Hash[:city_id => @chicago.id] }
+
+      should_assign_to(:sphinx_options, :class => Hash)
+
+      should "set sphinx classes option" do
+        @sphinx_options = assigns(:sphinx_options)
+        assert_equal [Location], @sphinx_options[:classes]
+      end
+
+      should "set sphinx with option" do
+        @sphinx_options = assigns(:sphinx_options)
+        assert_equal Hash[:city_id => @chicago.id], @sphinx_options[:with]
+      end
+
+      should "set sphinx conditions option" do
+        @sphinx_options = assigns(:sphinx_options)
+        assert_equal Hash[:tags => 'food'], @sphinx_options[:conditions]
+      end
+
+      should "set sphinx order option" do
+        @sphinx_options = assigns(:sphinx_options)
+        assert_equal 'popularity desc, @relevance desc', @sphinx_options[:order]
+      end
+
+      should "set sphinx page options" do
+        @sphinx_options = assigns(:sphinx_options)
+        assert_equal 1, @sphinx_options[:page]
+        assert_equal 10, @sphinx_options[:per_page]
+        assert_equal 100, @sphinx_options[:max_matches]
+      end
+
       should_assign_to(:title) { "Food near Chicago, IL" }
       should_assign_to(:h1) { "Food near Chicago, IL" }
 
@@ -243,6 +288,62 @@ class SearchControllerTest < ActionController::TestCase
                                  :descendant => {:tag => 'a', :attributes => {:class => 'city', :href => '/search/us/il/chicago'}}
       end
     end
+  end
+
+  context "city search with street and lat/lng" do
+    setup do
+      # stub search results
+      @results = [@location]
+      ThinkingSphinx.stubs(:search).returns(@results)
+      @results.stubs(:total_pages).returns(1)
+      get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :street => '100-w-grand-ave', 
+          :lat => '41891737', :lng => '-87631483', :tag => 'food'
+    end
+
+    should_respond_with :success
+    should_render_template 'search/index.html.haml'
+    should_assign_to(:objects) { [@location] }
+    should_assign_to(:klasses) { [Location] }
+    should_assign_to(:country) { @us }
+    should_assign_to(:state) { @il }
+    should_assign_to(:city) { @chicago }
+    should_assign_to(:street) { '100 W Grand Ave' }
+    should_assign_to(:lat, :class => BigDecimal)
+    should_assign_to(:lng, :class => BigDecimal)
+    should_assign_to(:geo_search) { 'city' }
+    should_assign_to(:geo_origin)
+
+    should_assign_to(:sphinx_options, :class => Hash)
+
+    should "set sphinx classes option" do
+      @sphinx_options = assigns(:sphinx_options)
+      assert_equal [Location], @sphinx_options[:classes]
+    end
+
+    should "set sphinx with option" do
+      @sphinx_options = assigns(:sphinx_options)
+      assert_equal Hash[:city_id => @chicago.id], @sphinx_options[:with]
+    end
+
+    should "set sphinx conditions option" do
+      @sphinx_options = assigns(:sphinx_options)
+      assert_equal Hash[:tags => 'food'], @sphinx_options[:conditions]
+    end
+
+    should "set sphinx order option" do
+      @sphinx_options = assigns(:sphinx_options)
+      assert_equal '@geodist asc', @sphinx_options[:order]
+    end
+
+    should "set sphinx page options" do
+      @sphinx_options = assigns(:sphinx_options)
+      assert_equal 1, @sphinx_options[:page]
+      assert_equal 10, @sphinx_options[:per_page]
+      assert_equal 100, @sphinx_options[:max_matches]
+    end
+
+    should_assign_to(:title) { "Food near 100 W Grand Ave, Chicago, IL" }
+    should_assign_to(:h1) { "Food near 100 W Grand Ave, Chicago, IL" }
   end
 
   context "city with no zips or neighborhoods" do

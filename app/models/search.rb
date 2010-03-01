@@ -6,6 +6,11 @@ class Search
     ThinkingSphinx::Configuration.instance.configuration.searchd.max_matches  
   end
 
+  # remove fields from the string
+  def self.remove_fields(s)
+    s.gsub(/(\w+:)/, '')
+  end
+
   # normalize the string
   def self.normalize(s)
     # remove quotes, dashes, @

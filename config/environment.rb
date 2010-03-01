@@ -102,6 +102,7 @@ require "#{RAILS_ROOT}/lib/string.rb"
 require "#{RAILS_ROOT}/lib/hash.rb"
 require "#{RAILS_ROOT}/lib/math.rb"
 require "#{RAILS_ROOT}/lib/array.rb"
+require "#{RAILS_ROOT}/lib/big_decimal.rb"
 require "#{RAILS_ROOT}/lib/secure_random.rb"
 require "#{RAILS_ROOT}/lib/time_calculations.rb"
 

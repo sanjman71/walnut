@@ -132,7 +132,7 @@ a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
 /* generic location styles */
 
 div.location.search_result, div.appointment.search_result
-                                                  { height: 70px; }
+                                                  { height: 85px; }
 
 .locations.featured.section, .events.featured.section
                                                   { color: #3A2313; font-weight: bold; }
@@ -277,7 +277,7 @@ span.example                                      { color: #666666; font-style: 
 .neighborhood.related, .zip.related, .city.related, .city.nearby, .zip.nearby, .tags.related
                                                   { color: #111111;  font-weight: bold; }
 
-a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.nearby.zip, a.related.neighborhood
+a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.nearby.zip, a.nearby.tag, a.related.neighborhood
                                                   { font-weight: normal; color: #0099FF; }
 
 span.neighborhood                                 { margin-right: 2px; }

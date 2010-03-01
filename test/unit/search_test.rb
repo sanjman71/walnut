@@ -257,4 +257,68 @@ class SearchTest < ActiveSupport::TestCase
       end
     end
   end
+  
+  context "search normalize" do
+    context "with quotes" do
+      setup do
+        @s = Search.normalize("'bar'")
+      end
+      
+      should "remove quotes" do
+        assert_equal 'bar', @s
+      end
+    end
+    
+    context "with dash" do
+      setup do
+        @s = Search.normalize("beer-bar")
+      end
+      
+      should "remove quotes" do
+        assert_equal 'beerbar', @s
+      end
+    end
+
+    context "with @" do
+      setup do
+        @s = Search.normalize("beer@bar")
+      end
+      
+      should "remove @" do
+        assert_equal 'beerbar', @s
+      end
+    end
+  end
+  
+  context "search remove fields" do
+    context "empty string" do
+      setup do
+        @s = Search.remove_fields("")
+      end
+      
+      should "not change query" do
+        assert_equal '', @s
+      end
+    end
+
+    context "with no field" do
+      setup do
+        @s = Search.remove_fields("beer")
+      end
+      
+      should "not change query" do
+        assert_equal 'beer', @s
+      end
+    end
+    
+    context "with field" do
+      setup do
+        @s = Search.remove_fields("tags:'hair salon'")
+      end
+
+      should "remove field" do
+        assert_equal "'hair salon'", @s
+      end
+    end
+  end
 end

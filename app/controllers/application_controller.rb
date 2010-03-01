@@ -213,6 +213,14 @@ class ApplicationController < ActionController::Base
         @neighborhood = @city.neighborhoods.find_like(params[:neighborhood].gsub('-','%')).first
       end
 
+      # if its a city, check for lat/lng coordinates
+      if @city and (!params[:lat].blank? and !params[:lng].blank?)
+        @geo_origin = true
+        @lat        = BigDecimal.from_url_param(params[:lat])
+        @lng        = BigDecimal.from_url_param(params[:lng])
+        @street     = params[:street].to_s.from_url_param.titleize
+      end
+
       if @city.blank? and @zip.blank?
         # invalid search
         redirect_to(:controller => params[:controller], :action => 'error', :locality => 'unknown') and return
@@ -278,6 +286,7 @@ class ApplicationController < ActionController::Base
   
   def build_search_title(options={})
     tag       = options[:tag] || ''
+    street    = options[:street] || ''
     query     = options[:query] || ''
     filter    = options[:filter] || ''
     klass     = options[:klass] || 'search'
@@ -286,6 +295,8 @@ class ApplicationController < ActionController::Base
     
     if options[:state] and options[:city] and options[:neighborhood]
       where = "#{options[:neighborhood].name}, #{options[:city].name}, #{options[:state].code}"
+    elsif options[:state] and options[:city] and options[:street]
+      where = "#{options[:street]}, #{options[:city].name}, #{options[:state].code}"
     elsif options[:state] and options[:city]
       where = "#{options[:city].name}, #{options[:state].code}"
     elsif options[:state] and options[:zip]

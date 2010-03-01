@@ -1,5 +1,5 @@
 / - query = nil unless local_assigns.has_key?(:query)
-/ - tags = [] unless local_assigns.has_key?(:tags)
+- tags      = [] unless local_assigns.has_key?(:tags)
 - color     = location_color(location) unless local_assigns.has_key?(:color)
 - features  = location_features(location) unless local_assigns.has_key?(:features)
 - klasses   = []
@@ -27,3 +27,10 @@
         .span-3.last.phone
           - unless location.phone_numbers_count == 0
             %span.phone{:style => "margin-left: 17px;"}= number_to_phone(location.primary_phone_number.address, :delimiter => ".")
+      .span-9.last.nearby
+        - if location.mappable? and !tags.empty?
+          -# search nearby locations with specific tags
+          %span{:style => 'color: #777; font-size: 0.9em;'}
+            == search nearby:
+            - tags.slice(0,2).each do |tag|
+              = link_to tag.name, url_for(:state => location.state, :city => location.city, :lat => location.lat.to_url_param, :lng => location.lng.to_url_param, :street => location.street_address.to_url_param, :tag => tag.name.to_url_param), :class => 'tag nearby'

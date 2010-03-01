@@ -139,10 +139,19 @@ class SearchController < ApplicationController
       @sort_order     = "start_at asc"
     end
 
+    # build sphinx options
+    @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :match_mode => :extended2, :rank_mode => :bm25,
+                           :order => @sort_order, :include => @eager_loads, :page => @page, :per_page => search_per_page,
+                           :max_matches => search_max_matches]
+
+    if @geo_origin
+      # search around a coordinate, sort results by distance
+      @sphinx_options[:geo]   = [Math.degrees_to_radians(@lat).to_f, Math.degrees_to_radians(@lng).to_f]
+      @sphinx_options[:order] = "@geodist asc"
+    end
+
     self.class.benchmark("*** Benchmarking sphinx query", APP_LOGGER_LEVEL, false) do
-      @objects = ThinkingSphinx.search(@query_quorum, :classes => @klasses, :with => @attributes, :conditions => @fields,
-                                       :match_mode => :extended2, :rank_mode => :bm25, :order => @sort_order, :include => @eager_loads, 
-                                       :page => @page, :per_page => search_per_page, :max_matches => search_max_matches)
+      @objects = ThinkingSphinx.search(@query_quorum, @sphinx_options)
       # the first reference to 'objects' does the actual sphinx query 
       logger.debug("*** [sphinx] objects: #{@objects.size}")
     end
@@ -262,7 +271,7 @@ class SearchController < ApplicationController
     @geo_params = {:country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhood => @neighborhood}
 
     # build search title based on query, city, neighborhood, zip search
-    @title  = build_search_title(:klass => @search_klass, :tag => @tag.to_s, :query => @query, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
+    @title  = build_search_title(:klass => @search_klass, :tag => @tag.to_s, :query => @query, :street => @street, :city => @city, :neighborhood => @neighborhood, :zip => @zip, :state => @state)
     @h1     = @title
 
     # set robots flag
@@ -289,9 +298,8 @@ class SearchController < ApplicationController
     # resolve where parameter
     @where    = params[:where].to_s
     @locality = Locality.search(@where, :log => true) || Locality.resolve(@where)
-    # normalize query parameter
-    @query    = Search.normalize(params[:query].to_s).to_url_param
-    # @query    = 'query'
+    # remove fields from query, normalize query
+    @query    = Search.normalize(Search.remove_fields(params[:query].to_s)).to_url_param
 
     # store raw query as a session parameter
     session[:query] = params[:query].to_s
@@ -315,7 +323,9 @@ class SearchController < ApplicationController
       @country  = @state.country
       redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :query => @query) and return
     when 'State'
-      raise Exception, "search by state not supported"
+      flash[:error] = "Searching by state is not supported"
+      redirect_to(:action => 'error', :locality => 'state') and return
+      # raise Exception, "search by state not supported"
     else
       redirect_to(root_path)
     end
