@@ -14,7 +14,10 @@ namespace :neighbors do
       city_locations_neighbors_ratio  = city_locations_with_neighbors.to_f / city.locations_count.to_f
       puts "#{Time.now}: city: #{city.name}, neighbors/locations: #{city_locations_with_neighbors}/#{city.locations_count}, ratio: #{city_locations_neighbors_ratio}"
     end
-    
+
+    locations_with_no_neighbors = Location.no_neighbors.with_latlng.count
+    puts "#{Time.now}: all: no neighbors/locations: #{locations_with_no_neighbors}/#{Location.count}"
+
     puts "#{Time.now}: completed"
   end
   
@@ -24,14 +27,11 @@ namespace :neighbors do
     filter  = ENV["FILTER"] if ENV["FILTER"]
     sleep   = ENV["SLEEP"] ? ENV["SLEEP"].to_i : 0
 
-    puts "#{Time.now}: initializing neighbors for all locations with no existing neighbors"
+    puts "#{Time.now}: initializing neighbors for all locations with no existing neighbors, limit: #{limit}"
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :select => 'id').collect(&:id)
-
-    # substract locations that already have neighbors
-    ids         -= LocationNeighbor.count(:group => "location_id").keys
+    ids         = Location.no_neighbors.with_latlng.all(:select => 'id', :limit => limit).collect(&:id)
 
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
@@ -59,10 +59,7 @@ namespace :neighbors do
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :offset => offset, :limit => limit, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
-    
-    # substract locations that already have neighbors
-    ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
+    ids         = Location.no_neighbors.with_latlng.all(:all, :offset => offset, :limit => limit, :conditions => {:city_id => city.id}, :select => 'id').collect(&:id)
 
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
@@ -88,10 +85,7 @@ namespace :neighbors do
 
     page        = 1
     page_size   = 1000
-    ids         = Location.find(:all, :offset => offset, :limit => limit, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
-
-    # substract locations that already have neighbors
-    ids         -= LocationNeighbor.with_city(city).count(:group => "location_id").keys
+    ids         = Location.no_neighbors.with_latlng.all(:all, :offset => offset, :limit => limit, :include => :companies, :conditions => ["city_id = ? AND companies.taggings_count > 0", city.id], :select => 'id').collect(&:id)
 
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
