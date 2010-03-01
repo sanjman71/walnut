@@ -102,6 +102,8 @@ class Company < ActiveRecord::Base
   named_scope :no_tag_groups,       { :conditions => ["tag_groups_count = 0"] }
   named_scope :with_taggings,       { :conditions => ["taggings_count > 0"] }
   named_scope :no_taggings,         { :conditions => ["taggings_count = 0"] }
+  named_scope :with_name_strict,    lambda { |s| {:conditions => ["name REGEXP '[[:<:]]%s[[:>:]]'", s] }}
+  named_scope :with_name,           lambda { |s| {:conditions => ["name REGEXP '%s'", s] }}
 
   # find all companies with subscriptions
   named_scope :with_subscriptions,  { :joins => :subscription, :conditions => ["subscriptions.id > 0"] }
