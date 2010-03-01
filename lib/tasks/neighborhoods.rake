@@ -74,7 +74,7 @@ namespace :neighborhoods do
         puts "#{Time.now}: *** finding neighbors for #{location.id}:#{location.company_name}"
       
         # find neighbors, constrained by city and distance
-        attributes  = ::Search.attributes(Array(location.city))
+        attributes  = ::Search.attributes(location.city)
         attributes["@geodist"] = 0.0..Neighborhood.within_neighborhood_distance_meters
         origin      = [Math.degrees_to_radians(location.lat).to_f, Math.degrees_to_radians(location.lng).to_f]
         limit       = 200
