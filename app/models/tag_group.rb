@@ -110,10 +110,10 @@ class TagGroup < ActiveRecord::Base
     array.reject(&:blank?).map{|s| s.split(/\S+/).size > TAG_MAX_WORDS ? nil : s.downcase.strip }.compact.uniq.sort
   end
   
-  def apply_tags(place)
-    return false if place.blank?
-    place.tag_list.add(tag_list)
-    place.save
+  def apply_tags(company)
+    return false if company.blank?
+    company.tag_list.add(tag_list)
+    company.save
   end
   
   def after_add_company(company)
