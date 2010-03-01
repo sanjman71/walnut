@@ -35,8 +35,6 @@ namespace :neighbors do
 
     puts "#{Time.now}: found #{ids.size} matching location ids"
 
-    exit
-
     neighbors   = init_neighbors(ids, page, page_size, :filter => filter, :limit => limit, :sleep => sleep)
 
     puts "#{Time.now}: completed, added neighbors to #{neighbors} locations" 
