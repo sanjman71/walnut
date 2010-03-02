@@ -8,7 +8,7 @@ class SearchControllerTest < ActionController::TestCase
   
   # state route
   should_route :get, '/search/us/il', :controller => 'search', :action => 'state', :country => 'us', :state => 'il'
-  should_route :get, '/search/us/il/q/pizza', :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :query => 'pizza'
+  should_route :get, '/search/us/il/q/pizza', :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :klass => 'search', :query => 'pizza'
   
   # city route
   should_route :get, '/search/us/il/chicago', :controller => 'search', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
@@ -74,6 +74,10 @@ class SearchControllerTest < ActionController::TestCase
    should_route :get, '/search/us/il/chicago/s/200-w-grand-ave/x/41891133/y/-87634015/tag/food',
                 :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :city => 'chicago', :lat => '41891133', :lng => '-87634015',
                 :street => '200-w-grand-ave', :tag => 'food', :klass => 'search'
+
+  # search untagged routes
+  should_route :get, '/search/untagged/q/pizza', :controller => 'search', :action => 'untagged', :query => 'pizza'
+  should_route :get, '/search/untagged', :controller => 'search', :action => 'untagged'
 
   # error route
   should_route :get, '/search/error/country', :controller => 'search', :action => 'error', :locality => 'country'

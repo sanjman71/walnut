@@ -18,6 +18,8 @@
 
     - if has_privilege?('manage site')
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
+      = link_to 'Untagged', search_untagged_path, :class => 'header link'
+      %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Tag Groups', taggs_path, :class => 'header link'
       %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
       = link_to 'Tags', tags_path, :class => 'header link'

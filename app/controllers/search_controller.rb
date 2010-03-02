@@ -331,6 +331,20 @@ class SearchController < ApplicationController
     end
   end
 
+  def untagged
+    @query      = params[:query].to_s
+    @per_page   = 50
+
+    if !@query.blank?
+      @companies = Company.no_tag_groups.no_taggings.with_name_strict(@query).paginate(:page => params[:page], :per_page => @per_page)
+    else
+      @companies = Company.no_tag_groups.no_taggings.paginate(:page =>params[:page], :per_page => @per_page)
+    end
+
+    @title  = "Untagged Locations" + (@query ? " with name '#{@query}'" : '')
+    @h1     = @title
+  end
+
   def error
     @title  = "Search Error"
   end
