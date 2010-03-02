@@ -50,6 +50,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/:klass/:country/:state/:zip/q/:query', 
                   :controller => 'search', :action => 'index', :zip => /\d{5}/, :klass => /search|locations|events/
   map.connect     '/search/:country/:state/:zip', :controller => 'search', :action => 'zip', :zip => /\d{5}/ # zip must be 5 digits
+  map.connect     '/:klass/:country/:state/q/:query',
+                  :controller => 'search', :action => 'index', :klass => /search|locations|events/, :state => /[a-z]{2}/ # state must be 2 letters
   map.connect     '/search/:country/:state', :controller => 'search', :action => 'state', :state => /[a-z]{2}/ # state must be 2 letters
   map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
 

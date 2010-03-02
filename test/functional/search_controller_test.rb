@@ -8,6 +8,7 @@ class SearchControllerTest < ActionController::TestCase
   
   # state route
   should_route :get, '/search/us/il', :controller => 'search', :action => 'state', :country => 'us', :state => 'il'
+  should_route :get, '/search/us/il/q/pizza', :controller => 'search', :action => 'index', :country => 'us', :state => 'il', :query => 'pizza'
   
   # city route
   should_route :get, '/search/us/il/chicago', :controller => 'search', :action => 'city', :country => 'us', :state => 'il', :city => 'chicago'
