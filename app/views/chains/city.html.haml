@@ -35,6 +35,10 @@
         -# show chain locations as regular locations
         = render(:partial => 'search/location', :locals => {:location => location, :query => @chain.name, :index => i})
 
+    - unless @nearby_cities.blank?
+      .span-10.padding-top-10#nearby_cities
+        = render(:partial => 'chains/nearby_cities', :locals => {:chain => @chain, :cities => @nearby_cities})
+
   .span-9.last
     - unless @locations.blank?
       .jmap#map{:style => "width: 350px; height: 430px;"}

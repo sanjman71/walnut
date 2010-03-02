@@ -134,7 +134,7 @@ class ChainsController < ApplicationController
     # @country, @state, @city initialized in before filter
     @chain      = Chain.find(params[:id])
 
-    self.class.benchmark("*** Benchmarking chain store locations in #{@city.name.downcase} using sphinx", APP_LOGGER_LEVEL, false) do
+    self.class.benchmark("*** Benchmarking #{@chain.display_name.to_s.downcase} chain store #{@city.name.downcase} locations using sphinx", APP_LOGGER_LEVEL, false) do
       @eagers       = [:company, :state, :city, :zip, :primary_phone_number]
       @per_page     = 5
       @max_matches  = 200
@@ -143,6 +143,16 @@ class ChainsController < ApplicationController
                                       :page => params[:page], :per_page => @per_page, :max_matches => @max_matches)
       # the first reference to 'locations' does the actual sphinx query 
       logger.debug("*** [sphinx] locations: #{@locations.size}")
+    end
+
+    self.class.benchmark("*** Benchmarking #{@chain.display_name.to_s.downcase} #{@city.name.downcase} nearby cities", APP_LOGGER_LEVEL, false) do
+      # find (and cache) nearby cities, where nearby is defined with a mile radius range, iff there are no neighborhoods
+      nearby_miles    = 50
+      nearby_limit    = 5
+      city_ids        = @chain.states[@state.id] || []
+      @nearby_cities  = Rails.cache.fetch("#{@state.code.downcase}:#{@city.name.to_url_param}:#{@chain.display_name.to_s.to_url_param}:nearby:cities", :expires_in => CacheExpire.localities) do
+        City.exclude(@city).within_state(@state).all(:conditions => 'id IN (%s)' % city_ids.join(','), :origin => @city, :within => nearby_miles, :order => "distance ASC", :limit => nearby_limit)
+      end
     end
 
     # show weather on chain city pages
