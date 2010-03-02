@@ -323,9 +323,9 @@ class SearchController < ApplicationController
       @country  = @state.country
       redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :query => @query) and return
     when 'State'
-      flash[:error] = "Searching by state is not supported"
-      redirect_to(:action => 'error', :locality => 'state') and return
-      # raise Exception, "search by state not supported"
+      @state    = @locality
+      @country  = @state.country
+      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :query => @query) and return
     else
       redirect_to(root_path)
     end

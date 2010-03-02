@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
 
       if @city.blank? and @zip.blank?
         # invalid search
-        redirect_to(:controller => params[:controller], :action => 'error', :locality => 'unknown') and return
+        redirect_to(:controller => params[:controller], :action => 'error', :locality => @state) and return
       end
 
       # initialize geo events count
