@@ -2,7 +2,7 @@
 
 .span-23.prepend-1.mat.padding-top-10.padding-bottom-20
   .last
-    %h1== Tag group '#{@tagg.name}'
+    %h3== Tag group '#{@tagg.name}'
     == Tags: #{@tagg.tags}
   .last.padding-top-10
     = link_to 'Edit', edit_tagg_path(@tagg)
@@ -20,8 +20,12 @@
 
 - @companies.each do |company|
   .prepend-1.span-23.letterbox{:class => cycle("shaded", "")}[company]
-    %h3{:style => 'margin-bottom: 3px;'}
-      = company.name
+    %h3.bottom.padding-bottom-5
+      - if company.locations_count == 1
+        -# link to location
+        = link_to company.name, location_path(company.primary_location)
+      - else
+        = company.name
     .span-2
       == Locations: #{company.locations_count}
     %br
