@@ -2,7 +2,7 @@
 - robots('index', 'follow') unless @robots == false
 
 .span-23.prepend-1.mat.padding-top-10.padding-bottom-20
-  %h1= @h1
+  %h1{:style => 'font-size: 1.5em;'}= @h1
   - if @letter
     %h5.bottom
       = link_to 'All Chain Stores', chains_path
