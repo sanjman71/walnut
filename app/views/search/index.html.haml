@@ -24,15 +24,16 @@
       = render(:partial => 'search/related_tags', :locals => {:title => "Related Searches", :tags => @related_tags}) unless @related_tags.blank?
     #neighborhoods
       = render(:partial => 'search/city_neighborhoods', :locals => {:neighborhoods => @neighborhoods, :city => @city, :tag => @tag.to_s, :query => @query}) unless @neighborhoods.blank?
+
+    -# google ad - search index left side vertical banner
+    = render :partial => 'adsense/search_index_left_verticalbanner'
+
     #zips
       = render(:partial => 'search/city_zips', :locals => {:zips => @zips, :city => @city, :tag => @tag.to_s, :query => @query}) unless @zips.blank?
     #cities
       = render(:partial => 'search/zip_cities', :locals => {:cities => @cities, :zip => @zip, :tag => @tag.to_s, :query => @query}) unless @cities.blank?
     #nearby_cities
       = render(:partial => 'search/nearby_cities', :locals => {:nearby_cities => @nearby_cities, :city => @city, :tag => @tag.to_s, :query => @query}) unless @nearby_cities.blank?
-
-    -# google ad - search index left side vertical banner
-    = render :partial => 'adsense/search_index_left_verticalbanner'
 
   .span-19.last
     -# google ad - search index top leaderboard
