@@ -1,0 +1,364 @@
+# mark chains with the specified tag groups, remove any and all other tag groups
+chain: Agway Inc
+add_tag_groups:
+  - Agricultural Equipment and Supplies
+  - Nurseries and Garden Centers
+  - Cargo and Freight Services
+  - Pet Services and Supplies
+---
+chain: American General Life & Accident Insurance
+tag_groups:
+  - Banks and Credit Unions
+  - Insurance
+  - Financial Services
+---
+chain: Air Liquide America Corp
+tag_groups:
+  - Medical Equipment and Supplies
+---
+chain: Amtrak
+tag_groups:
+  - Cargo and Freight Services
+  - Transportation Services
+---
+chain: Bakers Square
+tag_groups:
+  - Restaurants
+  - Bakeries
+---
+chain: Best Buy
+add_tag_groups:
+  - Appliances
+  - Electronics - Audio Visual
+  - Electronics - Computers
+  - Electronics - Dealers
+  - Electronics - Equipment and Services
+  - Electronics - Home Entertainment
+  - Music Stores
+  - Radio Communication Equipment
+remove_tag_groups:
+  - Carpet and Flooring
+  - Pawn Shops and Discount Stores
+---
+chain: Bi Lo
+tag_groups:
+  - Groceries
+  - Pharmacies
+---
+chain: Cendant
+add_tag_groups:
+  - Business Brokers and Franchising
+  - Loans and Mortgages
+  - Transportation Services
+---
+chain: Chase
+tag_groups:
+  - Banks and Credit Unions
+  - Credit Card Merchant Services
+  - Loans and Mortgages
+  - Financial Planning and Investments
+  - Business Brokers and Franchising
+---
+chain: Cheeburger Cheeburger
+tag_groups:
+  - Restaurants
+---
+chain: Cheeseburger in Paradise
+tag_groups:
+  - Restaurants
+---
+chain: Citibank
+tag_groups:
+  - Financial Planning and Investments
+  - Banks and Credit Unions
+  - Loans and Mortgages
+---
+chain: Coca Cola Bottling Co
+add_tag_groups:
+  - Beverage Sales and Distribution
+  - Groceries
+  - Food and Beverage Vendors
+  - Vending Machines
+---
+chain: Commerce Bank
+tag_groups:
+  - Banks and Credit Unions
+---
+chain: Costco
+add_tag_groups:
+  - Groceries
+  - Photo Finishing
+  - Medical Equipment and Supplies
+  - Storage Containers, Facilities and Warehouses
+  - Advertising
+  - Pawn Shops and Discount Stores
+  - Shopping Malls and Centers
+  - Pharmacies
+  - Automobile - Tires
+  - Manufacturing and Assembly
+---
+chain: Cosi
+tag_groups:
+  - Groceries
+  - Restaurants
+---
+chain: Costco
+remove_tag_groups:
+  - Physicians - Optometry and Opthalmology
+  - Government Services
+  - Sports Clubs
+---
+chain: Curves For Women
+tag_groups:
+  - Gymnastics Instruction
+  - Health and Fitness Clubs
+  - Diet, Nutrition and Weight Management
+  - Travel and Tourism
+---
+chain: Dave & Busters
+tag_groups:
+  - Bars, Taverns and Cocktail Lounges
+  - Restaurants
+  - Sports and Recreation Facilities
+  - Wedding Supplies and Services
+---
+chain: Dennys Restaurant
+tag_groups:
+  - Restaurants Delivery Service and Take Out
+  - Restaurants
+---
+chain: DIRECT SAT TV
+tag_groups:
+  - Telecommunications Equipment and Services
+  - Electronics - Home Entertainment
+---
+chain: Entrepreneurs Source
+add_tag_groups:
+  - Business Brokers and Franchising
+  - Consultants - Business
+  - Personal Coaching
+---
+chain: Fatburger
+tag_groups:
+  - Restaurants
+  - Restaurants Hamburgers
+---
+chain: First Charter
+add_tag_groups:
+  - Banks and Credit Unions
+  - Insurance
+  - Loans and Mortgages
+---
+chain: First Union
+tag_groups:
+  - Banks and Credit Unions
+  - Loans and Mortgages
+---
+chain: Gap
+add_tag_groups:
+  - Clothing and Accessories
+remove_tag_groups:
+ - Religious Services and Organizations
+ - Contractors - Roofing
+ - Hospitals, Clinics and Medical Centers
+ - Public and Social Services
+ - Textiles
+---
+chain: Hong KONG Express
+tag_groups:
+  - Restaurants
+---
+chain: Jo Ann Fabrics & Crafts
+tag_groups:
+  - Arts and Crafts Supplies
+  - Sewing Supplies and Services
+---
+chain: Jockey
+tag_groups:
+  - Pawn Shops and Discount Stores
+---
+chain: John Hancock Mutual Life Insurance
+add_tag_groups:
+  - Financial Planning and Investments
+  - Insurance
+---
+chain: LTD Express
+add_tag_groups:
+  - Clothing and Accessories
+remove_tag_groups:
+  - Body Piercing and Tattoos
+  - Bookstores
+  - Hair Salons and Barbers
+  - Jewelry
+  - Restaurants
+---
+chain: Macys
+add_tag_groups:
+  - Clothing and Accessories
+  - Shopping Malls and Centers
+  - Furniture
+  - Electronics - Computers
+---
+chain: Modells Sporting Goods
+tag_groups:
+  - Sporting Goods
+  - Clothing and Accessories
+---
+chain: Nathans Famous
+tag_groups:
+  - Restaurants
+---
+chain: New York Life Insurance Company
+tag_groups:
+  - Banks and Credit Unions
+  - Financial Services
+  - Financial Planning and Investments
+  - Insurance
+---
+chain: Noodles & Company
+tag_groups:
+  - Restaurants
+---
+chain: Norfolk Southern Corp
+tag_groups:
+  - Railroads
+  - Cargo and Freight Services
+  - Transportation Services
+---
+chain: North American
+tag_groups:
+  - Airlines and Airports
+  - Airlines
+---
+chain: Planned Parenthood
+add_tag_groups:
+  - Birth Control and Abortion Services
+  - Health Services
+  - Hospitals, Clinics and Medical Centers
+  - Public and Social Services
+  - Physicians - General
+---
+chain: Potbelly Sandwich Works
+tag_groups:
+  - Restaurants
+---
+chain: Pollo Tropical
+tag_groups:
+  - Restaurants
+---
+chain: Prudential
+remove_tag_groups:
+  - Garage Doors
+tag_groups:
+  - Banks and Credit Unions
+  - Financial Services
+  - Financial Planning and Investments
+  - Insurance
+---
+chain: Red Robin
+tag_groups:
+  - Restaurants Delivery Service and Take Out
+  - Restaurants
+---
+chain: Sprint
+tag_groups:
+  - Telecommunications Equipment and Services
+---
+chain: Shanes Rib Shack
+tag_groups:
+  - Restaurants
+  - Restaurants Barbecue
+---
+chain: Smoothie King
+tag_groups:
+  - Health and Diet Food Products
+  - Groceries
+  - Beverage Sales and Distribution
+  - Restaurants
+---
+chain: Square D Company
+add_tag_groups:
+  - Contractors - Electrical
+  - Electronics - Equipment and Services
+---
+chain: Staples The Office Superstore
+tag_groups:
+  - Office Services, Supplies and Equipment
+  - Electronics - Printers
+  - Electronics - Computers
+remove_tag_groups:
+  - Government Services
+  - Real Estate - Brokers and Agents
+---
+chain: Surf City Squeeze
+tag_groups:
+  - Health and Diet Food Products
+  - Groceries
+---
+chain: The Cheesecake Factory
+tag_groups:
+  - Restaurants
+---
+chain: The Great Steak & Potato Co
+tag_groups:
+  - Restaurants
+  - Restaurants Delivery Service and Take Out
+---
+chain: The Hartford
+tag_groups:
+  - Banks and Credit Unions
+  - Insurance
+  - Financial Services
+---
+chain: The Pantry
+add_tag_groups:
+  - Groceries
+  - Convenience Stores and Service Stations
+---
+chain: The Sports Authority
+tag_groups:
+  - Sporting Goods
+---
+chain: Tangles
+tag_groups:
+  - Hair Salons and Barbers
+  - Beauty Salons and Day Spas
+---
+chain: Toll Brothers Inc
+tag_groups:
+  - Contractors - Building
+  - Real Estate - Brokers and Agents
+  - Real Estate - Development
+---
+chain: Waste Management
+add_tag_groups:
+  - Recycling Centers
+  - Utilities - Gas, Water and Electric
+  - Waste Management
+  - Commercial and Industrial Vehicles and Machinery
+remove_tag_groups:
+  - Consultants - Business
+---
+chain: Weyerhaeuser Company
+add_tag_groups:
+  - Logging and Sawmills
+  - Packaging Supplies and Equipment
+  - Construction Supplies and Services
+  - Recycling Centers
+---
+chain: Worldwide Express
+tag_groups:
+  - Post Offices and Mail Services
+  - Packaging Supplies and Equipment
+  - Cargo and Freight Services
+---
+chain: Which Wich
+tag_groups:
+  - Restaurants
+---
+chain: Wingstreet
+tag_groups:
+  - Restaurants
+  - Restaurants Pizza
+
+

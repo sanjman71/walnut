@@ -1,5 +1,128 @@
 namespace :tags do
-  
+
+  desc "Mark untagged companies with the specified name filter"
+  task :mark_chains_with_tag_groups do
+    yaml  = ENV["YAML"]
+    path  = "data/#{yaml}"
+
+    if yaml.blank?
+      puts "missing YAML arg"
+      exit
+    end
+
+    if !File.exists?(path)
+      puts "missing file #{path}"
+      exit
+    end
+
+    stream = YAML::load_stream(File.open(path))
+
+    checked = 0
+    tagged  = 0
+
+    stream.documents.each do |object|
+      chain = Chain.find_by_name(object["chain"]) || Chain.find_by_display_name(object["chain"])
+
+      if chain.blank?
+        puts "[error] could not find chain: #{object['chain']}"
+        next
+      end
+
+      # find the tag groups
+      set_tag_groups = (object["tag_groups"] || []).collect do |tg|
+        TagGroup.find_by_name(tg)
+      end.compact
+
+      add_tag_groups = (object['add_tag_groups'] || []).collect do |tg|
+        TagGroup.find_by_name(tg)
+      end.compact
+
+      remove_tag_groups = (object['remove_tag_groups'] || []).collect do |tg|
+        TagGroup.find_by_name(tg)
+      end.compact
+
+      puts "*** chain #{chain.display_name} - setting #{set_tag_groups.size} tag groups" unless set_tag_groups.empty?
+      puts "*** chain #{chain.display_name} - adding #{add_tag_groups.size} tag groups" unless add_tag_groups.empty?
+      puts "*** chain #{chain.display_name} - removing #{remove_tag_groups.size} tag groups" unless remove_tag_groups.empty?
+
+      chain.companies.each do |company|
+        if !add_tag_groups.empty?
+          # build plus groups by checking against company's existing tag groups
+          plus_tag_groups = add_tag_groups.collect{ |o| company.tag_groups.include?(o) ? nil : o }.compact
+        elsif set_tag_groups.empty?
+          # nothing add
+          plus_tag_groups = []
+        else
+          # build plus groups using set substraction
+          plus_tag_groups = set_tag_groups - company.tag_groups
+        end
+
+        if !remove_tag_groups.empty?
+          # build delete groups by checking against company's existing tag groups
+          del_tag_groups = remove_tag_groups.collect{ |o| company.tag_groups.include?(o) ? o : nil }.compact
+        elsif set_tag_groups.empty?
+          # nothing remove
+          del_tag_groups = []
+        else
+          # build delete group using set subtraction
+          del_tag_groups = company.tag_groups - set_tag_groups
+        end
+
+        # skip if there are no tag groups to add or delete
+        next if plus_tag_groups.empty? and del_tag_groups.empty?
+
+        puts "*** company: #{company.inspect}"
+
+        unless plus_tag_groups.empty?
+          puts "*** adding: #{plus_tag_groups.collect(&:name).inspect}" 
+          plus_tag_groups.each do |tag_group|
+            company.tag_groups.push(tag_group)
+          end
+        end
+
+        unless del_tag_groups.empty?
+          puts "*** removing: #{del_tag_groups.collect(&:name).inspect}" 
+          del_tag_groups.each do |tag_group|
+            company.tag_groups.delete(tag_group)
+          end
+        end
+      end
+    end
+  end
+
+  # desc "Mark untagged companies with the specified name filter"
+  # task :mark_untagged_companies_with_name do
+  #   name = ENV["NAME"]
+  #   
+  #   if name.blank?
+  #     puts ""
+  #   end
+  # 
+  #   companies = Company.no_tag_groups.with_name(name)
+  #   
+  # end
+
+  desc "Find untagged companies with chains"
+  task :find_untagged_companies_with_chains do
+    companies = Company.no_tag_groups.with_chain.all(:group => 'companies.name').sort_by { |o| o.name }
+    
+    companies.each do |company|
+      chain = company.chain
+      hash  = Hash[]
+
+      # build tag group histogram
+      chain.companies.each do |o|
+        o.tag_groups.each do |tg|
+          hash[tg.name] = hash[tg.name].to_i + 1
+        end
+      end
+
+      puts "**** company: #{company.name}, hash: #{hash.inspect}"
+    end
+
+    puts "#{Time.now}: completed, found #{companies.size} companies"
+  end
+
   desc "Mark untagged places based on rules in yaml file"
   task :mark_untagged_places do
     s = YAML::load_stream( File.open("data/untagged_places.yml"))
@@ -176,6 +299,7 @@ namespace :tags do
     puts "#{Time.now}: completed, removed tag #{tag.name}"
   end
   
+  # Find tags with count == 0, and fix tags with incorrect taggings_count values
   desc "Cleanup tags"
   task :cleanup do
     unused  = 0
