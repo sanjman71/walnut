@@ -23,6 +23,13 @@
     #nearby_zips
       = render(:partial => 'zips/nearby_zips', :locals => {:title => "Nearby Zips", :zips => @nearby_zips}) #unless @nearby_zips.empty?
 
+  .span-19.last
+    -# google ad - zip top leaderboard, re-use search index leaderboard for now
+    = render :partial => 'adsense/search_index_top_leaderboard'
+
+  .span-19.last
+    %hr.space
+
   .span-19.last[@zip]
     .span-10
       .span-10.unselected{:id => "mappable_0", :class => klasses.join, :lat => @zip.lat, :lng => @zip.lng, :index => 0, :color => '_orange', :html => zip_html}
