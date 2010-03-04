@@ -1,0 +1,16 @@
+Ssh port forwarding
+-------------------
+
+1. Forward local port 3307 to port 3306 (mysql) on the prod1.
+
+  - ssh -L 3307:localhost:3306 -p 30001 app@10.176.195.21
+  
+
+Ssh reverse tunnels
+-------------------
+
+1. Forward remote port 8080 to local port 3001.  Note that 8080 is a non-privileged port.
+
+  - add 'GatewayPorts yes' to /etc/ssh/sshd_config; restart 'sudo /etc/init.d/ssh restart'
+  - ssh -R 8080:localhost:3000 app@mossoserver1
+  
