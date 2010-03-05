@@ -44,21 +44,59 @@ class PhoneNumberTest < ActiveSupport::TestCase
       end
     end
     
-    context "with callable and number with extra chars" do
-      setup do
-        @user  = Factory(:user)
-        @phone = @user.phone_numbers.create(:name => "Mobile", :address => "555-999-9999")
+    context "with callable and number with non digits" do
+      context "with -" do
+        setup do
+          @user  = Factory(:user)
+          @phone = @user.phone_numbers.create(:name => "Mobile", :address => "555-999-9999")
+        end
+
+        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+        should "increment user.phone_numbers_count" do
+          @user.reload
+          assert_equal 1, @user.phone_numbers_count
+        end
+
+        should "normalize phone number" do
+          assert_equal "5559999999", @phone.address
+        end
+      end
+      
+      context "with parens and spaces" do
+        setup do
+          @user  = Factory(:user)
+          @phone = @user.phone_numbers.create(:name => "Mobile", :address => "(555) 999 9999")
+        end
+
+        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+        should "increment user.phone_numbers_count" do
+          @user.reload
+          assert_equal 1, @user.phone_numbers_count
+        end
+
+        should "normalize phone number" do
+          assert_equal "5559999999", @phone.address
+        end
       end
 
-      should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+      context "with periods" do
+        setup do
+          @user  = Factory(:user)
+          @phone = @user.phone_numbers.create(:name => "Mobile", :address => "555.999.9999")
+        end
 
-      should "increment user.phone_numbers_count" do
-        @user.reload
-        assert_equal 1, @user.phone_numbers_count
-      end
+        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
 
-      should "normalize phone number" do
-        assert_equal "5559999999", @phone.address
+        should "increment user.phone_numbers_count" do
+          @user.reload
+          assert_equal 1, @user.phone_numbers_count
+        end
+
+        should "normalize phone number" do
+          assert_equal "5559999999", @phone.address
+        end
       end
     end
   end
