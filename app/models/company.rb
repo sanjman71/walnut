@@ -91,7 +91,9 @@ class Company < ActiveRecord::Base
                              :work_appointment_confirmation_customer => '0',
                              :work_appointment_confirmation_manager => '0',
                              :work_appointment_confirmation_provider => '0',
-                             :customer_password => 'required'}
+                             :customer_password => 'required',
+                             :customer_email => 'optional',
+                             :customer_phone => 'optional'}
 
   acts_as_taggable_on       :tags
   
