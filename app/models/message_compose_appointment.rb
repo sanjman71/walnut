@@ -5,6 +5,11 @@ class MessageComposeAppointment
     process('confirmation', appointment, preferences, options)
   end
   
+  # send all appointment changes for the specified appointment
+  def self.changes(appointment, preferences, options={})
+    process('change', appointment, preferences, options)
+  end
+
   # send all appointment cancelations for the specified appointment
   def self.cancelations(appointment, preferences, options={})
     process('cancelation', appointment, preferences, options)
