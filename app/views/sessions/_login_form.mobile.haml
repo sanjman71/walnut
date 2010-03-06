@@ -1,0 +1,10 @@
+#login
+  -#- form_for(Location.new, :url => search_resolve_path, :method => :post, :html => {:id => 'search_form', :class => 'form', :target => '_webapp'}) do |f|
+  - form_tag(login_path, :id => 'login_form') do
+    .toolbar
+      %h1== Login
+      = link_to 'Cancel', '#', :class => 'cancel'
+    %ul.rounded
+      %li= text_field_tag "email", '', :id => 'email', :name => 'email', :placeholder => 'email'
+      %li= password_field_tag "password", '', :id => 'password', :name => 'password', :placeholder => 'password'
+    = link_to "Login", '', :class => 'whiteButton submit'

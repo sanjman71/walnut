@@ -340,46 +340,6 @@ class SearchControllerTest < ActionController::TestCase
     should_render_template 'search/index.mobile.haml'
   end
 
-  # context "city search with query param and session query" do
-  #   context "by a non-mobile device" do
-  #     setup do
-  #       # stub search results
-  #       @results = [@location]
-  #       ThinkingSphinx.stubs(:search).returns(@results)
-  #       @results.stubs(:total_pages).returns(1)
-  #       # set session query
-  #       session[:query] = 'beer'
-  #       get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food'
-  #     end
-  # 
-  #     # should set query value to session[:query] instead of params[:query]
-  #     should_assign_to(:query) { 'beer' }
-  #     should_not_assign_to(:tag)
-  # 
-  #     should_respond_with :success
-  #     should_render_template 'search/index.html.haml'
-  #   end
-  # 
-  #   context "by a mobile device" do
-  #     setup do
-  #       # stub search results
-  #       @results = [@location]
-  #       ThinkingSphinx.stubs(:search).returns(@results)
-  #       @results.stubs(:total_pages).returns(1)
-  #       # set session query
-  #       session[:query] = 'beer'
-  #       get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :mobile => '1'
-  #     end
-  # 
-  #     # should set query value to params[:query] instead of session[:query]
-  #     should_assign_to(:query) { 'food' }
-  #     should_not_assign_to(:tag)
-  # 
-  #     should_respond_with :success
-  #     should_render_template 'search/index.mobile.haml'
-  #   end
-  # end
-
   context "city search with street and lat/lng" do
     setup do
       # stub search results

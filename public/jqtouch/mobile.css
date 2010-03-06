@@ -1,4 +1,7 @@
 form#search_form a.goback, form#search_form a.submit      { margin: 0 10px 10px 10px; }
 form#search_form a.submit                                 { color: rgba(0,0,0,0.9); }
 
+form#login_form                                           { margin: 0 10px 10px 10px; }
+form#login_form a.submit                                  { color: rgba(0,0,0,0.9); }
+
 ul li h4                                                  { color: #ff6600; }

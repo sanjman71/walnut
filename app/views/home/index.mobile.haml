@@ -1,6 +1,7 @@
 #home.current
   .toolbar
     %h1== Walnut Places
+    = link_to 'Login', '#login', :class => 'button slideup', :id => 'login_button'
 
   %ul.rounded
     %li.arrow
@@ -9,11 +10,19 @@
     %li.arrow
       = link_to 'Search Pizza in Chicago', '/search/us/il/chicago/q/pizza'
 
+  %h2== Search Popular Cities
+  %ul.rounded
+    - @cities.each do |city|
+      %li.arrow= link_to city.name, '#search', :id => 'search_city'
+
   .info
     == Walnut Places Mobile Edition
 
 -# add search form page
 = render(:partial => 'shared/search_form')
+
+-# add login form page
+= render(:partial => 'sessions/login_form')
 
 -##cities
   -#%ul.metal

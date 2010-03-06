@@ -22,15 +22,33 @@ class SessionsController < ApplicationController
     user = User.authenticate(params[:email], params[:password])
     
     if user
-      redirect_path = session_initialize(user)
-      redirect_back_or_default(redirect_path) and return
+      @redirect_path = session_initialize(user)
     else
       note_failed_signin
       @user        = User.new
       @email       = params[:email]
       @remember_me = params[:remember_me]
+    end
 
-      render(:action => 'new') and return
+    respond_to do |format|
+      format.html do
+        if user
+          # success
+          redirect_back_or_default(@redirect_path) and return
+        else
+          # error
+          render(:action => 'new') and return
+        end
+      end
+      format.mobile do
+        if user
+          # success
+          head(:ok, :content_type => 'application/json')
+        else
+          # error
+          head(:bad_request, :content_type => 'application/json')
+        end
+      end
     end
   end  
 
