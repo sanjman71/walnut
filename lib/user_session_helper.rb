@@ -13,7 +13,7 @@ module UserSessionHelper
     self.current_user = user
     new_cookie_flag   = (params[:remember_me] == "1")
     handle_remember_cookie! new_cookie_flag
-    flash[:notice]    = "Logged in successfully"
+    flash[:notice]    = "Logged in successfully as #{user.email_addresses_count > 0 ? user.primary_email_address.address : user.name}"
     
     # return the redirect path
     return_to || '/'

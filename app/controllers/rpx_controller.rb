@@ -10,7 +10,7 @@ class RpxController < ApplicationController
     if @user.blank?
       # only allow certain users to login with rpx
       if defined?(ADMIN_USER_EMAILS) and !ADMIN_USER_EMAILS.include?(@data[:email])
-        flash[:error] = "This feature is coming soon"
+        flash[:error] = "Logins are currently disabled"
         redirect_to("/") and return
       end
 
