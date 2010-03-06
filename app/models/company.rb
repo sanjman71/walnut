@@ -84,6 +84,10 @@ class Company < ActiveRecord::Base
   has_many                  :authorized_customers, :through => :user_roles, :source => :user,
                             :conditions => ['badges_user_roles.role_id = #{Company.customer_role.id}']
 
+  has_many                  :authorized_managers_and_providers, :through => :user_roles, :source => :user,
+                            :conditions => ['(badges_user_roles.role_id IN (#{Company.manager_role.id}, #{Company.provider_role.id}))'],
+                            :select => "DISTINCT users.*", :order => "users.name"
+
   # Preferences
   serialized_hash           :preferences,
                             {:time_horizon => 28.days, :start_wday => '0', :appt_start_minutes => [0], :public => '1',
