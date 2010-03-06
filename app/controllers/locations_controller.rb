@@ -57,7 +57,7 @@ class LocationsController < ApplicationController
 
     if mobile_device?
       # show full site
-      request.format = 'text/html'
+      request.format = :html
     end
   end
 
