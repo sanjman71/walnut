@@ -4,4 +4,4 @@ form#search_form a.submit                                 { color: rgba(0,0,0,0.
 form#login_form                                           { margin: 0 10px 10px 10px; }
 form#login_form a.submit                                  { color: rgba(0,0,0,0.9); }
 
-ul li h4                                                  { color: #ff6600; }
+ul li h4.name                                             { color: #ccc; }
