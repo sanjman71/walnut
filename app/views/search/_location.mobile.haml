@@ -1,0 +1,6 @@
+%li
+  %h4= location.company_name
+  = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
+  - unless location.phone_numbers_count == 0
+    = link_to number_to_phone(location.primary_phone_number.address, :delimiter => "."), "tel:#{location.primary_phone_number.address}", :rel => 'external'
+  

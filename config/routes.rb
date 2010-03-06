@@ -22,7 +22,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/search/error/:locality', :controller => 'search', :action => 'error'
 
   # search
-  map.connect     '/search/resolve', :controller => 'search', :action => 'resolve', :conditions => {:method => :post}
+  map.search_resolve  '/search/resolve', :controller => 'search', :action => 'resolve', :conditions => {:method => :post}
+
   map.connect     '/:klass/:country/:state/:city/s/:street/x/:lat/y/:lng/tag/:tag',
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/,
                   :lat => /[0-9]+/, :lng => /[0-9-]+/, :street => /[a-z0-9-]+/, :klass => /search|locations|events/
@@ -39,24 +40,25 @@ ActionController::Routing::Routes.draw do |map|
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z-]+/, :klass => /search|locations|events/
   map.connect     '/:klass/:country/:state/:city/n/:neighborhood/q/:query',
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z-]+/, :klass => /search|locations|events/
-  map.connect     '/search/:country/:state/:city/n/:neighborhood', 
+  map.search_hood '/search/:country/:state/:city/n/:neighborhood',
                   :controller => 'search', :action => 'neighborhood', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z-]+/
   map.connect     '/:klass/:country/:state/:city/tag/:tag',
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/, :klass => /search|locations|events/
   map.connect     '/:klass/:country/:state/:city/q/:query',
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/, :klass => /search|locations|events/
-  map.connect     '/search/:country/:state/:city', 
+  map.search_city '/search/:country/:state/:city',
                   :controller => 'search', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :action => 'city', :city => /[a-z-]+/
   map.connect     '/:klass/:country/:state/:zip/tag/:tag',
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :zip => /\d{5}/, :klass => /search|locations|events/
   map.connect     '/:klass/:country/:state/:zip/q/:query', 
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :zip => /\d{5}/, :klass => /search|locations|events/
-  map.connect     '/search/:country/:state/:zip', 
+  map.search_zip  '/search/:country/:state/:zip', 
                   :controller => 'search', :action => 'zip', :state => /[a-z]{2}/, :zip => /\d{5}/
   map.connect     '/:klass/:country/:state/q/:query',
                   :controller => 'search', :action => 'index', :klass => /search|locations|events/, :state => /[a-z]{2}/
-  map.connect     '/search/:country/:state', :controller => 'search', :action => 'state', :state => /[a-z]{2}/ # state must be 2 letters
-  map.connect     '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/ # country must be 2 letters
+
+  map.search_state    '/search/:country/:state', :controller => 'search', :action => 'state', :country => /[a-z]{2}/, :state => /[a-z]{2}/
+  map.search_country  '/search/:country', :controller => 'search', :action => 'country', :country => /[a-z]{2}/
 
   map.search_untagged_query '/search/untagged/q/:query', :controller => 'search', :action => 'untagged'
   map.search_untagged       '/search/untagged', :controller => 'search', :action => 'untagged'

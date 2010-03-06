@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class SearchControllerTest < ActionController::TestCase
 
@@ -105,8 +104,6 @@ class SearchControllerTest < ActionController::TestCase
         get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'anything'
       end
 
-      should_respond_with :success
-      should_render_template 'search/index.html.haml'
       should_assign_to(:klasses) { [Location] }
       should_assign_to(:country) { @us }
       should_assign_to(:state) { @il }
@@ -123,6 +120,9 @@ class SearchControllerTest < ActionController::TestCase
       should_assign_to(:title) { "Places Directory near Chicago, IL" }
       should_assign_to(:h1) { "Places Directory near Chicago, IL" }
 
+      should_respond_with :success
+      should_render_template 'search/index.html.haml'
+
       should "allow robots" do
         assert_true assigns(:robots)
       end
@@ -132,6 +132,25 @@ class SearchControllerTest < ActionController::TestCase
           assert_select "[content=?]", "index,follow"
         end
       end
+    end
+
+    context "with params query different than session query" do
+      setup do
+        # stub search results
+        @results = [@location]
+        ThinkingSphinx.stubs(:search).returns(@results)
+        @results.stubs(:total_pages).returns(1)
+        # set session query
+        session[:query] = 'beer'
+        get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food'
+      end
+
+      # should use session query instead of params query
+      should_assign_to(:query) { 'beer' }
+      should_not_assign_to(:tag)
+
+      should_respond_with :success
+      should_render_template 'search/index.html.haml'
     end
 
     context "with query and no locations" do
@@ -279,21 +298,87 @@ class SearchControllerTest < ActionController::TestCase
       end
 
       should "have breadcrumbs link 'United States'" do
-        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'},
                                  :descendant => {:tag => 'a', :attributes => {:class => 'country', :href => '/search/us'}}
       end
-    
+
       should "have breadcrumbs link 'Illinois'" do
-        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'},
                                  :descendant => {:tag => 'a', :attributes => {:class => 'state', :href => '/search/us/il'}}
       end
-    
+
       should "have breadcrumbs link 'Chicago'" do
-        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'}, 
+        assert_tag :tag => "h4", :attributes => {:id => 'breadcrumbs'},
                                  :descendant => {:tag => 'a', :attributes => {:class => 'city', :href => '/search/us/il/chicago'}}
       end
     end
   end
+
+  context "city search by a mobile device" do
+    setup do
+      # stub search results
+      @results = [@location]
+      ThinkingSphinx.stubs(:search).returns(@results)
+      @results.stubs(:total_pages).returns(1)
+      # set session query
+      session[:query] = 'beer'
+      get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :mobile => '1'
+    end
+
+    # should set query value to params[:query] instead of session[:query]
+    should_assign_to(:query) { 'food' }
+    should_not_assign_to(:tag)
+
+    should "set sphinx page options" do
+      @sphinx_options = assigns(:sphinx_options)
+      assert_equal 1, @sphinx_options[:page]
+      assert_equal 5, @sphinx_options[:per_page]
+      assert_equal 100, @sphinx_options[:max_matches]
+    end
+
+    should_respond_with :success
+    should_render_template 'search/index.mobile.haml'
+  end
+
+  # context "city search with query param and session query" do
+  #   context "by a non-mobile device" do
+  #     setup do
+  #       # stub search results
+  #       @results = [@location]
+  #       ThinkingSphinx.stubs(:search).returns(@results)
+  #       @results.stubs(:total_pages).returns(1)
+  #       # set session query
+  #       session[:query] = 'beer'
+  #       get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food'
+  #     end
+  # 
+  #     # should set query value to session[:query] instead of params[:query]
+  #     should_assign_to(:query) { 'beer' }
+  #     should_not_assign_to(:tag)
+  # 
+  #     should_respond_with :success
+  #     should_render_template 'search/index.html.haml'
+  #   end
+  # 
+  #   context "by a mobile device" do
+  #     setup do
+  #       # stub search results
+  #       @results = [@location]
+  #       ThinkingSphinx.stubs(:search).returns(@results)
+  #       @results.stubs(:total_pages).returns(1)
+  #       # set session query
+  #       session[:query] = 'beer'
+  #       get :index, :klass => 'search', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food', :mobile => '1'
+  #     end
+  # 
+  #     # should set query value to params[:query] instead of session[:query]
+  #     should_assign_to(:query) { 'food' }
+  #     should_not_assign_to(:tag)
+  # 
+  #     should_respond_with :success
+  #     should_render_template 'search/index.mobile.haml'
+  #   end
+  # end
 
   context "city search with street and lat/lng" do
     setup do
@@ -389,7 +474,7 @@ class SearchControllerTest < ActionController::TestCase
                                :descendant => {:tag => 'span', :attributes => {:class => 'city'}}
     end
   end
-  
+
   context "neighborhood" do
     setup do
       @river_north = Factory(:neighborhood, :name => "River North", :city => @chicago)

@@ -30,6 +30,9 @@ class ApplicationController < ActionController::Base
   # Load and cache all user privileges on each call so we don't have to keep checking the database
   before_filter :init_current_privileges
 
+  # Mobile device support
+  before_filter :prepare_for_mobile
+
   # Default application layout
   layout 'home'
 
@@ -365,4 +368,23 @@ class ApplicationController < ActionController::Base
 
     tuple.join(" - ")
   end
+
+  protected
+
+  def mobile_device?
+    if session[:mobile_param]
+      session[:mobile_param] == "1"
+    else
+      request.user_agent =~ /Mobile|webOS/
+    end
+  end
+
+  helper_method :mobile_device?
+
+  def prepare_for_mobile
+    # set session param if there is a 'mobile' url param
+    session[:mobile_param] = params[:mobile] if params[:mobile]
+    request.format = :mobile if mobile_device?
+  end
+
 end

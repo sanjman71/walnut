@@ -97,7 +97,7 @@ class SearchController < ApplicationController
     @query_quorum   = @hash[:query_quorum]
     @fields         = @hash[:fields]
     @attributes     = @hash[:attributes] || Hash.new
-    @page           = params[:page] || 1
+    @page           = params[:page] ? params[:page].to_i : 1
 
     # build attributes based on geo type
     case
@@ -312,22 +312,27 @@ class SearchController < ApplicationController
     when 'City'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @locality, :query => @query) and return
+      @path     = url_for(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @locality, :query => @query)
     when 'Zip'
       @state    = @locality.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :zip => @locality, :query => @query) and return
+      @path     = url_for(:action => 'index', :klass => @klass, :country => @country, :state => @state, :zip => @locality, :query => @query)
     when 'Neighborhood'
       @city     = @locality.city
       @state    = @city.state
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :query => @query) and return
+      @path     = url_for(:action => 'index', :klass => @klass, :country => @country, :state => @state, :city => @city, :neighborhood => @locality, :query => @query) and return
     when 'State'
       @state    = @locality
       @country  = @state.country
-      redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :query => @query) and return
+      @path     = redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :query => @query)
     else
-      redirect_to(root_path)
+      @path     = url_for(root_path)
+    end
+    
+    respond_to do |format|
+      format.html { redirect_to(@path) and return }
+      format.mobile { redirect_to(@path) and return }
     end
   end
 
@@ -368,8 +373,15 @@ class SearchController < ApplicationController
       # the special 'anything' query
       params[:query]
     when params[:query]
-      # use session query if one exists, default to params
-      session[:query] || params[:query]
+      logger.debug("*** params: #{params.inspect}")
+      logger.debug("*** sesson: #{session.inspect}")
+      if mobile_device?
+        # use params query
+        params[:query]
+      else
+        # use session query if one exists, default to params
+        session[:query] || params[:query]
+      end
     else
       # no query
       ''
@@ -410,7 +422,7 @@ class SearchController < ApplicationController
   end
 
   def search_per_page
-    10
+    mobile_device? ? 5 : 10
   end
 
   def search_max_page

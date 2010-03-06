@@ -1,0 +1,17 @@
+.current
+  .toolbar
+    = link_to "Home", '#home', :class => "button"
+    %h1= @title
+
+  %ul.edgetoedge
+    - @objects.slice(0,5).each_with_index do |object, i|
+      - case object.class.to_s
+      - when 'Location'
+        - tags = [] #(@city and !@geo_origin) ? object.tags : []
+        = render(:partial => 'search/location', :locals => {:location => object, :query => @query, :tags => tags, :index => i})
+      - when 'Appointment'
+        = render(:partial => 'search/event', :locals => {:event => object, :query => @query, :tags => [], :index => i})
+
+  %ul.individual
+    %li= link_to "More", url_for(params.update(:format => nil, :page => @page+1)), :class => "fade"
+    %li= link_to "Search", '#search', :class => "fade"

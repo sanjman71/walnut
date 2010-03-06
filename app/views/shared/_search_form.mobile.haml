@@ -1,0 +1,10 @@
+-# search page
+#search
+  - form_for(Location.new, :url => search_resolve_path, :method => :post, :html => {:id => 'search_form', :class => 'form', :target => '_webapp'}) do |f|
+    .toolbar
+      %h1== Local Search
+      = link_to 'Cancel', '#', :class => 'cancel'
+    %ul.rounded
+      %li= text_field_tag "search_what", '', :id => 'search_what', :name => 'query', :class => 'title', :placeholder => 'What? e.g. pizza, soccer'
+      %li= text_field_tag "search_where", '', :id => 'search_where', :name => 'where', :class => 'title', :placeholder => 'Where? e.g. Chicago, New York, 60610'
+    = link_to "Search", '', :class => 'whiteButton submit'

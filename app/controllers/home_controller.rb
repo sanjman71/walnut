@@ -81,6 +81,7 @@ class HomeController < ApplicationController
 
     respond_to do |format|
       format.html
+      format.mobile
     end
   end
 
