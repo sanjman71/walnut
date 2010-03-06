@@ -54,6 +54,11 @@ class LocationsController < ApplicationController
     # initialize title, h1 tags
     @title    = build_place_title(@company, @location, :city => @city, :state => @state, :zip => @zip)
     @h1       = @company.name
+
+    if mobile_device?
+      # show full site
+      request.format = 'text/html'
+    end
   end
 
   # GET /locations/:city/random
