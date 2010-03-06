@@ -25,6 +25,11 @@ class ChainsController < ApplicationController
     # track event
     track_chain_ga_event(params[:controller], "Index")
 
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
+
     respond_to do |format|
       format.html
     end
@@ -51,6 +56,11 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], "Index By Letter")
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
 
     respond_to do |format|
       format.html { render(:action => 'index') }
@@ -88,6 +98,11 @@ class ChainsController < ApplicationController
     # track event
     track_chain_ga_event(params[:controller], @chain, @country)
 
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
+
     respond_to do |format|
       format.html
     end
@@ -123,6 +138,11 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], @chain, @state)
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
 
     respond_to do |format|
       format.html
@@ -166,6 +186,11 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], @chain, @city)
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
 
     respond_to do |format|
       format.html

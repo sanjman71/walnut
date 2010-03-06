@@ -8,6 +8,11 @@ class SearchController < ApplicationController
     # @country, @states initialized in before filter
     @title  = "Search Places and Events in #{@country.name}"
     @h1     = "Search Places and Events by State"
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
   end
 
   def state
@@ -21,6 +26,11 @@ class SearchController < ApplicationController
     
     @title  = "Search Places and Events in #{@state.name}"
     @h1     = "Search Places and Events by City"
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
   end
 
   def city
@@ -37,6 +47,11 @@ class SearchController < ApplicationController
 
     @title  = "#{@city.name}, #{@state.code} Yellow Pages"
     @h1     = "Search Places and Events in #{@city.name}, #{@state.name}"
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
   end
 
   def neighborhood
@@ -55,6 +70,11 @@ class SearchController < ApplicationController
 
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.code} Yellow Pages"
     @h1     = "Search Places and Events in #{@neighborhood.name}, #{@city.name}, #{@state.name}"
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
   end
 
   def zip
@@ -73,6 +93,11 @@ class SearchController < ApplicationController
 
     @title  = "#{@state.code} #{@zip.name} Yellow Pages"
     @h1     = "Search Places and Events in #{@state.code} #{@zip.name}"
+
+    if mobile_device?
+      # show full site
+      request.format = :html
+    end
   end
   
   def index
