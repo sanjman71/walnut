@@ -14,6 +14,10 @@ class SessionsController < ApplicationController
   def create
     logout_keeping_session!
     
+    # set session return_to value if it was specified
+    @return_to = params[:return_to]
+    session[:return_to] = @return_to unless @return_to.blank?
+
     # authenticate user
     user = User.authenticate(params[:email], params[:password])
     
