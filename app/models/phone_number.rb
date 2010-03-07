@@ -43,6 +43,11 @@ class PhoneNumber < ActiveRecord::Base
     self.state == 'verified'
   end
 
+  # returns true if the phone number address is changeable
+  def changeable?
+    true
+  end
+
   # return true if the phone number is deletable
   def deletable?
     return false if new_record?
