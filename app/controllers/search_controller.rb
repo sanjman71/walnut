@@ -3,16 +3,12 @@ class SearchController < ApplicationController
   before_filter   :validate_search_page_number, :only => [:index]
   before_filter   :init_localities, :only => [:country, :state, :city, :neighborhood, :zip, :index]
   before_filter   :init_weather, :only => [:index]
+  before_filter   :force_full_site, :only => [:country, :state, :city, :neighborhood, :zip]
 
   def country
     # @country, @states initialized in before filter
     @title  = "Search Places and Events in #{@country.name}"
     @h1     = "Search Places and Events by State"
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
   end
 
   def state
@@ -26,11 +22,6 @@ class SearchController < ApplicationController
     
     @title  = "Search Places and Events in #{@state.name}"
     @h1     = "Search Places and Events by City"
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
   end
 
   def city
@@ -47,11 +38,6 @@ class SearchController < ApplicationController
 
     @title  = "#{@city.name}, #{@state.code} Yellow Pages"
     @h1     = "Search Places and Events in #{@city.name}, #{@state.name}"
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
   end
 
   def neighborhood
@@ -70,11 +56,6 @@ class SearchController < ApplicationController
 
     @title  = "#{@neighborhood.name}, #{@city.name}, #{@state.code} Yellow Pages"
     @h1     = "Search Places and Events in #{@neighborhood.name}, #{@city.name}, #{@state.name}"
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
   end
 
   def zip
@@ -93,11 +74,6 @@ class SearchController < ApplicationController
 
     @title  = "#{@state.code} #{@zip.name} Yellow Pages"
     @h1     = "Search Places and Events in #{@state.code} #{@zip.name}"
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
   end
   
   def index
@@ -453,6 +429,17 @@ class SearchController < ApplicationController
   def search_max_page
     search_max_matches / search_per_page
   end
+
+  # returns true if the current search page is the last page in the search
+  def search_last_page?(current_page, current_search_results)
+    # its the last page if the number of results is less than a page's worth;
+    # or if its the last page baased on the number of total results
+    return true if current_search_results < search_per_page
+    return true if current_page >= search_max_page
+    false
+  end
+
+  helper_method :search_last_page?
 
   # before filter to check the page number is in bounds
   def validate_search_page_number

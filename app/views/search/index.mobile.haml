@@ -13,5 +13,7 @@
         = render(:partial => 'search/event', :locals => {:event => object, :query => @query, :tags => [], :index => i})
 
   %ul.individual
-    %li= link_to "More", url_for(params.update(:format => nil, :page => @page+1)), :class => "fade"
+    -# check if its the last page
+    - unless search_last_page?(@page, @objects.size)
+      %li= link_to "More", url_for(params.update(:format => nil, :page => @page+1)), :class => "fade"
     %li= link_to "Search", '#search', :class => "fade"

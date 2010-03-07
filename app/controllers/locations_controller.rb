@@ -2,6 +2,8 @@ class LocationsController < ApplicationController
   # use the acts_as_friendly_param plugin filter to handle showing a unique friendly url for the location
   around_filter ActionController::FriendlyFilter.new
 
+  before_filter :force_full_site, :only => [:show]
+
   # GET /locations/1-hall-of-justice
   def show
     @location = Location.find(params[:id], :include => [:companies, :country, :state, :city, :zip, :neighborhoods])
@@ -50,15 +52,10 @@ class LocationsController < ApplicationController
         end
       end
     end
-    
+
     # initialize title, h1 tags
     @title    = build_place_title(@company, @location, :city => @city, :state => @state, :zip => @zip)
     @h1       = @company.name
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
   end
 
   # GET /locations/:city/random

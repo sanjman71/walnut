@@ -1,6 +1,7 @@
 class ChainsController < ApplicationController
   before_filter   :normalize_page_number, :only => [:city]
   before_filter   :init_areas, :only => [:country, :state, :city]
+  before_filter   :force_full_site
 
   # use the acts_as_friendly_param plugin filter to handle showing a unique friendly url for chain locations
   around_filter ActionController::FriendlyFilter.new
@@ -24,11 +25,6 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], "Index")
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
 
     respond_to do |format|
       format.html
@@ -56,11 +52,6 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], "Index By Letter")
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
 
     respond_to do |format|
       format.html { render(:action => 'index') }
@@ -98,11 +89,6 @@ class ChainsController < ApplicationController
     # track event
     track_chain_ga_event(params[:controller], @chain, @country)
 
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
-
     respond_to do |format|
       format.html
     end
@@ -138,11 +124,6 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], @chain, @state)
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
 
     respond_to do |format|
       format.html
@@ -186,11 +167,6 @@ class ChainsController < ApplicationController
 
     # track event
     track_chain_ga_event(params[:controller], @chain, @city)
-
-    if mobile_device?
-      # show full site
-      request.format = :html
-    end
 
     respond_to do |format|
       format.html

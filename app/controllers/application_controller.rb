@@ -379,6 +379,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def force_full_site
+    if mobile_device?
+      request.format = :html
+    end
+  end
+
   helper_method :mobile_device?
 
   def prepare_for_mobile
