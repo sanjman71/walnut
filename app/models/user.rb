@@ -153,10 +153,12 @@ class User < ActiveRecord::Base
     self.rpx == 1
   end
 
+  # address of primary email address
   def email_address
     @email_address ||= self.email_addresses_count > 0 ? self.primary_email_address.address : ''
   end
 
+  # address of primary phone number
   def phone_number
     @phone_number ||= self.phone_numbers_count > 0 ? self.primary_phone_number.address : ''
   end
