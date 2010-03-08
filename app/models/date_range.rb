@@ -129,8 +129,8 @@ class DateRange
         end_at    = start_at.end_of_day
         range_type = 'daily'
       when 'next 7 days'
-        end_at    = now + 7.days
-        start_at  = now
+        start_at  = now.beginning_of_day
+        end_at    = start_at + 7.days
         range_type = 'weekly'
       when 'this week'
         if options[:include] == :today
