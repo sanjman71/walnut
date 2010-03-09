@@ -326,7 +326,7 @@ class SearchController < ApplicationController
     when 'State'
       @state    = @locality
       @country  = @state.country
-      @path     = redirect_to(:action => 'index', :klass => @klass, :country => @country, :state => @state, :query => @query)
+      @path     = url_for(:action => 'index', :klass => @klass, :country => @country, :state => @state, :query => @query)
     else
       @path     = url_for(root_path)
     end
