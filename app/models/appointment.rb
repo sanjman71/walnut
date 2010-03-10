@@ -56,7 +56,7 @@ class Appointment < ActiveRecord::Base
   has_many                  :event_categories, :through => :appointment_event_category, :after_add => :after_add_category, :after_remove => :after_remove_category
   
   before_destroy            :before_destroy_callback
-
+  
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
   CREATE_APPT_ATTRS        = ["company_id", "service_id", "location_id", "provider_id", "provider_type", "customer_id", "mark_as",
@@ -681,15 +681,9 @@ class Appointment < ActiveRecord::Base
         a = Appointment.new(attrs)
 
         # Make sure to check validity before free_conflicts - validity check ensures start_at, end_at and duration are all in line
-        if a.valid?
-          if !a.free_conflicts?
-            Appointment.transaction do
-              a.save
-            end
-          end
-        else
-          # TODO - need to communicate to the user that we had a failure
-          # Nothing to do here yet. Will need to flag the issue by adding something to the parent record.
+        Appointment.transaction do
+          a.save
+          raise AppointmentInvalid, a.errors.full_messages unless a.valid?
         end
 
       rescue Exception => e
@@ -710,7 +704,7 @@ class Appointment < ActiveRecord::Base
   #
   def update_recurrence(attr_changed, attr_changes, force_destroy = false)
     # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
-    if (!self.recur_rule.blank?) && (self.recur_parent.nil?) && (!self.recur_expanded_to.nil?)
+    if (self.recurrence_parent?) && (!self.recur_expanded_to.nil?)
       # Check if any of the attributes changed that cause us to reexpand the recurring instances
       if ((attr_changed & REEXPAND_INSTANCES_ATTRS).size > 0)
         # We need to rebuild all the instances
@@ -723,7 +717,7 @@ class Appointment < ActiveRecord::Base
         }
         # Make sure we start expanding after the end of the original appointment
         self.expand_recurrence(((Time.now.in_time_zone > self.end_at.in_time_zone) ? Time.now.in_time_zone : self.end_at.in_time_zone), self.recur_expanded_to)
-      else
+      elsif ((attr_changed & UPDATE_APPT_ATTRS).size > 0)
         # We can update the existing instances
         # Build a hash of the changes, take out any attributes we don't want to update
         instance_updates = attr_changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }

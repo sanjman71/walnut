@@ -102,11 +102,6 @@ class AppointmentScheduler
 
     # Make sure that it's valid
     raise AppointmentInvalid, free_appointment.errors.full_messages unless free_appointment.valid?
-                      
-    # free appointments should not have conflicts
-    if free_appointment.conflicts?
-      raise TimeslotNotEmpty, 'This time conflicts with existing availability.'
-    end
 
     # Save the free appointment and add capacity in a single transaction
     # Capacity is added in the after create filter on Appointment, make_capacity_slot
@@ -180,17 +175,20 @@ class AppointmentScheduler
   def self.cancel_appointment(appointment, force = false)
     raise AppointmentInvalid, "Expected an appointment" if appointment.blank?
 
-    # We always commit a cancel
-    Appointment.transaction do
+    # If we're asked to cancel a canceled appointment, we return silently
+    if !appointment.canceled?
+      # We always commit a cancel
+      Appointment.transaction do
       
-      # Tell the appointment if it's allowed to create an overbooked situation or not
-      appointment.force = force
+        # Tell the appointment if it's allowed to create an overbooked situation or not
+        appointment.force = force
       
-      # cancel and save work appointment
-      appointment.cancel
-      appointment.save
-      raise AppointmentInvalid, appointment.errors.full_messages unless appointment.valid?
+        # cancel and save work appointment
+        appointment.cancel
+        appointment.save
+        raise AppointmentInvalid, appointment.errors.full_messages unless appointment.valid?
       
+      end
     end
     
     appointment
