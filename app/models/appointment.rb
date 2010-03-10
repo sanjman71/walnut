@@ -55,7 +55,7 @@ class Appointment < ActiveRecord::Base
   has_many                  :appointment_event_category, :dependent => :destroy
   has_many                  :event_categories, :through => :appointment_event_category, :after_add => :after_add_category, :after_remove => :after_remove_category
   
-  before_destroy            :before_destroy_callback
+  before_destroy            :before_destroy_callback, :destroy_capacity
   
   # Recurrence constants
   # When creating an appointment from a recurrence, only copy over these attributes into the appointment
@@ -700,27 +700,33 @@ class Appointment < ActiveRecord::Base
   end
 
   #
-  # update recurrence must be called explicitly with the list of changed attributes and the changes
+  # update recurrence must be called explicitly with an array of changed attributes and a hash of the changes (:key => new_value)
+  # Note that the attr_changes parameter is not the same as the .changes result from the dirty parameters code - it does not include the old value
+  # If you want to use the dirty attributes hash, then chnage the h.merge(k => v) below to read h.merge(k => v[1])
   #
-  def update_recurrence(attr_changed, attr_changes, force_destroy = false)
+  def update_recurrence(attr_changed, attr_changes)
+
     # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
     if (self.recurrence_parent?) && (!self.recur_expanded_to.nil?)
       # Check if any of the attributes changed that cause us to reexpand the recurring instances
       if ((attr_changed & REEXPAND_INSTANCES_ATTRS).size > 0)
+
         # We need to rebuild all the instances
-        self.recur_instances.each {|a| 
-          if !force_destroy && a.work_conflicts.count > 0
-            raise Exception, "Some of the recurring appointments have work appointments attached"
-          else
-            a.destroy
-          end
-        }
+        self.recur_instances.each do |a| 
+          # Destroy the appointment
+          a.destroy
+        end
+
+        # Queue the request to expand.
         # Make sure we start expanding after the end of the original appointment
-        self.expand_recurrence(((Time.now.in_time_zone > self.end_at.in_time_zone) ? Time.now.in_time_zone : self.end_at.in_time_zone), self.recur_expanded_to)
+        self.send_later(:expand_recurrence,
+                        ((Time.now.in_time_zone > self.end_at.in_time_zone) ? Time.now.in_time_zone : self.end_at.in_time_zone),
+                        self.recur_expanded_to)
+
       elsif ((attr_changed & UPDATE_APPT_ATTRS).size > 0)
         # We can update the existing instances
         # Build a hash of the changes, take out any attributes we don't want to update
-        instance_updates = attr_changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k) ? h.merge(k => v[1]) : h }
+        instance_updates = attr_changes.inject(Hash.new){|h, (k,v)| UPDATE_APPT_ATTRS.include?(k.to_s) ? h.merge(k => v) : h }
         self.recur_instances.each { |a| a.update_attributes(instance_updates) }
       end
     end
@@ -885,6 +891,22 @@ class Appointment < ActiveRecord::Base
 
   end
   
+  # The appointment is going away. Destroy its capacity
+  # Force this to happen. If we're here, we're here..
+  # If the attributes of the appointment are incorrect for some reason we don't try to fix it. This shouldn't happen in normal operation
+  # (it happens when tearing down the demos because the resources / users may go away before the appointments)
+  def destroy_capacity
+
+    # Don't try to destroy capacity for an appointment that's already canceled, or that doesn't have the necessary attributes
+    return true if (self.canceled? || self.company.blank? || self.provider.blank?)
+    CapacitySlot.transaction do
+      CapacitySlot.change_capacity(self.company, self.location, self.provider, self.start_at, self.end_at, -self.capacity, :force => true)
+    end
+
+    # Continue the filter chain
+    true
+  end
+
   def update_capacity
 
     # Determine if we need to update the capacity slot or not
