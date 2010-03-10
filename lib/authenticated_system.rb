@@ -104,6 +104,14 @@ module AuthenticatedSystem
       session[:return_to] = nil
     end
 
+    # URI to redirect to
+    # This is useful for a page.redirect_to RJS directive
+    def redirect_back_or_default_uri(default)
+      result = session[:return_to] || default
+      session[:return_to] = nil
+      result
+    end
+
     # Inclusion hook to make #current_user and #logged_in?
     # available as ActionView helper methods.
     def self.included(base)
