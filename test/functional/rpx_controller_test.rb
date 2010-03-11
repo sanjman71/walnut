@@ -52,7 +52,7 @@ class RpxControllerTest < ActionController::TestCase
 
       should_not_change("User.count") { User.count }
 
-      should_set_the_flash_to /This feature is coming soon/i
+      should_set_the_flash_to /Logins are currently disabled/i
 
       should_respond_with :redirect
       should_redirect_to("root path") { "/" }

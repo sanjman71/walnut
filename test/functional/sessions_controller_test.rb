@@ -12,6 +12,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert @user_email.valid?
     @user_phone = @user.phone_numbers.create(:name => 'Mobile', :address => '6509999999')
     assert @user_phone.valid?
+    assert_equal 'active', @user.state
   end
 
   context "create session (login)" do
@@ -65,7 +66,7 @@ class SessionsControllerTest < ActionController::TestCase
         assert @user2_email.valid?
       end
       
-      context "and login without a password" do
+      context "using no password" do
         setup do
           post :create, {:email => 'user2@walnut.com'}
         end
@@ -77,7 +78,7 @@ class SessionsControllerTest < ActionController::TestCase
         should_redirect_to("root path") { "/" }
       end
       
-      context "and login with a password" do
+      context "using a password" do
         setup do
           post :create, {:email => 'user2@walnut.com', :password => 'secret'}
         end
@@ -91,6 +92,20 @@ class SessionsControllerTest < ActionController::TestCase
         should_respond_with :success
         should_render_template "sessions/new.html.haml"
       end
+    end
+
+    context "for a user in incomplete state" do
+      setup do
+        @user.data_missing!
+        assert_equal 'incomplete', @user.state
+        post :create, {:email => 'user@walnut.com', :password => 'user'}
+      end
+
+      should "set session user" do
+        assert_equal @user.id, session[:user_id]
+      end
+
+      should_redirect_to("root path") { "/" }
     end
 
     context "with return_to" do

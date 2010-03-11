@@ -7,6 +7,17 @@ class User < ActiveRecord::Base
   include Authentication::ByCookieToken
   include Authorization::AasmRoles
 
+  # add states and events
+  aasm_state :incomplete
+
+  aasm_event :profile_data_missing  do
+    transitions :from => [:active, :incomplete], :to => :incomplete
+  end
+
+  aasm_event :profile_complete do
+    transitions :from => [:incomplete], :to => :active, :guard => :profile_complete?
+  end
+
   # Badges for authorization
   badges_authorized_user
 
@@ -18,10 +29,12 @@ class User < ActiveRecord::Base
   validates_presence_of     :password,  :if => :password_required?
   validates_confirmation_of :password,  :if => :password_set?
 
-  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc"
+  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc",
+                            :after_add => :after_add_email_address, :after_remove => :after_remove_email_address
   has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
   accepts_nested_attributes_for :email_addresses, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
-  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy, :order => "priority asc"
+  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy, :order => "priority asc",
+                            :after_add => :after_add_phone_number, :after_remove => :after_remove_phone_number
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
   accepts_nested_attributes_for :phone_numbers, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
 
@@ -49,7 +62,7 @@ class User < ActiveRecord::Base
   has_many                  :capacity_slots, :as => :provider
 
   # Preferences
-  serialized_hash           :preferences, {:provider_email_text => '', :provider_email_daily_schedule => '0'}
+  serialized_hash           :preferences, {:provider_email_text => '', :provider_email_daily_schedule => '0', :phone => 'optional', :email => 'optional'}
 
   # messages sent
   has_many                  :outbox, :class_name => "Message", :foreign_key => "sender_id"
@@ -59,12 +72,14 @@ class User < ActiveRecord::Base
   has_many                  :inbox, :through => :inbox_deliveries, :source => :message
 
   after_create              :manage_user_roles, :activate_user
+  after_update              :after_update_callback
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
   attr_accessible           :name, :password, :password_confirmation, :rpx, :email_addresses_attributes, :phone_numbers_attributes, 
-                            :capacity, :preferences_provider_email_text, :preferences_provider_email_daily_schedule
+                            :capacity, :preferences_provider_email_text, :preferences_provider_email_daily_schedule,
+                            :preferences_phone, :preferences_email
 
   named_scope               :with_emails, { :conditions => ["email_addresses_count > 0"] }
   named_scope               :with_email, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.address = ?", s] } }
@@ -95,10 +110,10 @@ class User < ActiveRecord::Base
     return nil if email_or_phone.blank?
     if PhoneNumber.phone?(email_or_phone)
       # phone authentication
-      users = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_state(:all, :active) # need to get the salt
+      users = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_states(:all, [:active, :incomplete])# need to get the salt
     else
       # assume email authentication
-      users = self.with_email(email_or_phone).find_in_state(:all, :active) # need to get the salt
+      users = self.with_email(email_or_phone).find_in_states(:all, [:active, :incomplete]) # need to get the salt
     end
     # authentication fails if there is no user or more than 1 user
     return nil if users.empty? or users.size > 1
@@ -109,10 +124,15 @@ class User < ActiveRecord::Base
     u.authenticated?(password) ? u : nil
   end
 
-  def self.create_rpx(name, email, identifier)
+  # find users in the specified states
+  def self.find_in_states(number, states)
+    self.find(number, :conditions => ["users.state IN (?)", states.map(&:to_s)])
+  end
+
+  def self.create_rpx(name, email, identifier, options={})
     User.transaction do
       # create user in passive state
-      user  = self.create(:name => name, :rpx => 1)
+      user  = self.create({:name => name, :rpx => 1}.update(options))
       # rpx users don't always have emails
       unless email.blank?
         # add email address with rpx identifier
@@ -138,24 +158,53 @@ class User < ActiveRecord::Base
       o.send(:id=, 0)
     end
   end
-  
+
   # return true if its the special user 'anyone'
   def anyone?
     self.id == 0
   end
-  
+
   # return true if the user is a provider
   def provider?
     self.company_providers.count > 0
   end
-  
+
   def rpx?
     self.rpx == 1
+  end
+
+  def profile_complete?
+    return false if (self.reload.email_missing? or self.reload.phone_missing?)
+    true
+  end
+
+  # return true if a email address is required but user doesn't have one
+  def email_missing?
+    case self.preferences[:email]
+    when 'optional'
+      false
+    when 'required'
+      self.email_addresses_count == 0
+    else
+      false
+    end
   end
 
   # address of primary email address
   def email_address
     @email_address ||= self.email_addresses_count > 0 ? self.primary_email_address.address : ''
+  end
+
+  # return true if a phone number is required but user doesn't have one
+  def phone_missing?
+    case self.preferences[:phone]
+    when 'optional'
+      false
+    when 'required'
+      self.phone_numbers_count == 0
+    else
+      false
+    end
   end
 
   # address of primary phone number
@@ -209,6 +258,43 @@ class User < ActiveRecord::Base
       self.register!
       self.activate!
     end
+
+    # check if user is missing any data
+    if self.reload.email_missing? or self.reload.phone_missing?
+      self.profile_data_missing!
+    end
+  end
+
+  def after_add_email_address(email_address)
+    return if email_address.new_record?
+    self.profile_complete! if self.incomplete?
+  end
+
+  def after_remove_email_address(email_address)
+    return if email_address.new_record?
+    if self.active? and self.reload.email_missing?
+      self.profile_data_missing!
+    end
+  end
+
+  def after_add_phone_number(phone_number)
+    return if phone_number.new_record?
+    self.profile_complete! if self.incomplete?
+  end
+
+  def after_remove_phone_number(phone_number)
+    return if phone_number.new_record?
+    if self.active? and self.reload.phone_missing?
+      self.profile_data_missing!
+    end
   end
   
+  def after_update_callback
+    # when a user's phone or email is added using update_attributes, the after_add callbacks are not called
+    # check if user is in the incomplete state and the missing data has been added
+    if self.incomplete? and self.profile_complete?
+      self.profile_complete!
+    end
+  end
+
 end

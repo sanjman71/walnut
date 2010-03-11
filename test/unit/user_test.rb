@@ -261,6 +261,158 @@ class UserTest < ActiveSupport::TestCase
       # should *not* send user created message
       should_not_change("delayed job count") { Delayed::Job.count }
     end
+
+    context "with phone required" do
+      context "but missing" do
+        setup do
+          @user1 = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_phone => 'required')
+        end
+
+        should_change("User.count", :by => 1) { User.count }
+
+        should "create user in incomplete state" do
+          assert_equal 'incomplete', @user1.state
+        end
+
+        context "and add phone as phone object" do
+          setup do
+            @user1.phone_numbers.create(:name => 'Mobile', :address => '5551112222')
+          end
+
+          should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+          should "change user state to active" do
+            assert_equal 'active', @user1.reload.state
+          end
+        end
+
+        context "and add phone as attributes hash" do
+          setup do
+            @user1.update_attributes({:phone_numbers_attributes => {"1" => {:address => "5551112222", :name => "Mobile"}}})
+          end
+
+          should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+          should "change user state to active" do
+            assert_equal 'active', @user1.reload.state
+          end
+        end
+      end
+      
+      context "and present" do
+        setup do
+          @user1 = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_phone => 'required',
+                               :phone_numbers_attributes => [{:address => "3125551212", :name => "Mobile"}])
+        end
+
+        should_change("User.count", :by => 1) { User.count }
+        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+        should "create user in active state" do
+          assert_equal 'active', @user1.state
+        end
+
+        context "and remove phone" do
+          setup do
+            @user1.phone_numbers.destroy(@user1.phone_numbers.first)
+          end
+
+          should_change("PhoneNumber.count", :by => -1) { PhoneNumber.count }
+
+          should "change user state to incomplete" do
+            assert_equal 'incomplete', @user1.reload.state
+          end
+        end
+      end
+    end
+
+    context "with email required" do
+      context "but missing" do
+        setup do
+          @user1 = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_email => 'required')
+        end
+
+        should_change("User.count", :by => 1) { User.count }
+
+        should "create user in incomplete state" do
+          assert_equal 'incomplete', @user1.state
+        end
+
+        context "and add email address as email object" do
+          setup do
+            @user1.email_addresses.create(:address => 'sanjay@jarna.com')
+          end
+
+          should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+          should "change user state to active" do
+            assert_equal 'active', @user1.reload.state
+          end
+        end
+
+        context "and add email as attributes hash" do
+          setup do
+            @user1.update_attributes({:email_addresses_attributes => {"1" => {:address => "sanjay@jarna.com"}}})
+          end
+
+          should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+          should "change user state to active" do
+            assert_equal 'active', @user1.reload.state
+          end
+        end
+      end
+
+      context "and present" do
+        setup do
+          @user1 = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_email => 'required',
+                               :email_addresses_attributes => [{:address => "user1@walnut.com"}])
+        end
+
+        should_change("User.count", :by => 1) { User.count }
+
+        should "create user in active state" do
+          assert_equal 'active', @user1.state
+        end
+
+        context "and remove email" do
+          setup do
+            @user1.email_addresses.destroy(@user1.email_addresses.first)
+          end
+
+          should_change("EmailAddress.count", :by => -1) { EmailAddress.count }
+
+          should "change user state to incomplete" do
+            assert_equal 'incomplete', @user1.reload.state
+          end
+        end
+      end
+    end
+
+    context "with phone and email required" do
+      setup do
+        @user1 = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret",
+                             :preferences_phone => 'required', :preferences_email => 'required')
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+
+      should "create user in incomplete state" do
+        assert_equal 'incomplete', @user1.state
+      end
+
+      context "and add phone number" do
+        setup do
+          @user1.phone_numbers.create(:name => 'Mobile', :address => '5551112222')
+        end
+
+        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+        should "leave user in incomplete state" do
+          assert_equal 'incomplete', @user1.reload.state
+        end
+      end
+    end
   end
 
   context "caldav token" do
