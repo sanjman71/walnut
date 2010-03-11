@@ -270,8 +270,8 @@ class UserTest < ActiveSupport::TestCase
 
         should_change("User.count", :by => 1) { User.count }
 
-        should "create user in incomplete state" do
-          assert_equal 'incomplete', @user1.state
+        should "create user in data_missing state" do
+          assert_equal 'data_missing', @user1.state
         end
 
         context "and add phone as phone object" do
@@ -319,8 +319,8 @@ class UserTest < ActiveSupport::TestCase
 
           should_change("PhoneNumber.count", :by => -1) { PhoneNumber.count }
 
-          should "change user state to incomplete" do
-            assert_equal 'incomplete', @user1.reload.state
+          should "change user state to data_missing" do
+            assert_equal 'data_missing', @user1.reload.state
           end
         end
       end
@@ -334,8 +334,8 @@ class UserTest < ActiveSupport::TestCase
 
         should_change("User.count", :by => 1) { User.count }
 
-        should "create user in incomplete state" do
-          assert_equal 'incomplete', @user1.state
+        should "create user in data_missing state" do
+          assert_equal 'data_missing', @user1.state
         end
 
         context "and add email address as email object" do
@@ -382,8 +382,8 @@ class UserTest < ActiveSupport::TestCase
 
           should_change("EmailAddress.count", :by => -1) { EmailAddress.count }
 
-          should "change user state to incomplete" do
-            assert_equal 'incomplete', @user1.reload.state
+          should "change user state to data_missing" do
+            assert_equal 'data_missing', @user1.reload.state
           end
         end
       end
@@ -397,8 +397,8 @@ class UserTest < ActiveSupport::TestCase
 
       should_change("User.count", :by => 1) { User.count }
 
-      should "create user in incomplete state" do
-        assert_equal 'incomplete', @user1.state
+      should "create user in data_missing state" do
+        assert_equal 'data_missing', @user1.state
       end
 
       context "and add phone number" do
@@ -408,8 +408,8 @@ class UserTest < ActiveSupport::TestCase
 
         should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
 
-        should "leave user in incomplete state" do
-          assert_equal 'incomplete', @user1.reload.state
+        should "leave user in data_missing state" do
+          assert_equal 'data_missing', @user1.reload.state
         end
       end
     end

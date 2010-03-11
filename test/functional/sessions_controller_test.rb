@@ -94,10 +94,10 @@ class SessionsControllerTest < ActionController::TestCase
       end
     end
 
-    context "for a user in incomplete state" do
+    context "for a user in data_missing state" do
       setup do
-        @user.data_missing!
-        assert_equal 'incomplete', @user.state
+        @user.profile_data_missing!
+        assert_equal 'data_missing', @user.state
         post :create, {:email => 'user@walnut.com', :password => 'user'}
       end
 

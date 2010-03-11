@@ -8,14 +8,14 @@ class User < ActiveRecord::Base
   include Authorization::AasmRoles
 
   # add states and events
-  aasm_state :incomplete
+  aasm_state :data_missing
 
   aasm_event :profile_data_missing  do
-    transitions :from => [:active, :incomplete], :to => :incomplete
+    transitions :from => [:active, :data_missing], :to => :data_missing
   end
 
   aasm_event :profile_complete do
-    transitions :from => [:incomplete], :to => :active, :guard => :profile_complete?
+    transitions :from => [:data_missing], :to => :active, :guard => :profile_complete?
   end
 
   # Badges for authorization
@@ -82,9 +82,11 @@ class User < ActiveRecord::Base
                             :preferences_phone, :preferences_email
 
   named_scope               :with_emails, { :conditions => ["email_addresses_count > 0"] }
+  named_scope               :no_emails, { :conditions => {'email_addresses_count' => 0} }
   named_scope               :with_email, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.address = ?", s] } }
   named_scope               :with_identifier, lambda { |s| { :include => :email_addresses, :conditions => ["email_addresses.identifier = ?", s] } }
-  named_scope               :with_phones, lambda { |s| { :conditions => ["phone_numbers_count > 0"] }}
+  named_scope               :with_phones, { :conditions => ["phone_numbers_count > 0"] }
+  named_scope               :no_phones, { :conditions => {'phone_numbers_count' => 0} }
   named_scope               :with_phone, lambda { |s| { :include => :phone_numbers, :conditions => ["phone_numbers.address = ?", s] } }
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
@@ -110,10 +112,10 @@ class User < ActiveRecord::Base
     return nil if email_or_phone.blank?
     if PhoneNumber.phone?(email_or_phone)
       # phone authentication
-      users = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_states(:all, [:active, :incomplete])# need to get the salt
+      users = self.with_phone(PhoneNumber.format(email_or_phone)).find_in_states(:all, [:active, :data_missing])# need to get the salt
     else
       # assume email authentication
-      users = self.with_email(email_or_phone).find_in_states(:all, [:active, :incomplete]) # need to get the salt
+      users = self.with_email(email_or_phone).find_in_states(:all, [:active, :data_missing]) # need to get the salt
     end
     # authentication fails if there is no user or more than 1 user
     return nil if users.empty? or users.size > 1
@@ -267,7 +269,7 @@ class User < ActiveRecord::Base
 
   def after_add_email_address(email_address)
     return if email_address.new_record?
-    self.profile_complete! if self.incomplete?
+    self.profile_complete! if self.data_missing?
   end
 
   def after_remove_email_address(email_address)
@@ -279,7 +281,7 @@ class User < ActiveRecord::Base
 
   def after_add_phone_number(phone_number)
     return if phone_number.new_record?
-    self.profile_complete! if self.incomplete?
+    self.profile_complete! if self.data_missing?
   end
 
   def after_remove_phone_number(phone_number)
@@ -291,8 +293,8 @@ class User < ActiveRecord::Base
   
   def after_update_callback
     # when a user's phone or email is added using update_attributes, the after_add callbacks are not called
-    # check if user is in the incomplete state and the missing data has been added
-    if self.incomplete? and self.profile_complete?
+    # check if user is in the data_missing state and the missing data has been added
+    if self.data_missing? and self.profile_complete?
       self.profile_complete!
     end
   end
