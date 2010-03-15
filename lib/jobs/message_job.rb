@@ -59,7 +59,7 @@ class MessageJob < Struct.new(:params)
 
     # check message template
     case message.preferences[:template]
-    when :appointment_confirmation, :appointment_reminder, :appointment_cancelation, :appointment_change
+    when :appointment_confirmation, :appointment_reminder, :appointment_cancelation, :appointment_change, :invitation
       # use all message preferences
       options = message.preferences
     else
