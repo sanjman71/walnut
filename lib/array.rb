@@ -12,4 +12,7 @@ class Array
     dup.zero_compact!
   end
   
+  def rotate
+    push shift
+  end
 end
