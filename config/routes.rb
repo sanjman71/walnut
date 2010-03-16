@@ -16,7 +16,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/locations/:id/recommend', :controller => 'locations', :action => 'recommend', :conditions => {:method => :post}
   map.connect     '/locations/:city/random', :controller => 'locations', :action => 'random', :conditions => {:method => :get}
 
-  map.resources   :locations, :only => [:index, :show, :create]
+  map.resources   :locations, :only => [:index, :show, :create, :edit, :update]
 
   # search error route
   map.connect     '/search/error/:locality', :controller => 'search', :action => 'error'

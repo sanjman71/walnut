@@ -13,7 +13,9 @@
       == Popularity:#{@location.popularity}
       == &nbsp;|&nbsp;
       == Events:#{@location.events_count}
-          
+      == &nbsp;
+      = link_to image_tag('search.png'), edit_location_path(@location), :title => 'Edit'
+
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'search', :country => @country, :state => @state, :city => @city, :link_all => true})
 
@@ -21,6 +23,9 @@
   = render(:partial => 'shared/weather', :locals => {:weather => @weather}) unless @weather.blank?
 
 %hr.space
+
+.span-15.prepend-1
+  = display_flash
 
 .span-18.prepend-1
   .span-18#address_phone

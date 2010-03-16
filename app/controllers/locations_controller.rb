@@ -139,7 +139,79 @@ class LocationsController < ApplicationController
       end
     end
   end
+
+  # GET /locations/1/edit
+  def edit
+    @location = Location.find(params[:id], :include => [:companies, :country, :state, :city, :zip, :neighborhoods])
+    @company  = @location.company unless @location.blank?
+
+    if @location.blank? or @company.blank?
+      redirect_to(:controller => 'search', :action => 'error', :locality => 'location') and return
+    end
+
+    @countries  = [@location.country]
+    @states     = [@location.state]
+    @cities     = (@location.state.andand.cities || []).sort_by{|o| o.name}
+    @zips       = (@location.state.andand.zips || []).sort_by{|o| o.name}
   
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  # PUT /locations/1
+  def update
+    @location = Location.find(params[:id], :include => [:companies, :country, :state, :city, :zip, :neighborhoods])
+    @company  = @location.company unless @location.blank?
+
+    if @location.blank? or @company.blank?
+      redirect_to(:controller => 'search', :action => 'error', :locality => 'location') and return
+    end
+
+    @locality_changes = 0
+    params[:location].keys.each do |key|
+      next unless [:country_id, :state_id, :city_id, :zip_id, :neighborhood_id].include?(key.to_sym)
+      begin
+        # get class object
+        klass_name  = key.to_s.split("_").first.titleize
+        klass       = Module.const_get(klass_name)
+      rescue
+        next
+      end
+
+      begin
+        locality = klass.find_by_id(params[:location][key])
+        method   = klass_name.downcase + "="
+        @location.send(method, locality)
+        @locality_changes += 1
+        # delete it from params since its already updated
+        params[:location].delete(key)
+      rescue
+        next
+      end
+    end
+
+    @success = @location.update_attributes(params[:location])
+
+    if @success
+      flash[:notice] = "Location updated"
+
+      if @locality_changes > 0
+        @location.geocode_latlng(:force => true)
+        flash[:notice] = "Location and map updated"
+      end
+    else
+      flash[:error] = "Location update failed"
+    end
+
+    # if !@success
+    #   puts "*** errors: #{@success.errors.full_messages}"
+    # end
+
+    redirect_to(location_path(@location))
+  end
+
+
   # POST /locations/1/recommend
   def recommend
     @location = Location.find(params[:id])
