@@ -110,28 +110,27 @@ class CompanyTest < ActiveSupport::TestCase
 
     end
   end
-  
+
   context "company phone number" do
     setup do
       @company = Company.create(:name => "Company 1", :time_zone => "UTC")
-      @company.phone_numbers.push(PhoneNumber.new(:name => "Mobile", :address => "9995551234"))
-      @company.phone_numbers.push(PhoneNumber.new(:name => "Home", :address => "9991234567", :priority => 3))
-      @company.reload
+      @phone1  = @company.phone_numbers.create(:name => "Mobile", :address => "9995551234")
+      @phone2  = @company.phone_numbers.create(:name => "Home", :address => "9991234567", :priority => 3)
     end
-  
+
     should_change("Company.count", :by => 1) { Company.count }
     should_change("PhoneNumber.count", :by => 2) { PhoneNumber.count }
-    
+
     should "have 2 phone numbers" do
-      assert_equal ["9995551234", "9991234567"], @company.phone_numbers.collect(&:address)
+      assert_equal ["9995551234", "9991234567"], @company.reload.phone_numbers.collect(&:address)
     end
-    
+
     should "have phone_numbers_count == 2" do
-      assert_equal 2, @company.phone_numbers_count
+      assert_equal 2, @company.reload.phone_numbers_count
     end
 
     should "have primary phone number" do
-      assert_equal "9995551234", @company.primary_phone_number.address
+      assert_equal "9995551234", @company.reload.primary_phone_number.address
     end
 
     context "then remove company" do
@@ -144,9 +143,30 @@ class CompanyTest < ActiveSupport::TestCase
         assert_equal 0, PhoneNumber.count
       end
     end
-
   end
   
+  context "company email address" do
+    setup do
+      @company = Company.create(:name => "Company 1", :time_zone => "UTC")
+      @email   = @company.email_addresses.create(:address => "soccer@jarna.com")
+    end
+
+    should_change("Company.count", :by => 1) { Company.count }
+    should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+    should "have 1 email address" do
+      assert_equal ["soccer@jarna.com"], @company.reload.email_addresses.collect(&:address)
+    end
+
+    should "have email_addresses_count == 1" do
+      assert_equal 1, @company.reload.email_addresses_count
+    end
+
+    should "have primary email" do
+      assert_equal "soccer@jarna.com", @company.reload.primary_email_address.address
+    end
+  end
+
   context "company tags" do
     setup do
       @company = Company.create(:name => "Company 1", :time_zone => "UTC")

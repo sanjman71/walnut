@@ -28,8 +28,12 @@ class Company < ActiveRecord::Base
   has_many                  :company_locations, :dependent => :destroy
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location
 
-  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
+  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy, :order => "priority asc"
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
+
+  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc"
+  has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
+  accepts_nested_attributes_for :email_addresses, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
 
   has_many                  :company_tag_groups, :dependent => :destroy
   has_many                  :tag_groups, :through => :company_tag_groups
