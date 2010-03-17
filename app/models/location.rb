@@ -38,7 +38,7 @@ class Location < ActiveRecord::Base
   # make sure only accessible attributes are written to from forms etc.
   attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng,
                           :timezone, :timezone_id, :source_id, :source_type,
-                          :company_attributes, :phone_numbers_attributes
+                          :company_attributes, :email_addresses_attributes, :phone_numbers_attributes
 
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :company_name

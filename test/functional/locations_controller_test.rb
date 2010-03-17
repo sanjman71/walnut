@@ -122,24 +122,23 @@ class LocationsControllerTest < ActionController::TestCase
       end
 
       should "change location phone number" do
-        # assert_equal "7043981488", @phone.reload.address
         assert_equal "7043981488", @location.reload.primary_phone_number.address
       end
     end
 
-    # context "email" do
-    #   setup do
-    #     @email = @location.email_addresses.create(:address => "email@jarna.com")
-    #     put :update, :id => @location.to_param,
-    #         :location => {:email_addresses_attributes => {"0" => {:id => @email.id, :address => "baz@jarna.com"}}}
-    #   end
-    # 
-    #   should_assign_to(:location) { @location }
-    #   should_assign_to(:company) { @company }
-    # 
-    #   should "change location email" do
-    #     assert_equal "7043981488", @email.address
-    #   end
-    # end
+    context "email" do
+      setup do
+        @email = @location.email_addresses.create(:address => "email@jarna.com")
+        put :update, :id => @location.to_param,
+            :location => {:email_addresses_attributes => {"0" => {:id => @email.id, :address => "baz@jarna.com"}}}
+      end
+    
+      should_assign_to(:location) { @location }
+      should_assign_to(:company) { @company }
+    
+      should "change location email" do
+        assert_equal "baz@jarna.com", @location.reload.primary_email_address.address
+      end
+    end
   end
 end
