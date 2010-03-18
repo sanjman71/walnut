@@ -17,9 +17,9 @@
         .span-10.letterbox-5.border_bottom.search_result[object]
           - case object.class.to_s
           - when 'Location'
-            = render(:partial => 'search/location', :locals => {:location => object, :index => i})
+            = render(:partial => 'search/location', :locals => {:location => object, :index => i, :markers => false})
           - when 'Appointment'
-            = render(:partial => 'search/event', :locals => {:event => object, :index => i})
+            = render(:partial => 'search/event', :locals => {:event => object, :index => i, :markers => false})
 
   .span-10.prepend-1.last
     - unless @featured_events.blank?
@@ -32,14 +32,14 @@
         .span-10.letterbox-5.border_bottom.search_result[object]
           - case object.class.to_s
           - when 'Location'
-            = render(:partial => 'search/location', :locals => {:location => object, :index => i})
+            = render(:partial => 'search/location', :locals => {:location => object, :index => i, :markers => false})
           - when 'Appointment'
-            = render(:partial => 'search/event', :locals => {:event => object, :index => i})
+            = render(:partial => 'search/event', :locals => {:event => object, :index => i, :markers => false})
 
     .span-11.last.padding-top-5#more_events
       - unless @featured_events_more.blank?
         = link_to @featured_events_more, build_search_route('events', 'city', :city => @featured_city, :state => @featured_state, :country => @country, :query => 'anything'), :class => 'locality search', :style => 'font-weight: bold;'  
-        
+
   -#.span-13.last
     -#- unless @featured_set.blank?
       -#.jmap#map{:style => "width: 500px; height: 390px;"}

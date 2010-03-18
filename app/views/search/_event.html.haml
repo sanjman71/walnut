@@ -1,16 +1,21 @@
-- color = "_orange"
-- klasses = []
+- markers   = true unless local_assigns.has_key?(:markers)
+- color     = "_orange"
+- klasses   = []
 - klasses.push("mappable") if event.mappable?
 
 .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => event.location.lat, :lng => event.location.lng, :index => index, :color => color, :html => "<strong>#{event.name}</strong><br/>At #{event.location_name}<br/>#{link_to "Details", event.url}"}
 
-  -# cache event google marker
-  - cache("google:marker:#{color}:#{index}") do
-    .span-1
-      %img{:src => "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png", :class => 'icon'}
+  - if markers
+    -# cache event google marker
+    - cache("google:marker:#{color}:#{index}") do
+      .span-1
+        %img{:src => "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png", :class => 'icon'}
+  - else
+    -# marker icon placeholder
+    .span-1== &nbsp;
 
   -# cache event info, independent of its list index
-  - cache("#{event.cache_key}") do
+  - cache("#{event.cache_key}", :expires_in => CacheExpire.events) do
     .span-7.info
       %h4.name.margin-bottom-5{:style => 'font-weight: normal;'}
         = truncate(event.name, :length => 30)
