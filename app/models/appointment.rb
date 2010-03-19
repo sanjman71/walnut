@@ -18,7 +18,7 @@ class Appointment < ActiveRecord::Base
 
   # Recurrences - an appointment might have a recurrence rule. If so, the appointment may have multiple recurrence instances.
   # These recurrence instances refer back to their parent. If their parent is destroyed, the instance refererences are nullified
-  has_many                    :recur_instances, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :nullify
+  has_many                    :recur_instances, :class_name => "Appointment", :foreign_key => "recur_parent_id", :dependent => :destroy
   belongs_to                  :recur_parent, :class_name => "Appointment"
 
   has_many                    :appointment_waitlists, :dependent => :destroy
