@@ -82,7 +82,16 @@ class AppointmentScheduler
 
   # build collection of all work appointments over the specified date range
   def self.find_work_appointments(company, location, provider, daterange, options = {})
-    company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+    if (!options[:include_canceled].blank?)
+      company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+    else
+      company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).not_canceled.order_start_at
+    end
+  end
+  
+  # build collection of all work appointments over the specified date range
+  def self.find_canceled_work_appointments(company, location, provider, daterange, options = {})
+    company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).canceled.order_start_at
   end
   
   # create a free appointment in the specified timeslot
