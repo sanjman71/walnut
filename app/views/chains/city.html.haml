@@ -33,7 +33,7 @@
     - @locations.each_with_index do |location, i|
       .span-10.letterbox-5.border_bottom.search_result[location]
         -# show chain locations as regular locations
-        = render(:partial => 'search/location', :locals => {:location => location, :query => @chain.name, :index => i})
+        = render(:partial => 'search/location', :locals => {:location => location, :index => i})
 
     - unless @nearby_cities.blank?
       .span-10.padding-top-10#nearby_cities

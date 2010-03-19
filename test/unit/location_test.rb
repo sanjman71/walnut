@@ -480,44 +480,79 @@ class LocationTest < ActiveSupport::TestCase
   context "location with a phone number" do
     setup do
       @location = Location.create(:name => "My Location", :country => @us)
-      @location.phone_numbers.push(PhoneNumber.new(:name => "Home", :address => "9991234567"))
-      @location.reload
+      @phone    = @location.phone_numbers.create(:name => "Home", :address => "9991234567")
     end
   
     should_change("Location.count", :by => 1) { Location.count }
     should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
     
     should "have 1 phone number" do
-      assert_equal ["9991234567"], @location.phone_numbers.collect(&:address)
+      assert_equal ["9991234567"], @location.reload.phone_numbers.collect(&:address)
     end
     
     should "have phone_numbers_count == 1" do
-      assert_equal 1, @location.phone_numbers_count
+      assert_equal 1, @location.reload.phone_numbers_count
     end
     
     should "have a primary phone number" do
-      assert_equal "9991234567", @location.primary_phone_number.address
+      assert_equal "9991234567", @location.reload.primary_phone_number.address
     end
     
-    context "then destroy phone number" do
+    context "then remove phone number" do
       setup do
-        @phone_number = @location.phone_numbers.first
-        @location.phone_numbers.destroy(@phone_number)
-        @location.reload
+        @location.phone_numbers.delete(@phone)
       end
-      
+
       should_change("PhoneNumber.count", :by => -1) { PhoneNumber.count }
 
       should "have no phone number" do
-        assert_equal [], @location.phone_numbers
+        assert_equal [], @location.reload.phone_numbers
       end
 
       should "have phone_numbers_count == 0" do
-        assert_equal 0, @location.phone_numbers_count
+        assert_equal 0, @location.reload.phone_numbers_count
       end
     end
   end
+
+  context "location with an email address" do
+    setup do
+      @location = Location.create(:name => "My Location", :country => @us)
+      @email    = @location.email_addresses.create(:address => "boozer@jarna.com")
+    end
   
+    should_change("Location.count", :by => 1) { Location.count }
+    should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+    
+    should "have 1 email address" do
+      assert_equal ["boozer@jarna.com"], @location.reload.email_addresses.collect(&:address)
+    end
+    
+    should "have email_addresses_count == 1" do
+      assert_equal 1, @location.reload.email_addresses_count
+    end
+    
+    should "have a primary email address" do
+      assert_equal "boozer@jarna.com", @location.primary_email_address.address
+    end
+
+    context "then remove email address" do
+      setup do
+        @location.email_addresses.delete(@email)
+      end
+      
+      should_change("EmailAddress.count", :by => -1) { EmailAddress.count }
+
+      should "have no email address" do
+        assert_equal [], @location.email_addresses
+      end
+
+      should "have email_addresses_count == 0" do
+        assert_equal 0, @location.reload.email_addresses_count
+      end
+    end
+  end
+
   context "location without refer_to" do
     setup do
       @location = Location.create(:name => "Home", :country => @us)

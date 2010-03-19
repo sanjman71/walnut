@@ -12,8 +12,13 @@ class Location < ActiveRecord::Base
   has_many                :company_locations, :dependent => :destroy
   has_many                :companies, :through => :company_locations
   has_one                 :company, :through => :company_locations, :order => 'id asc'
-  has_many                :phone_numbers, :as => :callable, :dependent => :destroy
+  accepts_nested_attributes_for :company, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
+  has_many                :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc"
+  has_one                 :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
+  accepts_nested_attributes_for :email_addresses, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
+  has_many                :phone_numbers, :as => :callable, :dependent => :destroy, :order => "priority asc"
   has_one                 :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
+  accepts_nested_attributes_for :phone_numbers, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
   has_one                 :event_venue, :dependent => :destroy
   has_many                :location_neighbors, :dependent => :destroy
   has_many                :neighbors, :through => :location_neighbors
@@ -32,7 +37,8 @@ class Location < ActiveRecord::Base
 
   # make sure only accessible attributes are written to from forms etc.
   attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng,
-                          :timezone, :timezone_id, :source_id, :source_type
+                          :timezone, :timezone_id, :source_id, :source_type,
+                          :company_attributes, :email_addresses_attributes, :phone_numbers_attributes
 
   # used to generated an seo friendly url parameter
   acts_as_friendly_param  :company_name

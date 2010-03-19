@@ -28,8 +28,12 @@ class Company < ActiveRecord::Base
   has_many                  :company_locations, :dependent => :destroy
   has_many                  :locations, :through => :company_locations, :after_add => :after_add_location, :after_remove => :after_remove_location
 
-  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy
+  has_many                  :phone_numbers, :as => :callable, :dependent => :destroy, :order => "priority asc"
   has_one                   :primary_phone_number, :class_name => 'PhoneNumber', :as => :callable, :order => "priority asc"
+
+  has_many                  :email_addresses, :as => :emailable, :dependent => :destroy, :order => "priority asc"
+  has_one                   :primary_email_address, :class_name => 'EmailAddress', :as => :emailable, :order => "priority asc"
+  accepts_nested_attributes_for :email_addresses, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? { |k, v| v.blank? } }
 
   has_many                  :company_tag_groups, :dependent => :destroy
   has_many                  :tag_groups, :through => :company_tag_groups
@@ -75,6 +79,9 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :logo, :allow_destroy => true
 
   # Roles through badges associations
+  has_many                  :authorized_staff, :through => :user_roles, :source => :user,
+                            :conditions => ['badges_user_roles.role_id = #{Company.staff_role.id}']
+
   has_many                  :authorized_managers, :through => :user_roles, :source => :user,
                             :conditions => ['badges_user_roles.role_id = #{Company.manager_role.id}']
 
@@ -120,16 +127,20 @@ class Company < ActiveRecord::Base
   # find all companies with appointments
   named_scope :with_appointments,   { :select => "distinct `companies`.*", :joins => :appointments, :conditions => ["appointments.id > 0"] }
 
+  def self.staff_role
+    Badges::Role.find_by_name('company staff')
+  end
+
+  def self.manager_role
+    Badges::Role.find_by_name('company manager')
+  end
+
   def self.provider_role
     Badges::Role.find_by_name('company provider')
   end
 
   def self.customer_role
     Badges::Role.find_by_name('company customer')
-  end
-
-  def self.manager_role
-    Badges::Role.find_by_name('company manager')
   end
 
   # find all polymorphic providers through the company_providers collection, sort by name
@@ -164,7 +175,32 @@ class Company < ActiveRecord::Base
   # check if the company plan allows more providers
   def may_add_provider?
     self.plan.may_add_provider?(self)
-  end  
+  end
+
+  # grant specified company role to the specified user
+  def grant_role(role, user)
+    return unless user.respond_to?(:has_role?)
+    role = role.match(/company \w+/) ? role : "company #{role}"
+    unless user.has_role?(role, self)
+      user.grant_role(role, self)
+    end
+    # add company staff role for selected company roles
+    if role.match(/manager|provider/)
+      role = 'company staff'
+      unless user.has_role?(role, self)
+        user.grant_role(role, self)
+      end
+    end
+  end
+
+  # reovke specified company role from the specified user
+  def revoke_role(role, user)
+    return unless user.respond_to?(:has_role?)
+    role = role.match(/company \w+/) ? role : "company #{role}"
+    if user.has_role?(role, self)
+      user.revoke_role(role, self)
+    end
+  end
 
   private
   
@@ -223,18 +259,18 @@ class Company < ActiveRecord::Base
   def after_add_provider(provider)
     if provider.respond_to?(:has_role?) and !provider.has_role?('company provider', self)
       # assign company roles to provider
-      provider.grant_role('company provider', self)
+      self.grant_role('company provider', provider)
     end
   end
 
   def after_remove_provider(provider)
     # the decrement counter cache doesn't work, so decrement here
     Company.decrement_counter(:providers_count, self.id) if provider
-    
+
     # check provider to see if they provide any services to this company
     if provider.respond_to?(:has_role?) and provider.has_role?('company provider', self) and !provider.provided_companies.include?(self)
       # revoke company roles from provider
-      provider.revoke_role('company provider', self)
+      self.revoke_role('company provider', provider)
     end
   end
   
