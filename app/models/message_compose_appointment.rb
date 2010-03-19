@@ -76,6 +76,11 @@ class MessageComposeAppointment
     if customer.phone_numbers_count > 0
       options.update(:customer_phone => appointment.customer.primary_phone_number.address)
     end
+    
+    # add appointment notes
+    if !appointment.notes.empty?
+      options.update(:appointment_notes => appointment.notes.map(&:comment))
+    end
 
     # add company, provider footers
     options   = add_footers(company, provider, options)

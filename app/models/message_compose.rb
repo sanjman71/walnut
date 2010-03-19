@@ -1,7 +1,7 @@
 class MessageCompose
   
   def self.preferences_list
-    [:template, :provider, :service, :customer, :customer_email, :customer_phone, :when, :footer_company, :footer_provider, :signature_template]
+    [:template, :provider, :service, :customer, :customer_email, :customer_phone, :when, :appointment_notes, :footer_company, :footer_provider, :signature_template]
   end
   
   # default message sender for the company, user
