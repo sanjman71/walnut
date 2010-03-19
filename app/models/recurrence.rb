@@ -26,12 +26,22 @@ class Recurrence
       "SA" => 6
     }
 
-  # Return the recurrence days from the specified appointment
-  def self.days(appointment, options={})
-    return [] if appointment.recur_rule.blank?
-    appointment.recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/
+  # Return the recurrence days from the specified appointment or recurrence rule
+  def self.days(appt_or_rule, options={})
+    case
+    when appt_or_rule.is_a?(Appointment)
+      recur_rule = appt_or_rule.recur_rule
+    when appt_or_rule.is_a?(String)
+      recur_rule = appt_or_rule
+    else
+      return []
+    end
+    # check recur_rule before parsing it
+    return [] if recur_rule.blank?
+
+    recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/i
     freq = FREQ[$1] unless $1.blank?
-    
+
     # check options
     format = options[:format] ? options[:format] : :short
     case format
@@ -49,7 +59,24 @@ class Recurrence
       days
     end
   end
-  
+
+  def self.frequency(appt_or_rule)
+    case
+    when appt_or_rule.is_a?(Appointment)
+      recur_rule = appt_or_rule.recur_rule
+    when appt_or_rule.is_a?(String)
+      recur_rule = appt_or_rule
+    else
+      return ''
+    end
+    # check recur_rule before parsing it
+    return '' if recur_rule.blank?
+
+    recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/i
+    freq = FREQ[$1] unless $1.blank?
+    freq ? freq.downcase : ''
+  end
+
   # Return the recurrence described in a sentence
   def self.to_words(appointment, options={})
     return "" if appointment.recur_rule.blank?
