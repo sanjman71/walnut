@@ -317,13 +317,11 @@ class Appointment < ActiveRecord::Base
     has location.neighborhoods(:id), :as => :neighborhood_ids, :facet => true
     # event categories
     has event_categories(:id), :as => :event_category_ids, :facet => true
-    # event tags
+    # event tags, for appointment and appointment recurrence parent (if there is one)
     indexes tags.name, :as => :tags
     has tags(:id), :as => :tag_ids, :facet => true
-
-    indexes recur_parent.event_tags.name, :as => :recur_tags
-    has recur_parent.event_tags(:id), :as => :recur_tag_ids, :facet => true
-
+    indexes recur_parent.tags.name, :as => :recur_tags
+    has recur_parent.tags(:id), :as => :recur_tag_ids, :facet => true
     # only index public appointments
     where "public = TRUE"
   end
