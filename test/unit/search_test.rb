@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class SearchTest < ActiveSupport::TestCase
   
@@ -81,7 +80,7 @@ class SearchTest < ActiveSupport::TestCase
                           :fields => {:address => '200 grand'}], @hash
       end
     end
-    
+
     context "with address fields in caps" do
       setup do
         @hash = Search.query("address:'200 Grand Ave'")
@@ -92,6 +91,31 @@ class SearchTest < ActiveSupport::TestCase
                           :fields => {:address => '200 Grand Ave'}], @hash
       end
     end
+    
+    context "with phone field" do
+      context "with parens and hyphens" do
+        setup do
+          @hash = Search.query("phone:'(312) 555-1212'")
+        end
+
+        should "have fields hash" do
+          assert_equal Hash[:query_raw => "phone:'(312) 555-1212'", :query_and => '', :query_or => '', :query_quorum => '', 
+                            :fields => {:phone => '(312) 555-1212'}], @hash
+        end
+      end
+
+      context "with dots" do
+        setup do
+          @hash = Search.query("phone:'312.555.1212'")
+        end
+
+        should "have fields hash" do
+          assert_equal Hash[:query_raw => "phone:'312.555.1212'", :query_and => '', :query_or => '', :query_quorum => '', 
+                            :fields => {:phone => '312.555.1212'}], @hash
+        end
+      end
+    end
+    
   end
 
   context "search query with a query string and events attribute" do
@@ -127,7 +151,7 @@ class SearchTest < ActiveSupport::TestCase
     end
   end
   
-  context "search query with a name field adn address field" do
+  context "search query with a name field and address field" do
     setup do
       @hash = Search.query("name:'pizza' address:'200 grand'")
     end
@@ -286,6 +310,26 @@ class SearchTest < ActiveSupport::TestCase
       
       should "remove @" do
         assert_equal 'beerbar', @s
+      end
+    end
+
+    context "with dashes" do
+      setup do
+        @s = Search.normalize("999-555-1212")
+      end
+      
+      should "remove dashes" do
+        assert_equal '9995551212', @s
+      end
+    end
+
+    context "with dots" do
+      setup do
+        @s = Search.normalize("999.555.1212")
+      end
+      
+      should "remove dots" do
+        assert_equal '9995551212', @s
       end
     end
   end

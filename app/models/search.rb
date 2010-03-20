@@ -13,8 +13,8 @@ class Search
 
   # normalize the string
   def self.normalize(s)
-    # remove quotes, dashes, @
-    s.gsub(/['-@]/, '').strip
+    # remove quotes, dashes, @, parens, dots
+    s.gsub(/[.@'()-]/, '').strip
   end
   
   # build sphinx attributes
@@ -40,15 +40,15 @@ class Search
     hash        = Hash[:query_raw => s]
     fields      = Hash.new
     attributes  = Hash.new
-    
+
     # valid fields and attributes
-    all_fields          = [:address, :name, :tags, :*]
+    all_fields          = [:address, :name, :tags, :phone, :*]
     all_attributes      = [:events, :popularity, :tag_ids]
-    
+
     # valid patterns
-    match_field_token   = "([a-zA-Z_]+):([0-9a-zA-Z]+)"
-    match_field_quotes  = "([a-zA-Z_]+):'([0-9a-zA-Z ]+)'"
-    match_quoted_phrase = "([ ]*)'([0-9a-zA-Z ]+)'"
+    match_field_token   = "([a-zA-Z_]+):([0-9a-zA-Z()-]+)"
+    match_field_quotes  = "([a-zA-Z_]+):'([.0-9a-zA-Z() -]+)'"
+    match_quoted_phrase = "([ ]*)'([.0-9a-zA-Z() -]+)'"
 
     # find all field matches, with or without quotes
     matches = s.scan(/#{match_field_token}/) + s.scan(/#{match_field_quotes}/)
