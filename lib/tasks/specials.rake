@@ -88,12 +88,12 @@ namespace :specials do
       # build start_at, end_at from day
       start_at  = DateRange.find_next_date(day.downcase)
       end_at    = start_at.end_of_day
-      
+
       # format drink and food strings
       drink     = normalize(drink)
       food      = normalize(food)
-      
-      if drink.empty? and food.empty?
+
+      if drink.blank? and food.blank?
         puts "[notice] no food or drink specials"
         next
       end
@@ -111,6 +111,7 @@ namespace :specials do
   end
   
   def normalize(s)
+    return s if s.blank?
     s.gsub(/none/i, '').strip
   end
   
