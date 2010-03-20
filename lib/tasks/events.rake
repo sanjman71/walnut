@@ -223,9 +223,9 @@ namespace :events do
   desc "Remove all past events"
   task :remove_past do
     # find all past events
-    events = Appointment.public.past
+    events = Appointment.public.not_recurring.past
 
-    puts "#{Time.now}: removing all #{events.size} past events"
+    puts "#{Time.now}: removing all #{events.size} past non-recurring events"
 
     events.each { |e| e.destroy }
 

@@ -89,6 +89,8 @@ class Location < ActiveRecord::Base
     # locality strings, faceted
     # indexes zip.name, :as => :zip, :type => :string, :facet => true
     # indexes city.name, :as => :city, :type => :string, :facet => true
+    # phone numbers
+    indexes phone_numbers(:address), :as => :phone
     # other attributes
     has popularity, :type => :integer, :as => :popularity
     has companies.chain_id, :type => :integer, :as => :chain_ids
@@ -246,8 +248,10 @@ class Location < ActiveRecord::Base
       Location.increment_counter(:events_count, self.id)
       # increment popularity
       Location.increment_counter(:popularity, self.id)
-      # add tags
-      add_venue_tag
+      if !appointment.recurrence?
+        # add tags
+        add_venue_tag
+      end
     end
     Location.increment_counter(:appointments_count, self.id)
   end
@@ -259,8 +263,10 @@ class Location < ActiveRecord::Base
       Location.decrement_counter(:events_count, self.id)
       # decrement popularity
       Location.decrement_counter(:popularity, self.id)
-      # remve tags
-      remove_venue_tag
+      if !appointment.recurrence?
+        # remove tags
+        remove_venue_tag
+      end
     end
     Location.decrement_counter(:appointments_count, self.id)
   end

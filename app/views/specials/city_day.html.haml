@@ -1,0 +1,47 @@
+- title(@title)
+- robots('index', 'follow') unless @robots == false
+
+-# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
+- content_for :javascript do
+  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
+- javascript("jquery.jmap", "places", "map_markers")
+
+.span-15.prepend-1.mat.padding-top-10.padding-bottom-10
+  %h1.title= @h1
+  %h4{:style => 'font-size: 1.0em;'}= link_to "#{@city.name.titleize} Specials", specials_city_path(:day => nil), :class => 'admin'
+
+.span-8.padding-top-5.bottom.last#weather
+  - unless @weather.blank?
+    - cache("#{@weather.name.to_url_param}", :expires_in => CacheExpire.weather) do
+      = render(:partial => 'shared/weather', :locals => {:weather => @weather})
+
+%hr.space
+
+.span-24.last
+  .span-5#sidebar
+    #other_days
+      = render(:partial => 'specials/special_other_days', :locals => {:days => @other_days}) unless @other_days.blank?
+
+    -# google ad - search index left side vertical banner
+    = render :partial => 'adsense/search_index_left_verticalbanner'
+
+  .span-19.last#specials
+    .span-10
+      %h4= page_entries_info(@specials, :entry_name => "special")
+    .span-9.last
+      = will_paginate(@specials, :page_links => true)
+
+    -# keywords
+    .span-19.last#taggings
+      - unless @keywords.empty?
+        %h4.bold== #{@city.name.titleize} #{@keywords.map(&:titleize).to_sentence} Specials for #{@day.titleize}
+
+    .span-19.last
+      .span-10
+        - @specials.each_with_index do |special, i|
+          .span-10.letterbox-5.border_bottom.search_result.special[special]
+            = render(:partial => 'specials/special', :locals => {:special => special, :location => special.location, :index => i})
+      .span-9.last
+        - unless @specials.blank?
+          .jmap#map{:style => "width: 350px; height: 430px;"}
+  

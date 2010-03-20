@@ -141,7 +141,7 @@ class ApplicationController < ActionController::Base
 
       # track events
       track_where_ga_event(params[:controller], @state)
-    when 'city'
+    when 'city', 'city_day'
       # find city, and all city zips and neighborhoods
       @city = @state.cities.find_by_name(params[:city].to_s.titleize)
 

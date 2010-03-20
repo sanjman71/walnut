@@ -1,0 +1,4 @@
+%h4.smaller.bold.bottom.padding-bottom-5== Search by Day
+%ul
+  - @other_days.each do |day|
+    %li= link_to(day.titleize, specials_city_day_path(:day => day.downcase), :class => 'special day other')

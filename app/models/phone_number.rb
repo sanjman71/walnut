@@ -59,7 +59,7 @@ class PhoneNumber < ActiveRecord::Base
     ['Mobile', 'Work', 'Home', 'Other']
   end
   
-  # returns true if the string is a valid phone numers
+  # returns true if the string is a valid phone number
   def self.phone?(s)
     format(s).match(/[0-9]{10,11}/)
   end

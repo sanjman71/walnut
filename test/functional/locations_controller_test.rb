@@ -4,6 +4,8 @@ class LocationsControllerTest < ActionController::TestCase
 
   should_route :post, '/locations/1/recommend', :controller => 'locations', :action => 'recommend', :id => '1'
   should_route :get, '/locations/chicago/random', :controller => 'locations', :action => 'random', :city => 'chicago'
+  should_route :get, '/locations/1-drinking-bar', :controller => 'locations', :action => 'show', :id => '1-drinking-bar'
+  should_route :get, '/locations/1-drinking-bar/specials', :controller => 'locations', :action => 'specials', :id => '1-drinking-bar'
 
   def setup
     @us       = Factory(:us)

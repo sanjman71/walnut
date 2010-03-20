@@ -16,7 +16,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect     '/locations/:id/recommend', :controller => 'locations', :action => 'recommend', :conditions => {:method => :post}
   map.connect     '/locations/:city/random', :controller => 'locations', :action => 'random', :conditions => {:method => :get}
 
-  map.resources   :locations, :only => [:index, :show, :create, :edit, :update]
+  map.resources   :locations, :only => [:index, :show, :create, :edit, :update], :member => {:specials => :get}
 
   # search error route
   map.connect     '/search/error/:locality', :controller => 'search', :action => 'error'
@@ -73,9 +73,16 @@ ActionController::Routing::Routes.draw do |map|
   map.chain_state     '/chains/:country/:state/:id', :controller => 'chains', :action => 'state'
   map.chain_city      '/chains/:country/:state/:city/:id', :controller => 'chains', :action => 'city'
   
-  map.resources   :chains, :only => [:index]
+  map.resources       :chains, :only => [:index]
 
-  
+  # specials
+  map.specials_city_day   '/specials/:country/:state/:city/:day',
+                          :controller => 'specials', :action => 'city_day', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/,
+                          :day => /[a-z]+/
+  map.specials_city       '/specials/:country/:state/:city',
+                          :controller => 'specials', :action => 'city', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/
+  map.specials            '/specials', :controller => 'specials', :action => 'index'
+
   # tag group routes
   map.resources   :taggs
 

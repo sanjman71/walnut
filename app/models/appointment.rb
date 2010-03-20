@@ -320,10 +320,11 @@ class Appointment < ActiveRecord::Base
     # event tags, for appointment and appointment recurrence parent (if there is one)
     indexes tags.name, :as => :tags
     has tags(:id), :as => :tag_ids, :facet => true
-    indexes recur_parent.tags.name, :as => :recur_tags
-    has recur_parent.tags(:id), :as => :recur_tag_ids, :facet => true
+    # SK: we get an ambiguous error here, so comment it out for now
+    # indexes recur_parent.tags.name, :as => :recur_tags
+    # has recur_parent.tags(:id), :as => :recur_tag_ids, :facet => true
     # only index public appointments
-    where "public = TRUE"
+    where "appointments.public = TRUE"
   end
 
   # TODO - this overrides and fixes a bug in Rails 2.2 - ticket http://rails.lighthouseapp.com/projects/8994/tickets/1339

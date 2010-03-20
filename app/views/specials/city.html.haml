@@ -1,0 +1,29 @@
+- title(@title)
+- robots('index', 'follow') unless @robots == false
+
+.span-15.prepend-1.mat.padding-top-10.padding-bottom-10
+  %h1.title= @h1
+
+.span-8.padding-top-5.bottom.last#weather
+  - unless @weather.blank?
+    - cache("#{@weather.name.to_url_param}", :expires_in => CacheExpire.weather) do
+      = render(:partial => 'shared/weather', :locals => {:weather => @weather})
+
+%hr.space
+
+.span-24.last
+  .span-5#sidebar
+    -# google ad - search index left side vertical banner
+    = render :partial => 'adsense/search_index_left_verticalbanner'
+
+  .span-19.last#main
+    %h3== Looking for #{@city.name.titleize} Bar, Drink, Food, or Restaurant Specials?
+    %h3== Pick a day below.
+    
+    -#- @days.each do |day|
+      -#%span.special.day= link_to day, specials_city_day_path(:day => day.downcase)
+
+    - @days.each do |day|
+      - klasses = ['day'].push(cycle('even', 'odd'))
+      %span.small= link_to day, specials_city_day_path(:day => day.downcase), :class => klasses.join(" ")
+  

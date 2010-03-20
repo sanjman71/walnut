@@ -30,6 +30,9 @@ a.logo:hover                                      { background-color: #EA6F34; }
 .text-align-right                                 { text-align: right; }
 .text-align-left                                  { text-align: left; }
 
+.bold                                             { font-weight: bold; }
+.smaller                                          { font-size: 0.9em; }
+
 /* header, tab, link styles */
 
 div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 15px 0px 0px 0px; 
@@ -72,6 +75,8 @@ div.block                                         { background: #E1E0E0 none rep
 
 div.mat                                           { background: #EDF3FE none repeat scroll 0 0; }
 div.mat.shaded                                    { background: #E5ECF9 none repeat scroll 0 0; }
+
+h1.title                                          { font-size: 1.5em; }
 
 /* form styles */
 
@@ -129,10 +134,17 @@ a.tag.odd.two, a.tag.even.two, a.chain.even.two, a.chain.odd.two
 a.tag.odd.three, a.tag.even.three, a.chain.even.three, a.chain.odd.three
                                                   { font-size: 2.0em; }
 
+a.day.even                                        { color: #0000BB; font-size: 3.5em; padding-right: 15px; line-height: 2.0em; }
+a.day.even:hover                                  { color: #FFFFFF; background-color: #0000BB; }
+a.day.odd                                         { color: #3A2313; font-size: 4.0em; padding-right: 15px; line-height: 2.0em; }
+a.day.odd:hover                                   { color: #FFFFFF; background-color: #3A2313; }
+
 /* generic location styles */
 
 div.location.search_result, div.appointment.search_result
                                                   { height: 85px; }
+
+div.appointment.special.search_result             { height: 115px; }
 
 .locations.featured.section, .events.featured.section
                                                   { color: #3A2313; font-weight: bold; }
@@ -225,6 +237,15 @@ span.chain_letter.current                         { background: #0099FF; color: 
 span.chain_letter a                               { display: block; text-decoration: none; }
 span.chain_letter a:hover                         { background: #3300BB; color: #0099FF; }
 
+/* special styles */
+
+span.special.day                                  { background: #EEEEEE; color: #111111;  display: block; width: 80px; float: left;
+                                                    text-align: center; padding: 0.1em 0.1em; margin-right: 5px; }
+span.special.day a                                { display: block; text-decoration: none; }
+span.special.day a:hover                          { background: #3300BB; color: #0099FF; }
+
+a.special.day.other                               { font-weight: normal; color: #0099FF; }
+ 
 /* sitemap styles */
 
 div#sitemap h5                                    { font-size: 1.0em; }

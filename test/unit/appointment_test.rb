@@ -259,7 +259,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "recurrence" do
+  context "public recurrence" do
     setup do
       @start_at_utc = Time.now.utc.beginning_of_day
       @end_at_utc   = @start_at_utc + 2.hours
@@ -275,6 +275,10 @@ class AppointmentTest < ActiveSupport::TestCase
     should_change("location.appointments_count", :by => 1) { @location.reload.appointments_count }
     should_change("location.events_count", :by => 1) { @location.reload.events_count }
     
+    should "not add 'tag' to company" do
+      assert_equal [], @company.reload.tag_list
+    end
+
     context "expand 1 instance" do
       setup do
         @appointments = @recurrence.expand_recurrence(Time.now, Time.now + 3.months, 1)
