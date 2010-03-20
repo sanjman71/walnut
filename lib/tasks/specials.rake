@@ -27,7 +27,7 @@ namespace :specials do
     # get location name and address
     name_and_address  = agent.page.at("div.threecolumns p").text()  # e.g. Kerryman 500 N Clark St Chicaogo, IL 60654, 555-999-9999
     name              = agent.page.at("div.threecolumns p strong").text() # e.g. Kerryman
-    phone             = agent.page.at("div.threecolumns p").text().split.last
+    phone             = PhoneNumber.format(agent.page.at("div.threecolumns p").text().split.last)
 
     puts "*** name and address: #{name_and_address}"
     
@@ -51,7 +51,7 @@ namespace :specials do
     hash   = StreetAddress.components(street)
 
     # build object hash using name, street, city, state
-    object    = Hash["name" => name, "street" => "#{hash[:housenumber]} #{hash[:streetname]}", "city" => city, "state" => state]
+    object    = Hash["name" => name, "address" => "#{hash[:housenumber]} #{hash[:streetname]}", "city" => city, "state" => state, "phone" => phone]
 
     puts "*** object: #{object.inspect}"
 

@@ -158,6 +158,8 @@ class Special
     name            = object['name'] # e.g. kerryman
     state           = object["state"] # e.g. il
     city            = object['city'] # e.g. chicago
+    phone           = object['phone'] # e.g. 3125559999
+    address         = object['address'] # e.g. 14 Division
 
     puts "*** searching for #{name}:#{city}:#{state}"
 
@@ -174,7 +176,7 @@ class Special
     @attributes     = Search.attributes(@city)
 
     # search query using a field search for name, and address if its given
-    @query          = ["name:'#{name}'", object['address'] ? "address:'#{object['address']}'" : ''].reject(&:blank?).join(' ')
+    @query          = ["name:'#{name}'", address ? "address:'#{address}'" : ''].reject(&:blank?).join(' ')
     @hash           = Search.query(@query)
     @fields         = @hash[:fields]
 
