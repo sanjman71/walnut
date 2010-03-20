@@ -222,14 +222,9 @@ namespace :events do
 
   desc "Remove all past events"
   task :remove_past do
-    # find all past events
-    events = Appointment.public.not_recurring.past
-
-    puts "#{Time.now}: removing all #{events.size} past non-recurring events"
-
-    events.each { |e| e.destroy }
-
-    puts "#{Time.now}: completed"
+    # use delayed job to remove
+    Delayed::Job.enqueue(EventJob.new(:method => 'remove_past'), 3)
+    puts "#{Time.now}: submitted to delayed job"
   end
 
   desc "Remove all events"

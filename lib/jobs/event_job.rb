@@ -46,8 +46,8 @@ class EventJob < Struct.new(:params)
 
   def remove_past_events
     # remove all past events
-    events = Appointment.public.past
-    logger.info "*** #{Time.now}: removing all #{events.size} past events"
+    events = Appointment.public.not_recurring.past
+    logger.info "*** #{Time.now}: removing all #{events.size} past non-recurring events"
     events.each { |e| e.destroy }
     logger.info "*** #{Time.now}: completed"
   end
