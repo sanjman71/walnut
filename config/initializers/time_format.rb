@@ -11,6 +11,7 @@ Time::DATE_FORMATS[:appt_short_month_day_year]  = "%b %d %Y"                    
 Time::DATE_FORMATS[:appt_short_month]           = "%b"                            # Oct
 
 Time::DATE_FORMATS[:appt_week_day_short]        = "%a"                            # Fri
+Time::DATE_FORMATS[:appt_week_day_long]         = "%A"                            # Friday
 Time::DATE_FORMATS[:appt_month_day]             = "%d"                            # 31
 
 

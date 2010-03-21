@@ -28,12 +28,17 @@ class Special
     return false if s.blank?
     Recurrence::DAYS_OF_WEEK.values.include?(s.titleize)
   end
-  
+
   # days supported
   def self.days
     ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   end
 
+  # find today in long format, e.g. 'Sunday'
+  def self.today
+    Time.now.to_s(:appt_week_day_long)
+  end
+  
   def self.create(name, location, recur_rule, options={})
     company     = options[:company] || location.company
     start_at    = options[:start_at]

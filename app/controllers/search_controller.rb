@@ -126,24 +126,33 @@ class SearchController < ApplicationController
       @facet_klass    = Location
       @tag_klasses    = [Location]
       @sort_order     = "popularity desc, @relevance desc"
+      @without        = Hash[]
     when 'locations'
       @klasses        = [Location]
       @eager_loads    = [{:company => :tags}, :city, :state, :zip, :primary_phone_number]
       @facet_klass    = Location
       @tag_klasses    = [Location]
       @sort_order     = "popularity desc, @relevance desc"
+      @without        = Hash[]
     when 'events'
       @klasses        = [Appointment]
       @eager_loads    = [{:location => :company}, :tags]
       @facet_klass    = Appointment
       @tag_klasses    = [Location]
       @sort_order     = "start_at asc"
+      @without_tags   = [Tag.find_by_name(Special.tag_name)].reject(&:blank?)
+      @without        = Hash[:tag_ids => @without_tags.collect(&:id)] unless @without_tags.empty?
     end
 
     # build sphinx options
     @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :match_mode => :extended2, :rank_mode => :bm25,
                            :order => @sort_order, :include => @eager_loads, :page => @page, :per_page => search_per_page,
                            :max_matches => search_max_matches]
+
+    if !@without.empty?
+      # exclude from search results
+      @sphinx_options[:without] = @without
+    end
 
     if @geo_origin
       # search around a coordinate, sort results by distance
