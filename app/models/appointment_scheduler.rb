@@ -127,7 +127,7 @@ class AppointmentScheduler
   # create a work appointment by scheduling the specified appointment in a free timeslot
   # options:
   #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
-  def self.create_work_appointment(company, location, provider, service, duration, customer, date_time_options, options={})
+  def self.create_work_appointment(company, location, provider, service, duration, customer, creator, date_time_options, options={})
     raise ArgumentError, "You must specify the company" if company.blank?
     raise ArgumentError, "You must specify the provider" if provider.blank?
     raise ArgumentError, "You must specify the service" if service.blank?
@@ -148,7 +148,7 @@ class AppointmentScheduler
 
     # Create the work appointment. Note the reference to the free_appointment corresponding to the relevant space is assigned below
     work_hash        = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer,
-                        :capacity => service.capacity }.merge(date_time_options)
+                        :capacity => service.capacity, :creator => creator}.merge(date_time_options)
     work_hash        = work_hash.merge(:force => force)
     work_appointment = Appointment.new(work_hash)
     
