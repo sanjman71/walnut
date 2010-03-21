@@ -1,0 +1,110 @@
+name: Beer Bistro
+state: il
+city: Chicago
+address: 1061 Madison
+rule: FREQ=WEEKLY;BYDAY=WE
+special_drink: $2 Hamm's, Pabst Blue Ribbon, Schlitz, Old Style, or Point Cans
+---
+name: Beer Bistro
+state: il
+city: Chicago
+address: 1061 Madison
+rule: FREQ=WEEKLY;BYDAY=TH
+special_drink: $5 Martinis
+---
+name: Cortland's Garage
+state: il
+city: Chicago
+address: 1645 Cortland
+rule: FREQ=WEEKLY;BYDAY=WE
+special_drink: $3 Budweiser or Bud Light Bottles, $4 Premium & Import Beers, $5 Ketel Vodka Cocktails
+special_food: Rib Night
+---
+name: Gamekeepers 
+state: il
+city: chicago
+address: 1971 Lincoln
+rule: FREQ=WEEKLY;BYDAY=TH
+special_food: 10¢ Jumbo Wings
+special_drink: $8 Bud Light Pitchers
+---
+# kirkwood
+name: Kirkwood Bar & Grill
+state: il
+city: Chicago
+address: 2934 Sheffield
+rule: FREQ=WEEKLY;BYDAY=WE
+special_drink: $3 All Pints, $15 Fishbowls, $3 Lemon Drops
+special_food: $5 All Wraps, $7 Fish Tacos (3)
+---
+name: Kirkwood Bar & Grill
+state: il
+city: Chicago
+address: 2934 Sheffield
+rule: FREQ=WEEKLY;BYDAY=TH
+special_drink: $2.50 Domestic Bottles, $5 All Bomb Shots, $15 Miller or Coors Family Das Boots
+special_food: $1 Mini Burgers
+---
+# kerryman
+name: Kerryman
+state: il
+city: Chicago
+address: 70 erie
+rule: FREQ=WEEKLY;BYDAY=WE
+special_drink: $2 Stella Artois or Blue Moon, $3 Jameson Shots, $4 Ketel One or Captain Morgan
+---
+name: Kerryman
+state: il
+city: Chicago
+address: 70 erie
+rule: FREQ=WEEKLY;BYDAY=TH
+special_drink: $2 Bud Light or Miller Lite Bottles, $3 Sam Adams Pints, $3 SoCo Lime Shots, $4 O-Bombs, $4 Jager Bombs, $4 Smirnoff Cocktails
+---
+# Mcgee's
+name: McGee's Tavern
+state: il
+city: Chicago
+address: 950 Webster
+rule: FREQ=WEEKLY;BYDAY=WE
+special_drink: $2 Domestic Bottles, $3 Import Drafts, $4 Bomb Shots
+special_food: $1 Burgers
+---
+name: McGee's Tavern
+state: il
+city: Chicago
+address: 950 Webster
+rule: FREQ=WEEKLY;BYDAY=TH
+special_drink: $1 Bud Light Bottles, $3 Margaritas, $3 Imports
+special_food: Free Buffet from 6-8pm
+---
+name: McGee's Tavern
+state: il
+city: Chicago
+address: 950 Webster
+rule: FREQ=WEEKLY;BYDAY=FR
+special_drink: $5 Three Olives Tall Cocktails, $5 Bomb Shots
+special_food: $20 Meal Package includes Buffet, All Drafts, & Well Drinks from 6:30-11:00pm
+---
+name: Other Side Bar
+state: il
+city: Chicago
+address: 2436 Clark
+rule: FREQ=WEEKLY;BYDAY=TH
+special_drink: $3 Stella Artois Drafts, $3 Shot-of-the-Day, $4 Jager Bombs
+---
+name: Stanley's Kitchen and Tap
+state: il
+city: chicago
+address: 1970 lincoln
+rule: FREQ=WEEKLY;BYDAY=WE
+special_food: $14.95 All-You-Can-Eat-and-Drink Pizza, Pasta, Caesar Salad, Bud Light Drafts, & Red or White Wine, $6.95 All-You-Can-Eat Pizza, Pasta, & Caesar Salad
+special_drink: $3 Pabst Blue Ribbon, Hamm's, or Natural Light Cans
+---
+name: WestEnd
+state: il
+city: chicago
+address: 1326 madison
+rule: FREQ=WEEKLY;BYDAY=WE
+special_food: $5 All Salads
+special_drink: $5 Glasses of Wine
+
