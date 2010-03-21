@@ -19,6 +19,8 @@ class SpecialsController < ApplicationController
 
     @title  = [@city.name.titleize, 'Specials'].reject(&:blank?).join(' ')
     @h1     = @title
+
+    track_special_ga_event(params[:controller], @city)
   end
 
   # GET /specials/us/il/chicago/weekly
@@ -63,6 +65,8 @@ class SpecialsController < ApplicationController
 
     @title      = [@city.name.titleize, @day.titleize, 'Specials'].reject(&:blank?).join(' ')
     @h1         = @title
+
+    track_special_ga_event(params[:controller], @city, @day)
   end
 
   protected

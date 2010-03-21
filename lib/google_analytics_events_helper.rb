@@ -56,4 +56,13 @@ module GoogleAnalyticsEventsHelper
     end
   end
   
+  def track_special_ga_event(controller, locality, day=nil)
+    @ga_events ||= []
+
+    if day
+      @ga_events.push("pageTracker._trackEvent('#{controller.titleize}', '#{locality.name.titleize}', '#{day.titleize}');")
+    else
+      @ga_events.push("pageTracker._trackEvent('#{controller.titleize}', '#{locality.name.titleize}');")
+    end
+  end
 end
