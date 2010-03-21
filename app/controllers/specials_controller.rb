@@ -1,4 +1,5 @@
 class SpecialsController < ApplicationController
+  before_filter   :normalize_page_number, :only => [:city_day]
   before_filter   :init_localities, :only => [:city, :city_day]
   before_filter   :init_weather, :only => [:city, :city_day]
 
