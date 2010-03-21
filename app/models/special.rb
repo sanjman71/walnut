@@ -160,41 +160,53 @@ class Special
   end
   
   def self.match(object)
-    name            = object['name'] # e.g. kerryman
-    state           = object["state"] # e.g. il
-    city            = object['city'] # e.g. chicago
-    phone           = object['phone'] # e.g. 3125559999
-    address         = object['address'] # e.g. 14 Division
-
-    puts "*** searching for #{name}:#{city}:#{state}"
+    @name           = object['name'] # e.g. kerryman
+    @state          = object["state"] # e.g. il
+    @city           = object['city'] # e.g. chicago
+    @phone          = object['phone'] # e.g. 3125559999
+    @address        = object['address'] # e.g. 14 Division
 
     # find state, city
-    @state          = State.find_by_code(state.upcase)
-    @city           = @state.cities.find_by_name(city) if @state
+    @state          = State.find_by_code(@state.upcase)
+    @city           = @state.cities.find_by_name(@city) if @state
     
     if @city.blank?
       puts "[error] missing city"
       return []
     end
-    
+
     # search city
     @attributes     = Search.attributes(@city)
 
-    # search query using a field search for name, and address if its given
-    @query          = ["name:'#{name}'", address ? "address:'#{address}'" : ''].reject(&:blank?).join(' ')
+    # only search locations
+    @klasses        = [Location]
+    @sort_order     = "popularity desc, @relevance desc"
+
+    puts "*** searching using name and address"
+
+    # search query using a field search for name and address
+    @query          = ["name:'#{@name}'", @address ? "address:'#{@address}'" : ''].reject(&:blank?).join(' ')
     @hash           = Search.query(@query)
     @fields         = @hash[:fields]
 
-    @klasses        = [Location]
-    @eager_loads    = [{:company => :tags}, :city, :state, :zip, :primary_phone_number]
-    @facet_klass    = Location
-    @tag_klasses    = [Location]
-    @sort_order     = "popularity desc, @relevance desc"
+    @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :order => @sort_order,
+                           :match_mode => :extended2, :rank_mode => :bm25, :page => 1, :per_page => 5, :max_matches => 100]
 
-    # build sphinx options
-    @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :match_mode => :extended2, :rank_mode => :bm25,
-                           :order => @sort_order, :include => @eager_loads, :page => 1, :per_page => 5, :max_matches => 100]
+    @locations      = ThinkingSphinx.search(@sphinx_options)
 
-    @locations = ThinkingSphinx.search(@sphinx_options)
+    if @locations.size > 1 and !@phone.blank?
+      puts "*** searching using name and phone"
+      # try again with name and phone
+      @query          = ["name:'#{@name}'", "phone:'#{@phone}'"].join(' ')
+      @hash           = Search.query(@query)
+      @fields         = @hash[:fields]
+
+      @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :order => @sort_order,
+                             :match_mode => :extended2, :rank_mode => :bm25, :page => 1, :per_page => 5, :max_matches => 100]
+
+      @locations      = ThinkingSphinx.search(@sphinx_options)
+    end
+    
+    @locations
   end
 end
