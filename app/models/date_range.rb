@@ -50,6 +50,10 @@ class DateRange
     !@error
   end
 
+  def empty?
+    @days == 0
+  end
+
   def errors
     @errors ||= ActiveRecord::Errors.new(self)
   end
@@ -281,14 +285,16 @@ class DateRange
     end_at
   end
   
-  # find next date with the specified day of week
-  def self.find_next_date(day_of_week)
+  # find next date from today, with the specified day of week
+  def self.find_next_date(day_of_week, days_collection=[])
     # find 2 letter abbreviation, then map to day of week int
     abbrev   = day_of_week.to_s.upcase.slice(0,2)
     @day_int = Recurrence::DAYS_OF_WEEK_INT[abbrev]
     return nil if @day_int.blank?
 
-    self.parse_when('next 7 days').each do |day|
+    # check days collection, start from today if its empty
+    days_collection = days_collection.empty? ? self.parse_when('next 7 days') : days_collection
+    days_collection.each do |day|
       return day if day.wday == @day_int
     end
   end
