@@ -30,8 +30,10 @@ class LocationsController < ApplicationController
       # find upcoming events at this event venue
       self.class.benchmark("*** Benchmarking upcoming events at event venue", APP_LOGGER_LEVEL, false) do
         @event_limit      = LocationNeighbor.default_limit
-        @location_events  = @location.appointments.public.future.all(:order => 'start_at asc')
+        @location_events  = @location.appointments.public.not_recurring.future.all(:order => 'start_at asc')
       end
+    else
+        @location_events  = []
     end
 
     if @location.mappable?

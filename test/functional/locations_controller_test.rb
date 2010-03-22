@@ -28,12 +28,13 @@ class LocationsControllerTest < ActionController::TestCase
 
     should_assign_to(:location) { @location }
     should_assign_to(:company) { @company }
-
-    should_respond_with :success
-    should_render_template 'locations/show.html.haml'
+    should_assign_to(:location_events) { [] }
 
     should_assign_to(:title) { "Chicago Pizza - Chicago IL" }
     should_assign_to(:h1) { "Chicago Pizza" }
+
+    should_respond_with :success
+    should_render_template 'locations/show.html.haml'
 
     should "have h1 tag" do
       assert_tag :tag => "h1", :content => "Chicago Pizza"
