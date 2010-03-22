@@ -705,8 +705,8 @@ class Appointment < ActiveRecord::Base
   #
   def update_recurrence(attr_changed, attr_changes)
 
-    # Check if this is a recurrence parent, if the recurrence has been expanded and if anything changed.
-    if (self.recurrence_parent?) && (!self.recur_expanded_to.nil?)
+    # Check if this is a recurrence parent
+    if self.recurrence_parent?
       # Check if any of the attributes changed that cause us to reexpand the recurring instances
       if ((attr_changed & REEXPAND_INSTANCES_ATTRS).size > 0)
 
@@ -715,12 +715,11 @@ class Appointment < ActiveRecord::Base
           # Destroy the appointment
           a.destroy
         end
-
-        # Queue the request to expand.
-        # Make sure we start expanding after the end of the original appointment
-        self.send_later(:expand_recurrence,
-                        ((Time.now.in_time_zone > self.end_at.in_time_zone) ? Time.now.in_time_zone : self.end_at.in_time_zone),
-                        self.recur_expanded_to)
+        # Clear the expanded_to date
+        self.update_attribute(:recur_expanded_to, nil)
+        
+        # Queue the request to expand. Use the default expand parameters
+        self.send_later(:expand_recurrence)
 
       elsif ((attr_changed & UPDATE_APPT_ATTRS).size > 0)
         # We can update the existing instances
