@@ -1,3 +1,5 @@
+require 'serialized_hash'
+
 class Location < ActiveRecord::Base
   # All addresses must have a country
   validates_presence_of   :country_id
@@ -34,6 +36,8 @@ class Location < ActiveRecord::Base
 
   # Note: the after_save_callback is deprecated, but its left here commented out for now for documentation purposes
   # after_save              :after_save_callback
+
+  serialized_hash         :preferences
 
   # make sure only accessible attributes are written to from forms etc.
   attr_accessible         :name, :country, :country_id, :state, :state_id, :city, :city_id, :zip, :zip_id, :street_address, :lat, :lng,
