@@ -59,7 +59,7 @@
   -# company and locality tags
   .span-18#all_tags
     .span-7.colborder#tags
-      %h2.location.tags.keywords== Keyword Tags
+      %h2.location.tags.keywords.divider== Keyword Tags
       - tags = @company.tags
       - if tags.blank?
         -# add space to fill in column border
@@ -71,7 +71,7 @@
             = link_to(tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.to_url_param), :class => klasses.join(' '))
       
     .span-9.last#locality_tags
-      %h2.location.tags.geography== Geography Tags
+      %h2.location.tags.geography.divider== Geography Tags
       - ([@state, @city, @zip].compact + @neighborhoods).each do |locality|
         %span{:style => 'padding-right: 3px; white-space: nowrap;'}
           - klasses = ["locality big"].push(cycle('even', 'odd'))
