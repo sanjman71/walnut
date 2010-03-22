@@ -34,6 +34,11 @@ class Special
     ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
   end
 
+  # normalize comma separated list into a collection
+  def self.collectionize(s)
+    s.split(/(\$[^\$]*,{0,1})/).reject(&:blank?).map{ |s| s.strip.gsub(/,/, '') }
+  end
+
   # find today in long format, e.g. 'Sunday'
   def self.today
     Time.now.to_s(:appt_week_day_long)

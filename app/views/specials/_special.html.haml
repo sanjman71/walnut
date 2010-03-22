@@ -24,6 +24,10 @@
       .span-9.last
         -# show each special
         - Special.preferences(special.preferences).keys.each do |special_key|
-          .span-9.last.padding-bottom-5
-            %span{:style => 'color: #0099FF;'}== #{Special.preference_name(special_key).titleize}:
-            = special.preferences[special_key]
+          .span-9.last.bottom.padding-bottom-5
+            %span{:style => 'color: #999;'}== #{Special.preference_name(special_key).titleize}:
+            - special_collection = Special.collectionize(special.preferences[special_key])
+            - special_collection.each_with_index do |s, i|
+              = s
+              - unless i == special_collection.length-1
+                %span{:style => 'color: #0099FF; font-size: 1.1em; padding: 0px; margin: 0px;'}== &bull; 
