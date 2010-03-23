@@ -14,35 +14,34 @@ class HomeController < ApplicationController
     # find featured city objects
     featured_limit = 5
 
-    # self.class.benchmark("*** Benchmarking #{@featured_city.name} featured places", APP_LOGGER_LEVEL, false) do
-    #   @featured_places = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:places", :expires_in => CacheExpire.locations) do
-    #     # Note: ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
-    #     # Note: So we can't use ThinkingSphinx.search here
-    #     ids = ThinkingSphinx.search_for_ids(:with => Search.attributes(@featured_city), :classes => [Location],
-    #                                         :include => [:company, :state, :city, :zip, :primary_phone_number],
-    #                                         :page => 1, :per_page => featured_limit, :order => "popularity desc")
-    #     locations = Location.find(ids, :include => [:company, :state, :city, :zip, :primary_phone_number])
-    #     locations
-    #   end
-    #   @featured_places_title = "#{@featured_city.name} Places"
-    # end
-
-
-    self.class.benchmark("*** Benchmarking #{@featured_city.name} featured specials", APP_LOGGER_LEVEL, false) do
-      @featured_specials = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:specials", :expires_in => CacheExpire.locations) do
-        # find tags that specials should be marked with
-        tags      = [Tag.find_by_name(Special.tag_name), Tag.find_by_name(Special.today.downcase)].reject(&:blank?)
-        with_all  = Hash[:tag_ids => tags.collect(&:id), :city_id => @featured_city.id]
-        # SK: ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on, so don't use ThinkingSphinx.search
-        ids = ThinkingSphinx.search_for_ids(:with_all => with_all, :classes => [Appointment],
-                                            :page => 1, :per_page => featured_limit-1, :order => "@relevance desc")
-        # raise Exception, ids.inspect
-        specials = Appointment.find(ids, :include => {:location => :company})
-        specials
+    self.class.benchmark("*** Benchmarking #{@featured_city.name} featured places", APP_LOGGER_LEVEL, false) do
+      @featured_places = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:places", :expires_in => CacheExpire.locations) do
+        # Note: ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on
+        # Note: So we can't use ThinkingSphinx.search here
+        ids = ThinkingSphinx.search_for_ids(:with => Search.attributes(@featured_city), :classes => [Location],
+                                            :include => [:company, :state, :city, :zip, :primary_phone_number],
+                                            :page => 1, :per_page => featured_limit, :order => "popularity desc")
+        locations = Location.find(ids, :include => [:company, :state, :city, :zip, :primary_phone_number])
+        locations
       end
-      @featured_specials_title  = "#{@featured_city.name} #{Special.today} Specials"
-      @featured_specials_more   = "More #{@featured_city.name} Specials"
+      @featured_places_title = "#{@featured_city.name} Places"
     end
+
+    # self.class.benchmark("*** Benchmarking #{@featured_city.name} featured specials", APP_LOGGER_LEVEL, false) do
+    #   @featured_specials = Rails.cache.fetch("#{@featured_city.name.to_url_param}:featured:specials", :expires_in => CacheExpire.locations) do
+    #     # find tags that specials should be marked with
+    #     tags      = [Tag.find_by_name(Special.tag_name), Tag.find_by_name(Special.today.downcase)].reject(&:blank?)
+    #     with_all  = Hash[:tag_ids => tags.collect(&:id), :city_id => @featured_city.id]
+    #     # SK: ThinkingSphinx.search returns an array of singleton objects, which you cannot call Marshal.dump on, so don't use ThinkingSphinx.search
+    #     ids = ThinkingSphinx.search_for_ids(:with_all => with_all, :classes => [Appointment],
+    #                                         :page => 1, :per_page => featured_limit-1, :order => "@relevance desc")
+    #     # raise Exception, ids.inspect
+    #     specials = Appointment.find(ids, :include => {:location => :company})
+    #     specials
+    #   end
+    #   @featured_specials_title  = "#{@featured_city.name} #{Special.today} Specials"
+    #   @featured_specials_more   = "More #{@featured_city.name} Specials"
+    # end
 
     self.class.benchmark("*** Benchmarking #{@featured_city.name} featured events", APP_LOGGER_LEVEL, false) do
       # find tags that specials should be marked with, and exclude them from event search results

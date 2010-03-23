@@ -10,28 +10,31 @@
   
   %hr.space
 
-  .span-10
-    - unless @featured_specials.blank?
+  -# featured specials
+  - unless @featured_specials.blank?
+    .span-10
       %h2.specials.featured.section
         = @featured_specials_title
       - @featured_specials.each_with_index do |special, i|
         .span-10.letterbox-5.border_bottom.search_result.special[special]
           = render(:partial => 'specials/special', :locals => {:special => special, :location => special.location, :index => i, :markers => false})
     .span-10.padding-top-5#more_specials
-      - unless @featured_events_more.blank?
+      - unless @featured_specials_more.blank?
         = link_to @featured_specials_more, specials_path, :class => 'admin', :style => 'font-weight: bold;'  
     
-  -#.span-10
-    -#- unless @featured_places.blank?
-      -#%h2.locations.featured.section= @featured_places_title
-      -#- @featured_places.each_with_index do |object, i|
-        -#.span-10.letterbox-5.border_bottom.search_result[object]
-          -#- case object.class.to_s
-          -#- when 'Location'
-            -#= render(:partial => 'search/location', :locals => {:location => object, :index => i, :markers => false})
-          -#- when 'Appointment'
-            -#= render(:partial => 'search/event', :locals => {:event => object, :index => i, :markers => false})
+  -# featured places
+  - unless @featured_places.blank?
+    .span-10
+      %h2.locations.featured.section= @featured_places_title
+      - @featured_places.each_with_index do |object, i|
+        .span-10.letterbox-5.border_bottom.search_result[object]
+          - case object.class.to_s
+          - when 'Location'
+            = render(:partial => 'search/location', :locals => {:location => object, :index => i, :markers => false})
+          - when 'Appointment'
+            = render(:partial => 'search/event', :locals => {:event => object, :index => i, :markers => false})
 
+  -# featured events
   .span-10.prepend-1.last
     - unless @featured_events.blank?
       %h2.events.featured.section
