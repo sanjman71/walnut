@@ -2,7 +2,7 @@
 - robots('index', 'follow')
 
 .span-23.mat.prepend-1.last.padding-top-10.padding-bottom-10
-  %h1{:style => 'font-size: 2.0em;'}= @h1
+  %h1.title= @h1
   %h5
     -#= link_to("Search #{pluralize(@city.name, 'Places and Events')}", url_for(:action => 'index', :klass => 'search', :query => 'anything'), :class => 'locality search')
     - if @events_count > 0

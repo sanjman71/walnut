@@ -61,6 +61,7 @@
         .span-10.letterbox-5.border_bottom.search_result[object]
           - case object.class.to_s
           - when 'Location'
+            -# show search nearby tags for city searches that are not based around a point
             - tags = [] #(@city and !@geo_origin) ? object.tags : []
             = render(:partial => 'search/location', :locals => {:location => object, :query => @query, :tags => tags, :index => i})
           - when 'Appointment'

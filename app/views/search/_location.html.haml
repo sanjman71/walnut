@@ -31,7 +31,7 @@
       .span-9.last.nearby
         - if location.mappable? and !tags.empty?
           -# search nearby locations with specific tags
-          %span{:style => 'color: #777; font-size: 0.9em;'}
-            == search nearby:
+          %span{:style => 'color: #999; font-size: 0.9em;'}
+            == Search nearby:
             - tags.slice(0,2).each do |tag|
               = link_to tag.name, url_for(:state => location.state, :city => location.city, :lat => location.lat.to_url_param, :lng => location.lng.to_url_param, :street => location.street_address.to_url_param, :tag => tag.name.to_url_param), :class => 'tag nearby'
