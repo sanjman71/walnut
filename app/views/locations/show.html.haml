@@ -66,14 +66,14 @@
         == &nbsp;
       - else
         - tags.each do |tag|
-          %span{:style => 'padding-right: 3px; white-space: nowrap;'}
+          %span{:style => 'padding-right: 3px;'}
             - klasses = ["tag big"].push(cycle('even', 'odd'))
             = link_to(tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.to_url_param), :class => klasses.join(' '))
       
     .span-9.last#locality_tags
       %h2.location.tags.geography.divider== Geography Tags
       - ([@state, @city, @zip].compact + @neighborhoods).each do |locality|
-        %span{:style => 'padding-right: 3px; white-space: nowrap;'}
+        %span{:style => 'padding-right: 3px;'}
           - klasses = ["locality big"].push(cycle('even', 'odd'))
           = link_to locality.name, infer_locality_route(locality.name, :country => @country, :state => @state, :city => @city, :zip => @zip, :neighborhoods => @neighborhoods), :class => klasses.join(' ')
 
