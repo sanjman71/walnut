@@ -33,6 +33,7 @@ class Location < ActiveRecord::Base
   has_many                :capacity_slots, :dependent => :nullify
 
   delegate                :tags, :to => '(company or return [])'
+  delegate                :tag_list, :to => '(company or return nil)'
 
   # Note: the after_save_callback is deprecated, but its left here commented out for now for documentation purposes
   # after_save              :after_save_callback
@@ -103,6 +104,8 @@ class Location < ActiveRecord::Base
     # convert degrees to radians for sphinx
     has 'RADIANS(locations.lat)', :as => :lat,  :type => :float
     has 'RADIANS(locations.lng)', :as => :lng,  :type => :float
+    # used delayed job for almost real time indexing using
+    set_property :delta => :delayed
     # only index valid locations
     where "status = 0"
   end
