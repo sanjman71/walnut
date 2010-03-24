@@ -24,6 +24,6 @@
 %hr.space
 
 .span-24.last#chains
-  %h4.prepend-1.span-23
+  %h4.span-24
     - unless @chains.blank?
       = render(:partial => 'chains', :locals => {:chains => @chains})

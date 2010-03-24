@@ -7,12 +7,26 @@
     %h4== #{pluralize(@count, 'location')}
   .span-23.last
     %h5.bottom= link_to 'All Chain Stores', chains_path
-    
+
 %hr.space
 
 %h3.prepend-1.span-23#states
-  - @states.each_with_index do |state, i|
-    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-    %span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to state, chain_state_path(@country, state, @chain), :class => klasses.join(" ")
+  - columns       = 4
+  - per_column    = (@states.size / columns) + (@states.size % columns == 0 ? 0 : 1)
+  - icolumn       = 0
+  - icolumn_last  = columns - 1
+
+  - columns.times do
+    .span-5#column{:class => icolumn == icolumn_last ? 'last' : ''}
+      %ul.chain.state.small{:style => 'list-style: none;'}
+        - (@states.slice(icolumn*per_column, per_column) || []).each do |state|
+          %li= link_to state, chain_state_path(@country, state, @chain), :class => 'admin'
+    - icolumn += 1
+
+  -#%hr.space
+
+  -#- @states.each_with_index do |state, i|
+    -#- klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    -#%span.small[state]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to state, chain_state_path(@country, state, @chain), :class => klasses.join(" ")
   
 

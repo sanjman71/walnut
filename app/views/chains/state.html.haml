@@ -6,10 +6,24 @@
   -#%h4= pluralize(@count, 'location')
   %h4#breadcrumbs
     = render(:partial => 'shared/breadcrumbs', :locals => {:tree => 'chains', :country => @country, :state => @state, :object => @chain})
-  
+
 %hr.space
 
-%h4.prepend-1.span-23#cities
-  - @cities.each_with_index do |city, i|
-    - klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
-    %span.small[city]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to city.name, {:action => 'city', :city => city, :state => @state, :country => @country}, :class => klasses.join(" ")
+%h4.span-24#cities
+  - columns       = 4
+  - per_column    = (@cities.size / columns) + ((@cities.size % columns == 0) ? 0 : 1)
+  - icolumn       = 0
+  - icolumn_last  = columns - 1
+
+  - columns.times do
+    .span-6#column{:class => icolumn == icolumn_last ? 'last' : ''}
+      %ul.chain.city.small{:style => 'list-style: none;'}
+        - (@cities.slice(icolumn*per_column, per_column) || []).each do |city|
+          %li= link_to city.name, chain_city_path(@country, @state, city, @chain), :class => ['admin', city.locations_count > 10000 ? 'bold' : ''].join(" ")
+    - icolumn += 1
+
+  -#%hr.space
+
+  -#- @cities.each_with_index do |city, i|
+    -#- klasses = i.odd? ? ["locality", "odd",] : ["locality", "even"]
+    -#%span.small[city]{:style => "white-space: nowrap; margin-right: 3px; font-weight: bold;"}= link_to city.name, {:action => 'city', :city => city, :state => @state, :country => @country}, :class => klasses.join(" ")
