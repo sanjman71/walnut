@@ -5,4 +5,4 @@
 %h4.neighborhood.related.bottom== #{city.name} Neighborhoods
 %ul
   - neighborhoods.each do |hood|
-    %li= link_to(hood.name, url_for(url_options.update(:neighborhood => hood)), :class => 'neighborhood related')
+    %li= link_to(hood.name, url_for(url_options.update(:neighborhood => hood.name.to_url_param)), :class => 'neighborhood related')
