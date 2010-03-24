@@ -38,7 +38,7 @@ class SpecialsController < ApplicationController
     @hash           = Search.query('special')
     @attributes     = Hash[:tag_ids => @tags.collect(&:id), :city_id => @city.id]
     @klasses        = [Appointment]
-    @sort_order     = "@relevance asc"
+    @sort_order     = "@relevance desc"
     @eager_loads    = [{:location => :company}, :tags]
     @page           = params[:page] ? params[:page].to_i : 1
     @sphinx_options = Hash[:classes => @klasses, :with_all => @attributes, :match_mode => :extended2, :rank_mode => :bm25,

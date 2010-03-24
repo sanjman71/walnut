@@ -1,11 +1,13 @@
 class Special
 
+  # database find_all
   def self.find_all
     tag = Tag.find_by_name(tag_name)
     return [] if tag.blank?
     Appointment.public.recurring.all(:joins => :tags, :conditions => ["tags.id = ?", tag.id])
   end
 
+  # database find_by_city
   def self.find_by_city(city, options={})
     return [] if city.blank?
     tag = Tag.find_by_name(tag_name)
@@ -14,6 +16,7 @@ class Special
     Appointment.public.recurring.all(:joins => [:tags, :location], :conditions => ["locations.city_id = ? AND tags.id = ?", city.id, tag.id])
   end
 
+  # database find_by_day
   # find location specials for the specified day
   def self.find_by_day(location, day)
     # find tag 'day'
@@ -113,7 +116,7 @@ class Special
 
   # import specials from specified yaml file
   def self.import(file = "data/specials.yml")
-    s = YAML::load_stream( File.open(file))
+    s = YAML::load_stream(File.open(file))
 
     s.documents.each do |object|
       locations = match(object)
@@ -164,54 +167,4 @@ class Special
     added
   end
   
-  def self.match(object)
-    @name           = object['name'] # e.g. kerryman
-    @state          = object["state"] # e.g. il
-    @city           = object['city'] # e.g. chicago
-    @phone          = object['phone'] # e.g. 3125559999
-    @address        = object['address'] # e.g. 14 Division
-
-    # find state, city
-    @state          = State.find_by_code(@state.upcase)
-    @city           = @state.cities.find_by_name(@city) if @state
-    
-    if @city.blank?
-      puts "[error] missing city"
-      return []
-    end
-
-    # search city
-    @attributes     = Search.attributes(@city)
-
-    # only search locations
-    @klasses        = [Location]
-    @sort_order     = "popularity desc, @relevance desc"
-
-    puts "*** searching using name and address"
-
-    # search query using a field search for name and address
-    @query          = ["name:'#{@name}'", @address ? "address:'#{@address}'" : ''].reject(&:blank?).join(' ')
-    @hash           = Search.query(@query)
-    @fields         = @hash[:fields]
-
-    @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :order => @sort_order,
-                           :match_mode => :extended2, :rank_mode => :bm25, :page => 1, :per_page => 5, :max_matches => 100]
-
-    @locations      = ThinkingSphinx.search(@sphinx_options)
-
-    if @locations.size > 1 and !@phone.blank?
-      puts "*** searching using name and phone"
-      # try again with name and phone
-      @query          = ["name:'#{@name}'", "phone:'#{@phone}'"].join(' ')
-      @hash           = Search.query(@query)
-      @fields         = @hash[:fields]
-
-      @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :order => @sort_order,
-                             :match_mode => :extended2, :rank_mode => :bm25, :page => 1, :per_page => 5, :max_matches => 100]
-
-      @locations      = ThinkingSphinx.search(@sphinx_options)
-    end
-    
-    @locations
-  end
 end
