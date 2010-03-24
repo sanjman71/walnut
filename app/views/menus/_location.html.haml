@@ -1,0 +1,41 @@
+- markers   = true unless local_assigns.has_key?(:markers)
+- tags      = [] unless local_assigns.has_key?(:tags)
+- exclude_tags = [] unless local_assigns.has_key?(:exclude_tags)
+- color     = '_orange' unless local_assigns.has_key?(:color)
+- features  = location_features(location) unless local_assigns.has_key?(:features)
+- klasses   = []
+- klasses.push("mappable") if location.mappable?
+
+.unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+  - if markers and location.mappable?
+    -# cache location google marker
+    - cache("google:marker:#{color}:#{index}") do
+      .span-1.icon-div
+        %img{:src => "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png", :class => 'icon'}
+  - else
+    -# marker icon placeholder
+    .span-1== &nbsp;
+
+  -# cache location info, independent of its list index
+  - cache("#{location.cache_key}:menu", :expires_in => CacheExpire.locations) do
+    .span-9.last.info
+      .span-9.last
+        %h4.name.margin-bottom-5
+          = link_to location.company_name, location_path(location), :class => "#{features.join(" ")} name"
+          = image_tag "restaurant_blue_16.png", :size => '16x16', :style => 'margin-left: 3px;', :title => 'Menu'
+      .span-9.last
+        .span-6
+          %span.menu.link= link_to 'Menu', location.preferences[:menu], :class => 'menu'
+          - unless location.preferences[:reviews].blank?
+            %span.menu.link= link_to 'Reviews', location.preferences[:reviews], :class => 'menu'
+          - unless location.preferences[:order_online].blank?
+            %span.menu.link= link_to 'Order Online', location.preferences[:menu], :class => 'menu'
+        .span-3.last.phone
+          - unless location.phone_numbers_count == 0
+            %span.phone{:style => "margin-left: 17px;"}= number_to_phone(location.primary_phone_number.address, :delimiter => ".")
+      .span-9.last.padding-top-5#tags
+        - tags = location.company.tag_list.sort - exclude_tags
+        - unless tags.empty?
+          %span{:style => 'color: #999; padding-right: 3px; font-size: 0.9em;'}== Search:
+          - tags.each do |tag|
+            = link_to tag, url_for(:tag => tag.to_url_param), :class => 'admin', :style => 'padding-right: 3px;'

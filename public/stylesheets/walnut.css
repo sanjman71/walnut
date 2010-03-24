@@ -101,6 +101,8 @@ a.admin:hover                                     { color: #FFFFFF; background-c
 a.admin.color, a.admin.color:visited              { color: #3A2313; font-size: 0.9em; font-weight: bold; }
 a.admin.color:hover                               { color: #FFFFFF; background-color: #3A2313; }
 
+a.admin.bold                                      { font-weight: bold; }
+
 a.header.link:link, a.header.link:visited         { color: #FFFFFF; }
 a.header.link:hover                               { background-color: #3A2313; text-decoration: none; }
 
@@ -143,8 +145,8 @@ a.day.odd:hover                                   { color: #FFFFFF; background-c
 
 div.location.search_result, div.appointment.search_result
                                                   { height: 85px; }
-
 div.appointment.special.search_result             { height: 115px; }
+div.location.menu.search_result                   { height: 95px; }
 
 .locations.featured.section, .events.featured.section, .specials.featured.section
                                                   { color: #3A2313; font-weight: normal; }
@@ -234,10 +236,12 @@ div.instructions ul                               { font-size: 12px; }
 /* chain styles */
 
 span.chain_letter                                 { background: #EEEEEE; color: #111111;  display: block; width: 15px; float: left;
-                                                    text-align: center; padding: 0.1em 0.1em; margin-right: 5px; }
+                                                    text-align: center; padding: 0.2em 0.2em; margin-right: 9px; }
 span.chain_letter.current                         { background: #0099FF; color: #111111; }
 span.chain_letter a                               { display: block; text-decoration: none; }
 span.chain_letter a:hover                         { background: #3300BB; color: #0099FF; }
+
+ul.chain.state, ul.chain.city                     { font-size: 1.0em; }
 
 /* special styles */
 
@@ -248,6 +252,13 @@ span.special.day a:hover                          { background: #3300BB; color: 
 
 a.special.day.other                               { font-weight: normal; color: #0099FF; }
  
+/* menu styles */
+
+span.menu.link                                    { padding-right: 5px; }
+
+a.menu:link, a.menu:visited                       { font-size: 0.9em; font-weight: normal; color: #FF6600; }
+a.menu:hover                                      { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
+
 /* sitemap styles */
 
 div#sitemap h5                                    { font-size: 1.0em; }
@@ -298,10 +309,10 @@ span.example                                      { color: #666666; font-style: 
 .state_zips                                       { color: #111111; font-weight: bold; padding-bottom: 10px; }
 
 .neighborhood.related, .zip.related, .city.related, .city.nearby, .zip.nearby, .tags.related
-                                                  { color: #111111;  font-weight: bold; }
+                                                  { color: #111111;  font-weight: bold; font-size: 1.0em; }
 
 a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.nearby.zip, a.nearby.tag, a.related.neighborhood
-                                                  { font-weight: normal; color: #0099FF; }
+                                                  { font-weight: normal; color: #0099FF; font-size: 0.9em; }
 
 span.neighborhood                                 { margin-right: 2px; }
 

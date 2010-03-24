@@ -83,6 +83,19 @@ ActionController::Routing::Routes.draw do |map|
                           :controller => 'specials', :action => 'city', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/
   map.specials            '/specials', :controller => 'specials', :action => 'index'
 
+  # menus
+  map.menu_city           '/menus/:country/:state/:city',
+                          :controller => 'menus', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/
+  map.menu_city_tag       '/menus/:country/:state/:city/tag/:tag',
+                          :controller => 'menus', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/
+  map.menu_hood           '/menus/:country/:state/:city/n/:neighborhood',
+                          :controller => 'menus', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/,
+                          :neighborhood => /[a-z-]+/
+  map.menu_hood_tag       '/menus/:country/:state/:city/n/:neighborhood/tag/:tag', 
+                          :controller => 'menus', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/,
+                          :neighborhood => /[a-z-]+/
+  map.menus               '/menus', :controller => 'menus', :action => 'country'
+
   # tag group routes
   map.resources   :taggs
 
