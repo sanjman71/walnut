@@ -340,26 +340,31 @@ class ApplicationController < ActionController::Base
     title = "#{subject.titleize} near #{where}"
 
     title
-  end  
-    
-  def build_place_title(place, location, options={})
-    city  = options[:city]
-    state = options[:state]
-    zip   = options[:zip]
+  end 
 
-    tuple = [place.name]
+  def build_place_title(place, location, options={})
+    street  = options[:street]
+    city    = options[:city]
+    state   = options[:state]
+    zip     = options[:zip]
+
+    # start with place name
+    tuple   = [place.name]
 
     if city.blank? and state.blank? and zip.blank?
       return tuple.join(" - ")
     end
 
+    address = [street]
+    # add street, city, state, zip
     if city and state and zip
-      tuple.push("#{city.name} #{state.code}, #{zip.name}")
+      address.push("#{city.name} #{state.code}, #{zip.name}")
     elsif city and state
-      tuple.push("#{city.name} #{state.code}")
+      address.push("#{city.name} #{state.code}")
     elsif city
-      tuple.push("#{city.name}")
+      address.push("#{city.name}")
     end
+    tuple.push(address.reject(&:blank?).join(", "))
 
     if location.phone_numbers_count > 0
       # add phone number

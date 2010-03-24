@@ -56,7 +56,7 @@ class LocationsController < ApplicationController
     end
 
     # initialize title, h1 tags
-    @title    = build_place_title(@company, @location, :city => @city, :state => @state, :zip => @zip)
+    @title    = build_place_title(@company, @location, :street => @location.street_address, :city => @city, :state => @state, :zip => @zip)
     @h1       = @company.name
   end
 
