@@ -39,21 +39,28 @@
       -# location address
       %h2#address
         = [@location.street_address, city_state_zip(@city, @state, @zip)].reject(&:blank?).join("<br/>")     
-        
-      -# location phone 
+
+      -# location phone
       %h3#phone
         - unless @location.phone_numbers_count == 0
           = render(:partial => 'phone', :locals => {:location => @location, :max_phones => 3})
-        
+
+      -# location menu
+      - if @location.preferences[:menu]
+        %h4#menu
+          = image_tag "restaurant_blue_16.png", :size => '16x16', :style => 'margin-left: 3px;', :title => 'Menu'
+          %span.menu.link= link_to 'Menu', @location.preferences[:menu], :class => 'menu'
+          - unless @location.preferences[:reviews].blank?
+            %span.menu.link= link_to 'Reviews', @location.preferences[:reviews], :class => 'menu'
       -# location events
       %h4#add_event
         - if has_privilege?('manage site') and @location.events_count == 0
           = link_to "Add Event", new_event_path(@location.id), :style => 'font-size: 1.0em;', :class => 'event add'
-          
+
       -# location recommendations
-      / %h4.recommendations#recommend
-      /   = render(:partial => "recommendations", :locals => {:location => @location})
-        
+      -# %h4.recommendations#recommend
+        -#= render(:partial => "recommendations", :locals => {:location => @location})
+
   %hr.space
 
   -# company and locality tags
@@ -70,7 +77,7 @@
             - klasses = ["tag big"].push(cycle('even', 'odd'))
             = link_to(tag.name, build_search_route('search', 'city', :country => @country, :state => @state, :city => @city, :tag => tag.name.to_url_param), :class => klasses.join(' '))
       
-    .span-9.last#locality_tags
+    .span-8.last#locality_tags
       %h2.location.tags.geography.divider== Geography Tags
       - ([@state, @city, @zip].compact + @neighborhoods).each do |locality|
         %span{:style => 'padding-right: 3px;'}
@@ -83,9 +90,9 @@
     -# nearby locations
     .last#nearby_places{:class => @nearby_event_venues.blank? ? "span-18" : "span-7 colborder"}
       = render(:partial => 'nearby_places', :locals => {:locations => @nearby_locations, :title => 'Nearby Places'}) unless @nearby_locations.blank?
-    
+
     -# nearby event venues
-    .span-9.last#nearby_event_venues
+    .span-8.last#nearby_event_venues
       = render(:partial => 'nearby_places', :locals => {:locations => @nearby_event_venues, :title => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
   - else
     -# location events
@@ -93,7 +100,7 @@
       = render(:partial => 'location_events', :locals => {:location => @location, :events => @location_events, :title => 'Upcoming Events'})
 
     -# nearby event venues
-    .span-9.last#nearby_event_venues
+    .span-8.last#nearby_event_venues
       = render(:partial => 'nearby_places', :locals => {:locations => @nearby_event_venues, :title => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
   
 .span-5.last#sidebar{:style => 'text-align: right;'}
