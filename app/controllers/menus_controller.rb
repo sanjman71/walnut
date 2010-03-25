@@ -61,14 +61,30 @@ class MenusController < ApplicationController
       @nearby_cities = [@city]
     end
 
-    # @title  = [@city.name.titleize, @tag.to_s.titleize, 'Menus'].reject(&:blank?).join(' ')
-    @title  = build_search_title(:klass => 'menu', :tag => [@tag.andand.name, 'restaurant', 'menus'].uniq.reject(&:blank?).join(' '), :query => nil, :city => @city, :neighborhood => @neighborhood, :state => @state)
-    @h1     = @title
+    @title  = build_search_title(:klass => 'menu', :tag => [@tag.andand.name, 'menus'].uniq.reject(&:blank?).join(' '), :query => nil, :city => @city, :neighborhood => @neighborhood, :state => @state)
+    @h1     = build_search_h1(@tag.andand.name, Hash["city" => @city.name, "neighborhood" => @neighborhood.andand.name])
 
-    # track_special_ga_event(params[:controller], @city)
+    # track_menu_ga_event(params[:controller], @city, @tag)
   end
 
   protected
+
+  # build h1 tag from what (e.g. 'pizza'), and where (e.g. {"city" => 'Chicago', "neighborhood" => 'River North'})
+  def build_search_h1(what, where)
+    # e.g. "Pizza Restaurants"
+    s1 = [what, 'restaurants'].uniq.reject(&:blank?).map(&:titleize)
+
+    case where.keys.sort
+    when ["city", "neighborhood"]
+      s2 = [where["neighborhood"], where["city"]]
+    when ["city"]
+      s2 = [where["city"]]
+    else
+      s2 = []
+    end
+
+    "#{s1.join(" ")} in #{s2.reject(&:blank?).join(", ")}"
+  end
 
   def search_max_matches
     100
