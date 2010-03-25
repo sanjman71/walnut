@@ -16,6 +16,8 @@
     %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
     = link_to 'Specials', specials_path, :class => 'header link'
     %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
+    = link_to 'Menus', menus_path, :class => 'header link'
+    %span{:class => 'vertical bar'}== &nbsp;|&nbsp;
     = link_to 'Zip Finder', zips_path, :class => 'header link'
 
     - if has_privilege?('manage site')
