@@ -44,13 +44,12 @@ class LocationFinder
       return []
     end
 
-
     # first search fixed mappings
-    if @key and (@mapping = mappings.find{ |h| h["key"] == @key })
-      @id = @mapping["id"]
-      @locations = [Location.find_by_id(@id)].compact
-      return @locations
-    end
+    # if @key and (@mapping = mappings.find{ |h| h["key"] == @key })
+    #   @id = @mapping["id"]
+    #   @locations = [Location.find_by_id(@id)].compact
+    #   return @locations
+    # end
 
     # search city
     @attributes     = Search.attributes(@city)
