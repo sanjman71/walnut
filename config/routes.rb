@@ -145,6 +145,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # sitemaps controller
   map.sitemap_events    '/sitemap.events.xml', :controller => 'sitemaps', :action => 'events'
+  map.sitemap_menus     '/sitemap.menus.xml', :controller => 'sitemaps', :action => 'menus'
   map.sitemap_tags      '/sitemap.tags.:state.:city.xml', :controller => 'sitemaps', :action => 'tags', :state => /[a-z]{2}/, :city => /[a-z-]+/
   map.sitemap_chains    '/sitemap.chains.:id.xml', :controller => 'sitemaps', :action => 'chains'
   map.sitemap_locations '/sitemap.locations.:state.:city.:index.xml', :controller => 'sitemaps', :action => 'locations', :state => /[a-z]{2}/, :city => /[a-z-]+/, :index => /[0-9]+/

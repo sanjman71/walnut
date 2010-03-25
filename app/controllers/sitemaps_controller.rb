@@ -26,6 +26,16 @@ class SitemapsController < ApplicationController
     end
   end
 
+  # GET /sitemap.menus.xml
+  def menus
+    @protocol = self.request.protocol
+    @host     = self.request.host
+
+    respond_to do |format|
+      format.xml
+    end
+  end
+
   # GET /sitemap.tags.nc.charlotte.xml
   # GET /sitemap.tags.il.chicago.xml
   def tags
