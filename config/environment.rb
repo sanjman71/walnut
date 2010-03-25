@@ -135,3 +135,6 @@ LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
 LOCALEZE_DELTA_LOGGER     = Logger.new("log/localeze.delta.log")
 DATA_ERROR_LOGGER         = Logger.new("log/data.error.log")
 DATA_TAGS_LOGGER          = Logger.new("log/data.tags.log")
+
+# create menu loggers
+MENU_ERROR_LOGGER         = Logger.new("log/menu.error.log")

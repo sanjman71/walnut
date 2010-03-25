@@ -12,7 +12,7 @@ namespace :specials do
       agent.get(url)
   
       # parse and map to a location
-      location = parse_geo(agent)
+      location = parse_specials_geo(agent)
 
       if location
         # parse specials for the location
@@ -21,9 +21,7 @@ namespace :specials do
     end
   end
   
-  # name, e.g. Kerryman
-  # name_and_address, e.g. Kerryman 500 N Clark St Chicaogo, IL 60654, 555-999-9999
-  def parse_geo(agent)
+  def parse_specials_geo(agent, options={})
     # get location name and address
     name_and_address  = agent.page.at("div.threecolumns p").text()  # e.g. Kerryman 500 N Clark St Chicaogo, IL 60654, 555-999-9999
     name              = agent.page.at("div.threecolumns p strong").text() # e.g. Kerryman
@@ -38,7 +36,6 @@ namespace :specials do
     city    = 'chicago'
     state   = 'il'
 
-    # 
     # strip city, state, zip phone from address;
     match   = address.match(/([\w\d\s]+) Chicago/)
     
@@ -51,12 +48,11 @@ namespace :specials do
     hash   = StreetAddress.components(street)
 
     # build object hash using name, street, city, state
-    object    = Hash["name" => name, "address" => "#{hash[:housenumber]} #{hash[:streetname]}", "city" => city, "state" => state, "phone" => phone]
+    object = Hash["name" => name, "address" => "#{hash[:housenumber]} #{hash[:streetname]}", "city" => city, "state" => state, "phone" => phone]
+    # puts "*** object: #{object.inspect}"
 
-    puts "*** object: #{object.inspect}"
-
-    locations = Special.match(object)
-    
+    # map to a location
+    locations = LocationFinder.match(object)
     # puts "*** locations: #{locations.inspect}"
     
     if locations.empty?
@@ -66,7 +62,7 @@ namespace :specials do
       puts "[error] #{locations.size} found"
       return nil
     end
-    
+  
     locations.first
   end
 
