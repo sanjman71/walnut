@@ -31,12 +31,19 @@ class LocationFinder
 
     # find state, city
     @state          = State.find_by_code(@state.upcase)
-    @city           = @state.cities.find_by_name(@city) if @state
-    
+
+    if @state.blank?
+      puts "[error] missing state" if @log
+      return []
+    end
+
+    @city           = @state.cities.find_by_name(@city)
+
     if @city.blank?
       puts "[error] missing city" if @log
       return []
     end
+
 
     # first search fixed mappings
     if @key and (@mapping = mappings.find{ |h| h["key"] == @key })
