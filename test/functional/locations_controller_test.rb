@@ -21,23 +21,70 @@ class LocationsControllerTest < ActionController::TestCase
   end
 
   context "show" do
-    setup do
-      ThinkingSphinx.stubs(:search).returns([@location])
-      get :show, :id => @location.to_param
+    context "location with city, state and no address" do
+      setup do
+        @location.street_address = ''
+        @location.save
+        ThinkingSphinx.stubs(:search).returns([@location])
+        get :show, :id => @location.to_param
+      end
+
+      should_assign_to(:location) { @location }
+      should_assign_to(:company) { @company }
+      should_assign_to(:location_events) { [] }
+
+      should_assign_to(:title) { "Chicago Pizza - Chicago IL" }
+      should_assign_to(:h1) { "Chicago Pizza" }
+
+      should_respond_with :success
+      should_render_template 'locations/show.html.haml'
+
+      should "have h1 tag" do
+        assert_tag :tag => "h1", :content => "Chicago Pizza"
+      end
     end
 
-    should_assign_to(:location) { @location }
-    should_assign_to(:company) { @company }
-    should_assign_to(:location_events) { [] }
+    context "location with address" do
+      setup do
+        ThinkingSphinx.stubs(:search).returns([@location])
+        get :show, :id => @location.to_param
+      end
 
-    should_assign_to(:title) { "Chicago Pizza - Chicago IL" }
-    should_assign_to(:h1) { "Chicago Pizza" }
+      should_assign_to(:location) { @location }
+      should_assign_to(:company) { @company }
+      should_assign_to(:location_events) { [] }
 
-    should_respond_with :success
-    should_render_template 'locations/show.html.haml'
+      should_assign_to(:title) { "Chicago Pizza - 200 W Grand Ave, Chicago IL" }
+      should_assign_to(:h1) { "Chicago Pizza" }
 
-    should "have h1 tag" do
-      assert_tag :tag => "h1", :content => "Chicago Pizza"
+      should_respond_with :success
+      should_render_template 'locations/show.html.haml'
+
+      should "have h1 tag" do
+        assert_tag :tag => "h1", :content => "Chicago Pizza"
+      end
+    end
+    
+    context "location with address and phone" do
+      setup do
+        @location.phone_numbers.create(:address => "3125551212", :name => "Work")
+        ThinkingSphinx.stubs(:search).returns([@location])
+        get :show, :id => @location.to_param
+      end
+
+      should_assign_to(:location) { @location }
+      should_assign_to(:company) { @company }
+      should_assign_to(:location_events) { [] }
+
+      should_assign_to(:title) { "Chicago Pizza - 200 W Grand Ave, Chicago IL - 312 555 1212" }
+      should_assign_to(:h1) { "Chicago Pizza" }
+
+      should_respond_with :success
+      should_render_template 'locations/show.html.haml'
+
+      should "have h1 tag" do
+        assert_tag :tag => "h1", :content => "Chicago Pizza"
+      end
     end
   end
 
