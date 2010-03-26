@@ -91,6 +91,43 @@ namespace :menu do
       puts "#{Time.now}: [completed]"
     end
 
+    desc "Parse menu error log"
+    task :check_menu_errors do
+      file      = ENV["FILE"] ? ENV["FILE"] : 'log/menu.error.log'
+      url       = ''
+      count     = 0
+      imported  = 0
+      agent     = WWW::Mechanize.new
+
+      File.open(file).readlines.each do |line|
+        # look for object hash, e.g {"name" => "Pizza Place", ... }
+        if match = line.match(/(\{.*\})/)
+          object    = eval(match[1])
+          locations = LocationFinder.match_phone(object, :log => 1)
+          count     += 1
+
+          puts "found #{locations.size} locations"
+
+          next if locations.size != 1
+          location = locations.first
+          # skip if location already has a menu
+          next if location.preferences[:menu] == url
+
+          puts "[mapping] #{location.company_name}:#{location.id}:#{location.street_address}:#{location.city}"
+          puts "[mapping] #{url}"
+          puts "*** type 'y' to import"
+          cmd = STDIN.readline.downcase.strip
+
+          if cmd == 'y'
+            import_menu(agent, url, :id => location.id)
+            imported += 1
+          end
+        elsif match = line.match(/(http.*\/)/)
+          url = match[1]
+        end
+      end
+    end
+
     # desc "Add menu links from allmenus.com"
     # task :import_from_allmenus do
     #   start_url = ENV["URL"] ? ENV["URL"] : "http://www.allmenus.com/il/chicago/"
@@ -158,16 +195,17 @@ namespace :menu do
 
   # import menu
   # e.g. http://www.allmenus.com/il/chicago/272001-portillos-hot-dogs/menu/
-  def import_menu(agent, url)
+  def import_menu(agent, url, options={})
     # check if this is a valid url
     return nil if skip_menu?(url)
     
     puts "**** importing menu: #{url}"
+
     # get and parse url
     agent.get(url)
 
     # parse and map to a location
-    location = parse_menu_geo(agent, url)
+    location = options[:id] ? Location.find_by_id(options[:id]) : parse_menu_geo(agent, url)
 
     if location
       add_menu(location, agent, url)
