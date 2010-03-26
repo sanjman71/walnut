@@ -22,12 +22,30 @@
         %h4.name.margin-bottom-5
           = link_to location.company_name, location_path(location), :class => "#{features.join(" ")} name"
       .span-9.last
+        -# build special collection
+        - specials_collection = Special.preferences(special.preferences).keys.inject([]) do |array, special_key|
+          - array = array + Special.collectionize(special.preferences[special_key])
+          - array
+        - columns = 2
+        - column1 = specials_collection.size / 2 + (specials_collection.size % columns == 0 ? 0 : 1)
+        .span-9.last.bottom.padding-bottom-5
+          - reset_cycle
+          .span-4#specials_column
+            %ul{:style => 'list-style-type: disc; margin-left: 0px; padding-bottom: 0px;'}
+              - specials_collection.slice(0, column1).each do |s|
+                %li{:class => cycle('gray', '')}= s
+          - reset_cycle
+          .span-5.last#specials_column
+            %ul{:style => 'list-style-type: disc; margin-left: 0px;'}
+              - specials_collection.slice(column1, specials_collection.size).each do |s|
+                %li{:class => cycle('gray', '')}= s
+
         -# show each special
-        - Special.preferences(special.preferences).keys.each do |special_key|
-          .span-9.last.bottom.padding-bottom-5
-            %span{:style => 'color: #999;'}== #{Special.preference_name(special_key).titleize}:
-            - special_collection = Special.collectionize(special.preferences[special_key])
-            - special_collection.each_with_index do |s, i|
-              = s
-              - unless i == special_collection.length-1
-                %span{:style => 'color: #0099FF; font-size: 1.1em; padding: 0px; margin: 0px;'}== &bull; 
+        -#- Special.preferences(special.preferences).keys.each do |special_key|
+          -#.span-9.last.bottom.padding-bottom-5
+            -#%span{:style => 'color: #999;'}== #{Special.preference_name(special_key).titleize}:
+            -#- special_collection = Special.collectionize(special.preferences[special_key])
+            -#- special_collection.each_with_index do |s, i|
+              -#= s
+              -#- unless i == special_collection.length-1
+                -#%span{:style => 'color: #0099FF; font-size: 1.1em; padding: 0px; margin: 0px;'}== &bull; 

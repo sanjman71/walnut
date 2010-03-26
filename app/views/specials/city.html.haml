@@ -19,11 +19,9 @@
   .span-19.last#main
     %h3== Looking for #{@city.name.titleize} Bar, Drink, Food, or Restaurant Specials?
     %h3== Pick a day below.
-    
-    -#- @days.each do |day|
-      -#%span.special.day= link_to day, specials_city_day_path(:day => day.downcase)
 
     - @days.each do |day|
-      - klasses = ['day'].push(cycle('even', 'odd'))
-      %span.small= link_to day, specials_city_day_path(:day => day.downcase), :class => klasses.join(" ")
+      %span{:style => 'font-size: 2.0em; padding-right: 7px;'}= link_to day, specials_city_day_path(:day => day.downcase), :class => 'admin'
+      -#- klasses = ['day'].push(cycle('even', 'odd'))
+      -##%span.small= link_to day, specials_city_day_path(:day => day.downcase), :class => klasses.join(" ")
   

@@ -269,13 +269,14 @@ div#sitemap a:hover                               { color: #0099FF; }
 /* highlight styles */
 
 .shaded                                           { background: #EDF3FE; none repeat scroll 0 0; }
+.gray                                             { background: #EFEFEF; non repeat scroll 0 0; }
 
 .highlighted, .highlighted.shaded, .highlight     { background: #FFCC00; none repeat scroll 0 0; }
 .highlight.muted                                  { background: #FFFF99; none repeat scroll 0 0; }
 .highlight.muted.more                             { background: #FFF4C2; none repeat scroll 0 0; }
 
 .blue.muted                                       { background: #EDF3FE; none repeat scroll 0 0; }
-  
+
 /* color styles */
 
 /*
