@@ -23,7 +23,6 @@ class LocationFinder
     @city           = object['city'] # e.g. chicago
     @phone          = object['phone'] # e.g. 3125559999
     @address        = object['address'] # e.g. 14 Division
-    @key            = object['key']
 
     @log            = options[:log].to_i == 1
 
@@ -43,13 +42,6 @@ class LocationFinder
       puts "[error] missing city" if @log
       return []
     end
-
-    # first search fixed mappings
-    # if @key and (@mapping = mappings.find{ |h| h["key"] == @key })
-    #   @id = @mapping["id"]
-    #   @locations = [Location.find_by_id(@id)].compact
-    #   return @locations
-    # end
 
     # search city
     @attributes     = Search.attributes(@city)
@@ -95,15 +87,13 @@ class LocationFinder
 
       @objects        = ThinkingSphinx.search(@sphinx_options)
 
-      # since its only a phone search, we require exactly 1 match, which then needs to match the name
       if @objects.size == 1
-        # check object name with query name for a regex match
+        # there was 1 phone match, but we require a phone and name match, so check object name with query name
         @object = @objects.first
         if (@object.company_name =~ /#{@name}/) || (@name =~ /#{@object.company_name}/)
           @locations = @objects
         end
       end
-
     end
 
     if @locations.size == 1
@@ -114,4 +104,47 @@ class LocationFinder
     @locations
   end
   
+  # use sphinx to match location on a phone number
+  def self.match_phone(object, options={})
+    @state          = object["state"] # e.g. il
+    @city           = object['city'] # e.g. chicago
+    @phone          = object['phone'] # e.g. 3125559999
+
+    @log            = options[:log].to_i == 1
+
+    puts "*** object: #{object.inspect}" if @log
+
+    # find state, city
+    @state          = State.find_by_code(@state.upcase)
+
+    if @state.blank?
+      puts "[error] missing state" if @log
+      return []
+    end
+
+    @city           = @state.cities.find_by_name(@city)
+
+    if @city.blank?
+      puts "[error] missing city" if @log
+      return []
+    end
+
+    # search city
+    @attributes     = Search.attributes(@city)
+
+    # only search locations
+    @klasses        = [Location]
+    @sort_order     = "popularity desc, @relevance desc"
+
+
+    @query          = ["phone:'#{@phone}'"].join(' ')
+    @hash           = Search.query(@query)
+    @fields         = @hash[:fields]
+
+    @sphinx_options = Hash[:classes => @klasses, :with => @attributes, :conditions => @fields, :order => @sort_order,
+                           :match_mode => :extended2, :rank_mode => :bm25, :page => 1, :per_page => 5, :max_matches => 100]
+
+    @objects        = ThinkingSphinx.search(@sphinx_options)
+    @objects
+  end
 end
