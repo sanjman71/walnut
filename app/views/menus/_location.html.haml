@@ -2,16 +2,18 @@
 - tags      = [] unless local_assigns.has_key?(:tags)
 - exclude_tags = [] unless local_assigns.has_key?(:exclude_tags)
 - color     = '_orange' unless local_assigns.has_key?(:color)
+- zoom      = 0 unless local_assigns.has_key?(:zoom)
 - features  = location_features(location) unless local_assigns.has_key?(:features)
 - klasses   = []
 - klasses.push("mappable") if location.mappable?
 
-.unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"}
+.unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :zoom => zoom, |
+                         :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"} |
   - if markers and location.mappable?
     -# cache location google marker
     - cache("google:marker:#{color}:#{index}") do
       .span-1.icon-div
-        %img{:src => "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png", :class => 'icon'}
+        = image_tag("/images/marker" + color + Array('A'..'Z')[index] + ".png", :size => '15x25')
   - else
     -# marker icon placeholder
     .span-1== &nbsp;

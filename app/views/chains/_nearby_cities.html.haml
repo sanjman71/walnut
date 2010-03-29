@@ -1,4 +1,4 @@
-%h5.bottom.padding-bottom-5{:style => 'color: #555;'}== #{@chain.display_name} Nearby Locations
+%h5.bottom.padding-bottom-5== #{@chain.display_name} Nearby Locations
 %ul
   - nearby_cities.each do |city|
     %li= link_to("#{chain.display_name} in #{city.name}", url_for(:city => city, :id => chain), :class => 'city nearby')

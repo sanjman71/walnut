@@ -1,10 +1,5 @@
 - title(@title)
 
--# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
-- content_for :javascript do
-  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
-- javascript("jquery.jmap", "places", "map_markers")
-
 - klasses   = []
 - klasses.push("mappable") if @zip.mappable?
 

@@ -61,10 +61,12 @@ div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited,
                                                     border-bottom: 1px solid #E5E5E5; font-weight: bold; margin: 0;
                                                     text-decoration: none; padding: 3px 8px 8px; }
 
+/*
 #location_switcher, #location_switcher ul         { list-style: none; }
 #location_switcher, #location_switcher *          { padding: 0; margin: 0; }
 #location_switcher li ul                          { display: none; }
 #location_switcher li:hover ul                    { display: block; }
+*/
 
 div#header_links span.vertical.bar                { color: #FFFFFF; }
 
@@ -261,10 +263,12 @@ a.menu:hover                                      { color: #FFFFFF; background-c
 
 /* sitemap styles */
 
+/*
 div#sitemap h5                                    { font-size: 1.0em; }
 div#sitemap h5.heading                            { color: #444; font-weight: bold; }
 div#sitemap a                                     { display: inline; text-decoration: none; color: #999; } 
 div#sitemap a:hover                               { color: #0099FF; }
+*/
 
 /* highlight styles */
 

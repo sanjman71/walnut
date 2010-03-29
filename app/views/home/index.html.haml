@@ -1,11 +1,6 @@
 - title('Home')
 - robots('index', 'follow')
 
--# The Google maps Javascript needs to be included before the other javascript files, as some refer to Google (in particular, markermanager)
-- content_for :javascript do
-  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
-- javascript("jquery.jmap", "map_markers")
-
 .span-23.prepend-1.padding-top-10
   
   %hr.space

@@ -1,8 +1,5 @@
 - title(@title)
 - robots('index', 'follow')
-- content_for :head do
-  %script{:src => GOOGLE_MAPS_API_URL, :type => 'text/javascript'}
-- javascript("jquery.jmap", "maps", "places")
 
 .span-15.prepend-1.mat.padding-top-10.padding-bottom-10
   %h1{:style => 'font-size: 2.0em;'}= @h1
@@ -29,15 +26,16 @@
 .span-15.prepend-1
   = display_flash
 
-.span-18.prepend-1
-  .span-18#address_phone
-    .span-11
-      -# show location map only if its mappable
-      = render(:partial => 'google_map', :locals => {:location => @location}) if @location.mappable?
+.span-19.prepend
+  .span-19.last#address_phone
+    .span-12
+      - if @location.mappable?
+        -# show map only if location is mappable
+        .jmap#map{:style => "width: 425; height: 225px;"}
     
     .span-6.append-1.last
       -# location address
-      %h2#address
+      %h2#address.mappable{:lat => @location.lat, :lng => @location.lng, :index => 0, :color => "_orange", :html => "", :zoom => "15"}
         = [@location.street_address, city_state_zip(@city, @state, @zip)].reject(&:blank?).join("<br/>")     
 
       -# location phone
@@ -64,8 +62,8 @@
   %hr.space
 
   -# company and locality tags
-  .span-18#all_tags
-    .span-7.colborder#tags
+  .span-19.last#all_tags
+    .span-8.colborder#tags
       %h2.location.tags.keywords.divider== Keyword Tags
       - tags = @company.tags
       - if tags.blank?
@@ -88,15 +86,16 @@
 
   - if @location_events.empty?
     -# nearby locations
-    .last#nearby_places{:class => @nearby_event_venues.blank? ? "span-18" : "span-7 colborder"}
+    #nearby_places{:class => @nearby_event_venues.blank? ? "span-17 last" : "span-8 colborder"}
       = render(:partial => 'nearby_places', :locals => {:locations => @nearby_locations, :title => 'Nearby Places'}) unless @nearby_locations.blank?
 
     -# nearby event venues
-    .span-8.last#nearby_event_venues
-      = render(:partial => 'nearby_places', :locals => {:locations => @nearby_event_venues, :title => 'Nearby Event Venues'}) unless @nearby_event_venues.blank?
+    - unless @nearby_event_venues.blank?
+      .span-8.last#nearby_event_venues
+        = render(:partial => 'nearby_places', :locals => {:locations => @nearby_event_venues, :title => 'Nearby Event Venues'})
   - else
     -# location events
-    .last#location_events{:class => "span-7 colborder"}
+    .span-8.colborder#location_events
       = render(:partial => 'location_events', :locals => {:location => @location, :events => @location_events, :title => 'Upcoming Events'})
 
     -# nearby event venues

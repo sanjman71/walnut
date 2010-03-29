@@ -3,6 +3,7 @@ $(document).ready(function() {
   var markers = [];
   var baseIcon;
   var gmap;
+  var zoom = 0;
   $(document).ready(function(){
     $('#map').jmap('init', {'mapType':'map','mapCenter':[0, 0], 'mapZoom':12 },
       function (map, element, options) {
@@ -19,12 +20,19 @@ $(document).ready(function() {
             glatlng = new GLatLng(lat, lng);
             html = latlng.attributes["html"].nodeValue;
             index = parseInt(latlng.attributes["index"].nodeValue);
+            zoom = parseInt(latlng.attributes["zoom"].nodeValue);
             markers[index] = createMarker(glatlng, html, index, color);
             map.addOverlay(markers[index]);
             bounds.extend(glatlng);
           }
         );
-        map.setZoom(map.getBoundsZoomLevel(bounds)-1);
+        if (zoom == 0) {
+          // set zoom using bounds
+          map.setZoom(map.getBoundsZoomLevel(bounds)-1);
+        } else {
+          // set zoom using configured value
+          map.setZoom(zoom);
+        }
         map.setCenter(bounds.getCenter());
       }
     );
@@ -57,7 +65,8 @@ function createMarker(glatlng, html, index, color) {
   // Create a lettered icon for this point using our icon class
   var letter = String.fromCharCode("A".charCodeAt(0) + index);
   var letteredIcon = new GIcon(baseIcon);
-  letteredIcon.image = "http://www.google.com/mapfiles/marker" + color + letter + ".png";
+  // use local path for image
+  letteredIcon.image = "/images/marker" + color + letter + ".png";
 
   // Set up our GMarkerOptions object
   markerOptions = { icon:letteredIcon, clickable: true };
