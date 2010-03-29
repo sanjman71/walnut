@@ -9,10 +9,8 @@
 .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :zoom => zoom, |
                          :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"} |
   - if markers and location.mappable?
-    -# cache location google marker
-    - cache("google:marker:#{color}:#{index}") do
-      .span-1.icon-div
-        = image_tag("/images/marker" + color + Array('A'..'Z')[index] + ".png", :size => '15x25')
+    .span-1.icon-div
+      = image_tag(google_marker(color, index), :size => google_marker_size)
   - else
     -# marker icon placeholder
     .span-1== &nbsp;

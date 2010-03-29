@@ -171,4 +171,14 @@ module ApplicationHelper
     end
   end
 
+  # build google image marker path
+  def google_marker(color, index)
+    "/images/marker" + color + Array('A'..'Z')[index] + ".png"
+  end
+
+  # original marker size is 20x34
+  def google_marker_size
+    "17x29"
+  end
+
 end
