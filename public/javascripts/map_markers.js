@@ -4,46 +4,45 @@ $(document).ready(function() {
   var baseIcon;
   var gmap;
   var zoom = 0;
-  $(document).ready(function(){
-    $('#map').jmap('init', {'mapType':'map','mapCenter':[0, 0], 'mapZoom':12 },
-      function (map, element, options) {
-        // remember the map
-        gmap = map;
-        // Create the base icon
-        createBaseIcon();
-        var lat, lng;
-        $('.mappable').each(function(i, latlng)
-          {
-            lat = latlng.attributes["lat"].nodeValue;
-            lng = latlng.attributes["lng"].nodeValue;
-            color = latlng.attributes["color"].nodeValue;
-            glatlng = new GLatLng(lat, lng);
-            html = latlng.attributes["html"].nodeValue;
-            index = parseInt(latlng.attributes["index"].nodeValue);
-            zoom = parseInt(latlng.attributes["zoom"].nodeValue);
-            markers[index] = createMarker(glatlng, html, index, color);
-            map.addOverlay(markers[index]);
-            bounds.extend(glatlng);
-          }
-        );
-        if (zoom == 0) {
-          // set zoom using bounds
-          map.setZoom(map.getBoundsZoomLevel(bounds)-1);
-        } else {
-          // set zoom using configured value
-          map.setZoom(zoom);
+  
+  $('div#map').jmap('init', {'mapType':'map','mapCenter':[0, 0], 'mapZoom':12 },
+    function (map, element, options) {
+      // remember the map
+      gmap = map;
+      // Create the base icon
+      createBaseIcon();
+      var lat, lng;
+      $('.mappable').each(function(i, latlng)
+        {
+          lat = latlng.attributes["lat"].nodeValue;
+          lng = latlng.attributes["lng"].nodeValue;
+          color = latlng.attributes["color"].nodeValue;
+          glatlng = new GLatLng(lat, lng);
+          html = latlng.attributes["html"].nodeValue;
+          index = parseInt(latlng.attributes["index"].nodeValue);
+          zoom = parseInt(latlng.attributes["zoom"].nodeValue);
+          markers[index] = createMarker(glatlng, html, index, color);
+          map.addOverlay(markers[index]);
+          bounds.extend(glatlng);
         }
-        map.setCenter(bounds.getCenter());
+      );
+      if (zoom == 0) {
+        // set zoom using bounds
+        map.setZoom(map.getBoundsZoomLevel(bounds)-1);
+      } else {
+        // set zoom using configured value
+        map.setZoom(zoom);
       }
-    );
-    $(".mappable").click(function(){
+      map.setCenter(bounds.getCenter());
+    })
+
+    $("div.mappable").click(function() {
       gmap.panTo(markers[$(this).attr("index")].getLatLng());
       markers[$(this).attr("index")].openInfoWindowHtml($(this).attr("html"));
       $(".mappable.selected").removeClass("selected").addClass("unselected");
       $(this).addClass("selected").removeClass("unselected");
-    });
-  })
-});
+    })
+})
 
 function createBaseIcon()
 {
