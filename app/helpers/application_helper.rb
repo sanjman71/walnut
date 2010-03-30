@@ -173,7 +173,15 @@ module ApplicationHelper
 
   # build google image marker path
   def google_marker(color, index)
+    google_marker_remote_path(color, index)
+  end
+
+  def google_marker_local_path(color, index)
     "/images/marker" + color + Array('A'..'Z')[index] + ".png"
+  end
+
+  def google_marker_remote_path(color, index)
+    "http://www.google.com/mapfiles/marker" + color + Array('A'..'Z')[index] + ".png"
   end
 
   # original marker size is 20x34

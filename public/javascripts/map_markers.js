@@ -62,10 +62,9 @@ function setSelected(index)
 
 function createMarker(glatlng, html, index, color) {
   // Create a lettered icon for this point using our icon class
-  var letter = String.fromCharCode("A".charCodeAt(0) + index);
-  var letteredIcon = new GIcon(baseIcon);
-  // use local path for image
-  letteredIcon.image = "/images/marker" + color + letter + ".png";
+  var letter          = String.fromCharCode("A".charCodeAt(0) + index);
+  var letteredIcon    = new GIcon(baseIcon);
+  letteredIcon.image  = google_marker(color, letter);
 
   // Set up our GMarkerOptions object
   markerOptions = { icon:letteredIcon, clickable: true };
@@ -77,4 +76,16 @@ function createMarker(glatlng, html, index, color) {
     setSelected(index);
   });
   return marker;
+}
+
+function google_marker(color, letter) {
+  return google_marker_remote_path(color, letter);
+}
+
+function google_marker_local_path(color, letter) {
+  return "/images/marker" + color + letter + ".png";
+}
+
+function google_marker_remote_path(color, letter) {
+  return "http://www.google.com/mapfiles/marker" + color + letter + ".png";
 }
