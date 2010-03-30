@@ -36,7 +36,7 @@
     .span-6.append-1.last
       -# location address
       %h2#address.mappable{:lat => @location.lat, :lng => @location.lng, :index => 0, :color => "_orange", :html => "", :zoom => "15"}
-        = [@location.street_address, city_state_zip(@city, @state, @zip)].reject(&:blank?).join("<br/>")     
+        = display_address(@location)
 
       -# location phone
       %h3#phone

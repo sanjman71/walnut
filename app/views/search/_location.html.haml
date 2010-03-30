@@ -6,8 +6,11 @@
 - klasses   = []
 - klasses.push("mappable") if location.mappable?
 
+-# formatted location address
+- address   = display_address(location)
+
 .unselected.span-10.last{:id => "mappable_#{index}", :class => klasses.join, :lat => location.lat, :lng => location.lng, :index => index, :color => color, :zoom => zoom, |
-                         :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"} |
+                         :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{address}"} |
   - if markers and location.mappable?
     .span-1.icon-div
       -# explicit link here to prevent asset timestamp, so the url looks exactly like the js generated one in map_markers
@@ -26,7 +29,7 @@
       .span-9.last
         .span-6.address
           %span.address.margin-bottom-5{:style => 'color: #555;'}
-            = [location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")
+            = address
         .span-3.last.phone
           - unless location.phone_numbers_count == 0
             %span.phone{:style => "margin-left: 17px;"}= number_to_phone(location.primary_phone_number.address, :delimiter => ".")
