@@ -87,5 +87,12 @@ function google_marker_local_path(color, letter) {
 }
 
 function google_marker_remote_path(color, letter) {
-  return "http://www.google.com/mapfiles/marker" + color + letter + ".png";
+  var s = "http://www.google.com/mapfiles/marker";
+  if (color != '') {
+    // use color and letter
+    return s + color + letter + ".png";
+  } else {
+    // use defaut color, no letter
+    return s + ".png";
+  }
 }

@@ -35,7 +35,7 @@
     
     .span-6.append-1.last
       -# location address
-      %h2#address.mappable{:lat => @location.lat, :lng => @location.lng, :index => 0, :color => "_orange", :html => "", :zoom => "15"}
+      %h2#address.mappable{:lat => @location.lat, :lng => @location.lng, :index => 0, :color => "", :html => "", :zoom => "15"}
         = display_address(@location)
 
       -# location phone
