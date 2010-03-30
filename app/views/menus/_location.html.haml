@@ -11,7 +11,9 @@
                          :html => "<strong>#{link_to location.company_name, location_path(location)}</strong><br />#{[location.street_address, city_state_zip(location.city, location.state, location.zip)].reject(&:blank?).join("<br/>")}"} |
   - if markers and location.mappable?
     .span-1.icon-div
-      = image_tag(google_marker(color, index), :size => google_marker_size)
+      -# explicit link here to prevent asset timestamp, so the url looks exactly like the js generated one in map_markers
+      %img{:src => google_marker(color, index), :width => google_marker_width, :height => google_marker_height}
+      -#= image_tag(google_marker(color, index), :size => google_marker_size)
   - else
     -# marker icon placeholder
     .span-1== &nbsp;

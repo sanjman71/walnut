@@ -178,7 +178,15 @@ module ApplicationHelper
 
   # original marker size is 20x34
   def google_marker_size
-    "17x29"
+    "16x27"
+  end
+
+  def google_marker_width
+    google_marker_size.split("x")[0]
+  end
+
+  def google_marker_height
+    google_marker_size.split("x")[1]
   end
 
 end
