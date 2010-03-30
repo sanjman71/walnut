@@ -37,11 +37,11 @@ ActionController::Routing::Routes.draw do |map|
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/,
                   :lat => /[0-9]+/, :lng => /[0-9-]+/, :klass => /search|locations|events/
   map.connect     '/:klass/:country/:state/:city/n/:neighborhood/tag/:tag',
-                  :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z-]+/, :klass => /search|locations|events/
+                  :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z0-9-]+/, :klass => /search|locations|events/
   map.connect     '/:klass/:country/:state/:city/n/:neighborhood/q/:query',
-                  :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z-]+/, :klass => /search|locations|events/
+                  :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z0-9-]+/, :klass => /search|locations|events/
   map.search_hood '/search/:country/:state/:city/n/:neighborhood',
-                  :controller => 'search', :action => 'neighborhood', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z-]+/
+                  :controller => 'search', :action => 'neighborhood', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :neighborhood => /[a-z0-9-]+/
   map.connect     '/:klass/:country/:state/:city/tag/:tag',
                   :controller => 'search', :action => 'index', :country => /[a-z]{2}/, :state => /[a-z]{2}/, :city => /[a-z-]+/, :klass => /search|locations|events/
   map.connect     '/:klass/:country/:state/:city/q/:query',
