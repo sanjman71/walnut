@@ -24,6 +24,18 @@ class Appointment < ActiveRecord::Base
   has_many                    :appointment_waitlists, :dependent => :destroy
   has_many                    :waitlists, :through => :appointment_waitlists
 
+  # appointment mark_as constants
+  FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
+  WORK                    = 'work'      # work appointments can be scheduled in free timeslots
+  VACATION                = 'vacation'
+
+  MARK_AS_TYPES           = [FREE, WORK, VACATION]
+
+  NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
+
+  # appointment confirmation code constants
+  CONFIRMATION_CODE_ZERO  = '00000'
+
   # validates_presence_of       :name
   validates_presence_of       :company_id
   validates_presence_of       :start_at, :end_at, :duration
@@ -31,7 +43,7 @@ class Appointment < ActiveRecord::Base
   validates_presence_of       :provider_id, :if => :provider_required?
   validates_presence_of       :provider_type, :if => :provider_required?
   validates_presence_of       :customer_id, :if => :customer_required?
-  validates_inclusion_of      :mark_as, :in => %w(free work)
+  validates_inclusion_of      :mark_as, :in => MARK_AS_TYPES
 
   before_validation           :calc_and_store_defaults, :make_confirmation_code, :make_uid
   after_create                :grant_company_customer_role, :grant_appointment_manager_role,
@@ -41,17 +53,6 @@ class Appointment < ActiveRecord::Base
   # preferences
   serialized_hash             :preferences, {:reminder_customer => '1'}
 
-  # appointment mark_as constants
-  FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
-  WORK                    = 'work'      # work appointments can be scheduled in free timeslots
-
-  MARK_AS_TYPES           = [FREE, WORK]
-
-  NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
-
-  # appointment confirmation code constants
-  CONFIRMATION_CODE_ZERO  = '00000'
-  
   has_many                  :appointment_event_category, :dependent => :destroy
   has_many                  :event_categories, :through => :appointment_event_category, :after_add => :after_add_category, :after_remove => :after_remove_category
   
