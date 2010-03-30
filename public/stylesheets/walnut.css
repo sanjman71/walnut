@@ -317,7 +317,7 @@ span.example                                      { color: #666666; font-style: 
                                                   { color: #111111;  font-weight: bold; font-size: 1.0em; }
 
 a.related.tag, a.related.city, a.related.zip, a.nearby.city, a.nearby.zip, a.nearby.tag, a.related.neighborhood
-                                                  { font-weight: normal; color: #0099FF; font-size: 0.9em; }
+                                                  { font-weight: normal; color: #0099FF; font-size: 1.0em; }
 
 span.neighborhood                                 { margin-right: 2px; }
 
