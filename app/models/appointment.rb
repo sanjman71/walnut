@@ -518,6 +518,10 @@ class Appointment < ActiveRecord::Base
   def work?
     self.mark_as == WORK
   end
+
+  def vacation?
+    self.mark_as == VACATION
+  end
   
   # return the collection of waitlist appointments that overlap with this free appointment
   def waitlist

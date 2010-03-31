@@ -88,7 +88,48 @@ class AppointmentScheduler
       company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).not_canceled.order_start_at
     end
   end
-  
+
+  # build collection of all vacation appointments over the specified date range
+  def self.find_vacation_appointments(company, location, provider, daterange, options = {})
+    appts = company.appointments.provider(provider).vacation.overlap(daterange.start_at, daterange.end_at).general_location(location).order_start_at
+
+    # split each appointment that spans more than a single day into its individual days
+    appt_days = appts.collect do |appt|
+      split_by_day(appt)
+    end
+    appt_days.flatten
+  end
+
+  def self.split_by_day(appointment)
+    start_date  = appointment.start_at.in_time_zone.to_date
+    end_date    = appointment.end_at.in_time_zone.to_date
+    appt_days   = []
+
+    return [appointment] if start_date == end_date
+
+    start_date.upto(end_date) do |date|
+      appt_clone = appointment.clone
+      appt_clone.id = appointment.id
+      if date == start_date
+        # use original start_at with modified end_at
+        appt_clone.end_at   = appt_clone.start_at.in_time_zone.end_of_day
+      elsif date == end_date
+        # use original end_at with modified start_at
+        appt_clone.start_at = Time.zone.parse(date.to_s).beginning_of_day
+      else
+        # use date as start_at
+        appt_clone.start_at = Time.zone.parse(date.to_s).beginning_of_day
+        appt_clone.end_at   = appt_clone.start_at.in_time_zone.end_of_day
+      end
+      # build duration
+      appt_clone.duration = (appt_clone.end_at - appt_clone.start_at).to_i
+      appt_clone.freeze
+      appt_days.push(appt_clone)
+    end
+
+    appt_days
+  end
+
   # build collection of all work appointments over the specified date range
   def self.find_canceled_work_appointments(company, location, provider, daterange, options = {})
     company.appointments.provider(provider).work.overlap(daterange.start_at, daterange.end_at).general_location(location).canceled.order_start_at
