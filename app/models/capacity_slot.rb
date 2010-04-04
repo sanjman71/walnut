@@ -413,44 +413,53 @@ class CapacitySlot < ActiveRecord::Base
       end
     end
 
-    sorted_slots = slots.sort_by {|x| x.start_at }
+    # The collection of consolidated slots across all poviders
+    consolidated_slots = []
     
-    # Iterate through them, comparing the previous slot with the current one in each case. We start on the second item
-    res_slots = []
-    res_slot = nil
+    # Group capacity slots by provider
+    provider_slots = slots.group_by{ |slot| slot.provider }
 
-    sorted_slots.each do |current_slot|
+    provider_slots.each do |provider, slots|
+      # Iterate through each provider's slots, comparing the previous slot with the current one in each case. We start on the second item
+      res_slots = []
+      res_slot = nil
 
-      if (current_slot.capacity >= capacity_req)
+      slots.sort_by{|x| x.start_at}.each do |current_slot|
+
+        if (current_slot.capacity >= capacity_req)
         
-        if (!res_slot.blank?) && (current_slot.start_at == res_slot.end_at)
+          if (!res_slot.blank?) && (current_slot.start_at == res_slot.end_at)
 
-          # Change the res_slot end time to encompass the current slot, and modify it's capacity if required
-          res_slot.end_at = current_slot.end_at
-          res_slot.capacity = current_slot.capacity unless (current_slot.capacity >= res_slot.capacity)
-          res_slot.duration += current_slot.duration
+            # Change the res_slot end time to encompass the current slot, and modify it's capacity if required
+            res_slot.end_at = current_slot.end_at
+            res_slot.capacity = current_slot.capacity unless (current_slot.capacity >= res_slot.capacity)
+            res_slot.duration += current_slot.duration
           
+          else
+
+            # The slots don't abut, so add the previous slot to the results array and start a new res_slot
+            res_slots << res_slot unless res_slot.blank?
+            res_slot = CapacitySlot.new(:company => current_slot.company, :location => current_slot.location, :provider => current_slot.provider,
+                                          :start_at => current_slot.start_at, :end_at => current_slot.end_at, :duration => current_slot.duration,
+                                          :capacity => current_slot.capacity)
+          
+          end
+        
         else
-
-          # The slots don't abut, so add the previous slot to the results array and start a new res_slot
-          res_slots << res_slot unless res_slot.blank?
-          res_slot = CapacitySlot.new(:company => current_slot.company, :location => current_slot.location, :provider => current_slot.provider,
-                                        :start_at => current_slot.start_at, :end_at => current_slot.end_at, :duration => current_slot.duration,
-                                        :capacity => current_slot.capacity)
-          
+          # The current slot capacity is too small. We don't do anything here - we just move onto the next slot
         end
-        
-      else
-        # The current slot capacity is too small. We don't do anything here - we just move onto the next slot
+
       end
 
-    end
+      # Store the final res_slot if appropriate
+      res_slots << res_slot unless res_slot.blank?
 
-    # Store the final res_slot if appropriate
-    res_slots << res_slot unless res_slot.blank?
-    
-    res_slots
-      
+      # Add provider slots to the combined collection
+      consolidated_slots += res_slots
+    end # grouped_sorted_slots
+  
+    # return the solidated slots
+    consolidated_slots
   end
 
   protected

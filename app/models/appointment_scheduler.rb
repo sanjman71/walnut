@@ -47,7 +47,7 @@ class AppointmentScheduler
     # use time range if it was specified
     time_range   = options.has_key?(:time_range) ? options[:time_range] : nil
     
-    # Clear the service and provider parameters if we don't need to specify specifics
+    # clear the service and provider parameters if we don't need to specify specifics
     service  = nil if service.blank? || service.nothing?
     provider = nil if provider.blank? || provider.anyone?
 
@@ -56,17 +56,17 @@ class AppointmentScheduler
     
     # use the (absolute value of the) capacity requested or the capacity from the service (defaults to nil - all capacities are collected)
     capacity_req = options.has_key?(:capacity) ? options[:capacity].abs : (service.blank? ? nil : service.capacity)
-    
-    # find free appointments for a specific provider, order by start times
+
+    # find free appointments for a specific provider or any provider, order by start times
     slots = company.capacity_slots.provider(provider).overlap(start_at, end_at).general_location(location).capacity_gteq(capacity_req).order_start_at
     
     # remove slots that have ended (when compared to Time.zone.now) or appointment providers that do not provide the requested service
     if (!keep_old) || (!service.blank?)
       slots = slots.select { |slot| ((keep_old || (slot.end_at.utc > Time.zone.now.utc)) && (service.blank? || service.provided_by?(slot.provider))) }
     end
-    
+
     slots = CapacitySlot.consolidate_slots_for_capacity(slots, capacity_req)
-    
+
     if !duration.blank?
       slots = slots.select { |slot| (slot.duration >= duration.to_i) }
     end
