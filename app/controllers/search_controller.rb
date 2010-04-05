@@ -1,6 +1,7 @@
 class SearchController < ApplicationController
   before_filter   :normalize_page_number, :only => [:index]
   before_filter   :validate_search_page_number, :only => [:index]
+  before_filter   :redirect_location_tag_searches, :only => [:index]
   before_filter   :init_localities, :only => [:country, :state, :city, :neighborhood, :zip, :index]
   before_filter   :init_weather, :only => [:index]
   before_filter   :force_full_site, :only => [:country, :state, :city, :neighborhood, :zip]
@@ -441,8 +442,9 @@ class SearchController < ApplicationController
 
   # returns true if the current search page is the last page in the search
   def search_last_page?(current_page, current_search_results)
-    # its the last page if the number of results is less than a page's worth;
-    # or if its the last page baased on the number of total results
+    # its the last page if
+    # - the number of results is less than a full page;
+    # - the number of total results has been reached
     return true if current_search_results < search_per_page
     return true if current_page >= search_max_page
     false
@@ -456,6 +458,15 @@ class SearchController < ApplicationController
     if current_page > search_max_page
       # redirect to page 1
       redirect_to(:page => nil) and return
+    end
+  end
+
+  # before filter to redirect klass 'locations' tag searches
+  def redirect_location_tag_searches
+    if params[:klass] == 'locations' and !params[:tag].blank?
+      redirect_to(url_for(params.update(:klass => 'search'))) and return
+    else
+      true
     end
   end
 

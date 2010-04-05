@@ -94,6 +94,37 @@ class SearchControllerTest < ActionController::TestCase
     @company.locations.push(@location)
   end
 
+  context "locations search" do
+    context "with tag" do
+      setup do
+        # stub search results
+        @results = [@location]
+        ThinkingSphinx.stubs(:search).returns(@results)
+        @results.stubs(:total_pages).returns(1)
+        get :index, :klass => 'locations', :country => 'us', :state => 'il', :city => 'chicago', :tag => 'food'
+      end
+
+      should_redirect_to("search with klass 'search'") { "/search/us/il/chicago/tag/food"}
+    end
+    
+    context "with query" do
+      setup do
+        # stub search results
+        @results = [@location]
+        ThinkingSphinx.stubs(:search).returns(@results)
+        @results.stubs(:total_pages).returns(1)
+        get :index, :klass => 'locations', :country => 'us', :state => 'il', :city => 'chicago', :query => 'food'
+      end
+
+      should "not allow robots" do
+        assert_false assigns(:robots)
+      end
+
+      should_respond_with :success
+      should_render_template 'search/index.html.haml'
+    end
+  end
+
   context "city search without street and lat/lng" do
     context "with query 'anything' and 1 location" do
       setup do
@@ -280,7 +311,7 @@ class SearchControllerTest < ActionController::TestCase
 
       should "set sphinx order option" do
         @sphinx_options = assigns(:sphinx_options)
-        assert_equal 'popularity desc, @relevance desc', @sphinx_options[:order]
+        assert_equal '@relevance desc', @sphinx_options[:order]
       end
 
       should "set sphinx page options" do
