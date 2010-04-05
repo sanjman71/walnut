@@ -122,12 +122,12 @@ class SearchController < ApplicationController
 
       # search returns location results until the eager loading performance issue is addressed
       @klasses        = [Location]
-      @eager_loads    = [{:company => :tags}, :city, :state, :zip, :primary_phone_number]
+      @eager_loads    = [{:company => :tags}, :city, :state, :zip]
       @facet_klass    = Location
       @tag_klasses    = [Location]
-      @sort_order     = "popularity desc, @relevance desc"
+      @sort_order     = "@relevance desc"
       @without        = Hash[]
-    when 'locations'
+    when 'locations' # removed 'Search Locations' link in search results
       @klasses        = [Location]
       @eager_loads    = [{:company => :tags}, :city, :state, :zip, :primary_phone_number]
       @facet_klass    = Location
@@ -168,9 +168,9 @@ class SearchController < ApplicationController
 
     # filter objects by class if this was a generic search
     @search_filters = Hash.new([])
-    @objects.each do |object|
-      @search_filters[object.class.to_s] += [object]
-    end if @search_klass == 'search'
+    # @objects.each do |object|
+    #   @search_filters[object.class.to_s] += [object]
+    # end if @search_klass == 'search'
 
     # self.class.benchmark("*** Benchmarking related tags from sphinx facets", Logger::INFO, false) do
     #   # find related tags by class; build tag facets for each specified tag klass
