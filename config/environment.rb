@@ -130,6 +130,9 @@ WEATHER_ENVS  = ['development', 'production']
 SMTP_PROVIDER = :google
 SMTP_FROM     = "Walnut Messaging <messaging@walnutindustries.com>"
 
+# Mobile device support flag
+MOBILE_DEVICE_SUPPORT = false
+
 # create special localeze loggers
 LOCALEZE_ERROR_LOGGER     = Logger.new("log/localeze.error.log")
 LOCALEZE_DELTA_LOGGER     = Logger.new("log/localeze.delta.log")

@@ -377,10 +377,14 @@ class ApplicationController < ActionController::Base
   protected
 
   def mobile_device?
-    if session[:mobile_param]
-      session[:mobile_param] == "1"
+    if MOBILE_DEVICE_SUPPORT
+      if session[:mobile_param]
+        session[:mobile_param] == "1"
+      else
+        request.user_agent =~ /Mobile|webOS/
+      end
     else
-      request.user_agent =~ /Mobile|webOS/
+      false
     end
   end
 
