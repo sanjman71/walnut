@@ -113,7 +113,7 @@ class DateRange
     if (m = s.match(/next (\d{1,2}) week/)) # e.g. 'next 3 weeks', 'next 1 week', 'next 10 weeks'
       # use [today, today + n weeks til end of week - 1.second], always end on last day of week at midnight
       nweeks    = m[1].to_i
-      start_at  = options[:start_date] ? options[:start_date].beginning_of_day : now.beginning_of_day
+      start_at  = options[:start_date] ? options[:start_date].in_time_zone.beginning_of_day : now.beginning_of_day
       if start_at.in_time_zone.wday == start_week_on
         # subtract a week, so we don't extend over n+1 full weeks
         nweeks -= 1
