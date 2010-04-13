@@ -50,6 +50,11 @@ class Message < ActiveRecord::Base
     
   end
 
+  # build sms text from message subject and body
+  def sms_text(limit=160)
+    text = [self.subject, self.body].reject(&:blank?).join(' ').slice(0,limit)
+  end
+
   protected
 
   # 'send' messages to local recipients

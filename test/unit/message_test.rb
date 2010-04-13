@@ -269,4 +269,39 @@ class MessageTest < ActiveSupport::TestCase
     end
   end
 
+  context "sms_text" do
+    context "with message subject and body" do
+      setup do
+        @sender   = Factory(:user, :name => "Sender")
+        @message  = Message.create(:sender => @sender, :subject => "Hello user", :body => "This is the message body")
+      end
+
+      should "combine message subject and body" do
+        assert_equal "Hello user This is the message body", @message.sms_text
+      end
+    end
+
+    context "with message body and no subject" do
+      setup do
+        @sender   = Factory(:user, :name => "Sender")
+        @message  = Message.create(:sender => @sender, :body => "This is the message body")
+      end
+
+      should "use message body" do
+        assert_equal "This is the message body", @message.sms_text
+      end
+    end
+    
+    context "with limit" do
+      setup do
+        @sender   = Factory(:user, :name => "Sender")
+        @message  = Message.create(:sender => @sender, :subject => "Hello user", :body => "This is the message body")
+      end
+
+      should "apply limit" do
+        assert_equal "Hello", @message.sms_text(5)
+      end
+    end
+  end
+
 end

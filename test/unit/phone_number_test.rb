@@ -5,7 +5,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
   should_validate_presence_of   :name
   should_validate_presence_of   :address
   
-  context "create phone number" do
+  context "create" do
     context "with invalid number" do
       setup do
         @phone = PhoneNumber.create(:name => "Mobile", :address => "5551234")
@@ -121,7 +121,7 @@ class PhoneNumberTest < ActiveSupport::TestCase
     end
   end
 
-  context "remove phone number" do
+  context "delete" do
     setup do
       @user   = Factory(:user)
       @phone  = @user.phone_numbers.create(:name => 'Mobile', :address => "5559999999")
@@ -134,4 +134,16 @@ class PhoneNumberTest < ActiveSupport::TestCase
       assert_equal 0, @user.reload.phone_numbers_count
     end
   end
+
+  context "protocol" do
+    setup do
+      @user   = Factory(:user)
+      @phone  = @user.phone_numbers.create(:name => 'Mobile', :address => "5559999999")
+    end
+
+    should "have protocol 'sms'" do
+      assert_equal 'sms', @phone.protocol
+    end
+  end
+
 end

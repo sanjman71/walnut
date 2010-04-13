@@ -28,20 +28,20 @@ Rails::Initializer.run do |config|
   config.gem "ar-extensions", :version => "~> 0.9.2"
   config.gem "chronic", :version => '~> 0.2.3' # required by javan-whenever
   config.gem "crack", :version => "~> 0.1.4" # required by google weather
-  config.gem "curb", :version => "~> 0.5.1" # curl api; requires native components
+  config.gem "curb" # curl api; requires native components
   config.gem "daemons", :version => '~> 1.0.10'
   config.gem "eventfulapi", :lib => false
-  # config.gem "fastercsv"  # built into ruby 1.9
   config.gem "geokit" # required by geokit-rails plugin
   config.gem "haml", :version => '~> 2.2.4'
   config.gem "httparty", :lib => false # used by google weather plugin
-  config.gem "json", :version => '~> 1.1.7' # requires native components
-  config.gem 'mechanize', :version => '0.9.3'
+  config.gem "json" # requires native components
+  config.gem 'mechanize'
   config.gem "mime-types", :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'ri_cal', :version => '~> 0.8.1'
   config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"
-  config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
+  config.gem 'twiliolib'
+  config.gem 'whenever', :lib => false, :source => 'http://gemcutter.org/'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

@@ -32,8 +32,8 @@ class MessageJob < Struct.new(:params)
           send_email_using_google(message, recipient)
         end
       when 'sms'
-        # use message pub
-        send_message_using_message_pub(message, recipient)
+        # pick an sms provider
+        send_sms_message_using_twilio(message, recipient)
       when 'local'
         # local messages are automatically delivered to local recipients
         next
@@ -84,6 +84,33 @@ class MessageJob < Struct.new(:params)
     end
   end
 
+  def send_sms_message_using_twilio(message, recipient)
+    text    = message.sms_text
+    address = recipient.messagable.address
+    topics  = message.message_topics
+
+    begin
+      # create a Twilio REST account object using Twilio account ID and token
+      account = Twilio::RestAccount.new(ACCOUNT_SID, ACCOUNT_TOKEN)
+      # build sms post options
+      options = Hash["From" => SMS_CALLERID, "To" => address, "Body" => text]
+      # send sms message
+      resp    = account.request("/#{API_VERSION}/Accounts/#{ACCOUNT_SID}/SMS/Messages", 'POST', options)
+      resp.error! unless resp.kind_of? Net::HTTPSuccess
+      logger.debug("#{Time.now}: [ok] " + ("code: %s, body: %s" % [resp.code, resp.body]))
+    rescue Exception => e
+      logger.debug("#{Time.now}: [twilio exception] #{e.message}")
+      return
+    end
+
+    begin
+      # change recipient state to sent
+      recipient.sent!
+    rescue
+      
+    end
+  end
+
   def send_message_using_message_pub(message, recipient)
     subject = message.subject
     body    = message.body
@@ -106,4 +133,5 @@ class MessageJob < Struct.new(:params)
     rescue
     end
   end
+
 end

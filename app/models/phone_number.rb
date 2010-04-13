@@ -43,6 +43,10 @@ class PhoneNumber < ActiveRecord::Base
     self.state == 'verified'
   end
 
+  def protocol
+    'sms'
+  end
+
   # returns true if the phone number address is changeable
   def changeable?
     true
