@@ -65,8 +65,10 @@ class MessageComposeAppointment
     return message if customer.blank? or provider.blank?
 
     # build message options
-    options   = Hash[:template => "appointment_#{text}".to_sym, :topic => appointment, :tag => text, :provider => provider.name,
-                     :service => appointment.service.name, :customer => customer.name, :when => appointment.start_at.to_s(:appt_day_date_time)]
+    options   = Hash[:template => "appointment_#{text}".to_sym, :company => company.name, :subdomain => company.subdomain,
+                     :provider => provider.name, :service => appointment.service.name, :customer => customer.name,
+                     :when => appointment.start_at.to_s(:appt_day_date_time),
+                     :topic => appointment, :tag => text]
 
     # add customer email, phone
     if customer.email_addresses_count > 0
@@ -76,7 +78,7 @@ class MessageComposeAppointment
     if customer.phone_numbers_count > 0
       options.update(:customer_phone => appointment.customer.primary_phone_number.address)
     end
-    
+
     # add appointment notes
     if !appointment.notes.empty?
       options.update(:appointment_notes => appointment.notes.map(&:comment))
@@ -123,7 +125,7 @@ class MessageComposeAppointment
   end
 
   def self.add_signature(options)
-    options.update(:signature_template => :signature_general)
+    options.update(:signature_template => :signature_company)
   end
 
 end
