@@ -67,14 +67,13 @@ class TimeRange
     # Convert start and end times to UTC
     @start_at   = @start_at.utc unless @start_at.blank?
     @end_at     = @end_at.utc unless @end_at.blank?
-    
   end
     
   def to_s
     @day
   end
   
-  # time_start_at and time_end_at are expressed in seconds, in UTC time
+  # time_start_at and time_end_at are the local start and end times expressed in seconds
   # time_end_at is calculated as time_start_at + duration
   # As a result, time_end_at may be > 24 hours (86400 seconds). This is useful, as it indicates a slot crossing midnight
   def time_start_at
