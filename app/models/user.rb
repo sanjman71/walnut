@@ -58,7 +58,7 @@ class User < ActiveRecord::Base
   # TODO - what should be done with these when the user goes away?
   has_many                  :provided_appointments, :class_name => 'Appointment', :as => :provider
   has_many                  :created_appointments, :class_name => 'Appointment', :source => :creator
-  has_many                  :customer_appointments, :class_name => 'Appointment', :source => :customer
+  has_many                  :customer_appointments, :class_name => 'Appointment', :foreign_key => 'customer_id'
   has_many                  :capacity_slots, :as => :provider
 
   # Preferences

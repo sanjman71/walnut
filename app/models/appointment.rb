@@ -182,6 +182,7 @@ class Appointment < ActiveRecord::Base
 
   # order by start_at
   named_scope :order_start_at,        {:order => 'appointments.start_at'}
+  named_scope :order_start_at_desc,   {:order => 'appointments.start_at desc'}
 
   # scope appointment search by a location
   
