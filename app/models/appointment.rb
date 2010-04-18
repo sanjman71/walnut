@@ -524,6 +524,10 @@ class Appointment < ActiveRecord::Base
     self.mark_as == VACATION
   end
   
+  def future?
+    self.start_at > Time.zone.now
+  end
+
   # return the collection of waitlist appointments that overlap with this free appointment
   def waitlist
     # check that this is a free appointment
