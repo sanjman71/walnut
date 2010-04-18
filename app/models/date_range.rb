@@ -67,7 +67,9 @@ class DateRange
 
   # returns true if the daterange includes the specifed date
   def include?(date)
-    date >= @start_at and date <= @end_at
+    # convert start_at, end_at to local time zone and compare dates as strings in format '2010T0101'
+    date = date.to_s(:appt_schedule_day)
+    date >= @start_at.to_s(:appt_schedule_day) and date <= @end_at.in_time_zone.to_s(:appt_schedule_day)
   end
   
   # options
