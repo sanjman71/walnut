@@ -229,6 +229,9 @@ class Appointment < ActiveRecord::Base
                                             }
                                           }
 
+  named_scope :order_id,      {:order => 'appointments.id'}
+  named_scope :order_id_desc, {:order => 'appointments.id desc'}
+
   # valid when values
   WHEN_TODAY                = 'today'
   WHEN_TOMORROW             = 'tomorrow'

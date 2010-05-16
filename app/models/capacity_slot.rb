@@ -31,9 +31,11 @@ class CapacitySlot < ActiveRecord::Base
   # Duration greater than or equal to a value. If nil passed in here, no conditions are added
   named_scope :duration_gteq, lambda { |t| (t.blank?) ? {} : { :conditions => ["`capacity_slots`.`duration` >= ?", t] } }
   
-  named_scope :capacity_gt,   lambda { |c| (c.blank?) ? {} : {:conditions => ["`capacity_slots`.`capacity` > ?", c]} }
+  named_scope :capacity_gt,   lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` > ?", c]} }
   named_scope :capacity_gteq, lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` >= ?", c]} }
   named_scope :capacity_eq,   lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` = ?", c]} }
+  named_scope :capacity_lt,   lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` < ?", c]} }
+  named_scope :capacity_lteq, lambda { |c| (c.blank?) ? {} : { :conditions => ["`capacity_slots`.`capacity` <= ?", c]} }
 
   # find capacity slots based on a named time range, use lambda to ensure time value is evaluated at run-time
   named_scope :future,        lambda { { :conditions => ["`capacity_slots`.`start_at` >= ?", Time.now] } }
