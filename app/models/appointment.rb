@@ -652,16 +652,16 @@ class Appointment < ActiveRecord::Base
     # By default we expand from the the date it has already been expanded to, until the before date
     # If the expanded to date is blank we use the end DateTime of the recurrence parent. Same if the expanded_to date is corrupt (< self.end_at)
     if starting.blank? || (starting < self.end_at)
-      starting = (recur_expanded_to.blank? || (recur_expanded_to < self.end_at)) ? self.end_at : self.recur_expanded_to
+      starting = (self.recur_expanded_to.blank? || (self.recur_expanded_to < self.end_at)) ? self.end_at : self.recur_expanded_to
     end
     
     # By default the before time is the beginning of today + the time horizon
-    # If the time horizon added to the beginning of today results in a time that is invalid (earlier than the end of the recurrence parent)
-    # we return.
     if before.blank? || (before < self.end_at)
       time_horizon = self.company.preferences[:time_horizon].to_i
       before = Time.zone.now.beginning_of_day + time_horizon
-      if before < self.end_at
+      # If the time horizon added to the beginning of today results in a time that is invalid (earlier than the end of the recurrence parent) we return.
+      # We also return if we've already expanded the recurrence past the before before time - i.e. if the starting time is later than the before time
+      if (before <= self.end_at) || (before <= starting)
         return
       end
     end
@@ -707,7 +707,11 @@ class Appointment < ActiveRecord::Base
 
       end
     end
-    self.update_attribute(:recur_expanded_to, before)
+
+    # Only update recur_expanded_to if before is later than the existing value
+    if (self.recur_expanded_to.blank?) || (before > self.recur_expanded_to)
+      self.update_attribute(:recur_expanded_to, before)
+    end
     self.recur_instances
   end
 
@@ -725,7 +729,7 @@ class Appointment < ActiveRecord::Base
 
         # We need to rebuild all the instances
         self.recur_instances.each do |a| 
-          # Destroy the appointment
+          # Destroy the recurrence instance
           a.destroy
         end
         # Clear the expanded_to date
