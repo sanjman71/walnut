@@ -6,7 +6,7 @@
 
 # Specifies gem version of Rails to use when vendor/rails is not present
 # Note: use 2.3.3 with ruby 1.9 - https://rails.lighthouseapp.com/projects/8994-ruby-on-rails/tickets/3144-undefined-method-for-string-ror-234
-RAILS_GEM_VERSION = '2.3.3' unless defined? RAILS_GEM_VERSION  
+RAILS_GEM_VERSION = '2.3.5' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -20,28 +20,6 @@ Rails::Initializer.run do |config|
   # Skip frameworks you're not going to use. To use Rails without a database
   # you must remove the Active Record framework.
   # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
-
-  # Specify gems that this application depends on. 
-  # They can then be installed with "rake gems:install" on new installations.
-  # You have to specify the :lib option for libraries, where the Gem name (sqlite3-ruby) differs from the file itself (sqlite3)
-  config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
-  config.gem "ar-extensions", :version => "~> 0.9.2"
-  config.gem "chronic", :version => '~> 0.2.3' # required by javan-whenever
-  config.gem "crack", :version => "~> 0.1.4" # required by google weather
-  config.gem "curb" # curl api; requires native components
-  config.gem "daemons", :version => '~> 1.0.10'
-  config.gem "eventfulapi", :lib => false
-  config.gem "geokit" # required by geokit-rails plugin
-  config.gem "haml", :version => '~> 2.2.4'
-  config.gem "httparty", :lib => false # used by google weather plugin
-  config.gem "json" # requires native components
-  config.gem 'mechanize'
-  config.gem "mime-types", :lib => false
-  config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'ri_cal', :version => '~> 0.8.1'
-  config.gem 'rubyist-aasm', :version => '~> 2.1.1', :lib => 'aasm', :source => "http://gems.github.com"
-  config.gem 'twiliolib'
-  config.gem 'whenever', :lib => false, :source => 'http://gemcutter.org/'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
