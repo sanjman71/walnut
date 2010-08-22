@@ -154,9 +154,9 @@ class User < ActiveRecord::Base
   end
 
   # the special user 'anyone'
-  def self.anyone
+  def self.anyone(name = 'Anyone')
     r = User.new do |o|
-      o.name = "Anyone"
+      o.name = name
       o.send(:id=, 0)
     end
   end
