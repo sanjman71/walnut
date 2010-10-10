@@ -620,15 +620,15 @@ class Appointment < ActiveRecord::Base
     location.appointments.delete(self) if location
   end
 
-  # expand_all_recurrences loops through all recurrences for a single company, and queues jobs to expand
-  # them all using the dates provided.
+  # expand_all_recurrences loops through all recurrences for a single company, and
+  # expands them all using the dates provided.
   # Note that these dates are passed through to expand_recurrence. As a result they can all be nil, in which case the sensible
   # thing will happen - i.e. It will start at the end of the parent, or at the expanded_to date, whichever is later, and will
   # continue to the time horizon, assuming that's later than the parent.
   # So, the sensible thing is to call this function with one parameter = the company
   def self.expand_all_recurrences(company, starting = nil, before = nil, count = nil)
     company.appointments.recurring.not_canceled.each do |recur|
-      recur.send_later(:expand_recurrence, starting, before, count)
+      recur.expand_recurrence(starting, before, count)
     end
   end
 
