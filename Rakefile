@@ -14,3 +14,8 @@ begin
 rescue MissingSourceFile
 end
 
+begin
+  require 'thinking_sphinx/tasks'
+rescue MissingSourceFile
+end
+
