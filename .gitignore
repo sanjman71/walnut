@@ -10,3 +10,5 @@ config/development.sphinx.conf
 .DS_Store
 public/javascripts/all.js
 public/stylesheets/all.css
+.bundle/
+.rvmrc

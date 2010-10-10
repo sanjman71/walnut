@@ -5,7 +5,6 @@ namespace :db do
     
     require 'populator'
     require 'faker'
-    require 'test/factories'
 
     desc "Populate places."
     task :places, :count do |t, args|
